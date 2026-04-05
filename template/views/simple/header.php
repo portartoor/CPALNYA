@@ -732,7 +732,6 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     </div>
 
     <div class="simple-header-right">
-        <a class="simple-header-action" href="/solutions/downloads/"><?= htmlspecialchars($isRu ? 'Backroom pack' : 'Backroom pack', ENT_QUOTES, 'UTF-8') ?></a>
         <button class="simple-nav-toggle" type="button" aria-expanded="false" aria-controls="simple-nav-drawer" aria-label="<?= htmlspecialchars($isRu ? 'Открыть меню журнала' : 'Open magazine menu', ENT_QUOTES, 'UTF-8') ?>">
             <span></span><span></span><span></span>
         </button>
