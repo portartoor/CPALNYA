@@ -361,16 +361,16 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         margin: 0;
         padding: 16px 20px;
         border: 1px solid var(--shell-border);
-        background: linear-gradient(180deg, rgba(6,10,18,.96), rgba(7,12,23,.88));
-        box-shadow: 0 22px 72px rgba(0, 4, 14, .34);
+        background: linear-gradient(180deg, rgba(6,10,18,.34), rgba(7,12,23,.18));
+        box-shadow: 0 14px 42px rgba(0, 4, 14, .16);
         clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
-        backdrop-filter: blur(20px) saturate(122%);
+        backdrop-filter: blur(10px) saturate(116%);
     }
     .simple-header::before {
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(90deg, rgba(61,116,255,.16), transparent 22%, transparent 78%, rgba(39,223,192,.14)), linear-gradient(180deg, rgba(255,255,255,.06), transparent 44%), radial-gradient(circle at 82% 18%, rgba(255,154,95,.12), transparent 18%);
+        background: linear-gradient(90deg, rgba(61,116,255,.08), transparent 22%, transparent 78%, rgba(39,223,192,.08)), linear-gradient(180deg, rgba(255,255,255,.03), transparent 44%), radial-gradient(circle at 82% 18%, rgba(255,154,95,.06), transparent 18%);
         pointer-events: none;
     }
     .simple-header.is-scrolled { transform: translateY(-2px); }
@@ -668,7 +668,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
             border: 1px solid var(--shell-border);
             background: var(--shell-panel-strong);
             backdrop-filter: blur(18px);
-            box-shadow: 0 22px 72px rgba(0, 4, 14, .34);
+            box-shadow: 0 14px 42px rgba(0, 4, 14, .16);
             clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
             display: grid;
             justify-content: stretch;
