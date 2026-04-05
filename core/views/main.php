@@ -80,7 +80,7 @@ $issueChips = [
 
 .cpz-cover-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:18px}
 .cpz-cover{padding:28px;border-radius:34px;clip-path:polygon(0 0,95% 0,100% 12%,100% 100%,5% 100%,0 88%)}
-.cpz-cover h1{margin:0;max-width:12ch;font:700 clamp(3.8rem,8vw,7rem)/.88 "Space Grotesk","Sora",sans-serif;letter-spacing:-.08em}
+.cpz-cover h1{margin:0;max-width:18ch;font:700 clamp(1.25rem,2.4vw,2.2rem)/1.02 "Space Grotesk","Sora",sans-serif;letter-spacing:-.05em}
 .cpz-cover-copy{display:grid;gap:16px}
 .cpz-cover-intro{max-width:72ch;margin:0;color:var(--shell-muted);font-size:15px;line-height:1.82}
 .cpz-actions{display:flex;flex-wrap:wrap;gap:12px}
@@ -124,7 +124,7 @@ $issueChips = [
 @media (max-width: 760px){
     .cpz{padding:18px 14px 54px}
     .cpz-cover{padding:22px;border-radius:28px}
-    .cpz-cover h1{max-width:none;font-size:clamp(2.9rem,14vw,4.8rem)}
+    .cpz-cover h1{max-width:none;font-size:clamp(1.15rem,5.6vw,1.7rem)}
 }
 </style>
 

@@ -276,7 +276,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         --shell-highlight: #ffdf78;
         --shell-shadow: 0 28px 80px rgba(1, 6, 18, .42);
         --simple-header-height: 104px;
-        --simple-header-max: 1360px;
+        --simple-header-max: none;
         --shell-notch: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
     }
 
@@ -351,26 +351,26 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         position: fixed;
         left: 18px;
         right: 18px;
-        top: 16px;
+        top: 14px;
         z-index: 9999;
         display: grid;
-        grid-template-columns: minmax(250px, 340px) minmax(260px, 1fr) auto;
+        grid-template-columns: minmax(280px, 340px) minmax(360px, 1fr) auto;
         gap: 16px;
         align-items: center;
-        max-width: var(--simple-header-max);
-        margin: 0 auto;
-        padding: 14px 16px;
+        max-width: none;
+        margin: 0;
+        padding: 16px 20px;
         border: 1px solid var(--shell-border);
-        background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.01)), var(--shell-panel-strong);
-        box-shadow: var(--shell-shadow);
-        clip-path: var(--shell-notch);
-        backdrop-filter: blur(18px) saturate(130%);
+        background: linear-gradient(180deg, rgba(6,10,18,.96), rgba(7,12,23,.88));
+        box-shadow: 0 22px 72px rgba(0, 4, 14, .34);
+        clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+        backdrop-filter: blur(20px) saturate(122%);
     }
     .simple-header::before {
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(90deg, rgba(115,184,255,.18), transparent 28%, transparent 72%, rgba(39,223,192,.14)), radial-gradient(circle at 84% 14%, rgba(255,154,95,.14), transparent 18%);
+        background: linear-gradient(90deg, rgba(61,116,255,.16), transparent 22%, transparent 78%, rgba(39,223,192,.14)), linear-gradient(180deg, rgba(255,255,255,.06), transparent 44%), radial-gradient(circle at 82% 18%, rgba(255,154,95,.12), transparent 18%);
         pointer-events: none;
     }
     .simple-header.is-scrolled { transform: translateY(-2px); }
@@ -399,14 +399,14 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-width: 34px;
+        min-width: 78px;
         min-height: 24px;
-        padding: 3px 8px;
+        padding: 3px 10px;
         border: 1px solid var(--shell-border-strong);
         background: linear-gradient(135deg, rgba(39,223,192,.18), rgba(115,184,255,.16));
         clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-        color: var(--shell-accent-2);
-        font-size: 11px;
+        color: var(--shell-highlight);
+        font-size: 10px;
         font-weight: 800;
         letter-spacing: .18em;
         text-transform: uppercase;
@@ -420,20 +420,20 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 700;
         letter-spacing: .18em;
         text-transform: uppercase;
         color: var(--shell-accent);
     }
     .pc-brand-copy strong::before {
-        content: "?";
-        color: var(--shell-accent-2);
+        content: "//";
+        color: var(--shell-highlight);
         font-size: 10px;
     }
     .pc-brand-copy span {
         display: block;
-        max-width: 28ch;
+        max-width: 42ch;
         color: var(--shell-muted);
         font-size: 12px;
         line-height: 1.32;
@@ -448,7 +448,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         min-width: 0;
         padding: 8px;
         border: 1px solid var(--shell-border);
-        background: rgba(255,255,255,.04);
+        background: rgba(255,255,255,.03);
         clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
     }
     .simple-header-search input {
@@ -517,7 +517,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         align-items: center;
         gap: 9px;
         padding: 10px 14px;
-        background: rgba(255,255,255,.04);
+        background: rgba(255,255,255,.03);
         color: var(--shell-muted);
         clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
         transition: color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease;
@@ -540,7 +540,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         align-items: center;
         justify-content: center;
         width: 18px;
-        color: var(--shell-accent-2);
+        color: var(--shell-highlight);
         font-size: 13px;
     }
     .nav-cta { color: var(--shell-text) !important; }
@@ -550,7 +550,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         cursor: pointer;
     }
     .nav-theme-toggle .theme-icon {
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 700;
         letter-spacing: .18em;
         text-transform: uppercase;
@@ -631,7 +631,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
             border: 1px solid var(--shell-border);
             background: var(--shell-panel-strong);
             backdrop-filter: blur(18px);
-            box-shadow: var(--shell-shadow);
+            box-shadow: 0 22px 72px rgba(0, 4, 14, .34);
             clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
             display: grid;
             justify-content: stretch;
@@ -666,35 +666,29 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         .simple-header-action { display: none; }
     }
     </style>
-</head>
-<body data-terrain-theme="enterprise" class="ui-tone-dark">
-<?php if ($yandexCounterCode !== ''): ?>
-<?= $yandexCounterCode . PHP_EOL ?>
-<?php endif; ?>
-<canvas id="terrainFieldGlobal" aria-hidden="true"></canvas>
-<header class="simple-header" id="cp-header">
+</head><header class="simple-header" id="cp-header">
     <a class="simple-brand" href="/" aria-label="<?= htmlspecialchars($logoAria, ENT_QUOTES, 'UTF-8') ?>">
         <span class="pc-logo-wrap">
             <span class="pc-logo">
                 <span class="pc-logo-main"><?= htmlspecialchars($logoMain, ENT_QUOTES, 'UTF-8') ?></span>
-                <span class="pc-logo-core">city</span>
+                <span class="pc-logo-core">backroom</span>
             </span>
         </span>
         <span class="pc-brand-copy">
-            <strong><?= htmlspecialchars($isRu ? 'CPA ZIN / utility magazine' : 'CPA ZIN / utility magazine', ENT_QUOTES, 'UTF-8') ?></strong>
-            <span><?= htmlspecialchars($isRu ? 'журнал про трафик, креативы, фарм, кейсы и ready-made assets для affiliate-команд' : 'a journal about traffic, creatives, farms, cases and ready-made assets for affiliate teams', ENT_QUOTES, 'UTF-8') ?></span>
+            <strong><?= htmlspecialchars($isRu ? 'CPA backstage / issue desk' : 'CPA backstage / issue desk', ENT_QUOTES, 'UTF-8') ?></strong>
+            <span><?= htmlspecialchars($isRu ? 'редакционная полоса закулисья: трафик, фарм, креативы, трекеры, кейсы и ready-made packs для affiliate-команд' : 'an editorial backstage strip: traffic, farms, creatives, trackers, cases and ready-made packs for affiliate teams', ENT_QUOTES, 'UTF-8') ?></span>
         </span>
     </a>
 
     <div class="simple-header-center">
         <form class="simple-header-search" method="get" action="/blog/">
-            <input type="text" name="q" data-search-input placeholder="<?= htmlspecialchars($isRu ? 'Поиск: Facebook farm, TikTok creatives, cloaking, tracker setup' : 'Search: Facebook farm, TikTok creatives, cloaking, tracker setup', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+            <input type="text" name="q" data-search-input placeholder="<?= htmlspecialchars($isRu ? 'Поиск: Facebook farm, антидетект, tracker setup, nutra funnel' : 'Search: Facebook farm, anti-detect, tracker setup, nutra funnel', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
             <button type="submit"><?= htmlspecialchars($isRu ? 'Найти' : 'Search', ENT_QUOTES, 'UTF-8') ?></button>
         </form>
     </div>
 
     <div class="simple-header-right">
-        <a class="simple-header-action" href="/solutions/downloads/"><?= htmlspecialchars($isRu ? 'Скачать assets' : 'Get assets', ENT_QUOTES, 'UTF-8') ?></a>
+        <a class="simple-header-action" href="/solutions/downloads/"><?= htmlspecialchars($isRu ? 'Backroom pack' : 'Backroom pack', ENT_QUOTES, 'UTF-8') ?></a>
         <button class="simple-nav-toggle" type="button" aria-expanded="false" aria-controls="simple-nav-drawer" aria-label="<?= htmlspecialchars($isRu ? 'Открыть меню' : 'Open menu', ENT_QUOTES, 'UTF-8') ?>">
             <span></span><span></span><span></span>
         </button>
@@ -713,7 +707,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     var header = document.getElementById('cp-header');
     var searchInput = document.querySelector('[data-search-input]');
     var placeholderIndex = 0;
-    var placeholders = <?= $isRu ? "json_encode(['Поиск: Facebook farm, TikTok creatives, cloaking, tracker setup','Поиск: антидетект, прогрев аккаунтов, BM risk, payment flow','Поиск: nutra, sweepstakes, crypto funnel, tracker cleanup'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)" : "json_encode(['Search: Facebook farm, TikTok creatives, cloaking, tracker setup','Search: anti-detect, account warmup, BM risk, payment flow','Search: nutra, sweepstakes, crypto funnel, tracker cleanup'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)" ?>;
+    var placeholders = <?= $isRu ? "json_encode(['Поиск: Facebook farm, антидетект, tracker setup, nutra funnel','Поиск: TikTok creatives, BM risk, cloaking, iGaming flow','Поиск: прогрев аккаунтов, sweepstakes, crypto angles, team SOP'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)" : "json_encode(['Search: Facebook farm, anti-detect, tracker setup, nutra funnel','Search: TikTok creatives, BM risk, cloaking, iGaming flow','Search: account warmup, sweepstakes, crypto angles, team SOP'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)" ?>;
     if (header) {
         var syncHeader = function () {
             header.classList.toggle('is-scrolled', window.scrollY > 18);
@@ -754,3 +748,5 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     });
 })();
 </script>
+
+

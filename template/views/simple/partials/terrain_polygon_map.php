@@ -25,6 +25,8 @@
         crossStreets: [],
         blocks: [],
         pulses: [],
+        bridges: [],
+        lamps: [],
         horizon: 0,
         roadHalfWidth: 0
     };
@@ -147,6 +149,8 @@
         scene.crossStreets = [];
         scene.blocks = [];
         scene.pulses = [];
+        scene.bridges = [];
+        scene.lamps = [];
 
         var avenueCount = width < 900 ? 7 : 9;
         for (var i = 0; i < avenueCount; i++) {
@@ -176,6 +180,29 @@
                 }
                 scene.blocks.push(buildBlock(left, right, nearZ, farZ, zIndex));
             }
+        }
+
+        for (var l = 1; l < scene.crossStreets.length - 1; l++) {
+            var lampDepth = scene.crossStreets[l];
+            for (var a = 0; a < scene.avenues.length; a++) {
+                scene.lamps.push({
+                    x: scene.avenues[a] + (a % 2 === 0 ? -scene.roadHalfWidth * 0.55 : scene.roadHalfWidth * 0.55),
+                    z: lampDepth,
+                    h: rand(22, 34),
+                    glow: rand(0.18, 0.34)
+                });
+            }
+        }
+
+        var bridgeCount = Math.max(1, Math.floor(scene.crossStreets.length / 5));
+        for (var b = 0; b < bridgeCount; b++) {
+            var bridgeDepth = scene.crossStreets[Math.floor(rand(2, scene.crossStreets.length - 2.001))];
+            scene.bridges.push({
+                z: bridgeDepth + rand(-14, 14),
+                left: scene.avenues[1],
+                right: scene.avenues[scene.avenues.length - 2],
+                h: rand(34, 60)
+            });
         }
 
         for (var p = 0; p < Math.max(14, scene.avenues.length * 2 + scene.crossStreets.length); p++) {
@@ -211,6 +238,7 @@
             nearZ: nearZ,
             farZ: farZ,
             type: type,
+            groundLift: rand(-18, 26) + (rowIndex % 3 === 0 ? rand(6, 18) : 0),
             buildings: []
         };
 
@@ -237,7 +265,10 @@
                         z: bz,
                         w: bw,
                         d: bd,
-                        h: heightUnits
+                        h: heightUnits,
+                        blockLift: block.groundLift,
+                        frontWindows: buildWindowPattern(Math.max(2, Math.floor(heightUnits / 32)), Math.max(2, Math.floor(bw / 18))),
+                        sideWindows: buildWindowPattern(Math.max(2, Math.floor(heightUnits / 32)), Math.max(2, Math.floor(bw / 22)))
                     });
                 }
             }
@@ -248,6 +279,24 @@
         }
 
         return block;
+    }
+
+    function buildWindowPattern(rows, cols) {
+        var pattern = [];
+        for (var row = 0; row < rows; row++) {
+            var line = [];
+            for (var col = 0; col < cols; col++) {
+                var stateRoll = Math.random();
+                line.push({
+                    on: stateRoll > 0.42,
+                    rareBlink: stateRoll > 0.82 && Math.random() > 0.7,
+                    tint: Math.random() > 0.5 ? 0 : 1,
+                    phase: rand(0, Math.PI * 2)
+                });
+            }
+            pattern.push(line);
+        }
+        return pattern;
     }
 
     function drawBackdrop(palette) {
@@ -340,10 +389,10 @@
     }
 
     function drawPark(block, palette, time) {
-        var a = project(block.left, block.nearZ, 0);
-        var b = project(block.right, block.nearZ, 0);
-        var c = project(block.right, block.farZ, 0);
-        var d = project(block.left, block.farZ, 0);
+        var a = project(block.left, block.nearZ, block.groundLift);
+        var b = project(block.right, block.nearZ, block.groundLift);
+        var c = project(block.right, block.farZ, block.groundLift);
+        var d = project(block.left, block.farZ, block.groundLift);
         ctx.fillStyle = 'rgba(' + palette.park + ',0.24)';
         ctx.strokeStyle = 'rgba(' + palette.gridMinor + ',0.3)';
         ctx.lineWidth = 1;
@@ -359,7 +408,7 @@
         for (var i = 0; i < 5; i++) {
             var tx = lerp(block.left, block.right, 0.18 + i * 0.15);
             var tz = lerp(block.nearZ, block.farZ, 0.25 + (i % 2) * 0.22);
-            var tree = project(tx, tz, 16 + Math.sin(time * 0.0018 + i) * 5);
+            var tree = project(tx, tz, block.groundLift + 16 + Math.sin(time * 0.0018 + i) * 5);
             ctx.fillStyle = 'rgba(' + palette.windowB + ',0.28)';
             ctx.beginPath();
             ctx.arc(tree.x, tree.y, 2 + tree.scale * 10, 0, Math.PI * 2);
@@ -372,17 +421,18 @@
         var x1 = building.x + building.w;
         var z0 = building.z;
         var z1 = building.z + building.d;
+        var baseLift = building.blockLift || 0;
         var h = building.h + Math.sin(time * 0.0009 + building.x * 0.02 + building.z * 0.01) * 3;
 
-        var fbl = project(x0, z0, 0);
-        var fbr = project(x1, z0, 0);
-        var bbr = project(x1, z1, 0);
-        var bbl = project(x0, z1, 0);
+        var fbl = project(x0, z0, baseLift);
+        var fbr = project(x1, z0, baseLift);
+        var bbr = project(x1, z1, baseLift);
+        var bbl = project(x0, z1, baseLift);
 
-        var tbl = project(x0, z0, h);
-        var tbr = project(x1, z0, h);
-        var tbbr = project(x1, z1, h);
-        var tbbl = project(x0, z1, h);
+        var tbl = project(x0, z0, h + baseLift);
+        var tbr = project(x1, z0, h + baseLift);
+        var tbbr = project(x1, z1, h + baseLift);
+        var tbbl = project(x0, z1, h + baseLift);
 
         ctx.fillStyle = 'rgba(' + palette.buildingSide + ',0.72)';
         ctx.strokeStyle = 'rgba(' + palette.edge + ',0.2)';
@@ -417,18 +467,19 @@
         ctx.strokeStyle = 'rgba(' + palette.edge + ',0.38)';
         ctx.stroke();
 
-        drawWindows(building, fbl, fbr, tbl, tbr, palette, time, true);
-        drawWindows(building, fbr, bbr, tbr, tbbr, palette, time, false);
+        drawWindows(building.frontWindows, fbl, fbr, tbl, tbr, palette, time);
+        drawWindows(building.sideWindows, fbr, bbr, tbr, tbbr, palette, time);
     }
 
-    function drawWindows(building, bl, br, tl, tr, palette, time, isFront) {
-        var rows = Math.max(2, Math.floor(building.h / 32));
-        var cols = Math.max(2, Math.floor(building.w / (isFront ? 18 : 22)));
+    function drawWindows(pattern, bl, br, tl, tr, palette, time) {
+        var rows = pattern.length;
         for (var row = 0; row < rows; row++) {
+            var cols = pattern[row].length;
             var v0 = (row + 0.22) / rows;
             var v1 = (row + 0.78) / rows;
             for (var col = 0; col < cols; col++) {
-                if (Math.random() > 0.58) {
+                var slot = pattern[row][col];
+                if (!slot.on) {
                     continue;
                 }
                 var u0 = (col + 0.18) / cols;
@@ -437,8 +488,11 @@
                 var p2 = quadPoint(bl, br, tl, tr, u1, v0);
                 var p3 = quadPoint(bl, br, tl, tr, u1, v1);
                 var p4 = quadPoint(bl, br, tl, tr, u0, v1);
-                var alpha = clamp(0.12 + Math.sin(time * 0.0024 + building.x * 0.03 + row * 0.5 + col) * 0.12, 0.08, 0.36);
-                ctx.fillStyle = 'rgba(' + ((row + col) % 2 ? palette.windowA : palette.windowB) + ',' + alpha.toFixed(3) + ')';
+                var alpha = 0.22;
+                if (slot.rareBlink) {
+                    alpha += Math.max(0, Math.sin(time * 0.00055 + slot.phase) * 0.12);
+                }
+                ctx.fillStyle = 'rgba(' + (slot.tint ? palette.windowA : palette.windowB) + ',' + clamp(alpha, 0.18, 0.34).toFixed(3) + ')';
                 ctx.beginPath();
                 ctx.moveTo(p1.x, p1.y);
                 ctx.lineTo(p2.x, p2.y);
@@ -471,6 +525,55 @@
             for (var j = 0; j < block.buildings.length; j++) {
                 drawBuilding(block.buildings[j], palette, time);
             }
+        }
+    }
+
+    function drawBridges(palette, time) {
+        for (var i = 0; i < scene.bridges.length; i++) {
+            var bridge = scene.bridges[i];
+            var leftNear = project(bridge.left, bridge.z - 12, bridge.h);
+            var rightNear = project(bridge.right, bridge.z - 12, bridge.h);
+            var rightFar = project(bridge.right, bridge.z + 12, bridge.h);
+            var leftFar = project(bridge.left, bridge.z + 12, bridge.h);
+            ctx.fillStyle = 'rgba(' + palette.buildingSide + ',0.5)';
+            ctx.strokeStyle = 'rgba(' + palette.edge + ',0.34)';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(leftNear.x, leftNear.y);
+            ctx.lineTo(rightNear.x, rightNear.y);
+            ctx.lineTo(rightFar.x, rightFar.y);
+            ctx.lineTo(leftFar.x, leftFar.y);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(' + palette.roadGlowB + ',0.4)';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(leftNear.x, leftNear.y - 3);
+            ctx.lineTo(rightNear.x, rightNear.y - 3);
+            ctx.stroke();
+        }
+    }
+
+    function drawLamps(palette, time) {
+        for (var i = 0; i < scene.lamps.length; i++) {
+            var lamp = scene.lamps[i];
+            var base = project(lamp.x, lamp.z, 0);
+            var top = project(lamp.x, lamp.z, lamp.h);
+            ctx.strokeStyle = 'rgba(' + palette.edge + ',0.26)';
+            ctx.lineWidth = Math.max(0.8, top.scale * 2.2);
+            ctx.beginPath();
+            ctx.moveTo(base.x, base.y);
+            ctx.lineTo(top.x, top.y);
+            ctx.stroke();
+
+            var glowRadius = 3 + top.scale * 16;
+            var alpha = lamp.glow + Math.max(0, Math.sin(time * 0.0012 + i) * 0.04);
+            ctx.fillStyle = 'rgba(' + palette.roadGlowA + ',' + clamp(alpha, 0.16, 0.34).toFixed(3) + ')';
+            ctx.beginPath();
+            ctx.arc(top.x, top.y, glowRadius, 0, Math.PI * 2);
+            ctx.fill();
         }
     }
 
@@ -541,7 +644,9 @@
         drawBackdrop(palette);
         drawRoadSurfaces(palette);
         drawRoadGrid(palette, ts);
+        drawBridges(palette, ts);
         drawBlocks(palette, ts);
+        drawLamps(palette, ts);
         drawPulses(palette, ts);
         drawNodes(palette, ts);
         rafId = window.requestAnimationFrame(frame);

@@ -13,11 +13,14 @@ $isRu = (bool)preg_match('/\.ru$/', $host);
 $items = [
     ['title' => $isRu ? 'Главная' : 'Home', 'path' => '/', 'icon' => '◫'],
     ['title' => $isRu ? 'Журнал' : 'Journal', 'path' => '/blog/', 'icon' => '✦'],
-    ['title' => $isRu ? 'Темы' : 'Topics', 'path' => '/blog/', 'icon' => '◎'],
-    ['title' => $isRu ? 'Assets' : 'Assets', 'path' => '/solutions/downloads/', 'icon' => '↓'],
-    ['title' => $isRu ? 'Playbooks' : 'Playbooks', 'path' => '/solutions/articles/', 'icon' => '▣'],
-    ['title' => $isRu ? 'Кейсы' : 'Cases', 'path' => '/cases/', 'icon' => '◈'],
-    ['title' => $isRu ? 'Продукты' : 'Products', 'path' => '/projects/', 'icon' => '⬢'],
+    ['title' => $isRu ? 'Источники' : 'Sources', 'path' => '/blog/', 'icon' => '◎'],
+    ['title' => $isRu ? 'Фарм' : 'Farm', 'path' => '/blog/', 'icon' => '◈'],
+    ['title' => $isRu ? 'Креативы' : 'Creatives', 'path' => '/blog/', 'icon' => '◇'],
+    ['title' => $isRu ? 'Трекеры' : 'Trackers', 'path' => '/blog/', 'icon' => '▣'],
+    ['title' => 'Assets', 'path' => '/solutions/downloads/', 'icon' => '↓'],
+    ['title' => 'Playbooks', 'path' => '/solutions/articles/', 'icon' => '⬢'],
+    ['title' => $isRu ? 'Кейсы' : 'Cases', 'path' => '/cases/', 'icon' => '◉'],
+    ['title' => $isRu ? 'Продукты' : 'Products', 'path' => '/projects/', 'icon' => '◌'],
     ['title' => $isRu ? 'Контакты' : 'Contact', 'path' => '/contact/', 'icon' => '↗'],
 ];
 foreach ($items as $item):
@@ -33,9 +36,5 @@ foreach ($items as $item):
 <?php endforeach; ?>
 <a class="nav-cta" href="/solutions/downloads/">
     <span class="nav-item-icon" aria-hidden="true">↓</span>
-    <span><?= htmlspecialchars($isRu ? 'Скачать' : 'Downloads', ENT_QUOTES, 'UTF-8') ?></span>
+    <span><?= htmlspecialchars($isRu ? 'Скачать набор' : 'Get pack', ENT_QUOTES, 'UTF-8') ?></span>
 </a>
-<button class="nav-theme-toggle" type="button" data-theme-toggle aria-pressed="false" title="<?= htmlspecialchars($isRu ? 'Переключить тему' : 'Switch theme', ENT_QUOTES, 'UTF-8') ?>">
-    <span class="theme-icon theme-icon-sun" aria-hidden="true">Sun</span>
-    <span class="theme-icon theme-icon-moon" aria-hidden="true">Moon</span>
-</button>
