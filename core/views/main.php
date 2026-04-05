@@ -135,7 +135,7 @@ $issueChips = [
                 <div class="cpz-cover-copy">
                     <span class="cpz-kicker"><span class="cpz-icon">Z</span><?= htmlspecialchars($t('CPALNYA ZIN / issue 01', 'CPALNYA ZIN / issue 01'), ENT_QUOTES, 'UTF-8') ?></span>
                     <h1 class="neo-title"><?= htmlspecialchars($t('CPA-журнал про трафик, фарм, креативы и backstage affiliate-команд, где ', 'A CPA magazine about traffic, farms, creatives and affiliate-team backstage where '), ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('темы разбиты как в хорошем зине', 'topics are split like a strong zine'), ENT_QUOTES, 'UTF-8') ?></strong></h1>
-                    <p class="cpz-cover-intro"><?= htmlspecialchars($t('Главная страница теперь должна ощущаться не как типовой портал, а как цифровой CPA-zine: обложка номера, большие cover-stories, тематические колонки, issue-rail со смыслами и отдельный utility-слой с тем, что можно сразу забрать и применить.', 'The homepage should feel less like a generic portal and more like a digital CPA zine: issue cover, cover stories, themed columns, an issue rail with context and a separate utility layer with assets that can be used right away.'), ENT_QUOTES, 'UTF-8') ?></p>
+                    <p class="cpz-cover-intro"><?= htmlspecialchars($t('На первом экране пользователь должен сразу понимать, что внутри выпуска: разборы по источникам трафика, кухня фарма и аккаунтов, креативы и связки, готовые таблицы, шаблоны и практические playbooks. Это не витрина ради стиля, а редакционный вход в реальные рабочие темы CPA-рынка.', 'The first screen should immediately explain what is inside the issue: source breakdowns, the farm-and-accounts kitchen, creatives and setups, ready-made sheets, templates and practical playbooks. This is not style for its own sake, but an editorial entry into real CPA work.'), ENT_QUOTES, 'UTF-8') ?></p>
                     <div class="cpz-issue-chips">
                         <?php foreach ($issueChips as $chip): ?>
                             <span class="cpz-tag"><span class="cpz-icon">◌</span><?= htmlspecialchars($chip, ENT_QUOTES, 'UTF-8') ?></span>
@@ -184,7 +184,7 @@ $issueChips = [
                             <span class="cpz-meta"><span class="cpz-icon">◈</span><?= htmlspecialchars($coverCluster !== '' ? $coverCluster : $t('feature', 'feature'), ENT_QUOTES, 'UTF-8') ?></span>
                             <span class="cpz-meta"><span class="cpz-icon">◌</span><?= (int)($cover['view_count'] ?? 0) ?> views</span>
                         </div>
-                        <a class="cpz-link" href="/blog/<?= $coverCluster !== '' ? rawurlencode($coverCluster) . '/' : '' ?><?= rawurlencode((string)($cover['slug'] ?? '')) ?>/"><?= htmlspecialchars($t('Читать cover-story', 'Read cover story'), ENT_QUOTES, 'UTF-8') ?> <span>↗</span></a>
+                        <a class="cpz-link" href="/blog/<?= $coverCluster !== '' ? rawurlencode($coverCluster) . '/' : '' ?><?= rawurlencode((string)($cover['slug'] ?? '')) ?>/"><?= htmlspecialchars($t('Читать главный материал выпуска', 'Read the issue cover story'), ENT_QUOTES, 'UTF-8') ?> <span>↗</span></a>
                     </article>
                 <?php endif; ?>
 
@@ -192,7 +192,7 @@ $issueChips = [
                     <div class="cpz-section-head">
                         <div>
                             <span class="cpz-section-tag"><span class="cpz-icon">▣</span><?= htmlspecialchars($t('Themes', 'Themes'), ENT_QUOTES, 'UTF-8') ?></span>
-                            <h2 class="neo-title"><?= htmlspecialchars($t('Журнал разбит на ', 'The zine is split into ') , ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('тематические полосы', 'thematic columns'), ENT_QUOTES, 'UTF-8') ?></strong></h2>
+                            <h2 class="neo-title"><?= htmlspecialchars($t('Ниже идут ', 'Below are ') , ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('реальные рабочие темы номера', 'the practical themes of the issue'), ENT_QUOTES, 'UTF-8') ?></strong></h2>
                         </div>
                         <a class="cpz-link" href="/blog/"><?= htmlspecialchars($t('Все материалы', 'All articles'), ENT_QUOTES, 'UTF-8') ?> <span>↗</span></a>
                     </div>
@@ -223,13 +223,13 @@ $issueChips = [
                         <span class="cpz-section-tag"><span class="cpz-icon">◎</span><?= htmlspecialchars($t('Feature note', 'Feature note'), ENT_QUOTES, 'UTF-8') ?></span>
                         <h2 class="neo-title"><?= htmlspecialchars((string)($secondaryLead['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h2>
                         <p><?= htmlspecialchars($excerpt((string)($secondaryLead['excerpt_html'] ?? $secondaryLead['content_html'] ?? ''), 170), ENT_QUOTES, 'UTF-8') ?></p>
-                        <a class="cpz-link" href="/blog/<?= $secondaryCluster !== '' ? rawurlencode($secondaryCluster) . '/' : '' ?><?= rawurlencode((string)($secondaryLead['slug'] ?? '')) ?>/"><?= htmlspecialchars($t('Читать заметку', 'Read feature'), ENT_QUOTES, 'UTF-8') ?> <span>↗</span></a>
+                        <a class="cpz-link" href="/blog/<?= $secondaryCluster !== '' ? rawurlencode($secondaryCluster) . '/' : '' ?><?= rawurlencode((string)($secondaryLead['slug'] ?? '')) ?>/"><?= htmlspecialchars($t('Открыть материал из номера', 'Open feature note'), ENT_QUOTES, 'UTF-8') ?> <span>↗</span></a>
                     </article>
                 <?php endif; ?>
 
                 <section class="cpz-assets">
                     <span class="cpz-section-tag"><span class="cpz-icon">↓</span><?= htmlspecialchars($t('Utility shelf', 'Utility shelf'), ENT_QUOTES, 'UTF-8') ?></span>
-                    <h2 class="neo-title"><?= htmlspecialchars($t('Рядом с журналом должен стоять ', 'Next to the zine there should be ') , ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('рабочий shelf с решениями', 'a working solutions shelf'), ENT_QUOTES, 'UTF-8') ?></strong></h2>
+                    <h2 class="neo-title"><?= htmlspecialchars($t('Рядом с редакционным выпуском должен лежать ', 'Next to the editorial issue there should be ') , ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('практический shelf с тем, что можно применить сразу', 'a practical shelf with things you can use immediately'), ENT_QUOTES, 'UTF-8') ?></strong></h2>
                     <div class="cpz-assets-list">
                         <?php foreach (array_slice($downloads, 0, 2) as $item): ?>
                             <article class="cpz-asset-card">
@@ -256,7 +256,7 @@ $issueChips = [
             <div class="cpz-section-head">
                 <div>
                     <span class="cpz-section-tag"><span class="cpz-icon">◇</span><?= htmlspecialchars($t('Field files', 'Field files'), ENT_QUOTES, 'UTF-8') ?></span>
-                    <h2 class="neo-title"><?= htmlspecialchars($t('Ниже идут кейсы и продукты как ', 'Below sit cases and products as ') , ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('практическое продолжение выпуска', 'the practical continuation of the issue'), ENT_QUOTES, 'UTF-8') ?></strong></h2>
+                    <h2 class="neo-title"><?= htmlspecialchars($t('Ниже идут кейсы и продукты как ', 'Below sit cases and products as ') , ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('прикладное продолжение редакционного номера', 'the practical continuation of the editorial issue'), ENT_QUOTES, 'UTF-8') ?></strong></h2>
                 </div>
             </div>
             <div class="cpz-assets-list">

@@ -681,20 +681,20 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
             </span>
         </span>
         <span class="pc-brand-copy">
-            <strong><?= htmlspecialchars($isRu ? 'Affiliate backstage' : 'Affiliate backstage', ENT_QUOTES, 'UTF-8') ?></strong>
-            <span><?= htmlspecialchars($isRu ? 'неоновая карта рынка, решений и editorial-потоков' : 'a neon map of market flows, utility assets and editorial streams', ENT_QUOTES, 'UTF-8') ?></span>
+            <strong><?= htmlspecialchars($isRu ? 'CPA ZIN / utility magazine' : 'CPA ZIN / utility magazine', ENT_QUOTES, 'UTF-8') ?></strong>
+            <span><?= htmlspecialchars($isRu ? 'журнал про трафик, креативы, фарм, кейсы и ready-made assets для affiliate-команд' : 'a journal about traffic, creatives, farms, cases and ready-made assets for affiliate teams', ENT_QUOTES, 'UTF-8') ?></span>
         </span>
     </a>
 
     <div class="simple-header-center">
         <form class="simple-header-search" method="get" action="/blog/">
-            <input type="text" name="q" placeholder="<?= htmlspecialchars($isRu ? 'Поиск по кластерам, решениям и инсайтам' : 'Search clusters, assets and insights', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+            <input type="text" name="q" data-search-input placeholder="<?= htmlspecialchars($isRu ? 'Поиск: Facebook farm, TikTok creatives, cloaking, tracker setup' : 'Search: Facebook farm, TikTok creatives, cloaking, tracker setup', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
             <button type="submit"><?= htmlspecialchars($isRu ? 'Найти' : 'Search', ENT_QUOTES, 'UTF-8') ?></button>
         </form>
     </div>
 
     <div class="simple-header-right">
-        <a class="simple-header-action" href="/solutions/downloads/"><?= htmlspecialchars($isRu ? 'Готовые решения' : 'Ready-made assets', ENT_QUOTES, 'UTF-8') ?></a>
+        <a class="simple-header-action" href="/solutions/downloads/"><?= htmlspecialchars($isRu ? 'Скачать assets' : 'Get assets', ENT_QUOTES, 'UTF-8') ?></a>
         <button class="simple-nav-toggle" type="button" aria-expanded="false" aria-controls="simple-nav-drawer" aria-label="<?= htmlspecialchars($isRu ? 'Открыть меню' : 'Open menu', ENT_QUOTES, 'UTF-8') ?>">
             <span></span><span></span><span></span>
         </button>
@@ -711,12 +711,21 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     var nav = document.getElementById('simple-nav-drawer');
     var backdrop = document.querySelector('.simple-nav-backdrop');
     var header = document.getElementById('cp-header');
+    var searchInput = document.querySelector('[data-search-input]');
+    var placeholderIndex = 0;
+    var placeholders = <?= $isRu ? "json_encode(['Поиск: Facebook farm, TikTok creatives, cloaking, tracker setup','Поиск: антидетект, прогрев аккаунтов, BM risk, payment flow','Поиск: nutra, sweepstakes, crypto funnel, tracker cleanup'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)" : "json_encode(['Search: Facebook farm, TikTok creatives, cloaking, tracker setup','Search: anti-detect, account warmup, BM risk, payment flow','Search: nutra, sweepstakes, crypto funnel, tracker cleanup'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)" ?>;
     if (header) {
         var syncHeader = function () {
             header.classList.toggle('is-scrolled', window.scrollY > 18);
         };
         window.addEventListener('scroll', syncHeader, { passive: true });
         syncHeader();
+    }
+    if (searchInput && Array.isArray(placeholders) && placeholders.length > 1) {
+        window.setInterval(function () {
+            placeholderIndex = (placeholderIndex + 1) % placeholders.length;
+            searchInput.setAttribute('placeholder', placeholders[placeholderIndex]);
+        }, 2600);
     }
     if (!btn || !nav) {
         return;
@@ -738,11 +747,6 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
             closeMenu();
         }
     });
-    window.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape') {
-            closeMenu();
-        }
-    });
     window.addEventListener('resize', function () {
         if (window.innerWidth > 1080) {
             closeMenu();
@@ -750,37 +754,3 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     });
 })();
 </script>
-<script>
-(function () {
-    var toggles = document.querySelectorAll('[data-theme-toggle]');
-    if (!toggles.length) {
-        return;
-    }
-    function applyTone(tone, persist) {
-        var isLight = tone === 'light';
-        document.body.classList.toggle('ui-tone-light', isLight);
-        document.body.classList.toggle('ui-tone-dark', !isLight);
-        document.body.setAttribute('data-terrain-theme', isLight ? 'simple' : 'enterprise');
-        for (var i = 0; i < toggles.length; i++) {
-            toggles[i].setAttribute('aria-pressed', isLight ? 'false' : 'true');
-        }
-        if (persist) {
-            try { localStorage.setItem('cpalnya_ui_tone', tone); } catch (e) {}
-        }
-        if (typeof window.__terrainApplyTheme === 'function') {
-            window.__terrainApplyTheme(isLight ? 'simple' : 'enterprise');
-        }
-    }
-    var savedTone = '';
-    try { savedTone = localStorage.getItem('cpalnya_ui_tone') || ''; } catch (e) {}
-    applyTone(savedTone === 'light' ? 'light' : 'dark', false);
-    for (var t = 0; t < toggles.length; t++) {
-        toggles[t].addEventListener('click', function () {
-            var nextTone = document.body.classList.contains('ui-tone-light') ? 'dark' : 'light';
-            applyTone(nextTone, true);
-        });
-    }
-})();
-</script>
-
-

@@ -12,15 +12,19 @@ if (strpos($host, ':') !== false) {
 $isRu = (bool)preg_match('/\.ru$/', $host);
 $items = [
     ['title' => $isRu ? 'Главная' : 'Home', 'path' => '/', 'icon' => '◫'],
-    ['title' => $isRu ? 'Блог' : 'Blog', 'path' => '/blog/', 'icon' => '✦'],
-    ['title' => $isRu ? 'Решения' : 'Solutions', 'path' => '/solutions/', 'icon' => '⬢'],
-    ['title' => $isRu ? 'Продукты' : 'Products', 'path' => '/projects/', 'icon' => '▣'],
+    ['title' => $isRu ? 'Журнал' : 'Journal', 'path' => '/blog/', 'icon' => '✦'],
+    ['title' => $isRu ? 'Темы' : 'Topics', 'path' => '/blog/', 'icon' => '◎'],
+    ['title' => $isRu ? 'Assets' : 'Assets', 'path' => '/solutions/downloads/', 'icon' => '↓'],
+    ['title' => $isRu ? 'Playbooks' : 'Playbooks', 'path' => '/solutions/articles/', 'icon' => '▣'],
     ['title' => $isRu ? 'Кейсы' : 'Cases', 'path' => '/cases/', 'icon' => '◈'],
+    ['title' => $isRu ? 'Продукты' : 'Products', 'path' => '/projects/', 'icon' => '⬢'],
     ['title' => $isRu ? 'Контакты' : 'Contact', 'path' => '/contact/', 'icon' => '↗'],
 ];
 foreach ($items as $item):
     $path = (string)$item['path'];
-    $isActive = ($path === '/') ? ($currentPath === '/') : (strpos($currentPath, $path) === 0);
+    $isActive = ($path === '/')
+        ? ($currentPath === '/')
+        : (strpos($currentPath, $path) === 0);
 ?>
     <a class="<?= $isActive ? 'is-active' : '' ?>" href="<?= htmlspecialchars($path, ENT_QUOTES, 'UTF-8') ?>">
         <span class="nav-item-icon" aria-hidden="true"><?= htmlspecialchars((string)$item['icon'], ENT_QUOTES, 'UTF-8') ?></span>
