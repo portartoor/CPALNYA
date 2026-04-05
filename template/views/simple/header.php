@@ -666,7 +666,9 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         .simple-header-action { display: none; }
     }
     </style>
-</head><header class="simple-header" id="cp-header">
+</head>
+<canvas id="terrainFieldGlobal" aria-hidden="true"></canvas>
+<header class="simple-header" id="cp-header">
     <a class="simple-brand" href="/" aria-label="<?= htmlspecialchars($logoAria, ENT_QUOTES, 'UTF-8') ?>">
         <span class="pc-logo-wrap">
             <span class="pc-logo">
@@ -676,20 +678,20 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         </span>
         <span class="pc-brand-copy">
             <strong><?= htmlspecialchars($isRu ? 'CPA backstage / issue desk' : 'CPA backstage / issue desk', ENT_QUOTES, 'UTF-8') ?></strong>
-            <span><?= htmlspecialchars($isRu ? 'редакционная полоса закулисья: трафик, фарм, креативы, трекеры, кейсы и ready-made packs для affiliate-команд' : 'an editorial backstage strip: traffic, farms, creatives, trackers, cases and ready-made packs for affiliate teams', ENT_QUOTES, 'UTF-8') ?></span>
+            <span><?= htmlspecialchars($isRu ? 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅ ready-made packs пїЅпїЅпїЅ affiliate-пїЅпїЅпїЅпїЅпїЅпїЅ' : 'an editorial backstage strip: traffic, farms, creatives, trackers, cases and ready-made packs for affiliate teams', ENT_QUOTES, 'UTF-8') ?></span>
         </span>
     </a>
 
     <div class="simple-header-center">
         <form class="simple-header-search" method="get" action="/blog/">
-            <input type="text" name="q" data-search-input placeholder="<?= htmlspecialchars($isRu ? 'Поиск: Facebook farm, антидетект, tracker setup, nutra funnel' : 'Search: Facebook farm, anti-detect, tracker setup, nutra funnel', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-            <button type="submit"><?= htmlspecialchars($isRu ? 'Найти' : 'Search', ENT_QUOTES, 'UTF-8') ?></button>
+            <input type="text" name="q" data-search-input placeholder="<?= htmlspecialchars($isRu ? 'пїЅпїЅпїЅпїЅпїЅ: Facebook farm, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, tracker setup, nutra funnel' : 'Search: Facebook farm, anti-detect, tracker setup, nutra funnel', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+            <button type="submit"><?= htmlspecialchars($isRu ? 'пїЅпїЅпїЅпїЅпїЅ' : 'Search', ENT_QUOTES, 'UTF-8') ?></button>
         </form>
     </div>
 
     <div class="simple-header-right">
         <a class="simple-header-action" href="/solutions/downloads/"><?= htmlspecialchars($isRu ? 'Backroom pack' : 'Backroom pack', ENT_QUOTES, 'UTF-8') ?></a>
-        <button class="simple-nav-toggle" type="button" aria-expanded="false" aria-controls="simple-nav-drawer" aria-label="<?= htmlspecialchars($isRu ? 'Открыть меню' : 'Open menu', ENT_QUOTES, 'UTF-8') ?>">
+        <button class="simple-nav-toggle" type="button" aria-expanded="false" aria-controls="simple-nav-drawer" aria-label="<?= htmlspecialchars($isRu ? 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ' : 'Open menu', ENT_QUOTES, 'UTF-8') ?>">
             <span></span><span></span><span></span>
         </button>
     </div>
@@ -707,7 +709,9 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     var header = document.getElementById('cp-header');
     var searchInput = document.querySelector('[data-search-input]');
     var placeholderIndex = 0;
-    var placeholders = <?= $isRu ? "json_encode(['Поиск: Facebook farm, антидетект, tracker setup, nutra funnel','Поиск: TikTok creatives, BM risk, cloaking, iGaming flow','Поиск: прогрев аккаунтов, sweepstakes, crypto angles, team SOP'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)" : "json_encode(['Search: Facebook farm, anti-detect, tracker setup, nutra funnel','Search: TikTok creatives, BM risk, cloaking, iGaming flow','Search: account warmup, sweepstakes, crypto angles, team SOP'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)" ?>;
+    var placeholders = <?= json_encode($isRu
+        ? ["РџРѕРёСЃРє: Facebook farm, Р°РЅС‚РёРґРµС‚РµРєС‚, tracker setup, nutra funnel", "РџРѕРёСЃРє: TikTok creatives, BM risk, cloaking, iGaming flow", "РџРѕРёСЃРє: РїСЂРѕРіСЂРµРІ Р°РєРєР°СѓРЅС‚РѕРІ, sweepstakes, crypto angles, team SOP"]
+        : ["Search: Facebook farm, anti-detect, tracker setup, nutra funnel", "Search: TikTok creatives, BM risk, cloaking, iGaming flow", "Search: account warmup, sweepstakes, crypto angles, team SOP"], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
     if (header) {
         var syncHeader = function () {
             header.classList.toggle('is-scrolled', window.scrollY > 18);
