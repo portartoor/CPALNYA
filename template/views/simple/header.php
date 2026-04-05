@@ -645,6 +645,8 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         .simple-nav a,
         .nav-cta,
         .nav-theme-toggle { width: 100%; justify-content: center; }
+        .nav-section-label { width: 100%; justify-content: flex-start; padding: 4px 2px 0; }
+        .nav-section-label::before { width: 18px; }
         body.simple-nav-open .simple-nav { transform: none; opacity: 1; pointer-events: auto; }
         body.simple-nav-open .simple-nav-backdrop { opacity: 1; pointer-events: auto; }
         body.simple-nav-open .simple-nav-toggle span:nth-child(1) { top: 25px; transform: rotate(45deg); }
