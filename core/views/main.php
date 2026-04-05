@@ -11,260 +11,242 @@ $cases = (array)($home['cases'] ?? []);
 $t = static function (string $ru, string $en) use ($isRu): string {
     return $isRu ? $ru : $en;
 };
-$excerpt = static function (string $html, int $limit = 180): string {
+$excerpt = static function (string $html, int $limit = 170): string {
     $text = trim(preg_replace('/\s+/u', ' ', strip_tags($html)));
     if (function_exists('mb_strlen') && mb_strlen($text, 'UTF-8') > $limit) {
         return rtrim((string)mb_substr($text, 0, $limit - 1, 'UTF-8')) . '...';
     }
     return $text;
 };
-$clusterLabels = [
-    $t('Трекеры', 'Trackers'),
-    $t('Фарм и аккаунты', 'Farm & accounts'),
-    $t('Креативы', 'Creatives'),
-    $t('Аналитика', 'Analytics'),
-    $t('Команда', 'Team'),
-    $t('SEO-кластеры', 'SEO clusters'),
+
+$signalBoard = [
+    ['icon' => '◉', 'value' => 'Live', 'label' => $t('новый слой редакционного сигнала', 'new editorial signal layer')],
+    ['icon' => '⬢', 'value' => '2x', 'label' => $t('ветки utility: assets и playbooks', 'utility branches: assets and playbooks')],
+    ['icon' => '↯', 'value' => 'UGC', 'label' => $t('древовидные обсуждения внутри материалов', 'threaded discussion inside materials')],
 ];
-$marketSignals = [
-    [
-        'value' => '72h',
-        'label' => $t('цикл обновления editorial-ленты', 'editorial refresh cycle'),
-    ],
-    [
-        'value' => '2-track',
-        'label' => $t('каталог: загрузки + playbooks', 'catalog split: downloads + playbooks'),
-    ],
-    [
-        'value' => 'UGC',
-        'label' => $t('древовидные комментарии с секциями', 'threaded comments with sections'),
-    ],
+
+$clusters = [
+    ['icon' => '◈', 'label' => $t('Трекеры', 'Trackers')],
+    ['icon' => '▣', 'label' => $t('Фарм и аккаунты', 'Farm & accounts')],
+    ['icon' => '◌', 'label' => $t('Креативы', 'Creatives')],
+    ['icon' => '◎', 'label' => $t('Аналитика', 'Analytics')],
+    ['icon' => '△', 'label' => $t('Команда', 'Team')],
+    ['icon' => '◇', 'label' => $t('SEO-кластеры', 'SEO clusters')],
 ];
-$funnelSteps = [
+
+$funnel = [
     [
-        'code' => 'TOFU',
-        'title' => $t('Забираем спрос', 'Capture demand'),
-        'copy' => $t('Кластеры по арбитражу, источникам, трекерам, антидетекту, клоакингу и affiliate-операционке.', 'Clusters for traffic buying, sources, trackers, anti-detect, cloaking and affiliate operations.'),
+        'code' => '01',
+        'icon' => '↗',
+        'title' => $t('Забираем поисковый и комьюнити-спрос в широкие кластеры', 'Capture search and community demand in wide clusters'),
+        'copy' => $t('Главная и блог работают как операторский newsroom: длинные заголовки, сильный контекст, маршрут в смежные темы и полезные слои.', 'Home and blog behave like an operator newsroom: long headlines, strong context and a route into adjacent topics and utility layers.'),
     ],
     [
-        'code' => 'MOFU',
-        'title' => $t('Конвертируем в полезность', 'Convert into utility'),
-        'copy' => $t('Шаблоны, таблицы, SOP, чеклисты, техничка и готовые решения с быстрым time-to-value.', 'Templates, spreadsheets, SOPs, checklists, technical assets and ready-made solutions with fast time-to-value.'),
+        'code' => '02',
+        'icon' => '⬢',
+        'title' => $t('Переводим внимание в рабочие решения, которые можно внедрить сразу', 'Turn attention into working solutions that can be deployed immediately'),
+        'copy' => $t('Скачиваемые assets и playbooks дают быстрый time-to-value вместо еще одной статьи без действия.', 'Downloadable assets and playbooks create fast time-to-value instead of yet another article with no action.'),
     ],
     [
-        'code' => 'BOFU',
-        'title' => $t('Удерживаем и возвращаем', 'Retain and bring back'),
-        'copy' => $t('Комментарии, ветки обсуждений, related-рекомендации и переходы в продуктовые сценарии.', 'Comments, discussion threads, related recommendations and transitions into product-led scenarios.'),
+        'code' => '03',
+        'icon' => '✦',
+        'title' => $t('Возвращаем пользователей через обсуждение, related-потоки и кейсы', 'Bring users back through discussion, related streams and cases'),
+        'copy' => $t('Комментарии, кейсы и соседние кластеры работают как knowledge-loop и удерживают аудиторию в системе.', 'Comments, case studies and adjacent clusters act as a knowledge loop and keep the audience inside the system.'),
     ],
 ];
 ?>
 <style>
-.cp-home{max-width:1280px;margin:0 auto;padding:26px 16px 54px;color:var(--shell-text);font-family:"Sora",system-ui,sans-serif}
+.cp-home{max-width:1380px;margin:0 auto;padding:28px 18px 64px;color:var(--shell-text);font-family:"Sora",system-ui,sans-serif}
 .cp-home a{text-decoration:none}
-.cp-shell{display:grid;gap:18px}
-.cp-card,.cp-masthead,.cp-market-map,.cp-feed,.cp-side-stack,.cp-funnel-band,.cp-operator-grid article,.cp-case-board{position:relative;overflow:hidden;border:1px solid var(--shell-border);background:var(--shell-panel);backdrop-filter:blur(16px);box-shadow:var(--shell-shadow)}
-.cp-masthead{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:20px;padding:30px;border-radius:34px;background:
-radial-gradient(circle at 12% 18%,rgba(44,224,199,.18),transparent 26%),
-radial-gradient(circle at 84% 12%,rgba(122,180,255,.18),transparent 28%),
-linear-gradient(145deg,rgba(7,14,28,.96),rgba(10,22,41,.92))}
-.cp-kicker,.cp-pill,.cp-card-tag,.cp-feed-meta span,.cp-board-tag,.cp-case-tag{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;border:1px solid rgba(122,180,255,.22);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
-.cp-masthead h1{margin:14px 0 12px;max-width:11ch;font:700 clamp(3.6rem,8vw,6.5rem)/.88 "Space Grotesk","Sora",sans-serif;letter-spacing:-.08em}
-.cp-masthead p{max-width:74ch;margin:0;color:var(--shell-muted);font-size:15px;line-height:1.78}
-.cp-masthead-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
-.cp-btn{display:inline-flex;align-items:center;justify-content:center;padding:14px 18px;border-radius:16px;font-weight:700;transition:transform .2s ease,border-color .2s ease}
-.cp-btn.primary{background:linear-gradient(135deg,#7ab4ff,#2ce0c7);color:#07111f}
-.cp-btn.secondary{border:1px solid var(--shell-border);background:rgba(255,255,255,.05);color:var(--shell-text)}
-.cp-btn:hover{transform:translateY(-1px)}
-.cp-masthead-grid{display:grid;gap:14px}
-.cp-signal-board{padding:18px;border-radius:26px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.03)}
-.cp-signal-board h2{margin:0 0 10px;font:700 1.1rem/1.1 "Space Grotesk","Sora",sans-serif}
-.cp-signal-list{display:grid;gap:10px}
-.cp-signal{display:grid;grid-template-columns:74px 1fr;gap:12px;padding:12px 0;border-top:1px solid rgba(255,255,255,.06)}
-.cp-signal:first-child{border-top:0;padding-top:0}
-.cp-signal strong{font:700 1.4rem/1 "Space Grotesk","Sora",sans-serif;color:var(--shell-highlight)}
-.cp-signal span{color:var(--shell-muted);font-size:13px;line-height:1.55}
-.cp-cluster-cloud{display:flex;flex-wrap:wrap;gap:10px}
-.cp-pill{letter-spacing:.08em;font-size:12px;color:var(--shell-text)}
+.cp-home-grid{display:grid;gap:18px}
+.cp-panel,.cp-hero,.cp-signal-grid,.cp-cluster-board,.cp-editorial-stream,.cp-utility-wall,.cp-funnel-stage,.cp-case-zone,.cp-products-grid article{position:relative;overflow:hidden;border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(6,12,24,.86),rgba(5,10,20,.72));backdrop-filter:blur(18px);box-shadow:var(--shell-shadow)}
+.cp-panel::before,.cp-hero::before,.cp-signal-grid::before,.cp-cluster-board::before,.cp-editorial-stream::before,.cp-utility-wall::before,.cp-funnel-stage::before,.cp-case-zone::before,.cp-products-grid article::before{content:"";position:absolute;inset:auto -18% -38% 28%;height:180px;background:radial-gradient(circle,rgba(61,233,202,.14),transparent 68%);pointer-events:none}
+.cp-hero{display:grid;grid-template-columns:minmax(0,1.24fr) minmax(360px,.76fr);gap:18px;padding:28px;border-radius:34px;clip-path:polygon(0 0,94% 0,100% 10%,100% 100%,6% 100%,0 90%)}
+.cp-kicker,.cp-chip,.cp-meta-chip,.cp-eye,.cp-stage-code{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid rgba(122,180,255,.2);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+.cp-kicker-icon,.cp-chip i,.cp-card-icon,.cp-block-icon,.cp-stage-icon{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;background:rgba(255,255,255,.06);font-style:normal}
+.cp-hero-copy{display:grid;align-content:start;gap:16px}
+.cp-hero h1{margin:0;max-width:15ch;font:700 clamp(3.5rem,8vw,6.7rem)/.9 "Space Grotesk","Sora",sans-serif;letter-spacing:-.08em}
+.cp-hero p{max-width:74ch;margin:0;color:var(--shell-muted);font-size:15px;line-height:1.82}
+.cp-actions{display:flex;flex-wrap:wrap;gap:12px}
+.cp-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:15px 18px;border-radius:18px;font-weight:700;transition:transform .22s ease,border-color .22s ease,background .22s ease}
+.cp-btn.primary{background:linear-gradient(135deg,#82b6ff,#3ae9ca);color:#04111a}
+.cp-btn.secondary{border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-text)}
+.cp-btn:hover{transform:translateY(-2px)}
+.cp-hero-side{display:grid;gap:14px}
+.cp-signal-grid{padding:18px;border-radius:28px;clip-path:polygon(0 0,100% 0,100% 88%,94% 100%,0 100%)}
+.cp-signal-head,.cp-cluster-head,.cp-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+.cp-signal-head h2,.cp-cluster-head h2,.cp-section-head h2,.cp-editorial-stream h2,.cp-utility-wall h2,.cp-funnel-stage h2,.cp-case-zone h2{margin:0;font:700 clamp(1.7rem,3vw,2.85rem)/.96 "Space Grotesk","Sora",sans-serif;letter-spacing:-.05em}
+.cp-signal-list{display:grid;gap:12px;margin-top:16px}
+.cp-signal-row{display:grid;grid-template-columns:72px 1fr;gap:12px;padding:14px 0;border-top:1px solid rgba(255,255,255,.07)}
+.cp-signal-row:first-child{padding-top:0;border-top:0}
+.cp-signal-row strong{display:inline-flex;align-items:center;gap:10px;font:700 1.4rem/1 "Space Grotesk","Sora",sans-serif;color:var(--shell-highlight)}
+.cp-signal-row span{color:var(--shell-muted);line-height:1.58}
+.cp-cluster-board{padding:18px;border-radius:28px;clip-path:polygon(0 0,94% 0,100% 16%,100% 100%,0 100%)}
+.cp-clusters{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.cp-chip{font-size:12px;letter-spacing:.08em}
 
-.cp-section-title{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-top:8px}
-.cp-section-title h2{margin:0;font:700 clamp(2rem,4vw,3rem)/.96 "Space Grotesk","Sora",sans-serif;letter-spacing:-.06em}
-.cp-section-title p{max-width:70ch;margin:0;color:var(--shell-muted)}
+.cp-scan-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);gap:18px}
+.cp-editorial-stream,.cp-utility-wall,.cp-funnel-stage,.cp-case-zone{padding:22px;border-radius:30px}
+.cp-stream-list,.cp-utility-columns,.cp-products-grid,.cp-case-grid{display:grid;gap:14px}
+.cp-stream-item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;padding:18px;border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.025));border:1px solid rgba(255,255,255,.06);clip-path:polygon(0 0,94% 0,100% 12%,100% 100%,6% 100%,0 88%)}
+.cp-card-index{display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:18px;border:1px solid rgba(122,180,255,.18);background:rgba(7,18,36,.72);font:700 1rem/1 "Space Grotesk","Sora",sans-serif}
+.cp-stream-item h3,.cp-utility-card h3,.cp-products-grid h3,.cp-case-card h3{margin:0 0 10px;font:700 1.45rem/1.08 "Space Grotesk","Sora",sans-serif;letter-spacing:-.04em}
+.cp-stream-item p,.cp-utility-card p,.cp-products-grid p,.cp-case-card p,.cp-funnel-card p{margin:0;color:var(--shell-muted);line-height:1.68}
+.cp-stream-arrow,.cp-link{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--shell-accent)}
+.cp-meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.cp-eye{letter-spacing:.08em}
 
-.cp-market-map{padding:22px;border-radius:28px}
-.cp-market-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:16px}
-.cp-card{padding:18px;border-radius:24px}
-.cp-card h3{margin:14px 0 10px;font:700 1.55rem/1.04 "Space Grotesk","Sora",sans-serif;letter-spacing:-.04em}
-.cp-card p,.cp-card li{color:var(--shell-muted);line-height:1.65}
-.cp-card ul{margin:0;padding-left:18px}
+.cp-utility-wall{display:grid;gap:16px}
+.cp-utility-columns{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cp-utility-card{padding:18px;border-radius:24px;background:linear-gradient(165deg,rgba(8,18,33,.88),rgba(9,15,24,.68));border:1px solid rgba(255,255,255,.06);clip-path:polygon(0 0,100% 0,100% 82%,92% 100%,0 100%)}
+.cp-utility-card .cp-meta-row{margin-top:12px;margin-bottom:0}
 
-.cp-editorial{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:18px}
-.cp-feed{padding:22px;border-radius:28px}
-.cp-feed-header{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:16px}
-.cp-feed-header h2,.cp-side-stack h2,.cp-funnel-band h2,.cp-case-board h2{margin:0;font:700 2rem/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.05em}
-.cp-feed-list{display:grid;gap:14px}
-.cp-feed-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;padding:16px 0;border-top:1px solid rgba(255,255,255,.07)}
-.cp-feed-item:first-child{border-top:0;padding-top:0}
-.cp-feed-item h3{margin:10px 0 8px;font:700 1.4rem/1.08 "Space Grotesk","Sora",sans-serif}
-.cp-feed-item p{margin:0;color:var(--shell-muted);line-height:1.65}
-.cp-feed-meta{display:flex;gap:8px;flex-wrap:wrap}
-.cp-feed-arrow{align-self:center;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:14px;border:1px solid var(--shell-border);background:rgba(255,255,255,.04);font-weight:700}
-.cp-side-stack{display:grid;gap:14px;padding:22px;border-radius:28px}
-.cp-side-panel{padding:16px;border-radius:20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)}
-.cp-side-panel h3{margin:10px 0 10px;font:700 1.25rem/1.04 "Space Grotesk","Sora",sans-serif}
-.cp-side-panel p,.cp-side-panel li{color:var(--shell-muted);line-height:1.62}
-.cp-side-panel ul{margin:0;padding-left:18px}
-.cp-side-link{display:inline-flex;margin-top:12px;color:var(--shell-accent);font-weight:700}
+.cp-products-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cp-products-grid article{padding:18px;border-radius:26px;clip-path:polygon(0 0,96% 0,100% 14%,100% 100%,4% 100%,0 86%)}
 
-.cp-operator-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.cp-operator-grid article{padding:18px;border-radius:24px}
-.cp-operator-grid h3{margin:12px 0 8px;font:700 1.4rem/1.08 "Space Grotesk","Sora",sans-serif}
-.cp-operator-grid p{margin:0;color:var(--shell-muted);line-height:1.64}
+.cp-funnel-stage{display:grid;gap:16px}
+.cp-funnel-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.cp-funnel-card{padding:18px;border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.06)}
+.cp-stage-code{margin-bottom:12px}
+.cp-stage-code b{font:700 12px/1 "Space Grotesk","Sora",sans-serif}
+.cp-funnel-card h3{margin:0 0 10px;font:700 1.35rem/1.06 "Space Grotesk","Sora",sans-serif}
 
-.cp-funnel-band{padding:22px;border-radius:28px}
-.cp-funnel-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}
-.cp-funnel-step{padding:18px;border-radius:22px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.02))}
-.cp-funnel-step strong{display:block;font:700 12px/1 "Sora",sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--shell-accent)}
-.cp-funnel-step h3{margin:10px 0 8px;font:700 1.3rem/1.02 "Space Grotesk","Sora",sans-serif}
-.cp-funnel-step p{margin:0;color:var(--shell-muted);line-height:1.62}
+.cp-case-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cp-case-card{padding:18px;border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.06);clip-path:polygon(0 0,100% 0,100% 88%,95% 100%,0 100%)}
 
-.cp-case-board{padding:22px;border-radius:28px}
-.cp-case-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
-.cp-case-card{padding:18px;border-radius:22px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
-.cp-case-card h3{margin:12px 0 8px;font:700 1.35rem/1.08 "Space Grotesk","Sora",sans-serif}
-.cp-case-card p{margin:0;color:var(--shell-muted);line-height:1.62}
-
-@media (max-width: 1120px){
-    .cp-masthead,.cp-editorial,.cp-market-grid,.cp-operator-grid,.cp-funnel-list,.cp-case-grid{grid-template-columns:1fr}
+@media (max-width: 1160px){
+    .cp-hero,.cp-scan-grid,.cp-utility-columns,.cp-products-grid,.cp-funnel-grid,.cp-case-grid{grid-template-columns:1fr}
 }
-@media (max-width: 720px){
-    .cp-home{padding-top:18px}
-    .cp-masthead{padding:22px;border-radius:26px}
-    .cp-masthead h1{max-width:none;font-size:clamp(2.8rem,14vw,4.2rem)}
-    .cp-feed,.cp-side-stack,.cp-funnel-band,.cp-case-board,.cp-market-map{padding:18px}
-    .cp-feed-item{grid-template-columns:1fr}
+@media (max-width: 760px){
+    .cp-home{padding:18px 14px 54px}
+    .cp-hero{padding:22px;border-radius:28px}
+    .cp-hero h1{max-width:none;font-size:clamp(2.8rem,14vw,4.5rem)}
+    .cp-stream-item{grid-template-columns:1fr}
 }
 </style>
 
 <section class="cp-home">
-    <div class="cp-shell">
-        <header class="cp-masthead">
-            <div>
-                <span class="cp-kicker"><?= htmlspecialchars($t('Affiliate Market Intelligence', 'Affiliate Market Intelligence'), ENT_QUOTES, 'UTF-8') ?></span>
-                <h1><?= htmlspecialchars($t('Портал, который выглядит как newsroom и работает как operator desk', 'A portal that looks like a newsroom and works like an operator desk'), ENT_QUOTES, 'UTF-8') ?></h1>
-                <p><?= htmlspecialchars($t('CPALNYA собирает редакционный трафик, утилитарные решения и комьюнити-механику в один контур. Визуально это должно считываться как backstage-система рынка: сигналы, связи, решения, маршруты и полезность без шумного “блогового” вайба.', 'CPALNYA merges editorial traffic, utility assets and community mechanics into one system. Visually it should read like a backstage market console: signals, routes, solutions and operator-grade usefulness instead of a generic blog shell.'), ENT_QUOTES, 'UTF-8') ?></p>
-                <div class="cp-masthead-actions">
-                    <a class="cp-btn primary" href="/solutions/downloads/"><?= htmlspecialchars($t('Открыть ready-made раздел', 'Open ready-made assets'), ENT_QUOTES, 'UTF-8') ?></a>
-                    <a class="cp-btn secondary" href="/blog/"><?= htmlspecialchars($t('Смотреть editorial-хаб', 'Explore editorial hub'), ENT_QUOTES, 'UTF-8') ?></a>
+    <div class="cp-home-grid">
+        <header class="cp-hero">
+            <div class="cp-hero-copy">
+                <span class="cp-kicker"><span class="cp-kicker-icon">◈</span><?= htmlspecialchars($t('CPA Backstage City', 'CPA Backstage City'), ENT_QUOTES, 'UTF-8') ?></span>
+                <h1 class="neo-title">
+                    <?= htmlspecialchars($t('Не просто блог про трафик, а длинная операторская поверхность, где ', 'Not just a traffic blog, but a long operator surface where '), ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('сигналы рынка', 'market signals'), ENT_QUOTES, 'UTF-8') ?></strong><?= htmlspecialchars($t(' переходят в ', ' turn into '), ENT_QUOTES, 'UTF-8') ?><em><?= htmlspecialchars($t('рабочие решения и маршруты команды', 'working solutions and team routes'), ENT_QUOTES, 'UTF-8') ?></em>
+                </h1>
+                <p><?= htmlspecialchars($t('CPALNYA должен ощущаться как живая неоновая карта арбитражного города: кварталы знаний, узлы влияния, редакционные потоки, скачиваемые инструменты и полевая практика в комментариях. Поэтому дизайн уводится от стандартных прямоугольных блоков в более жесткую, многослойную, асимметричную композицию.', 'CPALNYA should feel like a living neon map of an affiliate city: knowledge districts, influence nodes, editorial flows, downloadable tools and field practice in the comments. That is why the interface moves away from standard rectangles into a harder, layered and asymmetric composition.'), ENT_QUOTES, 'UTF-8') ?></p>
+                <div class="cp-actions">
+                    <a class="cp-btn primary" href="/solutions/downloads/"><span>⬢</span><?= htmlspecialchars($t('Открыть готовые assets', 'Open ready-made assets'), ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="cp-btn secondary" href="/blog/"><span>↗</span><?= htmlspecialchars($t('Перейти в editorial-поток', 'Go to editorial stream'), ENT_QUOTES, 'UTF-8') ?></a>
                 </div>
             </div>
-            <div class="cp-masthead-grid">
-                <div class="cp-signal-board">
-                    <h2><?= htmlspecialchars($t('Market signal board', 'Market signal board'), ENT_QUOTES, 'UTF-8') ?></h2>
+
+            <div class="cp-hero-side">
+                <section class="cp-signal-grid">
+                    <div class="cp-signal-head">
+                        <div>
+                            <span class="cp-chip"><i>↯</i><?= htmlspecialchars($t('Signal board', 'Signal board'), ENT_QUOTES, 'UTF-8') ?></span>
+                            <h2 class="neo-title"><?= htmlspecialchars($t('Что должно считываться ', 'What should be visible ') , ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('с первого экрана', 'from the first screen'), ENT_QUOTES, 'UTF-8') ?></strong></h2>
+                        </div>
+                    </div>
                     <div class="cp-signal-list">
-                        <?php foreach ($marketSignals as $signal): ?>
-                            <div class="cp-signal">
-                                <strong><?= htmlspecialchars($signal['value'], ENT_QUOTES, 'UTF-8') ?></strong>
-                                <span><?= htmlspecialchars($signal['label'], ENT_QUOTES, 'UTF-8') ?></span>
+                        <?php foreach ($signalBoard as $row): ?>
+                            <div class="cp-signal-row">
+                                <strong><span class="cp-card-icon"><?= htmlspecialchars($row['icon'], ENT_QUOTES, 'UTF-8') ?></span><?= htmlspecialchars($row['value'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                <span><?= htmlspecialchars($row['label'], ENT_QUOTES, 'UTF-8') ?></span>
                             </div>
                         <?php endforeach; ?>
                     </div>
-                </div>
-                <div class="cp-cluster-cloud">
-                    <?php foreach ($clusterLabels as $label): ?>
-                        <span class="cp-pill"><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></span>
-                    <?php endforeach; ?>
-                </div>
+                </section>
+
+                <section class="cp-cluster-board">
+                    <div class="cp-cluster-head">
+                        <div>
+                            <span class="cp-chip"><i>◎</i><?= htmlspecialchars($t('Map', 'Map'), ENT_QUOTES, 'UTF-8') ?></span>
+                            <h2 class="neo-title"><?= htmlspecialchars($t('Главные районы ', 'Main districts ') , ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('контентного города', 'of the content city'), ENT_QUOTES, 'UTF-8') ?></strong></h2>
+                        </div>
+                    </div>
+                    <div class="cp-clusters">
+                        <?php foreach ($clusters as $cluster): ?>
+                            <span class="cp-chip"><i><?= htmlspecialchars($cluster['icon'], ENT_QUOTES, 'UTF-8') ?></i><?= htmlspecialchars($cluster['label'], ENT_QUOTES, 'UTF-8') ?></span>
+                        <?php endforeach; ?>
+                    </div>
+                </section>
             </div>
         </header>
 
-        <section class="cp-market-map">
-            <div class="cp-section-title">
-                <div>
-                    <h2><?= htmlspecialchars($t('Market Map', 'Market Map'), ENT_QUOTES, 'UTF-8') ?></h2>
-                    <p><?= htmlspecialchars($t('По мотивам top-паттернов ниши структура собрана как гибрид Partnerkin-style media, utility-directory в духе OfferVault и community-механики форумного слоя. Не копия, а сборка сильных паттернов в одном продукте.', 'Using the strongest patterns from the niche, the structure acts like a hybrid of Partnerkin-style media, OfferVault-like utility discovery and a forum-grade community layer. Not a copy, but a concentrated blend of what actually works.'), ENT_QUOTES, 'UTF-8') ?></p>
-                </div>
-            </div>
-            <div class="cp-market-grid">
-                <article class="cp-card">
-                    <span class="cp-card-tag"><?= htmlspecialchars($t('Editorial', 'Editorial'), ENT_QUOTES, 'UTF-8') ?></span>
-                    <h3><?= htmlspecialchars($t('Плотная editorial-лента', 'Dense editorial feed'), ENT_QUOTES, 'UTF-8') ?></h3>
-                    <p><?= htmlspecialchars($t('Не “карточки блога”, а лента с большим headline, контекстом, кластером и быстрым переходом к related-потоку. Это паттерн, который держит внимание у нишевых медиа.', 'Not generic blog tiles, but a feed with a strong headline, context, cluster marker and fast route into related streams. This is what keeps niche media sticky.'), ENT_QUOTES, 'UTF-8') ?></p>
-                </article>
-                <article class="cp-card">
-                    <span class="cp-card-tag"><?= htmlspecialchars($t('Utility', 'Utility'), ENT_QUOTES, 'UTF-8') ?></span>
-                    <h3><?= htmlspecialchars($t('Каталог как рабочая база', 'Catalog as working base'), ENT_QUOTES, 'UTF-8') ?></h3>
-                    <p><?= htmlspecialchars($t('Раздел решений должен выглядеть как рабочий directory: короткая ценность, стек, формат, сложность, путь внедрения. Это приближает UX к offer-db и tool-db.', 'The solutions section should look like a working directory: short value proposition, stack, format, difficulty and implementation path. That moves the UX closer to an offer-db and tool-db.'), ENT_QUOTES, 'UTF-8') ?></p>
-                </article>
-                <article class="cp-card">
-                    <span class="cp-card-tag"><?= htmlspecialchars($t('Community', 'Community'), ENT_QUOTES, 'UTF-8') ?></span>
-                    <h3><?= htmlspecialchars($t('Комментарии как knowledge-layer', 'Comments as knowledge layer'), ENT_QUOTES, 'UTF-8') ?></h3>
-                    <p><?= htmlspecialchars($t('Ветка комментариев здесь не вторична. Это слой практики, который возвращает пользователей и делает материал живым, как у сильных community-driven нишевых площадок.', 'Comment threads are not secondary here. They are the practice layer that brings users back and makes every asset feel alive, just like strong community-driven niche properties.'), ENT_QUOTES, 'UTF-8') ?></p>
-                </article>
-            </div>
-        </section>
-
-        <section class="cp-editorial">
-            <div class="cp-feed">
-                <div class="cp-feed-header">
+        <div class="cp-scan-grid">
+            <section class="cp-editorial-stream">
+                <div class="cp-section-head">
                     <div>
-                        <span class="cp-card-tag"><?= htmlspecialchars($t('Editorial Feed', 'Editorial Feed'), ENT_QUOTES, 'UTF-8') ?></span>
-                        <h2><?= htmlspecialchars($t('Свежие кластеры и материалы', 'Fresh clusters and materials'), ENT_QUOTES, 'UTF-8') ?></h2>
+                        <span class="cp-chip"><i>✦</i><?= htmlspecialchars($t('Editorial stream', 'Editorial stream'), ENT_QUOTES, 'UTF-8') ?></span>
+                        <h2 class="neo-title"><?= htmlspecialchars($t('Плотная лента материалов, где ', 'A dense article stream where ') , ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('каждый вход', 'every entry point'), ENT_QUOTES, 'UTF-8') ?></strong><?= htmlspecialchars($t(' ведет дальше', ' leads further'), ENT_QUOTES, 'UTF-8') ?></h2>
                     </div>
-                    <a class="cp-side-link" href="/blog/"><?= htmlspecialchars($t('Весь блог', 'All blog'), ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="cp-link" href="/blog/"><?= htmlspecialchars($t('Весь блог', 'All blog'), ENT_QUOTES, 'UTF-8') ?> <span>↗</span></a>
                 </div>
-                <div class="cp-feed-list">
-                    <?php foreach (array_slice($blogItems, 0, 4) as $item): ?>
+                <div class="cp-stream-list">
+                    <?php foreach (array_slice($blogItems, 0, 4) as $index => $item): ?>
                         <?php $cluster = trim((string)($item['cluster_code'] ?? '')); ?>
-                        <a class="cp-feed-item" href="/blog/<?= $cluster !== '' ? rawurlencode($cluster) . '/' : '' ?><?= rawurlencode((string)($item['slug'] ?? '')) ?>/">
+                        <a class="cp-stream-item" href="/blog/<?= $cluster !== '' ? rawurlencode($cluster) . '/' : '' ?><?= rawurlencode((string)($item['slug'] ?? '')) ?>/">
+                            <span class="cp-card-index"><?= str_pad((string)($index + 1), 2, '0', STR_PAD_LEFT) ?></span>
                             <div>
-                                <div class="cp-feed-meta">
-                                    <span><?= htmlspecialchars($cluster !== '' ? $cluster : $t('article', 'article'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <div class="cp-meta-row">
+                                    <span class="cp-meta-chip"><span class="cp-card-icon">◉</span><?= htmlspecialchars($cluster !== '' ? $cluster : $t('article', 'article'), ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="cp-eye"><span class="cp-card-icon">◌</span><?= (int)($item['view_count'] ?? 0) ?> views</span>
                                 </div>
                                 <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                                 <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? '')), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
-                            <span class="cp-feed-arrow">01</span>
+                            <span class="cp-stream-arrow">↗</span>
                         </a>
                     <?php endforeach; ?>
                 </div>
-            </div>
+            </section>
 
-            <aside class="cp-side-stack">
-                <div>
-                    <span class="cp-card-tag"><?= htmlspecialchars($t('Utility Layer', 'Utility Layer'), ENT_QUOTES, 'UTF-8') ?></span>
-                    <h2><?= htmlspecialchars($t('Скачивания и playbooks', 'Downloads and playbooks'), ENT_QUOTES, 'UTF-8') ?></h2>
+            <aside class="cp-utility-wall">
+                <div class="cp-section-head">
+                    <div>
+                        <span class="cp-chip"><i>⬢</i><?= htmlspecialchars($t('Utility layer', 'Utility layer'), ENT_QUOTES, 'UTF-8') ?></span>
+                        <h2 class="neo-title"><?= htmlspecialchars($t('Не второй блог, а ', 'Not a second blog, but ') , ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('рабочий инструментальный слой', 'a working utility layer'), ENT_QUOTES, 'UTF-8') ?></strong></h2>
+                    </div>
                 </div>
-                <?php foreach (array_slice($downloads, 0, 2) as $item): ?>
-                    <article class="cp-side-panel">
-                        <span class="cp-board-tag"><?= htmlspecialchars($t('Download', 'Download'), ENT_QUOTES, 'UTF-8') ?></span>
-                        <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
-                        <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? '')), ENT_QUOTES, 'UTF-8') ?></p>
-                        <a class="cp-side-link" href="/solutions/downloads/<?= rawurlencode((string)($item['slug'] ?? '')) ?>/"><?= htmlspecialchars($t('Открыть asset', 'Open asset'), ENT_QUOTES, 'UTF-8') ?></a>
-                    </article>
-                <?php endforeach; ?>
-                <?php foreach (array_slice($solutionArticles, 0, 2) as $item): ?>
-                    <article class="cp-side-panel">
-                        <span class="cp-board-tag"><?= htmlspecialchars($t('Playbook', 'Playbook'), ENT_QUOTES, 'UTF-8') ?></span>
-                        <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
-                        <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? '')), ENT_QUOTES, 'UTF-8') ?></p>
-                        <a class="cp-side-link" href="/solutions/articles/<?= rawurlencode((string)($item['slug'] ?? '')) ?>/"><?= htmlspecialchars($t('Читать разбор', 'Read playbook'), ENT_QUOTES, 'UTF-8') ?></a>
-                    </article>
-                <?php endforeach; ?>
+                <div class="cp-utility-columns">
+                    <?php foreach (array_slice($downloads, 0, 2) as $item): ?>
+                        <article class="cp-utility-card">
+                            <span class="cp-chip"><i>↓</i><?= htmlspecialchars($t('Download', 'Download'), ENT_QUOTES, 'UTF-8') ?></span>
+                            <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
+                            <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? '')), ENT_QUOTES, 'UTF-8') ?></p>
+                            <div class="cp-meta-row">
+                                <span class="cp-eye"><span class="cp-card-icon">◎</span><?= htmlspecialchars((string)($item['category_code'] ?? $t('asset', 'asset')), ENT_QUOTES, 'UTF-8') ?></span>
+                            </div>
+                            <a class="cp-link" href="/solutions/downloads/<?= rawurlencode((string)($item['slug'] ?? '')) ?>/"><?= htmlspecialchars($t('Открыть asset', 'Open asset'), ENT_QUOTES, 'UTF-8') ?> <span>↗</span></a>
+                        </article>
+                    <?php endforeach; ?>
+                    <?php foreach (array_slice($solutionArticles, 0, 2) as $item): ?>
+                        <article class="cp-utility-card">
+                            <span class="cp-chip"><i>▣</i><?= htmlspecialchars($t('Playbook', 'Playbook'), ENT_QUOTES, 'UTF-8') ?></span>
+                            <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
+                            <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? '')), ENT_QUOTES, 'UTF-8') ?></p>
+                            <div class="cp-meta-row">
+                                <span class="cp-eye"><span class="cp-card-icon">◇</span><?= htmlspecialchars((string)($item['category_code'] ?? $t('guide', 'guide')), ENT_QUOTES, 'UTF-8') ?></span>
+                            </div>
+                            <a class="cp-link" href="/solutions/articles/<?= rawurlencode((string)($item['slug'] ?? '')) ?>/"><?= htmlspecialchars($t('Читать playbook', 'Read playbook'), ENT_QUOTES, 'UTF-8') ?> <span>↗</span></a>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
             </aside>
-        </section>
+        </div>
 
-        <section class="cp-funnel-band">
-            <div class="cp-section-title">
+        <section class="cp-funnel-stage">
+            <div class="cp-section-head">
                 <div>
-                    <span class="cp-card-tag"><?= htmlspecialchars($t('Funnels', 'Funnels'), ENT_QUOTES, 'UTF-8') ?></span>
-                    <h2><?= htmlspecialchars($t('Как портал монетизирует внимание', 'How the portal monetizes attention'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <span class="cp-chip"><i>↯</i><?= htmlspecialchars($t('Growth loop', 'Growth loop'), ENT_QUOTES, 'UTF-8') ?></span>
+                    <h2 class="neo-title"><?= htmlspecialchars($t('Портал должен вести пользователя ', 'The portal should move the user ') , ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('от сигнала к действию', 'from signal to action'), ENT_QUOTES, 'UTF-8') ?></strong></h2>
                 </div>
-                <p><?= htmlspecialchars($t('Контент здесь не должен просто читаться. Он должен вести в полезность, регистрацию, обсуждение и обратно в релевантный контур.', 'Content here should not just be consumed. It should route users into utility, registration, discussion and then back into the relevant cluster.'), ENT_QUOTES, 'UTF-8') ?></p>
             </div>
-            <div class="cp-funnel-list">
-                <?php foreach ($funnelSteps as $step): ?>
-                    <article class="cp-funnel-step">
-                        <strong><?= htmlspecialchars($step['code'], ENT_QUOTES, 'UTF-8') ?></strong>
+            <div class="cp-funnel-grid">
+                <?php foreach ($funnel as $step): ?>
+                    <article class="cp-funnel-card">
+                        <span class="cp-stage-code"><span class="cp-stage-icon"><?= htmlspecialchars($step['icon'], ENT_QUOTES, 'UTF-8') ?></span><b><?= htmlspecialchars($step['code'], ENT_QUOTES, 'UTF-8') ?></b></span>
                         <h3><?= htmlspecialchars($step['title'], ENT_QUOTES, 'UTF-8') ?></h3>
                         <p><?= htmlspecialchars($step['copy'], ENT_QUOTES, 'UTF-8') ?></p>
                     </article>
@@ -272,32 +254,32 @@ linear-gradient(145deg,rgba(7,14,28,.96),rgba(10,22,41,.92))}
             </div>
         </section>
 
-        <section class="cp-operator-grid">
+        <section class="cp-products-grid">
             <?php foreach (array_slice($projects, 0, 3) as $item): ?>
                 <article>
-                    <span class="cp-card-tag"><?= htmlspecialchars($t('Product', 'Product'), ENT_QUOTES, 'UTF-8') ?></span>
+                    <span class="cp-chip"><i>◈</i><?= htmlspecialchars($t('Product edge', 'Product edge'), ENT_QUOTES, 'UTF-8') ?></span>
                     <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                     <p><?= htmlspecialchars((string)($item['result_summary'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
-                    <a class="cp-side-link" href="/projects/<?= rawurlencode((string)($item['symbolic_code'] ?? $item['slug'] ?? '')) ?>/"><?= htmlspecialchars($t('Смотреть продукт', 'View product'), ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="cp-link" href="/projects/<?= rawurlencode((string)($item['symbolic_code'] ?? $item['slug'] ?? '')) ?>/"><?= htmlspecialchars($t('Смотреть продукт', 'View product'), ENT_QUOTES, 'UTF-8') ?> <span>↗</span></a>
                 </article>
             <?php endforeach; ?>
         </section>
 
-        <section class="cp-case-board">
-            <div class="cp-section-title">
+        <section class="cp-case-zone">
+            <div class="cp-section-head">
                 <div>
-                    <span class="cp-card-tag"><?= htmlspecialchars($t('Caseboard', 'Caseboard'), ENT_QUOTES, 'UTF-8') ?></span>
-                    <h2><?= htmlspecialchars($t('Кейсы и операторские разборы', 'Cases and operator breakdowns'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <span class="cp-chip"><i>✦</i><?= htmlspecialchars($t('Caseboard', 'Caseboard'), ENT_QUOTES, 'UTF-8') ?></span>
+                    <h2 class="neo-title"><?= htmlspecialchars($t('Разборы должны выглядеть как ', 'Breakdowns should look like ') , ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('операторские досье', 'operator dossiers'), ENT_QUOTES, 'UTF-8') ?></strong></h2>
                 </div>
-                <a class="cp-side-link" href="/cases/"><?= htmlspecialchars($t('Все кейсы', 'All cases'), ENT_QUOTES, 'UTF-8') ?></a>
+                <a class="cp-link" href="/cases/"><?= htmlspecialchars($t('Все кейсы', 'All cases'), ENT_QUOTES, 'UTF-8') ?> <span>↗</span></a>
             </div>
             <div class="cp-case-grid">
                 <?php foreach (array_slice($cases, 0, 4) as $item): ?>
                     <article class="cp-case-card">
-                        <span class="cp-case-tag"><?= htmlspecialchars($t('Case study', 'Case study'), ENT_QUOTES, 'UTF-8') ?></span>
+                        <span class="cp-chip"><i>◎</i><?= htmlspecialchars($t('Case study', 'Case study'), ENT_QUOTES, 'UTF-8') ?></span>
                         <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                         <p><?= htmlspecialchars((string)($item['result_summary'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
-                        <a class="cp-side-link" href="/cases/<?= rawurlencode((string)($item['symbolic_code'] ?? $item['slug'] ?? '')) ?>/"><?= htmlspecialchars($t('Открыть кейс', 'Open case'), ENT_QUOTES, 'UTF-8') ?></a>
+                        <a class="cp-link" href="/cases/<?= rawurlencode((string)($item['symbolic_code'] ?? $item['slug'] ?? '')) ?>/"><?= htmlspecialchars($t('Открыть разбор', 'Open breakdown'), ENT_QUOTES, 'UTF-8') ?> <span>↗</span></a>
                     </article>
                 <?php endforeach; ?>
             </div>

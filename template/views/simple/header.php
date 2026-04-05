@@ -257,68 +257,94 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     <script type="application/ld+json"><?= json_encode($schemaRow, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
     <?php endforeach; ?>
     <style>
-    @import url(''https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap'');
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
 
     :root {
         color-scheme: dark;
-        --shell-bg: #07111f;
-        --shell-bg-2: #0a1628;
-        --shell-panel: rgba(8, 14, 28, .76);
-        --shell-panel-strong: rgba(10, 18, 34, .88);
-        --shell-border: rgba(133, 170, 255, .18);
-        --shell-border-strong: rgba(133, 170, 255, .28);
-        --shell-text: #ebf3ff;
-        --shell-muted: #9fb3d1;
-        --shell-accent: #7ab4ff;
-        --shell-accent-2: #2ce0c7;
-        --shell-highlight: #ffe07a;
-        --shell-shadow: 0 24px 60px rgba(0, 6, 18, .34);
-        --simple-header-height: 98px;
-        --simple-header-max: 1320px;
+        --shell-bg: #06101d;
+        --shell-bg-2: #0b1730;
+        --shell-panel: rgba(7, 14, 28, .62);
+        --shell-panel-strong: rgba(9, 18, 36, .82);
+        --shell-surface: rgba(255, 255, 255, .04);
+        --shell-border: rgba(116, 171, 255, .18);
+        --shell-border-strong: rgba(116, 171, 255, .3);
+        --shell-text: #eef5ff;
+        --shell-muted: #9cb0ce;
+        --shell-accent: #73b8ff;
+        --shell-accent-2: #27dfc0;
+        --shell-accent-3: #ff9a5f;
+        --shell-highlight: #ffdf78;
+        --shell-shadow: 0 28px 80px rgba(1, 6, 18, .42);
+        --simple-header-height: 104px;
+        --simple-header-max: 1360px;
+        --shell-notch: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
     }
 
     * { box-sizing: border-box; }
     html, body {
         min-height: 100%;
-        background: radial-gradient(circle at top, #0d1b32 0%, #07111f 42%, #050b15 100%);
+        background:
+            radial-gradient(circle at top, rgba(13, 31, 66, .8), transparent 42%),
+            linear-gradient(180deg, #07101d 0%, #050b15 100%);
     }
     html { scroll-behavior: smooth; }
     body {
         margin: 0;
         padding-top: calc(var(--simple-header-height) + 18px);
-        font: 500 16px/1.6 "Sora", system-ui, sans-serif;
+        font: 500 16px/1.65 "Sora", system-ui, sans-serif;
         color: var(--shell-text);
-        background: radial-gradient(circle at top, #0d1b32 0%, #07111f 42%, #050b15 100%);
         position: relative;
         overflow-x: hidden;
         letter-spacing: -.01em;
     }
     body.ui-tone-light {
-        --shell-bg: #eef4ff;
-        --shell-bg-2: #f8fbff;
-        --shell-panel: rgba(255, 255, 255, .78);
-        --shell-panel-strong: rgba(255, 255, 255, .92);
-        --shell-border: rgba(44, 85, 154, .12);
-        --shell-border-strong: rgba(44, 85, 154, .2);
+        --shell-bg: #f2f7ff;
+        --shell-bg-2: #ffffff;
+        --shell-panel: rgba(255, 255, 255, .68);
+        --shell-panel-strong: rgba(255, 255, 255, .88);
+        --shell-surface: rgba(25, 73, 154, .04);
+        --shell-border: rgba(28, 84, 175, .12);
+        --shell-border-strong: rgba(28, 84, 175, .22);
         --shell-text: #10233f;
-        --shell-muted: #5f7696;
-        --shell-accent: #275fd5;
-        --shell-accent-2: #0a9f8d;
-        --shell-highlight: #ffcc4d;
-        --shell-shadow: 0 20px 48px rgba(34, 72, 138, .14);
+        --shell-muted: #607696;
+        --shell-accent: #225dcd;
+        --shell-accent-2: #0aa08d;
+        --shell-accent-3: #ec7d47;
+        --shell-highlight: #d49e17;
+        --shell-shadow: 0 24px 60px rgba(46, 88, 170, .14);
         color-scheme: light;
-        background: radial-gradient(circle at top, #ffffff 0%, #eef4ff 56%, #e4ecf9 100%);
     }
     body > *:not(#terrainFieldGlobal) { position: relative; z-index: 1; }
     a, button, input, textarea, select { font: inherit; }
-    img { max-width: 100%; height: auto; }
     a { color: inherit; }
+    img { max-width: 100%; height: auto; }
     #terrainFieldGlobal {
         position: fixed;
         inset: 0;
         z-index: 0;
         pointer-events: none;
-        opacity: .95;
+        opacity: .98;
+    }
+    ::selection { background: rgba(115, 184, 255, .32); color: #fff; }
+
+    .neo-title {
+        font-family: "Space Grotesk", "Sora", sans-serif;
+        letter-spacing: -.06em;
+        line-height: .92;
+    }
+    .neo-title strong,
+    .neo-title em {
+        position: relative;
+        display: inline;
+        font-style: normal;
+        font-weight: 700;
+        color: var(--shell-text);
+        background: linear-gradient(120deg, rgba(115, 184, 255, .24), rgba(39, 223, 192, .08));
+        box-shadow: inset 0 -0.48em 0 rgba(115, 184, 255, .12);
+    }
+    .neo-title em {
+        color: var(--shell-highlight);
+        box-shadow: inset 0 -0.5em 0 rgba(255, 154, 95, .16);
     }
 
     .simple-header {
@@ -328,24 +354,27 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         top: 16px;
         z-index: 9999;
         display: grid;
-        grid-template-columns: minmax(240px, 320px) minmax(260px, 1fr) auto;
-        gap: 18px;
+        grid-template-columns: minmax(250px, 340px) minmax(260px, 1fr) auto;
+        gap: 16px;
         align-items: center;
         max-width: var(--simple-header-max);
         margin: 0 auto;
-        padding: 14px 18px;
+        padding: 14px 16px;
         border: 1px solid var(--shell-border);
-        border-radius: 24px;
-        background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02)), var(--shell-panel-strong);
-        backdrop-filter: blur(16px) saturate(130%);
+        background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.01)), var(--shell-panel-strong);
         box-shadow: var(--shell-shadow);
+        clip-path: var(--shell-notch);
+        backdrop-filter: blur(18px) saturate(130%);
     }
-    .simple-header.is-scrolled {
-        background: linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.01)), rgba(6, 12, 24, .94);
+    .simple-header::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(115,184,255,.18), transparent 28%, transparent 72%, rgba(39,223,192,.14)), radial-gradient(circle at 84% 14%, rgba(255,154,95,.14), transparent 18%);
+        pointer-events: none;
     }
-    body.ui-tone-light .simple-header.is-scrolled {
-        background: linear-gradient(135deg, rgba(255,255,255,.78), rgba(255,255,255,.54)), rgba(245, 249, 255, .94);
-    }
+    .simple-header.is-scrolled { transform: translateY(-2px); }
+
     .simple-brand {
         display: flex;
         align-items: center;
@@ -353,68 +382,81 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         min-width: 0;
         text-decoration: none;
     }
+    .pc-logo-wrap { display: grid; gap: 4px; }
     .pc-logo {
         position: relative;
         display: inline-flex;
         align-items: baseline;
-        gap: 4px;
+        gap: 6px;
         line-height: 1;
     }
     .pc-logo-main {
         font: 700 34px/1 "Space Grotesk", "Sora", sans-serif;
-        letter-spacing: -.06em;
+        letter-spacing: -.08em;
         color: var(--shell-text);
     }
     .pc-logo-core {
         display: inline-flex;
         align-items: center;
-        padding: 4px 8px;
+        justify-content: center;
+        min-width: 34px;
+        min-height: 24px;
+        padding: 3px 8px;
         border: 1px solid var(--shell-border-strong);
-        border-radius: 999px;
-        background: rgba(255,255,255,.05);
+        background: linear-gradient(135deg, rgba(39,223,192,.18), rgba(115,184,255,.16));
+        clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
         color: var(--shell-accent-2);
         font-size: 11px;
-        font-weight: 700;
+        font-weight: 800;
         letter-spacing: .18em;
         text-transform: uppercase;
     }
     .pc-brand-copy {
         display: grid;
-        gap: 2px;
+        gap: 3px;
         min-width: 0;
     }
     .pc-brand-copy strong {
-        display: block;
-        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
         font-weight: 700;
-        letter-spacing: .16em;
+        letter-spacing: .18em;
         text-transform: uppercase;
         color: var(--shell-accent);
     }
+    .pc-brand-copy strong::before {
+        content: "?";
+        color: var(--shell-accent-2);
+        font-size: 10px;
+    }
     .pc-brand-copy span {
         display: block;
+        max-width: 28ch;
         color: var(--shell-muted);
         font-size: 12px;
-        line-height: 1.3;
+        line-height: 1.32;
     }
+
+    .simple-header-center { min-width: 0; }
     .simple-header-search {
         display: grid;
         grid-template-columns: 1fr auto;
         gap: 10px;
         align-items: center;
+        min-width: 0;
         padding: 8px;
-        border-radius: 18px;
         border: 1px solid var(--shell-border);
         background: rgba(255,255,255,.04);
-        min-width: 0;
+        clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
     }
     .simple-header-search input {
         width: 100%;
         min-width: 0;
+        padding: 11px 12px;
         border: 0;
         outline: none;
-        padding: 10px 12px;
-        border-radius: 12px;
         background: transparent;
         color: var(--shell-text);
     }
@@ -425,8 +467,6 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     .nav-theme-toggle,
     .simple-nav-toggle {
         border: 1px solid var(--shell-border);
-        border-radius: 14px;
-        background: rgba(255,255,255,.05);
         color: var(--shell-text);
         text-decoration: none;
     }
@@ -439,16 +479,18 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         gap: 8px;
         padding: 12px 16px;
         font-weight: 700;
-        transition: transform .2s ease, border-color .2s ease, background .2s ease;
-        background: linear-gradient(135deg, rgba(122,180,255,.22), rgba(44,224,199,.18));
-        border-color: rgba(122,180,255,.34);
+        background: linear-gradient(135deg, rgba(115,184,255,.22), rgba(39,223,192,.18));
+        clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+        transition: transform .2s ease, border-color .2s ease, filter .2s ease;
     }
     .simple-header-search button:hover,
     .simple-header-action:hover,
     .nav-cta:hover {
         transform: translateY(-1px);
-        border-color: rgba(122,180,255,.5);
+        filter: saturate(1.08);
+        border-color: var(--shell-border-strong);
     }
+
     .simple-header-right {
         display: flex;
         align-items: center;
@@ -461,53 +503,64 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         gap: 8px;
         flex-wrap: wrap;
     }
-    .simple-nav a {
-        padding: 10px 14px;
-        border-radius: 14px;
-        text-decoration: none;
-        color: var(--shell-muted);
-        transition: background .2s ease, color .2s ease, border-color .2s ease;
-        border: 1px solid transparent;
-    }
-    .simple-nav a:hover {
-        background: rgba(255,255,255,.05);
-        color: var(--shell-text);
-        border-color: var(--shell-border);
-    }
-    .simple-nav a.is-active {
-        color: var(--shell-text);
-        background: linear-gradient(135deg, rgba(122,180,255,.16), rgba(44,224,199,.12));
-        border-color: rgba(122,180,255,.3);
-    }
-    .nav-cta { color: var(--shell-text) !important; }
+    .simple-nav a,
     .nav-theme-toggle {
         display: inline-flex;
         align-items: center;
+        gap: 9px;
+        padding: 10px 14px;
+        background: rgba(255,255,255,.04);
+        color: var(--shell-muted);
+        clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+        transition: color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease;
+    }
+    .simple-nav a:hover,
+    .nav-theme-toggle:hover {
+        color: var(--shell-text);
+        border-color: var(--shell-border-strong);
+        background: rgba(255,255,255,.07);
+        transform: translateY(-1px);
+    }
+    .simple-nav a.is-active {
+        color: var(--shell-text);
+        background: linear-gradient(135deg, rgba(115,184,255,.18), rgba(39,223,192,.12));
+        border-color: var(--shell-border-strong);
+    }
+    .nav-item-icon {
+        display: inline-flex;
+        align-items: center;
         justify-content: center;
-        gap: 8px;
-        padding: 10px 12px;
-        cursor: pointer;
+        width: 18px;
+        color: var(--shell-accent-2);
+        font-size: 13px;
+    }
+    .nav-cta { color: var(--shell-text) !important; }
+    .nav-theme-toggle {
         min-width: 112px;
+        justify-content: center;
+        cursor: pointer;
     }
     .nav-theme-toggle .theme-icon {
         font-size: 11px;
         font-weight: 700;
         letter-spacing: .18em;
         text-transform: uppercase;
-        opacity: .46;
-        transition: opacity .2s ease, color .2s ease;
+        opacity: .42;
     }
     body.ui-tone-dark .theme-icon-moon,
     body.ui-tone-light .theme-icon-sun {
         opacity: 1;
         color: var(--shell-highlight);
     }
+
     .simple-nav-toggle {
         position: relative;
         display: none;
         width: 52px;
         height: 52px;
         padding: 0;
+        background: rgba(255,255,255,.05);
+        clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
         cursor: pointer;
     }
     .simple-nav-toggle span {
@@ -523,8 +576,28 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     .simple-nav-toggle span:nth-child(2) { top: 25px; }
     .simple-nav-toggle span:nth-child(3) { top: 32px; }
     .simple-nav-backdrop { display: none; }
+
+    .neo-panel,
+    .cp-card,
+    .cp-side-panel,
+    .cp-signal-board,
+    .cp-feed,
+    .cp-feed-item,
+    .cp-case-card,
+    .cpb-lead-card,
+    .cpb-feed,
+    .cpb-feed-card,
+    .cpb-side-panel,
+    .cpb-article,
+    .cpb-comments,
+    .sol-card,
+    .sol-board,
+    .sol-detail,
+    .sol-comments {
+        clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+    }
+
     main, .pc-main { width: 100%; }
-    ::selection { background: rgba(122, 180, 255, .32); color: #fff; }
 
     @media (max-width: 1080px) {
         .simple-header { grid-template-columns: minmax(240px, 1fr) auto; }
@@ -544,13 +617,13 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
             position: fixed;
             right: 18px;
             top: calc(var(--simple-header-height) + 8px);
-            width: min(92vw, 380px);
+            width: min(92vw, 390px);
             padding: 18px;
-            border-radius: 22px;
             border: 1px solid var(--shell-border);
             background: var(--shell-panel-strong);
             backdrop-filter: blur(18px);
             box-shadow: var(--shell-shadow);
+            clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
             display: grid;
             justify-content: stretch;
             gap: 10px;
@@ -562,36 +635,25 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         }
         .simple-nav a,
         .nav-cta,
-        .nav-theme-toggle {
-            width: 100%;
-            justify-content: center;
-        }
-        body.simple-nav-open .simple-nav {
-            transform: none;
-            opacity: 1;
-            pointer-events: auto;
-        }
-        body.simple-nav-open .simple-nav-backdrop {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .nav-theme-toggle { width: 100%; justify-content: center; }
+        body.simple-nav-open .simple-nav { transform: none; opacity: 1; pointer-events: auto; }
+        body.simple-nav-open .simple-nav-backdrop { opacity: 1; pointer-events: auto; }
         body.simple-nav-open .simple-nav-toggle span:nth-child(1) { top: 25px; transform: rotate(45deg); }
         body.simple-nav-open .simple-nav-toggle span:nth-child(2) { opacity: 0; }
         body.simple-nav-open .simple-nav-toggle span:nth-child(3) { top: 25px; transform: rotate(-45deg); }
     }
 
     @media (max-width: 720px) {
-        :root { --simple-header-height: 84px; }
-        body { padding-top: calc(var(--simple-header-height) + 14px); }
+        :root { --simple-header-height: 88px; }
+        body { padding-top: calc(var(--simple-header-height) + 12px); }
         .simple-header {
             left: 10px;
             right: 10px;
             top: 10px;
             padding: 12px 14px;
-            gap: 12px;
         }
         .pc-logo-main { font-size: 28px; }
-        .pc-brand-copy { display: none; }
+        .pc-brand-copy span { display: none; }
         .simple-header-action { display: none; }
     }
     </style>
@@ -603,20 +665,22 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
 <canvas id="terrainFieldGlobal" aria-hidden="true"></canvas>
 <header class="simple-header" id="cp-header">
     <a class="simple-brand" href="/" aria-label="<?= htmlspecialchars($logoAria, ENT_QUOTES, 'UTF-8') ?>">
-        <span class="pc-logo">
-            <span class="pc-logo-main"><?= htmlspecialchars($logoMain, ENT_QUOTES, 'UTF-8') ?></span>
-            <span class="pc-logo-core">grid</span>
+        <span class="pc-logo-wrap">
+            <span class="pc-logo">
+                <span class="pc-logo-main"><?= htmlspecialchars($logoMain, ENT_QUOTES, 'UTF-8') ?></span>
+                <span class="pc-logo-core">city</span>
+            </span>
         </span>
         <span class="pc-brand-copy">
-            <strong><?= htmlspecialchars('Affiliate backstage', ENT_QUOTES, 'UTF-8') ?></strong>
-            <span><?= htmlspecialchars($isRu ? 'медиа, решения, data-led навигация по CPA' : 'media, assets and data-led CPA navigation', ENT_QUOTES, 'UTF-8') ?></span>
+            <strong><?= htmlspecialchars($isRu ? 'Affiliate backstage' : 'Affiliate backstage', ENT_QUOTES, 'UTF-8') ?></strong>
+            <span><?= htmlspecialchars($isRu ? 'неоновая карта рынка, решений и editorial-потоков' : 'a neon map of market flows, utility assets and editorial streams', ENT_QUOTES, 'UTF-8') ?></span>
         </span>
     </a>
 
     <div class="simple-header-center">
         <form class="simple-header-search" method="get" action="/blog/">
-            <input type="text" name="q" placeholder="<?= htmlspecialchars($isRu ? 'Искать кластеры, статьи, шаблоны и разборы' : 'Search clusters, articles, templates and breakdowns', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-            <button type="submit"><?= htmlspecialchars($isRu ? 'Искать' : 'Search', ENT_QUOTES, 'UTF-8') ?></button>
+            <input type="text" name="q" placeholder="<?= htmlspecialchars($isRu ? 'Поиск по кластерам, решениям и инсайтам' : 'Search clusters, assets and insights', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+            <button type="submit"><?= htmlspecialchars($isRu ? 'Найти' : 'Search', ENT_QUOTES, 'UTF-8') ?></button>
         </form>
     </div>
 
@@ -640,7 +704,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     var header = document.getElementById('cp-header');
     if (header) {
         var syncHeader = function () {
-            header.classList.toggle('is-scrolled', window.scrollY > 14);
+            header.classList.toggle('is-scrolled', window.scrollY > 18);
         };
         window.addEventListener('scroll', syncHeader, { passive: true });
         syncHeader();
