@@ -680,20 +680,20 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         </span>
         <span class="pc-brand-copy">
             <strong><?= htmlspecialchars($isRu ? 'CPA backstage / issue desk' : 'CPA backstage / issue desk', ENT_QUOTES, 'UTF-8') ?></strong>
-            <span><?= htmlspecialchars($isRu ? '������������ ������ ���������: ������, ����, ��������, �������, ����� � ready-made packs ��� affiliate-������' : 'an editorial backstage strip: traffic, farms, creatives, trackers, cases and ready-made packs for affiliate teams', ENT_QUOTES, 'UTF-8') ?></span>
+            <span><?= htmlspecialchars($isRu ? 'редакционная полоса закулисья: трафик, фарм, креативы, трекеры, кейсы и готовые наборы для affiliate-команд' : 'an editorial backstage strip: traffic, farms, creatives, trackers, cases and ready-made packs for affiliate teams', ENT_QUOTES, 'UTF-8') ?></span>
         </span>
     </a>
 
     <div class="simple-header-center">
         <form class="simple-header-search" method="get" action="/blog/">
-            <input type="text" name="q" data-search-input placeholder="<?= htmlspecialchars($isRu ? '�����: Facebook farm, ����������, tracker setup, nutra funnel' : 'Search: Facebook farm, anti-detect, tracker setup, nutra funnel', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-            <button type="submit"><?= htmlspecialchars($isRu ? '�����' : 'Search', ENT_QUOTES, 'UTF-8') ?></button>
+            <input type="text" name="q" data-search-input placeholder="<?= htmlspecialchars($isRu ? 'Поиск: Facebook farm, антидетект, tracker setup, nutra funnel' : 'Search: Facebook farm, anti-detect, tracker setup, nutra funnel', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+            <button type="submit"><?= htmlspecialchars($isRu ? 'Найти в выпуске' : 'Search issue', ENT_QUOTES, 'UTF-8') ?></button>
         </form>
     </div>
 
     <div class="simple-header-right">
         <a class="simple-header-action" href="/solutions/downloads/"><?= htmlspecialchars($isRu ? 'Backroom pack' : 'Backroom pack', ENT_QUOTES, 'UTF-8') ?></a>
-        <button class="simple-nav-toggle" type="button" aria-expanded="false" aria-controls="simple-nav-drawer" aria-label="<?= htmlspecialchars($isRu ? '������� ����' : 'Open menu', ENT_QUOTES, 'UTF-8') ?>">
+        <button class="simple-nav-toggle" type="button" aria-expanded="false" aria-controls="simple-nav-drawer" aria-label="<?= htmlspecialchars($isRu ? 'Открыть меню журнала' : 'Open magazine menu', ENT_QUOTES, 'UTF-8') ?>">
             <span></span><span></span><span></span>
         </button>
     </div>
