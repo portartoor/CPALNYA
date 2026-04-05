@@ -354,8 +354,8 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         top: 14px;
         z-index: 9999;
         display: grid;
-        grid-template-columns: minmax(280px, 340px) minmax(360px, 1fr) auto;
-        gap: 16px;
+        grid-template-columns: minmax(260px, 340px) minmax(280px, 1fr) auto;
+        gap: 14px 16px;
         align-items: center;
         max-width: none;
         margin: 0;
@@ -495,15 +495,21 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         display: flex;
         align-items: center;
         justify-content: flex-end;
+        justify-self: end;
         gap: 10px;
         min-width: 0;
         flex-wrap: nowrap;
     }
     .simple-nav {
+        grid-column: 1 / -1;
         display: flex;
         align-items: center;
-        justify-content: flex-end;
+        justify-content: flex-start;
         gap: 8px;
+        min-width: 0;
+        padding-top: 12px;
+        margin-top: 2px;
+        border-top: 1px solid rgba(255,255,255,.08);
         flex-wrap: nowrap;
         white-space: nowrap;
         overflow-x: auto;
@@ -515,8 +521,8 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     .nav-theme-toggle {
         display: inline-flex;
         align-items: center;
-        gap: 9px;
-        padding: 10px 14px;
+        gap: 7px;
+        padding: 8px 11px;
         background: rgba(255,255,255,.03);
         color: var(--shell-muted);
         clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
@@ -539,9 +545,26 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 18px;
+        width: 14px;
         color: var(--shell-highlight);
-        font-size: 13px;
+        font-size: 11px;
+    }
+    .nav-section-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 8px 0 2px;
+        color: rgba(173, 190, 217, .72);
+        font: 700 10px/1 "Space Grotesk", "Sora", sans-serif;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        flex: 0 0 auto;
+    }
+    .nav-section-label::before {
+        content: "";
+        width: 16px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(115,184,255,.34));
     }
     .nav-cta { color: var(--shell-text) !important; }
     .nav-theme-toggle {
