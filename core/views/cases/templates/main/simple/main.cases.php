@@ -214,6 +214,20 @@ $buildCaseEnhancement = static function (array $case, bool $isRu) use ($stripHtm
   .cases-related{grid-template-columns:1fr}
 }
 </style>
+<style id="cp-front-override">
+.cases-simple{max-width:1240px;padding:24px 16px 46px;color:var(--shell-text);font-family:"Sora",system-ui,sans-serif}
+.cases-simple-hero,.cases-simple-card,.cases-simple-detail,.cases-deep-block,.cases-inline-contact,.cases-seo-block,.cases-related a,.cases-empty{border-color:var(--shell-border)!important;background:var(--shell-panel)!important;backdrop-filter:blur(14px);box-shadow:var(--shell-shadow)}
+.cases-simple-hero{position:relative;overflow:hidden;border-radius:30px;padding:34px}
+.cases-simple-hero:after{content:"";position:absolute;right:-50px;bottom:-70px;width:240px;height:240px;border-radius:999px;background:radial-gradient(circle,rgba(122,180,255,.24),rgba(122,180,255,0));pointer-events:none}
+.cases-simple-hero h1,.cases-simple-top h3,.cases-simple-detail h2,.cases-deep-block h3,.cases-seo-block h2{font-family:"Space Grotesk","Sora",sans-serif;color:var(--shell-text)}
+.cases-simple-hero h1{font-size:clamp(2.5rem,4vw,4.2rem);line-height:.94;max-width:10ch}
+.cases-simple-hero p,.cases-simple-summary span,.cases-simple-detail-grid p,.cases-simple-detail-copy div,.cases-simple-excerpt,.cases-simple-sections p,.cases-deep-block p,.cases-howto,.cases-checklist,.cases-seo-block p,.cases-seo-list li{color:var(--shell-muted)!important}
+.cases-simple-card,.cases-simple-detail,.cases-inline-contact,.cases-seo-block{border-radius:26px}
+.cases-simple-link,.cases-simple-back{border-color:var(--shell-border)!important;background:rgba(255,255,255,.05)!important;color:var(--shell-accent)!important}
+.cases-simple-summary div,.cases-simple-detail-grid article,.cases-simple-detail-copy article,.cases-simple-sections article,.cases-deep-table,.cases-deep-table th,.cases-deep-table td{border-color:var(--shell-border)!important;background:rgba(255,255,255,.03)!important;color:inherit}
+.cases-inline-contact input,.cases-inline-contact textarea{border-color:var(--shell-border)!important;background:rgba(4,8,18,.56)!important;color:var(--shell-text)}
+.cases-inline-contact button{background:linear-gradient(135deg,#7ab4ff,#2ce0c7)!important;color:#07111f}
+</style>
 <section class="cases-simple">
     <div class="cases-simple-hero">
         <h1><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h1>
@@ -390,4 +404,5 @@ $buildCaseEnhancement = static function (array $case, bool $isRu) use ($stripHtm
         <p><?= htmlspecialchars($isRu ? 'Если нужен похожий результат, оставьте заявку: подготовим план реализации под ваш стек, ограничения и целевые метрики бизнеса.' : 'If you need a similar result, send a request and we will prepare an implementation plan for your stack, constraints and business KPIs.', ENT_QUOTES, 'UTF-8') ?></p>
     </article>
 </section>
+
 

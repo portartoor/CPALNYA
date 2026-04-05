@@ -103,6 +103,20 @@ $stepTitles = $isRu
 .contact-simple.dark .cw-group-row,body.ui-tone-dark .cw-group-row{color:#c5dcf7}
 @media (max-width:980px){.cw-needs,.cw-grid,.cw-by-need.a{grid-template-columns:1fr}}
 </style>
+<style id="cp-front-override">
+.contact-simple{max-width:1240px;padding:24px 16px 46px;color:var(--shell-text);font-family:"Sora",system-ui,sans-serif}
+.contact-simple-hero,.contact-simple-copy,.cw,.cw-panel,.cw-needs label,.cw-note{border-color:var(--shell-border)!important;background:var(--shell-panel)!important;backdrop-filter:blur(14px);box-shadow:var(--shell-shadow)}
+.contact-simple-hero{position:relative;overflow:hidden;border-radius:30px;padding:34px}
+.contact-simple-hero:before{content:"";position:absolute;left:-70px;bottom:-70px;width:250px;height:250px;border-radius:999px;background:radial-gradient(circle,rgba(44,224,199,.22),rgba(44,224,199,0));pointer-events:none}
+.contact-simple-hero h1,.cw h2{font-family:"Space Grotesk","Sora",sans-serif;color:var(--shell-text)}
+.contact-simple-hero h1{font-size:clamp(2.5rem,4vw,4.2rem);line-height:.94;max-width:9ch}
+.contact-simple-copy p,.cw p,.cw-needs span,.cw-note,.cw-budget-values{color:var(--shell-muted)!important}
+.cw,.cw-panel{border-radius:26px}
+.cw-steps span,.cw-nav button{border-color:var(--shell-border)!important;background:rgba(255,255,255,.05)!important;color:var(--shell-text)!important}
+.cw-steps span.a,.cw-nav .p{background:linear-gradient(135deg,#7ab4ff,#2ce0c7)!important;color:#07111f!important;border-color:rgba(122,180,255,.34)!important}
+.cw-field label,.cw-needs strong,.cw-group-row{color:var(--shell-text)!important}
+.cw-field input,.cw-field select,.cw-field textarea{border-color:var(--shell-border)!important;background:rgba(4,8,18,.56)!important;color:var(--shell-text)!important}
+</style>
 
 <section class="contact-simple<?= $forceDark ? ' dark' : '' ?>">
   <div class="contact-simple-hero"><h1><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h1><p><?= htmlspecialchars($lead, ENT_QUOTES, 'UTF-8') ?></p></div>
@@ -193,3 +207,4 @@ prev.addEventListener('click',function(){setStep(s-1);});next.addEventListener('
 form.addEventListener('submit',function(e){if(!val4()){e.preventDefault();setStep(4);return;}syncBudget();var payload={need:needLabel(),need_code:needCode(),timeline:(form.wz_timeline.value||''),budget_from:(budgetFrom?budgetFrom.value:''),budget_to:(budgetTo?budgetTo.value:''),budget_range:(budgetText?budgetText.textContent:''),product_type:(form.wz_product_type?form.wz_product_type.value:''),stage:(form.wz_stage?form.wz_stage.value:''),stack:(form.wz_stack?form.wz_stack.value:''),refactor_problem:(form.wz_refactor_problem?form.wz_refactor_problem.value:''),audit_type:(form.wz_audit_type?form.wz_audit_type.value:''),audit_target:(form.wz_audit_target?form.wz_audit_target.value:''),docs_type:(form.wz_docs_type?form.wz_docs_type.value:''),docs_audience:(form.wz_docs_audience?form.wz_docs_audience.value:''),seo_site:(form.wz_seo_site?form.wz_seo_site.value:''),seo_priority:(form.wz_seo_priority?form.wz_seo_priority.value:''),services:[].slice.call(services.options).filter(function(o){return o.selected;}).map(function(o){return o.textContent;}),links:(form.wz_links.value||''),comment:(form.wz_comment.value||''),contact_channel:(form.wz_contact_channel.value||'')};hiddenPayload.value=JSON.stringify(payload);hiddenSubj.value=payload.need||(ru?'Заявка через мастер':'Wizard request');hiddenCamp.value='contact:wizard:'+payload.need_code;hiddenMsg.value=(ru?'Запрос через мастер обращения':'Request from contact wizard')+'\n'+(ru?'Тип: ':'Type: ')+payload.need+'\n'+(ru?'Сроки: ':'Timeline: ')+payload.timeline+'\n'+(ru?'Бюджет: ':'Budget: ')+payload.budget_range;});
 toggleNeed();refreshServices();syncBudget();setStep(1);})();
 </script>
+

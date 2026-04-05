@@ -24,12 +24,8 @@ foreach ($items as $item):
 ?>
     <a class="<?= $isActive ? 'is-active' : '' ?>" href="<?= htmlspecialchars($path, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)$item['title'], ENT_QUOTES, 'UTF-8') ?></a>
 <?php endforeach; ?>
-<form class="nav-site-check nav-site-check--drawer" method="get" action="/blog/">
-    <input type="text" name="q" placeholder="<?= htmlspecialchars($isRu ? 'Искать статьи и решения' : 'Search articles and solutions', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-    <button type="submit"><?= htmlspecialchars($isRu ? 'Найти' : 'Search', ENT_QUOTES, 'UTF-8') ?></button>
-    <div class="nav-site-check-hint" aria-hidden="true"><?= htmlspecialchars($isRu ? 'Кластеры: SEO, трекеры, аналитика, ready-made' : 'Clusters: SEO, trackers, analytics, ready-made', ENT_QUOTES, 'UTF-8') ?></div>
-</form>
+<a class="nav-cta" href="/solutions/downloads/"><?= htmlspecialchars($isRu ? 'Скачать' : 'Downloads', ENT_QUOTES, 'UTF-8') ?></a>
 <button class="nav-theme-toggle" type="button" data-theme-toggle aria-pressed="false" title="<?= htmlspecialchars($isRu ? 'Переключить тему' : 'Switch theme', ENT_QUOTES, 'UTF-8') ?>">
-    <span class="theme-icon theme-icon-sun" aria-hidden="true">☀</span>
-    <span class="theme-icon theme-icon-moon" aria-hidden="true">☾</span>
+    <span class="theme-icon theme-icon-sun" aria-hidden="true">Sun</span>
+    <span class="theme-icon theme-icon-moon" aria-hidden="true">Moon</span>
 </button>

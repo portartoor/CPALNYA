@@ -166,6 +166,26 @@ body.ui-tone-dark .services-simple-group-header small{color:#9db7d8}
 body.ui-tone-dark .services-simple-group-line{background:linear-gradient(90deg,#3f5f84,rgba(63,95,132,0))}
 @media (max-width:860px){.services-simple-grid{grid-template-columns:1fr}.services-inline-contact form{grid-template-columns:1fr}.services-simple-selected-content th,.services-simple-selected-content td{min-width:120px;font-size:13px}}
 </style>
+<style id="cp-front-override">
+.services-simple{max-width:1240px;padding:24px 16px 44px;color:var(--shell-text);font-family:"Sora",system-ui,sans-serif}
+.services-simple-hero,.services-simple-selected,.services-inline-contact,.services-simple-card,.services-simple-empty{border:1px solid var(--shell-border)!important;background:var(--shell-panel)!important;backdrop-filter:blur(14px);box-shadow:var(--shell-shadow)}
+.services-simple-hero{position:relative;overflow:hidden;border-radius:30px;padding:34px}
+.services-simple-hero:before{content:"";position:absolute;inset:auto auto -80px -40px;width:240px;height:240px;border-radius:999px;background:radial-gradient(circle,rgba(44,224,199,.24),rgba(44,224,199,0));pointer-events:none}
+.services-simple-hero h1,.services-simple-selected h2,.services-simple-card h3{font-family:"Space Grotesk","Sora",sans-serif;color:var(--shell-text)}
+.services-simple-hero h1{font-size:clamp(2.5rem,4vw,4.4rem);line-height:.94;max-width:11ch}
+.services-simple-hero p,.services-simple-card p,.services-simple-selected-content,.services-inline-contact p,.services-simple-empty{color:var(--shell-muted)!important}
+.services-simple-groups{gap:10px}
+.services-simple-groups a,.services-simple-back,.services-simple-link,.services-simple-pagination a,.services-simple-pagination span{border:1px solid var(--shell-border)!important;background:rgba(255,255,255,.04)!important;color:var(--shell-muted)!important;border-radius:999px}
+.services-simple-groups a.active,.services-simple-pagination .active{background:linear-gradient(135deg,rgba(122,180,255,.26),rgba(44,224,199,.18))!important;color:var(--shell-text)!important;border-color:rgba(122,180,255,.34)!important}
+.services-simple-grid{gap:16px}
+.services-simple-card{border-radius:24px;padding:20px}
+.services-simple-link{padding:10px 14px!important}
+.services-simple-selected{border-radius:28px;padding:26px}
+.services-simple-selected-content .svc-block,.services-simple-selected-content table,.services-simple-selected-content th,.services-simple-selected-content td{border-color:var(--shell-border)!important;background:rgba(255,255,255,.03)!important;color:inherit}
+.services-inline-contact{border-radius:24px;padding:20px}
+.services-inline-contact input,.services-inline-contact textarea{border-color:var(--shell-border)!important;background:rgba(4,8,18,.56)!important;color:var(--shell-text)}
+.services-inline-contact button{background:linear-gradient(135deg,#7ab4ff,#2ce0c7)!important;color:#07111f}
+</style>
 <section class="services-simple">
     <div class="services-simple-hero">
         <h1><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h1>
@@ -297,6 +317,7 @@ body.ui-tone-dark .services-simple-group-line{background:linear-gradient(90deg,#
         </nav>
     <?php endif; ?>
 </section>
+
 
 
 

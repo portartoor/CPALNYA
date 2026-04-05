@@ -250,6 +250,19 @@ body.ui-tone-dark .products-contact button{background:linear-gradient(135deg,#2c
 body.ui-tone-dark .products-contact .contact-alert.ok{background:#173828;border-color:#2a6045;color:#b8e8cb}
 body.ui-tone-dark .products-contact .contact-alert.error{background:#3b1f25;border-color:#71414a;color:#f0c7cf}
 </style>
+<style id="cp-front-override">
+.products-page{max-width:1240px;padding:24px 16px 46px;color:var(--shell-text);font-family:"Sora",system-ui,sans-serif}
+.products-hero,.product-card,.product-block,.product-nuance,.product-deep,.products-contact,.products-seo-block{border-color:var(--shell-border)!important;background:var(--shell-panel)!important;backdrop-filter:blur(14px);box-shadow:var(--shell-shadow)}
+.products-hero{position:relative;overflow:hidden;border-radius:30px;padding:34px}
+.products-hero:before{content:"";position:absolute;left:-60px;top:-60px;width:220px;height:220px;border-radius:999px;background:radial-gradient(circle,rgba(44,224,199,.24),rgba(44,224,199,0));pointer-events:none}
+.products-hero h1,.product-head h2,.products-contact h2,.products-seo-block h2,.product-deep h3{font-family:"Space Grotesk","Sora",sans-serif;color:var(--shell-text)}
+.products-hero h1{font-size:clamp(2.5rem,4vw,4.3rem);line-height:.94;max-width:12ch}
+.products-hero p,.product-summary,.product-block li,.product-block p,.product-nuance,.product-deep dd,.products-contact p,.products-seo-block p,.products-seo-list li{color:var(--shell-muted)!important}
+.product-card,.products-contact,.products-seo-block{border-radius:26px}
+.product-tag,.product-back,.product-btn-detail{border-color:var(--shell-border)!important;background:rgba(255,255,255,.05)!important;color:var(--shell-accent)!important}
+.product-btn-open,.products-contact button{background:linear-gradient(135deg,#7ab4ff,#2ce0c7)!important;color:#07111f!important;border-color:rgba(122,180,255,.34)!important}
+.products-contact input,.products-contact select,.products-contact textarea{border-color:var(--shell-border)!important;background:rgba(4,8,18,.56)!important;color:var(--shell-text)}
+</style>
 
 <section class="products-page">
     <div class="products-hero">
@@ -386,3 +399,4 @@ body.ui-tone-dark .products-contact .contact-alert.error{background:#3b1f25;bord
         <p><?= htmlspecialchars($t('Оставьте запрос, и получите рабочий план внедрения: этапы, сроки, требования к интеграции и прогнозируемый экономический эффект.', 'Send a request to get a practical rollout plan: stages, timeline, integration requirements and projected business impact.'), ENT_QUOTES, 'UTF-8') ?></p>
     </article>
 </section>
+
