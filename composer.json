@@ -1,0 +1,17 @@
+{
+    "name": "vendor/geoip-service",
+    "description": "GeoIP detection service",
+    "type": "project",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Port Arthur",
+            "email": "portartoor@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "geoip2/geoip2": "^3.3",
+        "phpmailer/phpmailer": "^7.0"
+    }
+}
