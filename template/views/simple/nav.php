@@ -61,7 +61,3 @@ foreach ($navSections as $sectionBlock):
         </a>
     <?php endforeach; ?>
 <?php endforeach; ?>
-<a class="nav-cta" href="/solutions/downloads/">
-    <span class="nav-item-icon" aria-hidden="true">↓</span>
-    <span><?= htmlspecialchars($isRu ? 'Скачать набор' : 'Get pack', ENT_QUOTES, 'UTF-8') ?></span>
-</a>

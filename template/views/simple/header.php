@@ -354,8 +354,8 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         top: 14px;
         z-index: 9999;
         display: grid;
-        grid-template-columns: minmax(260px, 340px) minmax(280px, 1fr) auto;
-        gap: 14px 16px;
+        grid-template-columns: minmax(220px, 300px) minmax(320px, 1fr) auto;
+        gap: 10px 16px;
         align-items: center;
         max-width: none;
         margin: 0;
@@ -376,6 +376,8 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     .simple-header.is-scrolled { transform: translateY(-2px); }
 
     .simple-brand {
+        grid-column: 1;
+        grid-row: 1 / span 2;
         display: flex;
         align-items: center;
         gap: 14px;
@@ -416,6 +418,12 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         gap: 3px;
         min-width: 0;
     }
+    .simple-header-note {
+        grid-column: 2;
+        grid-row: 1;
+        min-width: 0;
+        align-self: end;
+    }
     .pc-brand-copy strong {
         display: inline-flex;
         align-items: center;
@@ -439,7 +447,11 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         line-height: 1.32;
     }
 
-    .simple-header-center { min-width: 0; }
+    .simple-header-center {
+        grid-column: 2;
+        grid-row: 2;
+        min-width: 0;
+    }
     .simple-header-search {
         display: grid;
         grid-template-columns: 1fr auto;
@@ -495,6 +507,8 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         display: flex;
         align-items: center;
         justify-content: flex-end;
+        grid-column: 3;
+        grid-row: 1 / span 2;
         justify-self: end;
         gap: 10px;
         min-width: 0;
@@ -633,7 +647,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
 
     @media (max-width: 1080px) {
         .simple-header { grid-template-columns: minmax(240px, 1fr) auto; }
-        .simple-header-center { display: none; }
+        .simple-header-note, .simple-header-center { display: none; }
         .simple-nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
         .simple-nav-backdrop {
             display: block;
@@ -701,11 +715,14 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
                 <span class="pc-logo-core">backroom</span>
             </span>
         </span>
+    </a>
+
+    <div class="simple-header-note">
         <span class="pc-brand-copy">
             <strong><?= htmlspecialchars($isRu ? 'CPA backstage / issue desk' : 'CPA backstage / issue desk', ENT_QUOTES, 'UTF-8') ?></strong>
             <span><?= htmlspecialchars($isRu ? 'редакционная полоса закулисья: трафик, фарм, креативы, трекеры, кейсы и готовые наборы для affiliate-команд' : 'an editorial backstage strip: traffic, farms, creatives, trackers, cases and ready-made packs for affiliate teams', ENT_QUOTES, 'UTF-8') ?></span>
         </span>
-    </a>
+    </div>
 
     <div class="simple-header-center">
         <form class="simple-header-search" method="get" action="/blog/">
