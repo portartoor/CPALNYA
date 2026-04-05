@@ -643,6 +643,157 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
     }
 
+    .neo-panel,
+    .cp-card,
+    .cp-side-panel,
+    .cp-signal-board,
+    .cp-feed,
+    .cp-feed-item,
+    .cp-case-card,
+    .cpb-lead-card,
+    .cpb-feed,
+    .cpb-feed-card,
+    .cpb-side-panel,
+    .cpb-article,
+    .cpb-comments,
+    .cpb-feature,
+    .cpb-stream,
+    .cpb-comment,
+    .sol-card,
+    .sol-board,
+    .sol-detail,
+    .sol-comments,
+    .sol-list,
+    .sol-comment,
+    .cpz-cover,
+    .cpz-issue-rail,
+    .cpz-lead-card,
+    .cpz-assets,
+    .cpz-cases,
+    .cpz-topic-card,
+    .cpz-asset-card,
+    .cpz-case-card,
+    .cpz-products article,
+    .cpz-panel,
+    .cpz-feature-note,
+    .cpz-secondary-lead,
+    .cpz-cluster-intro,
+    .cpz-issue-row strong,
+    .cpb-index,
+    .cpb-feed-arrow,
+    .sol-meta div,
+    .cpb-meta div {
+        border-radius: 0 !important;
+        background: linear-gradient(180deg, rgba(7, 13, 24, .22), rgba(7, 12, 23, .08)) !important;
+        border: 1px solid rgba(141, 179, 236, .14) !important;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 10px 28px rgba(2, 7, 18, .08) !important;
+        clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px)) !important;
+        backdrop-filter: blur(10px) saturate(112%);
+    }
+
+    .cpz-kicker,
+    .cpz-tag,
+    .cpz-meta,
+    .cpz-section-tag,
+    .cpb-kicker,
+    .cpb-chip,
+    .cpb-meta-pill,
+    .cpb-comment-meta span,
+    .sol-kicker,
+    .sol-tab,
+    .sol-type,
+    .sol-note,
+    .sol-comment-meta span {
+        border-radius: 0 !important;
+        padding: 8px 11px !important;
+        border: 1px solid rgba(141, 179, 236, .16) !important;
+        background: rgba(255,255,255,.03) !important;
+        clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%) !important;
+    }
+
+    .cpz-icon,
+    .cpb-icon,
+    .sol-icon {
+        width: 16px !important;
+        height: 16px !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        color: var(--shell-highlight) !important;
+    }
+
+    .cpz-btn,
+    .cpb-link,
+    .cpb-btn,
+    .sol-link,
+    .sol-btn,
+    .cpb-toolbar button,
+    .sol-toolbar button,
+    .cpb-auth-grid button,
+    .cpb-comment-form button,
+    .solutions-comment-form button,
+    .cpz-actions a,
+    .cpz-actions button {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        padding: 12px 16px !important;
+        border-radius: 0 !important;
+        border: 1px solid var(--shell-border) !important;
+        background: linear-gradient(135deg, rgba(115,184,255,.22), rgba(39,223,192,.18)) !important;
+        color: var(--shell-text) !important;
+        text-decoration: none !important;
+        font-weight: 700 !important;
+        clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%) !important;
+        transition: transform .2s ease, border-color .2s ease, filter .2s ease !important;
+        box-shadow: none !important;
+    }
+
+    .cpz-btn:hover,
+    .cpb-link:hover,
+    .cpb-btn:hover,
+    .sol-link:hover,
+    .sol-btn:hover,
+    .cpb-toolbar button:hover,
+    .sol-toolbar button:hover,
+    .cpb-auth-grid button:hover,
+    .cpb-comment-form button:hover,
+    .solutions-comment-form button:hover,
+    .cpz-actions a:hover,
+    .cpz-actions button:hover {
+        transform: translateY(-1px) !important;
+        filter: saturate(1.08) !important;
+        border-color: var(--shell-border-strong) !important;
+    }
+
+    .cpb-auth-grid input,
+    .cpb-comment-form input,
+    .cpb-comment-form select,
+    .cpb-comment-form textarea,
+    .sol-auth-grid input,
+    .solutions-comment-form input,
+    .solutions-comment-form select,
+    .solutions-comment-form textarea,
+    .cpz-cover input,
+    .cpz-cover select,
+    .cpz-cover textarea {
+        border-radius: 0 !important;
+        border: 1px solid rgba(141, 179, 236, .16) !important;
+        background: rgba(255,255,255,.03) !important;
+        color: var(--shell-text) !important;
+        clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%) !important;
+        box-shadow: none !important;
+    }
+
+    .cpb-article img,
+    .cpz-cover img,
+    .cpz-products img,
+    .sol-detail img {
+        border-radius: 0 !important;
+        clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%) !important;
+        border: 1px solid rgba(141, 179, 236, .14) !important;
+    }
+
     main, .pc-main { width: 100%; }
 
     @media (max-width: 1080px) {
