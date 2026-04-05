@@ -750,3 +750,6 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
 </script>
 
 
+
+<?php include DIR . '/template/views/simple/partials/terrain_polygon_map.php'; ?>
+
