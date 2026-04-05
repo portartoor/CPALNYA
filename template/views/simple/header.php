@@ -494,15 +494,23 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     .simple-header-right {
         display: flex;
         align-items: center;
+        justify-content: flex-end;
         gap: 10px;
+        min-width: 0;
+        flex-wrap: nowrap;
     }
     .simple-nav {
         display: flex;
         align-items: center;
         justify-content: flex-end;
         gap: 8px;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
     }
+    .simple-nav::-webkit-scrollbar { display: none; }
     .simple-nav a,
     .nav-theme-toggle {
         display: inline-flex;
@@ -513,6 +521,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         color: var(--shell-muted);
         clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
         transition: color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease;
+        flex: 0 0 auto;
     }
     .simple-nav a:hover,
     .nav-theme-toggle:hover {
@@ -773,3 +782,5 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     }
 })();
 </script>
+
+

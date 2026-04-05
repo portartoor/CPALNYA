@@ -20,7 +20,15 @@
     var height = 0;
     var rafId = 0;
     var theme = 'enterprise';
-    var timeSeed = Math.random() * 1000;
+    var scene = {
+        avenues: [],
+        crossStreets: [],
+        blocks: [],
+        pulses: [],
+        horizon: 0,
+        roadHalfWidth: 0
+    };
+
     var pointer = {
         x: 0,
         y: 0,
@@ -28,14 +36,6 @@
         ty: 0,
         strength: 0,
         targetStrength: 0
-    };
-
-    var city = {
-        roadsX: [],
-        roadsY: [],
-        blocks: [],
-        pulses: [],
-        nodes: []
     };
 
     function rand(min, max) {
@@ -46,45 +46,53 @@
         return Math.min(max, Math.max(min, value));
     }
 
-    function mix(a, b, t) {
+    function lerp(a, b, t) {
         return a + (b - a) * t;
     }
 
     function buildPalette(mode) {
         if (mode === 'simple') {
             return {
-                bgA: '#eff6ff',
-                bgB: '#d7e4f8',
-                hazeA: '84,124,255',
-                hazeB: '0,177,162',
-                lineMajor: '42,89,165',
-                lineMinor: '88,122,187',
-                flowA: '68,110,255',
-                flowB: '0,174,162',
-                tower: '232,240,255',
-                towerEdge: '107,135,194',
-                windowA: '104,123,255',
-                windowB: '47,179,162',
-                park: '160,221,198',
-                node: '45,106,221'
+                skyTop: '#eef5ff',
+                skyBottom: '#d6e5fb',
+                hazeA: '105,138,255',
+                hazeB: '0,174,163',
+                groundA: '229,238,252',
+                groundB: '210,223,245',
+                gridMajor: '61,95,182',
+                gridMinor: '93,135,207',
+                roadGlowA: '86,119,255',
+                roadGlowB: '0,176,167',
+                buildingFront: '222,232,250',
+                buildingSide: '207,220,244',
+                roof: '240,246,255',
+                edge: '101,135,198',
+                windowA: '95,113,255',
+                windowB: '37,169,154',
+                park: '182,232,206',
+                node: '48,111,221'
             };
         }
 
         return {
-            bgA: '#030711',
-            bgB: '#081325',
-            hazeA: '104,114,255',
-            hazeB: '38,224,194',
-            lineMajor: '97,128,255',
-            lineMinor: '24,150,150',
-            flowA: '149,91,255',
-            flowB: '47,232,194',
-            tower: '10,19,37',
-            towerEdge: '122,168,255',
-            windowA: '117,146,255',
-            windowB: '47,232,194',
-            park: '24,76,67',
-            node: '175,210,255'
+            skyTop: '#02060f',
+            skyBottom: '#081425',
+            hazeA: '111,95,255',
+            hazeB: '29,228,192',
+            groundA: '#060d19',
+            groundB: '#08101e',
+            gridMajor: '93,122,255',
+            gridMinor: '28,168,158',
+            roadGlowA: '149,98,255',
+            roadGlowB: '38,233,198',
+            buildingFront: '8,17,32',
+            buildingSide: '12,25,46',
+            roof: '14,31,58',
+            edge: '119,174,255',
+            windowA: '124,136,255',
+            windowB: '43,232,196',
+            park: '19,70,62',
+            node: '171,209,255'
         };
     }
 
@@ -99,201 +107,205 @@
         seedCity();
     }
 
-    function buildRoads(length, minStep, maxStep, startPad, endPad) {
-        var roads = [startPad];
-        while (roads[roads.length - 1] < length - endPad) {
-            roads.push(roads[roads.length - 1] + rand(minStep, maxStep));
-        }
-        roads[roads.length - 1] = length - endPad;
-        return roads;
-    }
-
-    function pickBlockType(cx, cy) {
-        var centerWeight = 1 - Math.min(1, Math.hypot(cx - width * 0.52, cy - height * 0.5) / Math.max(width, height));
-        var parkChance = 0.1 + Math.max(0, 0.18 - centerWeight * 0.12);
-        if (Math.random() < parkChance) {
-            return 'park';
-        }
-        return 'towers';
-    }
-
-    function createBuildings(block) {
-        var buildings = [];
-        var cols = Math.max(1, Math.floor(block.w / rand(44, 66)));
-        var rows = Math.max(1, Math.floor(block.h / rand(40, 58)));
-        var cellW = block.w / cols;
-        var cellH = block.h / rows;
-        var centerBias = 1 - Math.min(1, Math.hypot(block.cx - width * 0.5, block.cy - height * 0.54) / (Math.max(width, height) * 0.58));
-
-        for (var row = 0; row < rows; row++) {
-            for (var col = 0; col < cols; col++) {
-                if (Math.random() < 0.18) {
-                    continue;
-                }
-                var w = cellW * rand(0.42, 0.82);
-                var d = cellH * rand(0.4, 0.78);
-                var x = block.x + col * cellW + (cellW - w) * rand(0.15, 0.85);
-                var y = block.y + row * cellH + (cellH - d) * rand(0.15, 0.85);
-                var heightUnits = rand(20, 140) + centerBias * rand(30, 110);
-                buildings.push({
-                    x: x,
-                    y: y,
-                    w: w,
-                    d: d,
-                    h: heightUnits
-                });
-            }
-        }
-
-        buildings.sort(function (a, b) {
-            return (a.y + a.d) - (b.y + b.d);
-        });
-        return buildings;
-    }
-
-    function seedCity() {
-        city.roadsX = buildRoads(width, 90, 170, 34, 34);
-        city.roadsY = buildRoads(height, 82, 154, 42, 42);
-        city.blocks = [];
-        city.pulses = [];
-        city.nodes = [];
-
-        for (var yi = 0; yi < city.roadsY.length - 1; yi++) {
-            for (var xi = 0; xi < city.roadsX.length - 1; xi++) {
-                var x = city.roadsX[xi];
-                var y = city.roadsY[yi];
-                var w = city.roadsX[xi + 1] - x;
-                var h = city.roadsY[yi + 1] - y;
-                if (w < 46 || h < 42) {
-                    continue;
-                }
-                var block = {
-                    x: x + 8,
-                    y: y + 8,
-                    w: Math.max(18, w - 16),
-                    h: Math.max(18, h - 16)
-                };
-                block.cx = block.x + block.w * 0.5;
-                block.cy = block.y + block.h * 0.5;
-                block.type = pickBlockType(block.cx, block.cy);
-                block.buildings = block.type === 'park' ? [] : createBuildings(block);
-                city.blocks.push(block);
-            }
-        }
-
-        for (var rx = 0; rx < city.roadsX.length; rx++) {
-            for (var ry = 0; ry < city.roadsY.length; ry++) {
-                city.nodes.push({
-                    x: city.roadsX[rx],
-                    y: city.roadsY[ry],
-                    phase: rand(0, Math.PI * 2),
-                    power: rand(0.3, 1)
-                });
-            }
-        }
-
-        for (var i = 0; i < Math.max(10, Math.round((city.roadsX.length + city.roadsY.length) * 1.3)); i++) {
-            var horizontal = Math.random() > 0.48;
-            if (horizontal) {
-                city.pulses.push({
-                    axis: 'x',
-                    y: city.roadsY[Math.floor(rand(0, city.roadsY.length - 1e-6))],
-                    from: city.roadsX[0],
-                    to: city.roadsX[city.roadsX.length - 1],
-                    progress: Math.random(),
-                    speed: rand(0.00005, 0.00013),
-                    size: rand(60, 120),
-                    hue: Math.random()
-                });
-            } else {
-                city.pulses.push({
-                    axis: 'y',
-                    x: city.roadsX[Math.floor(rand(0, city.roadsX.length - 1e-6))],
-                    from: city.roadsY[0],
-                    to: city.roadsY[city.roadsY.length - 1],
-                    progress: Math.random(),
-                    speed: rand(0.00005, 0.00013),
-                    size: rand(60, 120),
-                    hue: Math.random()
-                });
-            }
-        }
-    }
-
-    function drawBackdrop(palette) {
-        var bg = ctx.createLinearGradient(0, 0, width, height);
-        bg.addColorStop(0, palette.bgA);
-        bg.addColorStop(1, palette.bgB);
-        ctx.fillStyle = bg;
-        ctx.fillRect(0, 0, width, height);
-
-        var hazeA = ctx.createRadialGradient(width * 0.22, height * 0.2, 0, width * 0.22, height * 0.2, width * 0.48);
-        hazeA.addColorStop(0, 'rgba(' + palette.hazeA + ',0.22)');
-        hazeA.addColorStop(1, 'rgba(' + palette.hazeA + ',0)');
-        ctx.fillStyle = hazeA;
-        ctx.fillRect(0, 0, width, height);
-
-        var hazeB = ctx.createRadialGradient(width * 0.78, height * 0.28, 0, width * 0.78, height * 0.28, width * 0.42);
-        hazeB.addColorStop(0, 'rgba(' + palette.hazeB + ',0.18)');
-        hazeB.addColorStop(1, 'rgba(' + palette.hazeB + ',0)');
-        ctx.fillStyle = hazeB;
-        ctx.fillRect(0, 0, width, height);
-    }
-
-    function pointerWarp(x, y) {
-        var dx = x - pointer.x;
-        var dy = y - pointer.y;
-        var dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        var reach = 240 + pointer.strength * 120;
-        if (dist > reach) {
-            return { x: x, y: y };
-        }
-        var falloff = 1 - dist / reach;
-        var push = falloff * falloff * (18 + pointer.strength * 32);
+    function project(x, z, y) {
+        var horizon = scene.horizon;
+        var perspective = clamp(1 - z / 1080, 0.045, 1.4);
+        var swayX = (pointer.x - width * 0.5) / Math.max(width, 1) * 90 * perspective;
+        var swayY = (pointer.y - height * 0.5) / Math.max(height, 1) * 32 * perspective;
+        var deform = pointerDeform(x, z);
         return {
-            x: x + (dx / dist) * push,
-            y: y + (dy / dist) * push
+            x: width * 0.5 + x * perspective + swayX + deform.x,
+            y: horizon + z * 0.78 - y * perspective * 0.92 + swayY + deform.y,
+            scale: perspective
         };
     }
 
-    function drawRoads(palette, time) {
-        var lineShift = Math.sin(time * 0.00018) * 0.5;
+    function pointerDeform(x, z) {
+        var screen = {
+            x: width * 0.5 + x * clamp(1 - z / 1080, 0.045, 1.4),
+            y: scene.horizon + z * 0.78
+        };
+        var dx = screen.x - pointer.x;
+        var dy = screen.y - pointer.y;
+        var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        var reach = 220 + pointer.strength * 140;
+        if (dist >= reach) {
+            return { x: 0, y: 0 };
+        }
+        var falloff = 1 - dist / reach;
+        var push = falloff * falloff * (28 + pointer.strength * 18);
+        return {
+            x: (dx / dist) * push,
+            y: (dy / dist) * push * 0.7
+        };
+    }
+
+    function seedCity() {
+        scene.horizon = height * 0.23;
+        scene.roadHalfWidth = Math.max(14, width * 0.012);
+        scene.avenues = [];
+        scene.crossStreets = [];
+        scene.blocks = [];
+        scene.pulses = [];
+
+        var avenueCount = width < 900 ? 7 : 9;
+        for (var i = 0; i < avenueCount; i++) {
+            scene.avenues.push(lerp(-width * 0.58, width * 0.58, i / (avenueCount - 1)));
+        }
+
+        var depth = 0;
+        while (depth < 980) {
+            scene.crossStreets.push(depth);
+            depth += rand(60, 120) + depth * 0.045;
+        }
+
+        for (var zIndex = 0; zIndex < scene.crossStreets.length - 1; zIndex++) {
+            for (var xIndex = 0; xIndex < scene.avenues.length - 1; xIndex++) {
+                var x0 = scene.avenues[xIndex];
+                var x1 = scene.avenues[xIndex + 1];
+                var z0 = scene.crossStreets[zIndex];
+                var z1 = scene.crossStreets[zIndex + 1];
+                var inset = rand(6, 16);
+                var road = scene.roadHalfWidth;
+                var left = x0 + road + inset;
+                var right = x1 - road - inset;
+                var nearZ = z0 + road + inset;
+                var farZ = z1 - road - inset;
+                if (right - left < 18 || farZ - nearZ < 24) {
+                    continue;
+                }
+                scene.blocks.push(buildBlock(left, right, nearZ, farZ, zIndex));
+            }
+        }
+
+        for (var p = 0; p < Math.max(14, scene.avenues.length * 2 + scene.crossStreets.length); p++) {
+            if (Math.random() > 0.5) {
+                scene.pulses.push({
+                    axis: 'z',
+                    lane: scene.avenues[Math.floor(rand(0, scene.avenues.length - 0.001))] + rand(-scene.roadHalfWidth * 0.35, scene.roadHalfWidth * 0.35),
+                    progress: Math.random(),
+                    speed: rand(0.00008, 0.0002),
+                    span: rand(45, 85),
+                    hue: Math.random()
+                });
+            } else {
+                scene.pulses.push({
+                    axis: 'x',
+                    depth: scene.crossStreets[Math.floor(rand(1, scene.crossStreets.length - 1.001))],
+                    progress: Math.random(),
+                    speed: rand(0.00008, 0.00018),
+                    span: rand(55, 105),
+                    hue: Math.random()
+                });
+            }
+        }
+    }
+
+    function buildBlock(left, right, nearZ, farZ, rowIndex) {
+        var centerBias = 1 - Math.min(1, Math.abs((left + right) * 0.5) / (width * 0.34));
+        var parkChance = rowIndex < 2 ? 0.22 : 0.1;
+        var type = Math.random() < parkChance ? 'park' : 'buildings';
+        var block = {
+            left: left,
+            right: right,
+            nearZ: nearZ,
+            farZ: farZ,
+            type: type,
+            buildings: []
+        };
+
+        if (type === 'buildings') {
+            var widthSpan = right - left;
+            var depthSpan = farZ - nearZ;
+            var cols = Math.max(1, Math.floor(widthSpan / rand(48, 90)));
+            var rows = Math.max(1, Math.floor(depthSpan / rand(54, 92)));
+            var cellW = widthSpan / cols;
+            var cellD = depthSpan / rows;
+
+            for (var row = 0; row < rows; row++) {
+                for (var col = 0; col < cols; col++) {
+                    if (Math.random() < 0.16) {
+                        continue;
+                    }
+                    var bw = cellW * rand(0.42, 0.84);
+                    var bd = cellD * rand(0.42, 0.82);
+                    var bx = left + col * cellW + (cellW - bw) * rand(0.08, 0.92);
+                    var bz = nearZ + row * cellD + (cellD - bd) * rand(0.08, 0.92);
+                    var heightUnits = rand(80, 260) + centerBias * rand(60, 220) + (1 - bz / 1000) * rand(30, 120);
+                    block.buildings.push({
+                        x: bx,
+                        z: bz,
+                        w: bw,
+                        d: bd,
+                        h: heightUnits
+                    });
+                }
+            }
+
+            block.buildings.sort(function (a, b) {
+                return b.z - a.z;
+            });
+        }
+
+        return block;
+    }
+
+    function drawBackdrop(palette) {
+        var sky = ctx.createLinearGradient(0, 0, 0, height);
+        sky.addColorStop(0, palette.skyTop);
+        sky.addColorStop(0.54, palette.skyBottom);
+        sky.addColorStop(1, palette.groundB);
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, width, height);
+
+        var glowLeft = ctx.createRadialGradient(width * 0.24, scene.horizon * 0.76, 0, width * 0.24, scene.horizon * 0.76, width * 0.42);
+        glowLeft.addColorStop(0, 'rgba(' + palette.hazeA + ',0.22)');
+        glowLeft.addColorStop(1, 'rgba(' + palette.hazeA + ',0)');
+        ctx.fillStyle = glowLeft;
+        ctx.fillRect(0, 0, width, height);
+
+        var glowRight = ctx.createRadialGradient(width * 0.72, scene.horizon * 0.9, 0, width * 0.72, scene.horizon * 0.9, width * 0.4);
+        glowRight.addColorStop(0, 'rgba(' + palette.hazeB + ',0.18)');
+        glowRight.addColorStop(1, 'rgba(' + palette.hazeB + ',0)');
+        ctx.fillStyle = glowRight;
+        ctx.fillRect(0, 0, width, height);
+
+        var ground = ctx.createLinearGradient(0, scene.horizon, 0, height);
+        ground.addColorStop(0, palette.groundA);
+        ground.addColorStop(1, palette.groundB);
+        ctx.fillStyle = ground;
+        ctx.fillRect(0, scene.horizon, width, height - scene.horizon);
+    }
+
+    function drawRoadGrid(palette, time) {
         ctx.lineCap = 'round';
 
-        for (var i = 0; i < city.roadsX.length; i++) {
-            var x = city.roadsX[i];
-            var top = pointerWarp(x, city.roadsY[0]);
-            var bottom = pointerWarp(x, city.roadsY[city.roadsY.length - 1]);
+        for (var i = 0; i < scene.avenues.length; i++) {
+            var avenue = scene.avenues[i];
+            var top = project(avenue, 0, 0);
+            var bottom = project(avenue, 1100, 0);
 
-            ctx.strokeStyle = 'rgba(' + palette.lineMinor + ',0.16)';
+            ctx.strokeStyle = 'rgba(' + palette.gridMinor + ',0.18)';
             ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(top.x + lineShift, top.y);
-            ctx.lineTo(bottom.x + lineShift, bottom.y);
-            ctx.stroke();
-
-            ctx.strokeStyle = 'rgba(' + palette.lineMajor + ',0.34)';
-            ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.moveTo(top.x, top.y);
             ctx.lineTo(bottom.x, bottom.y);
             ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(' + palette.gridMajor + ',0.34)';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(top.x + Math.sin(time * 0.00035 + i) * 0.8, top.y);
+            ctx.lineTo(bottom.x, bottom.y);
+            ctx.stroke();
         }
 
-        for (var j = 0; j < city.roadsY.length; j++) {
-            var y = city.roadsY[j];
-            var left = pointerWarp(city.roadsX[0], y);
-            var right = pointerWarp(city.roadsX[city.roadsX.length - 1], y);
-
-            ctx.strokeStyle = 'rgba(' + palette.lineMinor + ',0.16)';
+        for (var j = 0; j < scene.crossStreets.length; j++) {
+            var z = scene.crossStreets[j];
+            var left = project(scene.avenues[0], z, 0);
+            var right = project(scene.avenues[scene.avenues.length - 1], z, 0);
+            ctx.strokeStyle = 'rgba(' + palette.gridMinor + ',0.14)';
             ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(left.x, left.y + lineShift);
-            ctx.lineTo(right.x, right.y + lineShift);
-            ctx.stroke();
-
-            ctx.strokeStyle = 'rgba(' + palette.lineMajor + ',0.34)';
-            ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.moveTo(left.x, left.y);
             ctx.lineTo(right.x, right.y);
@@ -301,163 +313,237 @@
         }
     }
 
-    function drawPark(block, palette, time) {
-        var p = pointerWarp(block.cx, block.cy);
-        var offsetX = (p.x - block.cx) * 0.25;
-        var offsetY = (p.y - block.cy) * 0.25;
-        var radius = Math.min(block.w, block.h) * 0.2;
+    function drawRoadSurfaces(palette) {
+        for (var i = 0; i < scene.avenues.length - 1; i++) {
+            var leftRoad = scene.avenues[i] + scene.roadHalfWidth;
+            var rightRoad = scene.avenues[i + 1] - scene.roadHalfWidth;
+            if (rightRoad <= leftRoad) {
+                continue;
+            }
+            for (var j = 0; j < scene.crossStreets.length - 1; j++) {
+                var nearZ = scene.crossStreets[j];
+                var farZ = scene.crossStreets[j + 1];
+                var a = project(leftRoad, nearZ, 0);
+                var b = project(rightRoad, nearZ, 0);
+                var c = project(rightRoad, farZ, 0);
+                var d = project(leftRoad, farZ, 0);
+                ctx.fillStyle = 'rgba(' + palette.gridMajor + ',' + clamp(0.035 + (1 - nearZ / 1100) * 0.06, 0.03, 0.08).toFixed(3) + ')';
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+                ctx.lineTo(c.x, c.y);
+                ctx.lineTo(d.x, d.y);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+    }
 
-        ctx.fillStyle = 'rgba(' + palette.park + ',0.22)';
-        ctx.strokeStyle = 'rgba(' + palette.lineMinor + ',0.26)';
+    function drawPark(block, palette, time) {
+        var a = project(block.left, block.nearZ, 0);
+        var b = project(block.right, block.nearZ, 0);
+        var c = project(block.right, block.farZ, 0);
+        var d = project(block.left, block.farZ, 0);
+        ctx.fillStyle = 'rgba(' + palette.park + ',0.24)';
+        ctx.strokeStyle = 'rgba(' + palette.gridMinor + ',0.3)';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.roundRect(block.x + offsetX, block.y + offsetY, block.w, block.h, radius);
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.lineTo(c.x, c.y);
+        ctx.lineTo(d.x, d.y);
+        ctx.closePath();
         ctx.fill();
         ctx.stroke();
 
-        for (var i = 0; i < 4; i++) {
-            var treeX = block.x + block.w * rand(0.2, 0.8) + offsetX;
-            var treeY = block.y + block.h * rand(0.24, 0.76) + offsetY;
-            var glow = 6 + Math.sin(time * 0.002 + i) * 2;
+        for (var i = 0; i < 5; i++) {
+            var tx = lerp(block.left, block.right, 0.18 + i * 0.15);
+            var tz = lerp(block.nearZ, block.farZ, 0.25 + (i % 2) * 0.22);
+            var tree = project(tx, tz, 16 + Math.sin(time * 0.0018 + i) * 5);
             ctx.fillStyle = 'rgba(' + palette.windowB + ',0.28)';
             ctx.beginPath();
-            ctx.arc(treeX, treeY, glow, 0, Math.PI * 2);
+            ctx.arc(tree.x, tree.y, 2 + tree.scale * 10, 0, Math.PI * 2);
             ctx.fill();
         }
     }
 
-    function drawBuildings(palette, time) {
-        for (var i = 0; i < city.blocks.length; i++) {
-            var block = city.blocks[i];
-            if (block.type === 'park') {
-                drawPark(block, palette, time);
-                continue;
-            }
+    function drawBuilding(building, palette, time) {
+        var x0 = building.x;
+        var x1 = building.x + building.w;
+        var z0 = building.z;
+        var z1 = building.z + building.d;
+        var h = building.h + Math.sin(time * 0.0009 + building.x * 0.02 + building.z * 0.01) * 3;
 
-            for (var j = 0; j < block.buildings.length; j++) {
-                var building = block.buildings[j];
-                var center = pointerWarp(building.x + building.w * 0.5, building.y + building.d * 0.5);
-                var nudgeX = (center.x - (building.x + building.w * 0.5)) * 0.2;
-                var nudgeY = (center.y - (building.y + building.d * 0.5)) * 0.2;
-                var roofLift = building.h * 0.18;
-                var wobble = Math.sin(time * 0.0012 + building.x * 0.02 + building.y * 0.03) * 2;
-                var bx = building.x + nudgeX;
-                var by = building.y + nudgeY;
-                var topY = by - roofLift - wobble;
+        var fbl = project(x0, z0, 0);
+        var fbr = project(x1, z0, 0);
+        var bbr = project(x1, z1, 0);
+        var bbl = project(x0, z1, 0);
 
-                ctx.fillStyle = 'rgba(' + palette.tower + ',0.74)';
-                ctx.strokeStyle = 'rgba(' + palette.towerEdge + ',0.22)';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(bx, by + building.d);
-                ctx.lineTo(bx, by);
-                ctx.lineTo(bx + building.w, by);
-                ctx.lineTo(bx + building.w, by + building.d);
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
+        var tbl = project(x0, z0, h);
+        var tbr = project(x1, z0, h);
+        var tbbr = project(x1, z1, h);
+        var tbbl = project(x0, z1, h);
 
-                ctx.fillStyle = 'rgba(' + palette.tower + ',0.52)';
-                ctx.beginPath();
-                ctx.moveTo(bx, by);
-                ctx.lineTo(bx + building.w * 0.24, topY);
-                ctx.lineTo(bx + building.w * 1.24, topY);
-                ctx.lineTo(bx + building.w, by);
-                ctx.closePath();
-                ctx.fill();
+        ctx.fillStyle = 'rgba(' + palette.buildingSide + ',0.72)';
+        ctx.strokeStyle = 'rgba(' + palette.edge + ',0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(fbr.x, fbr.y);
+        ctx.lineTo(bbr.x, bbr.y);
+        ctx.lineTo(tbbr.x, tbbr.y);
+        ctx.lineTo(tbr.x, tbr.y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
 
-                ctx.strokeStyle = 'rgba(' + palette.towerEdge + ',0.46)';
-                ctx.beginPath();
-                ctx.moveTo(bx, by);
-                ctx.lineTo(bx + building.w * 0.24, topY);
-                ctx.lineTo(bx + building.w * 1.24, topY);
-                ctx.lineTo(bx + building.w, by);
-                ctx.stroke();
+        ctx.fillStyle = 'rgba(' + palette.buildingFront + ',0.86)';
+        ctx.beginPath();
+        ctx.moveTo(fbl.x, fbl.y);
+        ctx.lineTo(fbr.x, fbr.y);
+        ctx.lineTo(tbr.x, tbr.y);
+        ctx.lineTo(tbl.x, tbl.y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
 
-                var rows = Math.max(2, Math.floor((roofLift + building.d) / 18));
-                var cols = Math.max(2, Math.floor(building.w / 14));
-                for (var row = 0; row < rows; row++) {
-                    for (var col = 0; col < cols; col++) {
-                        if (Math.random() > 0.5) {
-                            continue;
-                        }
-                        var wx = bx + 5 + col * ((building.w - 10) / cols);
-                        var wy = by + 4 + row * ((building.d - 8) / rows);
-                        var alpha = 0.12 + Math.sin(time * 0.003 + wx * 0.05 + wy * 0.06) * 0.08;
-                        ctx.fillStyle = 'rgba(' + (col % 2 ? palette.windowA : palette.windowB) + ',' + clamp(alpha, 0.08, 0.34).toFixed(3) + ')';
-                        ctx.fillRect(wx, wy, 3, 6);
-                    }
+        ctx.fillStyle = 'rgba(' + palette.roof + ',0.62)';
+        ctx.beginPath();
+        ctx.moveTo(tbl.x, tbl.y);
+        ctx.lineTo(tbr.x, tbr.y);
+        ctx.lineTo(tbbr.x, tbbr.y);
+        ctx.lineTo(tbbl.x, tbbl.y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(' + palette.edge + ',0.38)';
+        ctx.stroke();
+
+        drawWindows(building, fbl, fbr, tbl, tbr, palette, time, true);
+        drawWindows(building, fbr, bbr, tbr, tbbr, palette, time, false);
+    }
+
+    function drawWindows(building, bl, br, tl, tr, palette, time, isFront) {
+        var rows = Math.max(2, Math.floor(building.h / 32));
+        var cols = Math.max(2, Math.floor(building.w / (isFront ? 18 : 22)));
+        for (var row = 0; row < rows; row++) {
+            var v0 = (row + 0.22) / rows;
+            var v1 = (row + 0.78) / rows;
+            for (var col = 0; col < cols; col++) {
+                if (Math.random() > 0.58) {
+                    continue;
                 }
+                var u0 = (col + 0.18) / cols;
+                var u1 = (col + 0.72) / cols;
+                var p1 = quadPoint(bl, br, tl, tr, u0, v0);
+                var p2 = quadPoint(bl, br, tl, tr, u1, v0);
+                var p3 = quadPoint(bl, br, tl, tr, u1, v1);
+                var p4 = quadPoint(bl, br, tl, tr, u0, v1);
+                var alpha = clamp(0.12 + Math.sin(time * 0.0024 + building.x * 0.03 + row * 0.5 + col) * 0.12, 0.08, 0.36);
+                ctx.fillStyle = 'rgba(' + ((row + col) % 2 ? palette.windowA : palette.windowB) + ',' + alpha.toFixed(3) + ')';
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.lineTo(p3.x, p3.y);
+                ctx.lineTo(p4.x, p4.y);
+                ctx.closePath();
+                ctx.fill();
             }
         }
     }
 
-    function drawFlows(palette, time) {
+    function quadPoint(bl, br, tl, tr, u, v) {
+        var bottomX = lerp(bl.x, br.x, u);
+        var bottomY = lerp(bl.y, br.y, u);
+        var topX = lerp(tl.x, tr.x, u);
+        var topY = lerp(tl.y, tr.y, u);
+        return {
+            x: lerp(bottomX, topX, v),
+            y: lerp(bottomY, topY, v)
+        };
+    }
+
+    function drawBlocks(palette, time) {
+        for (var i = 0; i < scene.blocks.length; i++) {
+            var block = scene.blocks[i];
+            if (block.type === 'park') {
+                drawPark(block, palette, time);
+                continue;
+            }
+            for (var j = 0; j < block.buildings.length; j++) {
+                drawBuilding(block.buildings[j], palette, time);
+            }
+        }
+    }
+
+    function drawPulses(palette, time) {
         ctx.lineCap = 'round';
-        for (var i = 0; i < city.pulses.length; i++) {
-            var pulse = city.pulses[i];
+        for (var i = 0; i < scene.pulses.length; i++) {
+            var pulse = scene.pulses[i];
             pulse.progress += pulse.speed * 16;
             if (pulse.progress > 1) {
                 pulse.progress = 0;
             }
 
-            var color = pulse.hue > 0.5 ? palette.flowA : palette.flowB;
-            var position = mix(pulse.from, pulse.to, pulse.progress);
-            if (pulse.axis === 'x') {
-                var start = pointerWarp(position - pulse.size, pulse.y);
-                var end = pointerWarp(position + pulse.size, pulse.y);
-                var gradX = ctx.createLinearGradient(start.x, start.y, end.x, end.y);
-                gradX.addColorStop(0, 'rgba(' + color + ',0)');
-                gradX.addColorStop(0.5, 'rgba(' + color + ',0.72)');
-                gradX.addColorStop(1, 'rgba(' + color + ',0)');
-                ctx.strokeStyle = gradX;
-                ctx.lineWidth = 2.4;
+            var color = pulse.hue > 0.5 ? palette.roadGlowA : palette.roadGlowB;
+            if (pulse.axis === 'z') {
+                var z = lerp(0, 1020, pulse.progress);
+                var start = project(pulse.lane, Math.max(0, z - pulse.span), 0);
+                var end = project(pulse.lane, Math.min(1040, z + pulse.span), 0);
+                var gradZ = ctx.createLinearGradient(start.x, start.y, end.x, end.y);
+                gradZ.addColorStop(0, 'rgba(' + color + ',0)');
+                gradZ.addColorStop(0.5, 'rgba(' + color + ',0.82)');
+                gradZ.addColorStop(1, 'rgba(' + color + ',0)');
+                ctx.strokeStyle = gradZ;
+                ctx.lineWidth = 2.8;
                 ctx.beginPath();
                 ctx.moveTo(start.x, start.y);
                 ctx.lineTo(end.x, end.y);
                 ctx.stroke();
             } else {
-                var startY = pointerWarp(pulse.x, position - pulse.size);
-                var endY = pointerWarp(pulse.x, position + pulse.size);
-                var gradY = ctx.createLinearGradient(startY.x, startY.y, endY.x, endY.y);
-                gradY.addColorStop(0, 'rgba(' + color + ',0)');
-                gradY.addColorStop(0.5, 'rgba(' + color + ',0.72)');
-                gradY.addColorStop(1, 'rgba(' + color + ',0)');
-                ctx.strokeStyle = gradY;
+                var depth = pulse.depth;
+                var spanX = lerp(width * 0.08, width * 0.32, 1 - depth / 1040);
+                var x = lerp(-width * 0.5, width * 0.5, pulse.progress);
+                var left = project(x - spanX, depth, 0);
+                var right = project(x + spanX, depth, 0);
+                var gradX = ctx.createLinearGradient(left.x, left.y, right.x, right.y);
+                gradX.addColorStop(0, 'rgba(' + color + ',0)');
+                gradX.addColorStop(0.5, 'rgba(' + color + ',0.76)');
+                gradX.addColorStop(1, 'rgba(' + color + ',0)');
+                ctx.strokeStyle = gradX;
                 ctx.lineWidth = 2.4;
                 ctx.beginPath();
-                ctx.moveTo(startY.x, startY.y);
-                ctx.lineTo(endY.x, endY.y);
+                ctx.moveTo(left.x, left.y);
+                ctx.lineTo(right.x, right.y);
                 ctx.stroke();
             }
         }
     }
 
     function drawNodes(palette, time) {
-        for (var i = 0; i < city.nodes.length; i++) {
-            var node = city.nodes[i];
-            var p = pointerWarp(node.x, node.y);
-            var pulse = 1.6 + Math.sin(time * 0.0024 + node.phase) * node.power * 1.8;
-            ctx.fillStyle = 'rgba(' + palette.node + ',' + (0.22 + node.power * 0.24).toFixed(3) + ')';
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, pulse + 1.2, 0, Math.PI * 2);
-            ctx.fill();
+        for (var i = 0; i < scene.avenues.length; i++) {
+            for (var j = 1; j < scene.crossStreets.length; j += 2) {
+                var point = project(scene.avenues[i], scene.crossStreets[j], 0);
+                var glow = 1.5 + point.scale * 12 + Math.sin(time * 0.002 + i + j) * 0.8;
+                ctx.fillStyle = 'rgba(' + palette.node + ',' + clamp(0.12 + point.scale * 0.28, 0.1, 0.34).toFixed(3) + ')';
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, glow, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
     }
 
     function frame(ts) {
         var palette = buildPalette(theme);
-        timeSeed += 0.35;
-        pointer.x = mix(pointer.x, pointer.tx, 0.08);
-        pointer.y = mix(pointer.y, pointer.ty, 0.08);
-        pointer.strength = mix(pointer.strength, pointer.targetStrength, 0.08);
+        pointer.x = lerp(pointer.x, pointer.tx, 0.08);
+        pointer.y = lerp(pointer.y, pointer.ty, 0.08);
+        pointer.strength = lerp(pointer.strength, pointer.targetStrength, 0.08);
 
         ctx.clearRect(0, 0, width, height);
         drawBackdrop(palette);
-        drawRoads(palette, ts + timeSeed);
-        drawBuildings(palette, ts + timeSeed);
-        drawFlows(palette, ts + timeSeed);
-        drawNodes(palette, ts + timeSeed);
+        drawRoadSurfaces(palette);
+        drawRoadGrid(palette, ts);
+        drawBlocks(palette, ts);
+        drawPulses(palette, ts);
+        drawNodes(palette, ts);
         rafId = window.requestAnimationFrame(frame);
     }
 
@@ -469,7 +555,7 @@
 
     function onLeave() {
         pointer.tx = width * 0.5;
-        pointer.ty = height * 0.5;
+        pointer.ty = height * 0.56;
         pointer.targetStrength = 0;
     }
 
