@@ -56,7 +56,7 @@ $imageSrc = static function (array $item): string {
 $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover : null);
 ?>
 <style>
-.home-z{max-width:1480px;margin:0 auto;padding:28px 18px 64px;color:var(--shell-text)}
+.home-z{max-width:1240px;margin:0 auto;padding:28px 18px 64px;color:var(--shell-text)}
 .home-z-shell{display:grid;gap:22px}
 .home-z-hero,.home-z-block{border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(6,12,24,.88),rgba(5,10,20,.76));box-shadow:var(--shell-shadow)}
 .home-z-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:18px;padding:28px}

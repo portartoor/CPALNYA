@@ -10,18 +10,6 @@ if (strpos($host, ':') !== false) {
     $host = explode(':', $host, 2)[0];
 }
 $isRu = (bool)preg_match('/\.ru$/', $host);
-$lang = $isRu ? 'ru' : 'en';
-
-$normalizeTopicTitle = static function (string $value): string {
-    $value = trim((string)preg_replace('/\s+/u', ' ', $value));
-    if ($value === '') {
-        return '';
-    }
-    if (function_exists('mb_strtolower')) {
-        return mb_strtolower($value, 'UTF-8');
-    }
-    return strtolower($value);
-};
 
 $sectionTitles = [
     'journal' => $isRu ? 'Журнал' : 'Journal',
@@ -36,112 +24,19 @@ $sectionBasePaths = [
     'fun' => '/fun/',
 ];
 $sectionIcons = [
+    'home' => '⌂',
     'journal' => '✦',
     'playbooks' => '⚙',
     'signals' => '⌁',
     'fun' => '✺',
+    'contact' => '✉',
 ];
-$topicIconMap = [
-    'источники' => '⇢',
-    'sources' => '⇢',
-    'фарм' => '◩',
-    'farm' => '◩',
-    'ai creatives' => '✶',
-    'ai-креативы' => '✶',
-    'ai креативы' => '✶',
-    'операции' => '⚙',
-    'operations' => '⚙',
-    'policy shifts' => '⚖',
-    'policy shift' => '⚖',
-    'регуляторика снг' => '▣',
-    'cis regulation' => '▣',
-    'мемы команды' => '☺',
-    'team memes' => '☺',
-    'драма модерации' => '⚠',
-    'moderation drama' => '⚠',
-];
-
-$pickTopicIcon = static function (string $title, string $fallback = '◦') use ($normalizeTopicTitle, $topicIconMap): string {
-    $normalized = $normalizeTopicTitle($title);
-    if ($normalized === '') {
-        return $fallback;
-    }
-    return $topicIconMap[$normalized] ?? $fallback;
-};
-
-$buildClusterPath = static function (string $section, string $code) use ($host, $sectionBasePaths): string {
-    if (function_exists('examples_cluster_list_path')) {
-        return examples_cluster_list_path($code, $host, $section);
-    }
-    return $sectionBasePaths[$section] ?? '/';
-};
-
-$importantTopics = [];
-$importantCounts = [];
-$importantRaw = [];
-
-foreach (['journal', 'playbooks', 'signals', 'fun'] as $sectionKey) {
-    if (!isset($FRMWRK) || !function_exists('examples_fetch_clusters')) {
-        continue;
-    }
-    $sectionClusters = (array)examples_fetch_clusters($FRMWRK, $host, $lang, 40, $sectionKey);
-    $sectionTopicsAdded = 0;
-    foreach ($sectionClusters as $row) {
-        if ($sectionTopicsAdded >= 2) {
-            break;
-        }
-        $code = trim((string)($row['code'] ?? ''));
-        if ($code === '') {
-            continue;
-        }
-        $title = trim((string)($row['label'] ?? $code));
-        $normalizedTitle = $normalizeTopicTitle($title);
-        $normalizedParent = $normalizeTopicTitle((string)($sectionTitles[$sectionKey] ?? ''));
-        if ($normalizedTitle === '' || $normalizedTitle === $normalizedParent) {
-            continue;
-        }
-        $importantCounts[$normalizedTitle] = (int)($importantCounts[$normalizedTitle] ?? 0) + 1;
-        $importantRaw[] = [
-            'section' => $sectionKey,
-            'title' => $title,
-            'normalized_title' => $normalizedTitle,
-            'path' => $buildClusterPath($sectionKey, $code),
-            'icon' => $pickTopicIcon($title),
-        ];
-        $sectionTopicsAdded++;
-    }
-}
-
-foreach ($importantRaw as $item) {
-    $title = $item['title'];
-    if ((int)($importantCounts[$item['normalized_title']] ?? 0) > 1) {
-        $title .= ' (// ' . (string)($sectionTitles[$item['section']] ?? $item['section']) . ')';
-    }
-    $importantTopics[] = [
-        'title' => $title,
-        'path' => $item['path'],
-        'icon' => $item['icon'],
-    ];
-}
-
-if (count($importantTopics) < 8) {
-    $importantTopics = [
-        ['title' => $isRu ? 'Источники' : 'Sources', 'path' => '/journal/', 'icon' => '⇢'],
-        ['title' => $isRu ? 'Фарм' : 'Farm', 'path' => '/journal/', 'icon' => '◩'],
-        ['title' => 'AI Creatives', 'path' => '/playbooks/', 'icon' => '✶'],
-        ['title' => $isRu ? 'Операции' : 'Operations', 'path' => '/playbooks/', 'icon' => '⚙'],
-        ['title' => 'Policy shifts', 'path' => '/signals/', 'icon' => '⚖'],
-        ['title' => $isRu ? 'Регуляторика СНГ' : 'CIS regulation', 'path' => '/signals/', 'icon' => '▣'],
-        ['title' => $isRu ? 'Мемы команды' : 'Team memes', 'path' => '/fun/', 'icon' => '☺'],
-        ['title' => $isRu ? 'Драма модерации' : 'Moderation drama', 'path' => '/fun/', 'icon' => '⚠'],
-    ];
-}
 
 $navSections = [
     [
         'label' => $isRu ? 'Выпуск' : 'Issue',
         'items' => [
-            ['title' => $isRu ? 'Главная' : 'Home', 'path' => '/', 'icon' => '⌂'],
+            ['title' => $isRu ? 'Главная' : 'Home', 'path' => '/', 'icon' => $sectionIcons['home']],
             ['title' => $sectionTitles['journal'], 'path' => $sectionBasePaths['journal'], 'icon' => $sectionIcons['journal']],
             ['title' => $sectionTitles['playbooks'], 'path' => $sectionBasePaths['playbooks'], 'icon' => $sectionIcons['playbooks']],
             ['title' => $sectionTitles['signals'], 'path' => $sectionBasePaths['signals'], 'icon' => $sectionIcons['signals']],
@@ -149,13 +44,9 @@ $navSections = [
         ],
     ],
     [
-        'label' => $isRu ? 'Важные темы' : 'Important Topics',
-        'items' => $importantTopics,
-    ],
-    [
         'label' => $isRu ? 'Связь' : 'Reach',
         'items' => [
-            ['title' => $isRu ? 'Контакты' : 'Contact', 'path' => '/contact/', 'icon' => '✉'],
+            ['title' => $isRu ? 'Контакты' : 'Contact', 'path' => '/contact/', 'icon' => $sectionIcons['contact']],
         ],
     ],
 ];

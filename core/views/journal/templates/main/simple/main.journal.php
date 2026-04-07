@@ -208,7 +208,7 @@ if ($selected) {
 }
 ?>
 <style>
-.jrnl{max-width:1480px;margin:0 auto;padding:28px 18px 64px;color:var(--shell-text)}
+.jrnl{max-width:1240px;margin:0 auto;padding:28px 18px 64px;color:var(--shell-text)}
 .jrnl-shell{display:grid;gap:24px}
 .jrnl-hero,.jrnl-detail,.jrnl-card,.jrnl-related,.jrnl-empty{border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(6,12,24,.88),rgba(5,10,20,.76));box-shadow:var(--shell-shadow)}
 .jrnl-hero,.jrnl-detail,.jrnl-related,.jrnl-empty{padding:28px}
