@@ -148,7 +148,14 @@ function queue_table_ensure(mysqli $db): bool
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
     $ok = mysqli_query($db, $sql) !== false;
     if ($ok) {
-        @mysqli_query($db, "ALTER TABLE seo_article_generation_queue ADD COLUMN campaign_key VARCHAR(32) NOT NULL DEFAULT '' AFTER lang_code");
+        $check = mysqli_query($db, "SHOW COLUMNS FROM seo_article_generation_queue LIKE 'campaign_key'");
+        $hasCampaignKey = $check && mysqli_num_rows($check) > 0;
+        if ($check) {
+            mysqli_free_result($check);
+        }
+        if (!$hasCampaignKey) {
+            $ok = mysqli_query($db, "ALTER TABLE seo_article_generation_queue ADD COLUMN campaign_key VARCHAR(32) NOT NULL DEFAULT '' AFTER lang_code") !== false;
+        }
     }
     return $ok;
 }
