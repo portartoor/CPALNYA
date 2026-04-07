@@ -415,12 +415,13 @@ if (isset($_GET['header_search_preview'])) {
     html { scroll-behavior: smooth; }
     body {
         margin: 0;
-        padding-top: calc(var(--simple-header-height) + 18px);
+        padding-top: 0;
         font: 500 16px/1.65 "Sora", system-ui, sans-serif;
         color: var(--shell-text);
         position: relative;
         overflow-x: hidden;
         letter-spacing: -.01em;
+        transition: padding-top .24s ease;
     }
     body.ui-tone-light {
         --shell-bg: #f2f7ff;
@@ -473,11 +474,11 @@ if (isset($_GET['header_search_preview'])) {
     }
 
     .simple-header {
-        position: fixed;
-        left: 18px;
-        right: 18px;
-        top: 14px;
-        z-index: 9999;
+        position: relative;
+        left: auto;
+        right: auto;
+        top: auto;
+        z-index: 20;
         display: grid;
         grid-template-columns: minmax(220px, 300px) minmax(320px, 1fr) auto;
         gap: 10px 16px;
@@ -500,11 +501,17 @@ if (isset($_GET['header_search_preview'])) {
         pointer-events: none;
     }
     .simple-header.is-scrolled {
+        position: fixed;
+        left: 18px;
+        right: 18px;
+        top: 14px;
+        z-index: 999;
         transform: translateY(0);
         padding: 10px 16px;
         background: linear-gradient(180deg, rgba(6,10,18,.72), rgba(7,12,23,.58));
         box-shadow: 0 18px 42px rgba(0, 4, 14, .22);
         border-color: var(--shell-border-strong);
+        margin-top: 0;
     }
 
     .simple-brand {
@@ -1197,12 +1204,19 @@ if (isset($_GET['header_search_preview'])) {
 
     @media (max-width: 720px) {
         :root { --simple-header-height: 88px; }
-        body { padding-top: calc(var(--simple-header-height) + 12px); }
+        body { padding-top: 0; }
         .simple-header {
+            left: auto;
+            right: auto;
+            top: auto;
+            margin: 10px 10px 0;
+            padding: 12px 14px;
+        }
+        .simple-header.is-scrolled {
             left: 10px;
             right: 10px;
             top: 10px;
-            padding: 12px 14px;
+            z-index: 999;
         }
         .pc-logo-main { font-size: 28px; }
         .pc-brand-copy span { display: none; }
@@ -1402,10 +1416,32 @@ if (isset($_GET['header_search_preview'])) {
             });
     }
     if (header) {
-        var syncHeader = function () {
-            header.classList.toggle('is-scrolled', window.scrollY > 18);
+        var measuredHeaderOffset = 0;
+        var measureExpandedHeaderOffset = function () {
+            var hadScrolled = header.classList.contains('is-scrolled');
+            if (hadScrolled) {
+                header.classList.remove('is-scrolled');
+            }
+            var styles = window.getComputedStyle(header);
+            var marginTop = parseFloat(styles.marginTop || '0') || 0;
+            var marginBottom = parseFloat(styles.marginBottom || '0') || 0;
+            measuredHeaderOffset = Math.ceil(header.offsetHeight + marginTop + marginBottom);
+            document.documentElement.style.setProperty('--simple-header-height', String(Math.ceil(header.offsetHeight)) + 'px');
+            if (hadScrolled) {
+                header.classList.add('is-scrolled');
+            }
         };
+        var syncHeader = function () {
+            var isScrolled = window.scrollY > 18;
+            header.classList.toggle('is-scrolled', isScrolled);
+            document.body.style.paddingTop = isScrolled ? (String(measuredHeaderOffset) + 'px') : '0px';
+        };
+        measureExpandedHeaderOffset();
         window.addEventListener('scroll', syncHeader, { passive: true });
+        window.addEventListener('resize', function () {
+            measureExpandedHeaderOffset();
+            syncHeader();
+        }, { passive: true });
         syncHeader();
     }
     if (searchInput && Array.isArray(placeholders) && placeholders.length > 1) {
