@@ -148,7 +148,7 @@ function seo_apply_db_settings_to_cfg(array $cfg, array $dbSettings): array
         'expand_user_prompt_append_en', 'expand_user_prompt_append_ru', 'preview_image_style_options',
         'image_color_schemes', 'image_scene_families', 'image_compositions', 'image_scenarios',
         'openrouter_api_key', 'openrouter_base_url', 'openrouter_model',
-        'openrouter_fallback_model', 'campaigns',
+        'openrouter_fallback_model', 'campaigns', 'duplicate_retry_attempts',
     ];
     foreach ($directKeys as $key) {
         if (array_key_exists($key, $dbSettings)) {
@@ -3997,6 +3997,7 @@ function seo_apply_campaign_to_cfg(array $cfg, array $runtime): array
     $cfg['max_per_run'] = (int)($campaign['max_per_run'] ?? $cfg['max_per_run']);
     $cfg['word_min'] = (int)($campaign['word_min'] ?? $cfg['word_min']);
     $cfg['word_max'] = (int)($campaign['word_max'] ?? $cfg['word_max']);
+    $cfg['duplicate_retry_attempts'] = (int)($campaign['duplicate_retry_attempts'] ?? ($cfg['duplicate_retry_attempts'] ?? 1));
     $cfg['seed_salt'] = trim((string)($cfg['seed_salt'] ?? 'seo-articles')) . '::' . trim((string)($campaign['seed_salt_suffix'] ?? $campaignKey));
     foreach ([
         'styles_en',
@@ -4016,6 +4017,24 @@ function seo_apply_campaign_to_cfg(array $cfg, array $runtime): array
     }
 
     return $cfg;
+}
+
+function seo_is_duplicate_generation_error_message(string $message): bool
+{
+    $message = trim($message);
+    if ($message === '') {
+        return false;
+    }
+
+    return strpos($message, 'Duplicate generated article matches existing article #') === 0
+        || strpos($message, 'Near-duplicate title matches existing article #') === 0;
+}
+
+function seo_duplicate_retry_attempts(array $cfg): int
+{
+    $section = strtolower(trim((string)($cfg['campaign_material_section'] ?? 'journal')));
+    $fallback = in_array($section, ['signals', 'fun'], true) ? 3 : 1;
+    return max(1, min(8, (int)($cfg['duplicate_retry_attempts'] ?? $fallback)));
 }
 
 function seo_normalize_llm_content_to_text($content): string
@@ -6580,8 +6599,12 @@ foreach ($cfg['langs'] as $lang) {
             $attempts++;
         }
         $processed++;
-        try {
-            $created = seo_publish_article($DB, $cfg, $lang, $recent, $runtime['dry_run'], $topicAnalysisForLang);
+        $generationAttempt = 0;
+        $generationAttemptLimit = seo_duplicate_retry_attempts($cfg);
+        while (true) {
+            $generationAttempt++;
+            try {
+                $created = seo_publish_article($DB, $cfg, $lang, $recent, $runtime['dry_run'], $topicAnalysisForLang);
             $imageResult = (array)($created['preview_image_result'] ?? []);
             $imageColor = (string)($imageResult['color_scheme'] ?? '');
             $imageFamily = (string)($imageResult['scene_family'] ?? '');
@@ -6692,10 +6715,21 @@ foreach ($cfg['langs'] as $lang) {
                 'tg_preview_result' => (array)$tgPreviewResult,
                 'error_message' => '',
             ]);
-            $generated++;
-        } catch (Throwable $e) {
-            $err = $e->getMessage();
-            seo_log_generation($DB, [
+                $generated++;
+                break;
+            } catch (Throwable $e) {
+                $err = $e->getMessage();
+                $retryableDuplicate = seo_is_duplicate_generation_error_message($err)
+                    && $generationAttempt < $generationAttemptLimit;
+                if ($retryableDuplicate) {
+                    seo_echo(
+                        "Lang {$lang}, slot {$slotIndex}: duplicate guard hit on generation attempt "
+                        . $generationAttempt . '/' . $generationAttemptLimit
+                        . ', retrying with a new angle.'
+                    );
+                    continue;
+                }
+                seo_log_generation($DB, [
                 'job_date' => $jobDate,
                 'lang_code' => $lang,
                 'slot_index' => (int)$slotIndex,
@@ -6739,28 +6773,30 @@ foreach ($cfg['langs'] as $lang) {
                     'portfolio_product_weight' => (int)($cfg['portfolio_product_weight'] ?? 10),
                 ],
                 'tg_preview_result' => ['status' => 'not_attempted_due_generation_error'],
-                'error_message' => $err,
-            ]);
-            if (!$runtime['dry_run']) {
-                seo_mark_slot_result($DB, $runId, 'failed', $attempts, null, $err);
-                seo_admin_notification_create(
-                    $DB,
-                    'seo_article_failed',
-                    'SEO article generation failed [' . strtoupper($lang) . ']',
-                    mb_substr($err, 0, 800),
-                    '/adminpanel/examples/',
-                    [
-                        'lang' => $lang,
-                        'job_date' => $jobDate,
-                        'slot' => (int)$slotIndex,
-                        'error' => $err,
-                    ],
-                    'seo_article_failed_' . $jobDate . '_' . $lang . '_' . (int)$slotIndex . '_' . (int)$attempts
-                );
-                // Always notify admin Telegram channel about generation result.
-                seo_notify_telegram_failure($lang, $jobDate, (int)$slotIndex, $err);
+                    'error_message' => $err,
+                ]);
+                if (!$runtime['dry_run']) {
+                    seo_mark_slot_result($DB, $runId, 'failed', $attempts, null, $err);
+                    seo_admin_notification_create(
+                        $DB,
+                        'seo_article_failed',
+                        'SEO article generation failed [' . strtoupper($lang) . ']',
+                        mb_substr($err, 0, 800),
+                        '/adminpanel/examples/',
+                        [
+                            'lang' => $lang,
+                            'job_date' => $jobDate,
+                            'slot' => (int)$slotIndex,
+                            'error' => $err,
+                        ],
+                        'seo_article_failed_' . $jobDate . '_' . $lang . '_' . (int)$slotIndex . '_' . (int)$attempts
+                    );
+                    // Always notify admin Telegram channel about generation result.
+                    seo_notify_telegram_failure($lang, $jobDate, (int)$slotIndex, $err);
+                }
+                seo_echo("Lang {$lang}, slot {$slotIndex}: failed - {$err}");
+                break;
             }
-            seo_echo("Lang {$lang}, slot {$slotIndex}: failed - {$err}");
         }
     }
 }

@@ -68,6 +68,7 @@ if (!function_exists('seo_gen_settings_default')) {
                 'daily_min' => 4,
                 'daily_max' => 6,
                 'max_per_run' => 2,
+                'duplicate_retry_attempts' => 1,
                 'word_min' => 1800,
                 'word_max' => 3200,
                 'seed_salt_suffix' => 'journal',
@@ -115,6 +116,7 @@ if (!function_exists('seo_gen_settings_default')) {
                 'daily_min' => 4,
                 'daily_max' => 8,
                 'max_per_run' => 3,
+                'duplicate_retry_attempts' => 1,
                 'word_min' => 1600,
                 'word_max' => 3600,
                 'seed_salt_suffix' => 'playbooks',
@@ -162,11 +164,38 @@ if (!function_exists('seo_gen_settings_default')) {
                 'daily_min' => 2,
                 'daily_max' => 4,
                 'max_per_run' => 2,
+                'duplicate_retry_attempts' => 4,
                 'word_min' => 1400,
                 'word_max' => 2600,
                 'seed_salt_suffix' => 'signals',
-                'styles_en' => ['policy brief', 'market signal memo', 'regulatory watch', 'platform change dispatch'],
-                'styles_ru' => ['policy brief', 'обзор сигнала рынка', 'регуляторная записка', 'сводка изменений платформ'],
+                'styles_en' => [
+                    'policy brief',
+                    'market signal memo',
+                    'regulatory watch',
+                    'platform change dispatch',
+                    'policy-impact memo',
+                    'operator checklist',
+                    'what-to-do-now brief',
+                    'enforcement watch',
+                    'risk memo',
+                    'compliance update',
+                    'platform shift note',
+                    'impact bulletin',
+                ],
+                'styles_ru' => [
+                    'policy brief',
+                    'обзор сигнала рынка',
+                    'регуляторная записка',
+                    'сводка изменений платформ',
+                    'policy-impact memo',
+                    'operator checklist',
+                    'что делать сейчас',
+                    'enforcement watch',
+                    'risk memo',
+                    'compliance update',
+                    'операционный bulletin',
+                    'разбор последствий для команды',
+                ],
                 'clusters_en' => [
                     'meta policy changes and moderation enforcement',
                     'telegram platform shifts and monetization rules',
@@ -174,6 +203,18 @@ if (!function_exists('seo_gen_settings_default')) {
                     'cis regulation and affiliate market implications',
                     'global privacy moves and attribution fallout',
                     'payment, compliance and source volatility signals',
+                    'platform trust shifts and account quality pressure',
+                    'source-side volatility after moderation rule changes',
+                    'measurement loss after privacy and data retention changes',
+                    'telegram enforcement patterns for affiliate operators',
+                    'what changes first for buyers after policy shifts',
+                    'operator response plans to sudden platform restrictions',
+                    'fresh politics and government decisions affecting traffic markets',
+                    'business analysis around public companies, sectors and market stress',
+                    'exchange analytics and market structure shifts',
+                    'major cryptocurrency moves and asset-specific implications',
+                    'russian business news with operational market consequences',
+                    'new russian laws, bills and enforcement practice with digital impact',
                 ],
                 'clusters_ru' => [
                     'изменения policy в Meta и ужесточение модерации',
@@ -182,21 +223,41 @@ if (!function_exists('seo_gen_settings_default')) {
                     'регуляторные движения в СНГ и их эффект на affiliate-рынок',
                     'privacy-сдвиги в мире и последствия для атрибуции',
                     'сигналы по payment, compliance и волатильности источников',
+                    'сдвиги trust-механик и давление на качество аккаунтов',
+                    'волатильность источников после новых правил модерации',
+                    'потери измерения после privacy-ограничений и data retention сдвигов',
+                    'Telegram enforcement-паттерны для affiliate-команд',
+                    'что первым меняется для баеров после platform shifts',
+                    'операционный response plan при резких ограничениях платформ',
+                    'свежие политические новости и решения власти с влиянием на рынок трафика',
+                    'бизнес-аналитика по компаниям, секторам и рыночному стрессу',
+                    'аналитика бирж, структуры рынка и движения ликвидности',
+                    'отдельные криптовалюты и их новостной фон как рыночный сигнал',
+                    'свежие бизнес-новости России с последствиями для digital-рынка',
+                    'новости законодательства России, законопроекты и практика применения',
                 ],
                 'article_structures_en' => [
                     'Signal -> what changed -> operator impact -> affected geos -> action checklist',
                     'Policy update -> enforcement pattern -> hidden risks -> response plan',
                     'News brief -> why it matters -> who gets hit first -> mitigation steps',
+                    'Policy-impact memo -> what changed -> what breaks -> what to do now',
+                    'Regulatory watch -> signal summary -> risk map -> response checklist',
+                    'Operator checklist -> immediate actions -> edge cases -> verification',
+                    'What-to-do-now -> signal -> implications -> first 24 hours plan',
                 ],
                 'article_structures_ru' => [
                     'Сигнал -> что изменилось -> влияние на оператора -> затронутые гео -> чеклист действий',
                     'Policy-апдейт -> паттерн enforcement -> скрытые риски -> план реакции',
                     'Новость -> почему это важно -> кто почувствует первым -> шаги смягчения',
+                    'Policy-impact memo -> что изменилось -> что ломается -> что делать сейчас',
+                    'Regulatory watch -> краткий сигнал -> карта рисков -> чеклист реакции',
+                    'Operator checklist -> немедленные действия -> edge cases -> верификация',
+                    'Что делать сейчас -> сигнал -> последствия -> план на первые 24 часа',
                 ],
                 'article_system_prompt_en' => '',
                 'article_system_prompt_ru' => '',
-                'article_user_prompt_append_en' => 'Track policy, moderation, legal and market signals around affiliate traffic. Stay concrete, date-aware and operator-relevant.',
-                'article_user_prompt_append_ru' => 'Отслеживай policy, модерацию, регуляторику и рыночные сигналы вокруг арбитража трафика. Пиши конкретно, с привязкой к текущей практике и решениям оператора.',
+                'article_user_prompt_append_en' => 'Track policy, moderation, legal and market signals around affiliate traffic. Include fresh politics, business analysis, exchange analytics, major cryptocurrency developments, Russian business news and Russian legislation when they create real operator-relevant consequences. Force a non-generic angle: prefer policy-impact memo, regulatory watch, operator checklist, enforcement watch or what-to-do-now format over a generic overview. Every article must answer what changed, who gets hit first, what breaks operationally, and what the team should do next.',
+                'article_user_prompt_append_ru' => 'Отслеживай policy, модерацию, регуляторику и рыночные сигналы вокруг арбитража трафика. В этот же слой включай свежие политические новости, бизнес-аналитику, аналитику бирж, движения по отдельным криптовалютам, бизнес-новости России и новости законодательства России, если у них есть реальное последствие для digital-рынка, affiliate-операций, платежей, комплаенса, источников трафика или поведения платформ. Принудительно смещай угол в policy-impact memo, regulatory watch, operator checklist, enforcement watch или формат «что делать сейчас», а не в очередной общий обзор. Каждый материал должен отвечать на вопросы: что изменилось, кто почувствует удар первым, что ломается в операционке и что команде делать дальше.',
             ],
             'fun' => [
                 'key' => 'fun',
@@ -209,11 +270,12 @@ if (!function_exists('seo_gen_settings_default')) {
                 'daily_min' => 1,
                 'daily_max' => 3,
                 'max_per_run' => 1,
+                'duplicate_retry_attempts' => 3,
                 'word_min' => 1000,
                 'word_max' => 2200,
                 'seed_salt_suffix' => 'fun',
-                'styles_en' => ['satirical pamphlet', 'humorous review', 'meme editorial', 'operator parody'],
-                'styles_ru' => ['сатирический памфлет', 'юмористический обзор', 'мем-редакционка', 'операционная пародия'],
+                'styles_en' => ['satirical pamphlet', 'humorous review', 'meme editorial', 'operator parody', 'office folklore note', 'comic backstage column'],
+                'styles_ru' => ['сатирический памфлет', 'юмористический обзор', 'мем-редакционка', 'операционная пародия', 'заметка про офисный фольклор', 'комическая backstage-колонка'],
                 'clusters_en' => [
                     'agency life and buyer folklore',
                     'farm drama and operator superstitions',
@@ -242,8 +304,8 @@ if (!function_exists('seo_gen_settings_default')) {
                 ],
                 'article_system_prompt_en' => '',
                 'article_system_prompt_ru' => '',
-                'article_user_prompt_append_en' => 'Keep it playful, sharp and niche-native. Humor should come from real affiliate operations, not generic jokes.',
-                'article_user_prompt_append_ru' => 'Держи тон живым, ироничным и нишевым. Юмор должен рождаться из реальной affiliate-операционки, а не из общих шуток.',
+                'article_user_prompt_append_en' => 'Keep it playful, sharp and niche-native. Humor should come from real affiliate operations, role behavior, handoff failures, moderation absurdity and tracker chaos, not generic jokes.',
+                'article_user_prompt_append_ru' => 'Держи тон живым, ироничным и нишевым. Юмор должен рождаться из реальной affiliate-операционки, ролевого поведения команды, handoff-сбоев, модерационного абсурда и хаоса трекеров, а не из общих шуток.',
             ],
         ];
     }
@@ -263,6 +325,7 @@ if (!function_exists('seo_gen_settings_default')) {
             $row['daily_min'] = max(1, min(48, (int)($row['daily_min'] ?? $default['daily_min'])));
             $row['daily_max'] = max($row['daily_min'], min(96, (int)($row['daily_max'] ?? $default['daily_max'])));
             $row['max_per_run'] = max(1, min(24, (int)($row['max_per_run'] ?? $default['max_per_run'])));
+            $row['duplicate_retry_attempts'] = max(1, min(8, (int)($row['duplicate_retry_attempts'] ?? ($default['duplicate_retry_attempts'] ?? 1))));
             $row['word_min'] = max(600, min(12000, (int)($row['word_min'] ?? $default['word_min'])));
             $row['word_max'] = max($row['word_min'], min(20000, (int)($row['word_max'] ?? $default['word_max'])));
             $row['seed_salt_suffix'] = trim((string)($row['seed_salt_suffix'] ?? $default['seed_salt_suffix']));
@@ -270,7 +333,7 @@ if (!function_exists('seo_gen_settings_default')) {
                 $row['seed_salt_suffix'] = $default['seed_salt_suffix'];
             }
             foreach (['styles_en', 'styles_ru', 'clusters_en', 'clusters_ru', 'article_structures_en', 'article_structures_ru'] as $listKey) {
-                $row[$listKey] = seo_gen_settings_parse_lines(implode("\n", (array)($row[$listKey] ?? [])), 300);
+                $row[$listKey] = seo_gen_settings_parse_lines(implode("\n", (array)($row[$listKey] ?? [])), 1200);
                 if (empty($row[$listKey])) {
                     $row[$listKey] = (array)$default[$listKey];
                 }
@@ -295,6 +358,7 @@ if (!function_exists('seo_gen_settings_default')) {
             'daily_min' => 1,
             'daily_max' => 3,
             'max_per_run' => 2,
+            'duplicate_retry_attempts' => 1,
             'word_min' => 2000,
             'word_max' => 5000,
             'today_first_delay_min' => 15,
@@ -630,6 +694,7 @@ if (!function_exists('seo_gen_settings_normalize')) {
         $settings['daily_min'] = max(1, min(48, (int)$settings['daily_min']));
         $settings['daily_max'] = max($settings['daily_min'], min(96, (int)$settings['daily_max']));
         $settings['max_per_run'] = max(1, min(40, (int)$settings['max_per_run']));
+        $settings['duplicate_retry_attempts'] = max(1, min(8, (int)($settings['duplicate_retry_attempts'] ?? 1)));
         $settings['word_min'] = max(400, min(12000, (int)$settings['word_min']));
         $settings['word_max'] = max($settings['word_min'], min(20000, (int)$settings['word_max']));
         $settings['today_first_delay_min'] = max(1, min(360, (int)$settings['today_first_delay_min']));
@@ -702,28 +767,28 @@ if (!function_exists('seo_gen_settings_normalize')) {
         ))));
         $settings['langs'] = ['ru'];
 
-        $settings['styles_en'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['styles_en']), 300);
-        $settings['styles_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['styles_ru']), 300);
-        $settings['clusters_en'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['clusters_en']), 300);
-        $settings['clusters_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['clusters_ru']), 300);
-        $settings['intent_verticals_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_verticals_en'] ?? [])), 300);
-        $settings['intent_verticals_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_verticals_ru'] ?? [])), 300);
-        $settings['intent_scenarios_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_scenarios_en'] ?? [])), 300);
-        $settings['intent_scenarios_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_scenarios_ru'] ?? [])), 300);
-        $settings['intent_objectives_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_objectives_en'] ?? [])), 300);
-        $settings['intent_objectives_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_objectives_ru'] ?? [])), 300);
-        $settings['intent_constraints_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_constraints_en'] ?? [])), 300);
-        $settings['intent_constraints_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_constraints_ru'] ?? [])), 300);
-        $settings['intent_artifacts_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_artifacts_en'] ?? [])), 300);
-        $settings['intent_artifacts_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_artifacts_ru'] ?? [])), 300);
-        $settings['intent_outcomes_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_outcomes_en'] ?? [])), 300);
-        $settings['intent_outcomes_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_outcomes_ru'] ?? [])), 300);
-        $settings['service_focus_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['service_focus_en'] ?? [])), 300);
-        $settings['service_focus_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['service_focus_ru'] ?? [])), 300);
-        $settings['forbidden_topics_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['forbidden_topics_en'] ?? [])), 300);
-        $settings['forbidden_topics_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['forbidden_topics_ru'] ?? [])), 300);
-        $settings['article_structures_en'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['article_structures_en']), 300);
-        $settings['article_structures_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['article_structures_ru']), 300);
+        $settings['styles_en'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['styles_en']), 1200);
+        $settings['styles_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['styles_ru']), 1200);
+        $settings['clusters_en'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['clusters_en']), 1200);
+        $settings['clusters_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['clusters_ru']), 1200);
+        $settings['intent_verticals_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_verticals_en'] ?? [])), 1200);
+        $settings['intent_verticals_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_verticals_ru'] ?? [])), 1200);
+        $settings['intent_scenarios_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_scenarios_en'] ?? [])), 1200);
+        $settings['intent_scenarios_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_scenarios_ru'] ?? [])), 1200);
+        $settings['intent_objectives_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_objectives_en'] ?? [])), 1200);
+        $settings['intent_objectives_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_objectives_ru'] ?? [])), 1200);
+        $settings['intent_constraints_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_constraints_en'] ?? [])), 1200);
+        $settings['intent_constraints_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_constraints_ru'] ?? [])), 1200);
+        $settings['intent_artifacts_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_artifacts_en'] ?? [])), 1200);
+        $settings['intent_artifacts_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_artifacts_ru'] ?? [])), 1200);
+        $settings['intent_outcomes_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_outcomes_en'] ?? [])), 1200);
+        $settings['intent_outcomes_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_outcomes_ru'] ?? [])), 1200);
+        $settings['service_focus_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['service_focus_en'] ?? [])), 1200);
+        $settings['service_focus_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['service_focus_ru'] ?? [])), 1200);
+        $settings['forbidden_topics_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['forbidden_topics_en'] ?? [])), 1200);
+        $settings['forbidden_topics_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['forbidden_topics_ru'] ?? [])), 1200);
+        $settings['article_structures_en'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['article_structures_en']), 1200);
+        $settings['article_structures_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['article_structures_ru']), 1200);
         $settings['openai_headers'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['openai_headers']), 100);
         $settings['openai_proxy_pool'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['openai_proxy_pool']), 300);
         $settings['preview_image_style_options'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['preview_image_style_options']), 60);
