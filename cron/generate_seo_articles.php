@@ -352,6 +352,57 @@ function seo_table_has_column(mysqli $db, string $table, string $column): bool
     return $res && mysqli_num_rows($res) > 0;
 }
 
+function seo_table_has_index(mysqli $db, string $table, string $indexName): bool
+{
+    $tableSafe = mysqli_real_escape_string($db, $table);
+    $indexSafe = mysqli_real_escape_string($db, $indexName);
+    $res = mysqli_query(
+        $db,
+        "SELECT 1
+         FROM information_schema.STATISTICS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = '{$tableSafe}'
+           AND INDEX_NAME = '{$indexSafe}'
+         LIMIT 1"
+    );
+    return $res && mysqli_num_rows($res) > 0;
+}
+
+function seo_ensure_cron_runs_campaign_support(mysqli $db): void
+{
+    if (!seo_table_exists($db, 'seo_article_cron_runs')) {
+        return;
+    }
+
+    if (!seo_table_has_column($db, 'seo_article_cron_runs', 'campaign_key')) {
+        mysqli_query(
+            $db,
+            "ALTER TABLE seo_article_cron_runs
+             ADD COLUMN campaign_key VARCHAR(32) NOT NULL DEFAULT '' AFTER lang_code"
+        );
+    }
+
+    if (seo_table_has_index($db, 'seo_article_cron_runs', 'uniq_seo_article_slot')) {
+        mysqli_query($db, "ALTER TABLE seo_article_cron_runs DROP INDEX uniq_seo_article_slot");
+    }
+
+    if (!seo_table_has_index($db, 'seo_article_cron_runs', 'uniq_seo_article_slot_campaign')) {
+        mysqli_query(
+            $db,
+            "ALTER TABLE seo_article_cron_runs
+             ADD UNIQUE KEY uniq_seo_article_slot_campaign (job_date, lang_code, campaign_key, slot_index)"
+        );
+    }
+
+    if (!seo_table_has_index($db, 'seo_article_cron_runs', 'idx_seo_article_lang_date_campaign')) {
+        mysqli_query(
+            $db,
+            "ALTER TABLE seo_article_cron_runs
+             ADD KEY idx_seo_article_lang_date_campaign (lang_code, campaign_key, job_date)"
+        );
+    }
+}
+
 function seo_ensure_examples_image_columns(mysqli $db): void
 {
     if (!seo_table_exists($db, 'examples_articles')) {
@@ -3079,10 +3130,11 @@ function seo_daily_slots_ranged(
     return $slots;
 }
 
-function seo_fetch_slots(mysqli $db, string $jobDate, string $lang): array
+function seo_fetch_slots(mysqli $db, string $jobDate, string $lang, string $campaignKey = ''): array
 {
     $jobDateSafe = mysqli_real_escape_string($db, $jobDate);
     $langSafe = mysqli_real_escape_string($db, $lang);
+    $campaignSafe = mysqli_real_escape_string($db, $campaignKey);
     $rows = [];
     $res = mysqli_query(
         $db,
@@ -3090,6 +3142,7 @@ function seo_fetch_slots(mysqli $db, string $jobDate, string $lang): array
          FROM seo_article_cron_runs
          WHERE job_date = '{$jobDateSafe}'
            AND lang_code = '{$langSafe}'
+           AND campaign_key = '{$campaignSafe}'
          ORDER BY slot_index ASC"
     );
     if ($res) {
@@ -3101,14 +3154,16 @@ function seo_fetch_slots(mysqli $db, string $jobDate, string $lang): array
     return $rows;
 }
 
-function seo_schedule_exists(mysqli $db, string $jobDate): bool
+function seo_schedule_exists(mysqli $db, string $jobDate, string $campaignKey = ''): bool
 {
     $jobDateSafe = mysqli_real_escape_string($db, $jobDate);
+    $campaignSafe = mysqli_real_escape_string($db, $campaignKey);
     $res = mysqli_query(
         $db,
         "SELECT id
          FROM seo_article_cron_runs
          WHERE job_date = '{$jobDateSafe}'
+           AND campaign_key = '{$campaignSafe}'
          LIMIT 1"
     );
     return $res && mysqli_num_rows($res) > 0;
@@ -4027,17 +4082,18 @@ function seo_extract_json(string $raw): array
     throw new RuntimeException('LLM JSON decode failed: ' . $rawShort);
 }
 
-function seo_upsert_slot_run(mysqli $db, string $jobDate, string $lang, int $slotIndex, string $plannedAt): array
+function seo_upsert_slot_run(mysqli $db, string $jobDate, string $lang, string $campaignKey, int $slotIndex, string $plannedAt): array
 {
     $jobDateSafe = mysqli_real_escape_string($db, $jobDate);
     $langSafe = mysqli_real_escape_string($db, $lang);
+    $campaignSafe = mysqli_real_escape_string($db, $campaignKey);
     $plannedSafe = mysqli_real_escape_string($db, $plannedAt);
     $slotIndex = max(1, $slotIndex);
 
     mysqli_query(
         $db,
-        "INSERT INTO seo_article_cron_runs (job_date, lang_code, slot_index, planned_at, status, attempts, created_at, updated_at)
-         VALUES ('{$jobDateSafe}', '{$langSafe}', {$slotIndex}, '{$plannedSafe}', 'pending', 0, NOW(), NOW())
+        "INSERT INTO seo_article_cron_runs (job_date, lang_code, campaign_key, slot_index, planned_at, status, attempts, created_at, updated_at)
+         VALUES ('{$jobDateSafe}', '{$langSafe}', '{$campaignSafe}', {$slotIndex}, '{$plannedSafe}', 'pending', 0, NOW(), NOW())
          ON DUPLICATE KEY UPDATE planned_at = VALUES(planned_at), updated_at = NOW()"
     );
     $isNew = ((int)mysqli_affected_rows($db) === 1);
@@ -4048,6 +4104,7 @@ function seo_upsert_slot_run(mysqli $db, string $jobDate, string $lang, int $slo
          FROM seo_article_cron_runs
          WHERE job_date = '{$jobDateSafe}'
            AND lang_code = '{$langSafe}'
+           AND campaign_key = '{$campaignSafe}'
            AND slot_index = {$slotIndex}
          LIMIT 1"
     );
@@ -6108,6 +6165,9 @@ if (!$runtime['backfill_images'] && !seo_table_exists($DB, 'seo_article_cron_run
     seo_echo('Table seo_article_cron_runs does not exist. Run seo_articles_cron_setup.sql');
     exit(1);
 }
+if (!$runtime['backfill_images']) {
+    seo_ensure_cron_runs_campaign_support($DB);
+}
 seo_ensure_examples_image_columns($DB);
 seo_ensure_generator_logs_table($DB);
 seo_ensure_topic_analysis_cache_table($DB);
@@ -6144,6 +6204,7 @@ seo_echo('Job date: ' . $jobDate);
 if (!empty($cfg['campaign_key'])) {
     seo_echo('Campaign: ' . $cfg['campaign_key'] . ' -> section=' . (string)($cfg['campaign_material_section'] ?? 'journal'));
 }
+$slotCampaignKey = (string)($cfg['campaign_key'] ?? '');
 seo_echo('LLM provider: ' . $cfg['llm_provider'] . ', model: ' . $cfg['openai_model']);
 if ($cfg['llm_provider'] === 'openrouter' && !empty($cfg['openrouter_fallback_model'])) {
     seo_echo('OpenRouter fallback model: ' . (string)$cfg['openrouter_fallback_model']);
@@ -6171,7 +6232,7 @@ foreach ($cfg['langs'] as $lang) {
 
         if (!$runtime['dry_run']) {
             foreach ($slots as $slotIndex => $plannedAt) {
-                $runRow = seo_upsert_slot_run($DB, $jobDate, $lang, (int)$slotIndex, $plannedAt);
+                $runRow = seo_upsert_slot_run($DB, $jobDate, $lang, $slotCampaignKey, (int)$slotIndex, $plannedAt);
                 if ((int)($runRow['is_new'] ?? 0) === 1) {
                     $newScheduledSlots++;
                     if (!empty($cfg['notify_schedule'])) {
@@ -6214,7 +6275,7 @@ foreach ($cfg['langs'] as $lang) {
         $runId = 0;
         $attempts = 1;
         if (!$runtime['dry_run']) {
-            $runRow = seo_upsert_slot_run($DB, $jobDate, $lang, (int)$slotIndex, $plannedAt);
+            $runRow = seo_upsert_slot_run($DB, $jobDate, $lang, $slotCampaignKey, (int)$slotIndex, $plannedAt);
             $runId = (int)($runRow['id'] ?? 0);
             $status = (string)($runRow['status'] ?? 'pending');
             $attempts = (int)($runRow['attempts'] ?? 0);

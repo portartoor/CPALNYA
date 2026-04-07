@@ -445,14 +445,14 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     :where(body) :is(h1, h2):not(.pc-logo-main)::before {
         content: "//";
         display: inline-block;
-        margin: 0 .34em 0 0;
+        margin: 0 .28em 0 0;
         color: var(--shell-highlight);
-        font-size: .72em;
+        font-size: .78em;
         font-weight: 700;
         letter-spacing: .18em;
-        line-height: .9;
+        line-height: 1;
         text-transform: uppercase;
-        vertical-align: .08em;
+        vertical-align: .02em;
     }
     .simple-header :is(h1, h2)::before,
     .simple-nav :is(h1, h2)::before,
