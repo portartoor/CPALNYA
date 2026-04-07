@@ -6,6 +6,10 @@ $t = static function (string $ru, string $en) use ($isRu): string {
 };
 $year = date('Y');
 $footerSeoBlock = null;
+if (isset($FRMWRK) && is_object($FRMWRK) && method_exists($FRMWRK, 'DB') && function_exists('footer_seo_blocks_fetch_random')) {
+    $db = $FRMWRK->DB();
+    $footerSeoBlock = footer_seo_blocks_fetch_random($db, (string)$host, $isRu ? 'ru' : 'en', 'any');
+}
 $footerSeoEndpoint = (string)parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 if ($footerSeoEndpoint === '') {
     $footerSeoEndpoint = '/';
