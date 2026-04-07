@@ -652,9 +652,9 @@ function seo_article_public_url(string $lang, string $slug, string $clusterCode 
     }
     $clusterCode = examples_normalize_cluster((string)$clusterCode, $lang);
     if ($clusterCode === '') {
-        return 'https://' . $host . '/blog/' . rawurlencode($slug);
+        return 'https://' . $host . '/journal/' . rawurlencode($slug);
     }
-    return 'https://' . $host . '/blog/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug);
+    return 'https://' . $host . '/journal/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug);
 }
 
 function seo_public_image_url_for_lang(string $lang, string $rawUrl): string
@@ -4101,7 +4101,7 @@ function seo_append_related_links(string $contentHtml, array $related, bool $isR
     foreach ($related as $item) {
         $href = trim((string)($item['url'] ?? ''));
         if ($href === '') {
-            $href = '/blog/' . rawurlencode((string)($item['cluster_code'] ?? 'general')) . '/' . rawurlencode((string)($item['slug'] ?? '')) . '/';
+            $href = '/journal/' . rawurlencode((string)($item['cluster_code'] ?? 'general')) . '/' . rawurlencode((string)($item['slug'] ?? '')) . '/';
         }
         $href = htmlspecialchars($href, ENT_QUOTES, 'UTF-8');
         $label = htmlspecialchars((string)$item['title'], ENT_QUOTES, 'UTF-8');
@@ -4199,7 +4199,7 @@ function seo_analyze_existing_topics(
         $line = '- ' . $title;
         if ($slug !== '') {
             $clusterCode = examples_normalize_cluster((string)($row['cluster_code'] ?? ''), $lang);
-            $line .= ' | ' . $analysisBaseUrl . '/blog/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug) . '/';
+            $line .= ' | ' . $analysisBaseUrl . '/journal/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug) . '/';
         }
         $sourceLines[] = $line;
     }
@@ -5025,7 +5025,7 @@ function seo_generate_article_payload(
                 'title' => $title,
                 'slug' => $slug,
                 'cluster_code' => $clusterCode,
-                'url' => '/blog/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug) . '/'
+                'url' => '/journal/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug) . '/'
             ];
         }
     }
@@ -5071,7 +5071,7 @@ function seo_generate_article_payload(
 
     $relatedLines = [];
     foreach ($related as $r) {
-        $relatedLines[] = '- ' . $r['title'] . ' -> ' . (string)($r['url'] ?? ('/blog/' . (string)($r['slug'] ?? '')));
+        $relatedLines[] = '- ' . $r['title'] . ' -> ' . (string)($r['url'] ?? ('/journal/' . (string)($r['slug'] ?? '')));
     }
     $topicBanLines = [];
     foreach ($topicBans as $topic) {
@@ -6432,7 +6432,7 @@ if (!empty($cfg['notify_daily_schedule']) && $newScheduledSlots > 0 && !empty($s
 if (!$runtime['dry_run'] && $generated > 0 && function_exists('page_html_cache_purge_prefix')) {
     $purged = 0;
     $purged += page_html_cache_purge_prefix('/');
-    $purged += page_html_cache_purge_prefix('/blog/');
+    $purged += page_html_cache_purge_prefix('/journal/');
     $purged += page_html_cache_purge_prefix('/services/');
     $purged += page_html_cache_purge_prefix('/projects/');
     seo_echo('HTML cache purge after generation: deleted=' . (int)$purged);

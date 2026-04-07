@@ -7,7 +7,7 @@ $t = static function (string $ru, string $en) use ($isRu): string {
 $year = date('Y');
 $nav = [
     ['href' => '/', 'label' => $t('Главная', 'Home')],
-    ['href' => '/blog/', 'label' => $t('Блог', 'Blog')],
+    ['href' => '/journal/', 'label' => $t('Журнал', 'Journal')],
     ['href' => '/solutions/downloads/', 'label' => $t('Решения', 'Solutions')],
     ['href' => '/projects/', 'label' => $t('Продукты', 'Products')],
     ['href' => '/cases/', 'label' => $t('Кейсы', 'Cases')],

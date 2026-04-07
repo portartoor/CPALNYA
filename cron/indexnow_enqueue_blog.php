@@ -149,7 +149,7 @@ foreach ($hosts as $host) {
 
         if ($clusterCode !== '' && !isset($seenClusters[$clusterCode])) {
             $seenClusters[$clusterCode] = true;
-            $clusterUrl = 'https://' . $host . '/blog/' . rawurlencode($clusterCode) . '/';
+            $clusterUrl = 'https://' . $host . '/journal/' . rawurlencode($clusterCode) . '/';
             $clusterHash = hash('sha256', $clusterUrl);
             if (!isset($seen[$clusterHash])) {
                 $seen[$clusterHash] = true;
@@ -169,8 +169,8 @@ foreach ($hosts as $host) {
 
         $url = 'https://' . $host
             . ($clusterCode !== ''
-                ? '/blog/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug) . '/'
-                : '/blog/' . rawurlencode($slug) . '/');
+                ? '/journal/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug) . '/'
+                : '/journal/' . rawurlencode($slug) . '/');
         $urlHash = hash('sha256', $url);
         if (isset($seen[$urlHash])) {
             continue;
@@ -198,4 +198,3 @@ enqueue_blog_echo(
     . ', dry_run=' . (int)$opts['dry_run']
 );
 exit(0);
-

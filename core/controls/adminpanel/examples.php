@@ -104,9 +104,9 @@ function admin_examples_public_url(string $domainHost, string $langCode, string 
     }
     $clusterCode = examples_slugify($clusterCode);
     if ($clusterCode === '') {
-        return 'https://' . $host . '/blog/' . rawurlencode($slug);
+        return 'https://' . $host . '/journal/' . rawurlencode($slug);
     }
-    return 'https://' . $host . '/blog/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug);
+    return 'https://' . $host . '/journal/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug);
 }
 
 function admin_examples_indexnow_enabled(mysqli $DB): bool

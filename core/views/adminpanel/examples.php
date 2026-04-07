@@ -103,7 +103,14 @@
             </div>
         </div>
     <?php else: ?>
-        <div class="d-flex justify-content-end mb-3">
+        <div class="d-flex justify-content-end gap-2 mb-3">
+            <?php foreach ((array)($adminExamplesExtraActions ?? []) as $action): ?>
+                <a
+                    class="btn <?= htmlspecialchars((string)($action['class'] ?? 'btn-outline-secondary')) ?>"
+                    href="<?= htmlspecialchars((string)($action['href'] ?? '#')) ?>"
+                    <?php if (!empty($action['target'])): ?>target="<?= htmlspecialchars((string)$action['target']) ?>" rel="noopener noreferrer"<?php endif; ?>
+                ><?= htmlspecialchars((string)($action['label'] ?? 'Open')) ?></a>
+            <?php endforeach; ?>
             <a class="btn btn-primary" href="<?= htmlspecialchars((string)$adminExamplesBackUrl) ?>?create=1">Create Item</a>
         </div>
         <div class="card">

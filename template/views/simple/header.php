@@ -11,7 +11,10 @@ $logoAria = $logoMain . ' portal';
 $requestPath = parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 $requestPath = is_string($requestPath) && $requestPath !== '' ? $requestPath : '/';
 $firstSegment = strtolower((string)(explode('/', trim($requestPath, '/'))[0] ?? ''));
-$section = in_array($firstSegment, ['blog', 'services', 'projects', 'cases', 'offers', 'solutions', 'contact', 'audit'], true) ? $firstSegment : 'home';
+$section = in_array($firstSegment, ['blog', 'journal', 'services', 'projects', 'cases', 'offers', 'solutions', 'contact', 'audit'], true) ? $firstSegment : 'home';
+if ($section === 'blog') {
+    $section = 'journal';
+}
 $scheme = (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ? 'https' : 'http';
 $faviconPrimary = $isRu ? '/favicon1.png' : '/favicon2.png';
 $favicon32 = $faviconPrimary;
@@ -140,7 +143,7 @@ $canonical = $scheme . '://' . $canonicalHost . $canonicalPath;
 $ruHost = $canonicalHost;
 $enHost = $canonicalHost;
 $selfLang = $isRu ? 'ru' : 'en';
-$isEquivalentPath = in_array($canonicalPath, ['/', '/blog/', '/services/', '/projects/', '/cases/', '/offers/', '/contact/', '/audit/', '/privacy/', '/terms/'], true);
+$isEquivalentPath = in_array($canonicalPath, ['/', '/journal/', '/services/', '/projects/', '/cases/', '/offers/', '/contact/', '/audit/', '/privacy/', '/terms/'], true);
 $hreflangLinks = [];
 $hreflangLinks[] = ['lang' => $selfLang, 'href' => $canonical];
 if ($isEquivalentPath) {
@@ -876,7 +879,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     </div>
 
     <div class="simple-header-center">
-        <form class="simple-header-search" method="get" action="/blog/">
+        <form class="simple-header-search" method="get" action="/journal/">
             <input type="text" name="q" data-search-input placeholder="<?= htmlspecialchars($isRu ? 'Поиск: Facebook farm, антидетект, tracker setup, nutra funnel' : 'Search: Facebook farm, anti-detect, tracker setup, nutra funnel', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
             <button type="submit"><?= htmlspecialchars($isRu ? 'Найти в выпуске' : 'Search issue', ENT_QUOTES, 'UTF-8') ?></button>
         </form>

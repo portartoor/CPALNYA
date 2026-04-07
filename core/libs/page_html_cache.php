@@ -38,7 +38,7 @@ if (!function_exists('page_html_cache_defaults')) {
             ],
             'ttl_by_prefix' => [
                 '/' => 120,
-                '/blog/' => 600,
+                '/journal/' => 600,
                 '/services/' => 900,
                 '/projects/' => 900,
                 '/cases/' => 900,

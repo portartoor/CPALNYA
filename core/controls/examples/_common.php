@@ -51,14 +51,14 @@ if (!function_exists('examples_default_lang_for_host')) {
 if (!function_exists('examples_route_base')) {
     function examples_route_base(?string $host = null): string
     {
-        return '/blog';
+        return '/journal';
     }
 }
 
 if (!function_exists('examples_article_detail_base')) {
     function examples_article_detail_base(?string $host = null): string
     {
-        return '/blog/';
+        return '/journal/';
     }
 }
 
@@ -146,9 +146,9 @@ if (!function_exists('examples_article_url_path')) {
         }
         $clusterSafe = examples_slugify((string)$clusterCode);
         if ($clusterSafe === '') {
-            return '/blog/' . rawurlencode($slugSafe) . '/';
+            return '/journal/' . rawurlencode($slugSafe) . '/';
         }
-        return '/blog/' . rawurlencode($clusterSafe) . '/' . rawurlencode($slugSafe) . '/';
+        return '/journal/' . rawurlencode($clusterSafe) . '/' . rawurlencode($slugSafe) . '/';
     }
 }
 if (!function_exists('examples_cluster_list_path')) {
@@ -156,9 +156,9 @@ if (!function_exists('examples_cluster_list_path')) {
     {
         $clusterSafe = examples_slugify((string)$clusterCode);
         if ($clusterSafe === '') {
-            return '/blog/';
+            return '/journal/';
         }
-        return '/blog/' . rawurlencode($clusterSafe) . '/';
+        return '/journal/' . rawurlencode($clusterSafe) . '/';
     }
 }
 if (!function_exists('examples_resolve_lang')) {
@@ -265,7 +265,7 @@ if (!function_exists('examples_build_excerpt')) {
 }
 
 if (!function_exists('examples_fetch_published_list')) {
-    function examples_fetch_published_list($FRMWRK, string $host, int $limit = 100, string $lang = 'en', string $cluster = ''): array
+    function examples_fetch_published_list($FRMWRK, string $host, int $limit = 100, string $lang = 'en', string $cluster = '', string $materialSection = ''): array
     {
         $db = $FRMWRK->DB();
         if (!$db || !examples_table_exists($db)) {
@@ -287,6 +287,10 @@ if (!function_exists('examples_fetch_published_list')) {
                 ? " AND cluster_code = '{$clusterSafe}'"
                 : '';
         }
+        $sectionWhere = '';
+        if ($materialSection !== '' && examples_table_has_column($db, 'material_section')) {
+            $sectionWhere = " AND material_section = '" . mysqli_real_escape_string($db, $materialSection) . "'";
+        }
 
         if (!$hasLang) {
             return $FRMWRK->DBRecords(
@@ -294,7 +298,7 @@ if (!function_exists('examples_fetch_published_list')) {
                  FROM examples_articles
                  WHERE is_published = 1
                    AND (domain_host IS NULL OR domain_host = '' OR domain_host = '{$hostSafe}')
-                   {$clusterWhere}
+                   {$clusterWhere}{$sectionWhere}
                  ORDER BY COALESCE(published_at, updated_at, created_at) DESC, id DESC
                  LIMIT {$limit}"
             );
@@ -311,7 +315,7 @@ if (!function_exists('examples_fetch_published_list')) {
              WHERE is_published = 1
                AND (domain_host IS NULL OR domain_host = '' OR domain_host = '{$hostSafe}')
                AND {$langCond}
-               {$clusterWhere}
+               {$clusterWhere}{$sectionWhere}
              ORDER BY
                (lang_code = '{$langSafe}') DESC,
                COALESCE(published_at, updated_at, created_at) DESC,
@@ -338,7 +342,7 @@ if (!function_exists('examples_fetch_published_list')) {
 }
 
 if (!function_exists('examples_build_where')) {
-    function examples_build_where(mysqli $db, string $host, string $lang, string $query = '', bool $exact = false, string $cluster = ''): string
+    function examples_build_where(mysqli $db, string $host, string $lang, string $query = '', bool $exact = false, string $cluster = '', string $materialSection = ''): string
     {
         $hostSafe = mysqli_real_escape_string($db, strtolower($host));
         $lang = examples_normalize_lang($lang);
@@ -357,6 +361,9 @@ if (!function_exists('examples_build_where')) {
                 $where[] = "cluster_code = '{$clusterSafe}'";
             }
         }
+        if ($materialSection !== '' && examples_table_has_column($db, 'material_section')) {
+            $where[] = "material_section = '" . mysqli_real_escape_string($db, $materialSection) . "'";
+        }
 
         $query = trim($query);
         if ($query !== '') {
@@ -374,14 +381,14 @@ if (!function_exists('examples_build_where')) {
 }
 
 if (!function_exists('examples_fetch_published_count')) {
-    function examples_fetch_published_count($FRMWRK, string $host, string $lang = 'en', string $query = '', bool $exact = false, string $cluster = ''): int
+    function examples_fetch_published_count($FRMWRK, string $host, string $lang = 'en', string $query = '', bool $exact = false, string $cluster = '', string $materialSection = ''): int
     {
         $db = $FRMWRK->DB();
         if (!$db || !examples_table_exists($db)) {
             return 0;
         }
 
-        $where = examples_build_where($db, $host, $lang, $query, $exact, $cluster);
+        $where = examples_build_where($db, $host, $lang, $query, $exact, $cluster, $materialSection);
         $rows = $FRMWRK->DBRecords(
             "SELECT COUNT(*) AS cnt
              FROM examples_articles
@@ -403,7 +410,8 @@ if (!function_exists('examples_fetch_published_page')) {
         int $perPage = 10,
         string $query = '',
         bool $exact = false,
-        string $cluster = ''
+        string $cluster = '',
+        string $materialSection = ''
     ): array {
         $db = $FRMWRK->DB();
         if (!$db || !examples_table_exists($db)) {
@@ -413,7 +421,7 @@ if (!function_exists('examples_fetch_published_page')) {
         $perPage = max(1, min(50, $perPage));
         $page = max(1, $page);
         $offset = ($page - 1) * $perPage;
-        $where = examples_build_where($db, $host, $lang, $query, $exact, $cluster);
+        $where = examples_build_where($db, $host, $lang, $query, $exact, $cluster, $materialSection);
         $previewSelect = examples_preview_select_sql($db);
         $hasLang = examples_table_has_lang_column($db);
         $hasCluster = examples_table_has_column($db, 'cluster_code');
@@ -431,7 +439,7 @@ if (!function_exists('examples_fetch_published_page')) {
 }
 
 if (!function_exists('examples_fetch_suggestions')) {
-    function examples_fetch_suggestions($FRMWRK, string $host, string $lang = 'en', string $query = '', int $limit = 10, string $cluster = ''): array
+    function examples_fetch_suggestions($FRMWRK, string $host, string $lang = 'en', string $query = '', int $limit = 10, string $cluster = '', string $materialSection = ''): array
     {
         $query = trim($query);
         if (mb_strlen($query) < 3) {
@@ -444,7 +452,7 @@ if (!function_exists('examples_fetch_suggestions')) {
         }
 
         $limit = max(1, min(10, $limit));
-        $where = examples_build_where($db, $host, $lang, $query, false, $cluster);
+        $where = examples_build_where($db, $host, $lang, $query, false, $cluster, $materialSection);
         $hasCluster = examples_table_has_column($db, 'cluster_code');
         $clusterSelect = $hasCluster ? 'cluster_code' : ("'" . examples_cluster_default($lang) . "' AS cluster_code");
         $rows = $FRMWRK->DBRecords(
@@ -469,7 +477,7 @@ if (!function_exists('examples_fetch_suggestions')) {
 }
 
 if (!function_exists('examples_fetch_published_by_slug')) {
-    function examples_fetch_published_by_slug($FRMWRK, string $host, string $slug, string $lang = 'en', string $cluster = ''): ?array
+    function examples_fetch_published_by_slug($FRMWRK, string $host, string $slug, string $lang = 'en', string $cluster = '', string $materialSection = ''): ?array
     {
         $db = $FRMWRK->DB();
         if (!$db || !examples_table_exists($db)) {
@@ -493,6 +501,10 @@ if (!function_exists('examples_fetch_published_by_slug')) {
             $clusterSafe = mysqli_real_escape_string($db, examples_normalize_cluster($cluster, $lang));
             $clusterWhere = " AND cluster_code = '{$clusterSafe}'";
         }
+        $sectionWhere = '';
+        if ($materialSection !== '' && examples_table_has_column($db, 'material_section')) {
+            $sectionWhere = " AND material_section = '" . mysqli_real_escape_string($db, $materialSection) . "'";
+        }
         if (!$hasLang) {
             $rows = $FRMWRK->DBRecords(
                 "SELECT id, domain_host, title, slug, {$clusterSelect}, excerpt_html, content_html{$previewSelect}, is_published, published_at, created_at, updated_at, 'en' AS lang_code
@@ -500,7 +512,7 @@ if (!function_exists('examples_fetch_published_by_slug')) {
                  WHERE is_published = 1
                    AND {$slugWhere}
                    AND (domain_host IS NULL OR domain_host = '' OR domain_host = '{$hostSafe}')
-                   {$clusterWhere}
+                   {$clusterWhere}{$sectionWhere}
                  ORDER BY (domain_host = '{$hostSafe}') DESC, id DESC
                  LIMIT 1"
             );
@@ -517,7 +529,7 @@ if (!function_exists('examples_fetch_published_by_slug')) {
              WHERE is_published = 1
                AND {$slugWhere}
                AND {$langCond}
-               {$clusterWhere}
+               {$clusterWhere}{$sectionWhere}
                AND (domain_host IS NULL OR domain_host = '' OR domain_host = '{$hostSafe}')
              ORDER BY (lang_code = '{$langSafe}') DESC, (domain_host = '{$hostSafe}') DESC, id DESC
              LIMIT 1"
@@ -528,7 +540,7 @@ if (!function_exists('examples_fetch_published_by_slug')) {
 }
 
 if (!function_exists('examples_fetch_clusters')) {
-    function examples_fetch_clusters($FRMWRK, string $host, string $lang = 'en', int $limit = 20): array
+    function examples_fetch_clusters($FRMWRK, string $host, string $lang = 'en', int $limit = 20, string $materialSection = ''): array
     {
         $db = $FRMWRK->DB();
         if (!$db || !examples_table_exists($db) || !examples_table_has_column($db, 'cluster_code')) {
@@ -539,6 +551,9 @@ if (!function_exists('examples_fetch_clusters')) {
         $langCond = examples_table_has_lang_column($db)
             ? ($lang === 'ru' ? "AND lang_code = 'ru'" : "AND lang_code = 'en'")
             : '';
+        $sectionWhere = ($materialSection !== '' && examples_table_has_column($db, 'material_section'))
+            ? " AND material_section = '" . mysqli_real_escape_string($db, $materialSection) . "'"
+            : '';
 
         $rows = $FRMWRK->DBRecords(
             "SELECT cluster_code, COUNT(*) AS cnt
@@ -546,7 +561,7 @@ if (!function_exists('examples_fetch_clusters')) {
              WHERE is_published = 1
                AND COALESCE(cluster_code, '') <> ''
                AND (domain_host IS NULL OR domain_host = '' OR domain_host = '{$hostSafe}')
-               {$langCond}
+               {$langCond}{$sectionWhere}
              GROUP BY cluster_code
              ORDER BY cnt DESC, cluster_code ASC
              LIMIT {$limit}"

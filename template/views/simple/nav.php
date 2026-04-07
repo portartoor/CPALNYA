@@ -15,33 +15,33 @@ $navSections = [
     [
         'label' => $isRu ? 'Выпуск' : 'Issue',
         'items' => [
-            ['title' => $isRu ? 'Главная' : 'Home', 'path' => '/', 'icon' => '●'],
-            ['title' => $isRu ? 'Журнал' : 'Journal', 'path' => '/blog/', 'icon' => '✦'],
-            ['title' => $isRu ? 'Темы' : 'Topics', 'path' => '/blog/', 'icon' => '◌'],
+            ['title' => $isRu ? 'Главная' : 'Home', 'path' => '/', 'icon' => '*'],
+            ['title' => $isRu ? 'Журнал' : 'Journal', 'path' => '/journal/', 'icon' => '+'],
+            ['title' => $isRu ? 'Темы' : 'Topics', 'path' => '/journal/', 'icon' => '#'],
         ],
     ],
     [
         'label' => $isRu ? 'Операционка' : 'Ops',
         'items' => [
-            ['title' => $isRu ? 'Источники' : 'Sources', 'path' => '/blog/', 'icon' => '↗'],
-            ['title' => $isRu ? 'Фарм' : 'Farm', 'path' => '/blog/', 'icon' => '▣'],
-            ['title' => $isRu ? 'Креативы' : 'Creatives', 'path' => '/blog/', 'icon' => '◇'],
-            ['title' => $isRu ? 'Трекеры' : 'Trackers', 'path' => '/blog/', 'icon' => '⌁'],
+            ['title' => $isRu ? 'Источники' : 'Sources', 'path' => '/journal/', 'icon' => '>'],
+            ['title' => $isRu ? 'Фарм' : 'Farm', 'path' => '/journal/', 'icon' => 'F'],
+            ['title' => $isRu ? 'Креативы' : 'Creatives', 'path' => '/journal/', 'icon' => 'C'],
+            ['title' => $isRu ? 'Трекеры' : 'Trackers', 'path' => '/journal/', 'icon' => 'T'],
         ],
     ],
     [
         'label' => $isRu ? 'Библиотека' : 'Library',
         'items' => [
-            ['title' => 'Assets', 'path' => '/solutions/downloads/', 'icon' => '↓'],
-            ['title' => 'Playbooks', 'path' => '/solutions/articles/', 'icon' => '▤'],
-            ['title' => $isRu ? 'Кейсы' : 'Cases', 'path' => '/cases/', 'icon' => '◎'],
-            ['title' => $isRu ? 'Продукты' : 'Products', 'path' => '/projects/', 'icon' => '◍'],
+            ['title' => 'Assets', 'path' => '/solutions/downloads/', 'icon' => 'D'],
+            ['title' => 'Playbooks', 'path' => '/solutions/articles/', 'icon' => 'P'],
+            ['title' => $isRu ? 'Кейсы' : 'Cases', 'path' => '/cases/', 'icon' => 'K'],
+            ['title' => $isRu ? 'Продукты' : 'Products', 'path' => '/projects/', 'icon' => 'R'],
         ],
     ],
     [
         'label' => $isRu ? 'Связь' : 'Reach',
         'items' => [
-            ['title' => $isRu ? 'Контакты' : 'Contact', 'path' => '/contact/', 'icon' => '↘'],
+            ['title' => $isRu ? 'Контакты' : 'Contact', 'path' => '/contact/', 'icon' => '@'],
         ],
     ],
 ];

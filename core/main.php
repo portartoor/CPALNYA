@@ -309,11 +309,21 @@ class Render {
 			$this->RenderRobotsTxt();
 			exit;
 		}
+		if ($requestPath === '/blog' || $requestPath === '/blog/' || strpos($requestPath, '/blog/') === 0) {
+			$tail = (string)substr($requestPath, strlen('/blog'));
+			$target = '/journal' . $tail;
+			$query = (string)($_SERVER['QUERY_STRING'] ?? '');
+			if ($query !== '') {
+				$target .= '?' . $query;
+			}
+			header('Location: ' . $target, true, 301);
+			exit;
+		}
 		if (strpos($requestPath, '/examples/article/') === 0) {
 			$tail = (string)substr($requestPath, strlen('/examples/article/'));
 			$tail = ltrim($tail, '/');
 			if ($tail !== '') {
-				$target = '/blog/' . $tail;
+				$target = '/journal/' . $tail;
 				$query = (string)($_SERVER['QUERY_STRING'] ?? '');
 				if ($query !== '') {
 					$target .= '?' . $query;
@@ -696,7 +706,7 @@ class Render {
 			$urls[] = ['loc' => $base.'/dashboard/auth/', 'changefreq' => 'weekly', 'priority' => '0.7'];
 		} else {
 			$urls[] = ['loc' => $base.'/', 'changefreq' => 'daily', 'priority' => '1.0'];
-			$urls[] = ['loc' => $base.'/blog/', 'changefreq' => 'daily', 'priority' => '0.9'];
+			$urls[] = ['loc' => $base.'/journal/', 'changefreq' => 'daily', 'priority' => '0.9'];
 			$urls[] = ['loc' => $base.'/solutions/downloads/', 'changefreq' => 'weekly', 'priority' => '0.9'];
 			$urls[] = ['loc' => $base.'/solutions/articles/', 'changefreq' => 'weekly', 'priority' => '0.9'];
 			$urls[] = ['loc' => $base.'/services/', 'changefreq' => 'weekly', 'priority' => '0.9'];
@@ -827,15 +837,15 @@ class Render {
 				if ($hasClusterColumn && $clusterCode !== '' && !isset($seenClusters[$clusterCode])) {
 					$seenClusters[$clusterCode] = true;
 					$result[] = [
-						'loc' => $base . '/blog/' . rawurlencode($clusterCode) . '/',
+						'loc' => $base . '/journal/' . rawurlencode($clusterCode) . '/',
 						'changefreq' => 'weekly',
 						'priority' => '0.6'
 					];
 				}
 				$result[] = [
 					'loc' => $base . ($clusterCode !== ''
-						? '/blog/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug) . '/'
-						: '/blog/' . rawurlencode($slug) . '/'),
+						? '/journal/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug) . '/'
+						: '/journal/' . rawurlencode($slug) . '/'),
 					'changefreq' => 'weekly',
 					'priority' => '0.7'
 				];
@@ -1232,14 +1242,14 @@ class Render {
 				if ($clusterCode !== '' && !isset($seenClusters[$clusterCode])) {
 					$seenClusters[$clusterCode] = true;
 					$result[] = [
-						'loc' => $base . ($isApiGeoOnlineHost ? '/articles/' : '/examples/') . rawurlencode($clusterCode) . '/',
+						'loc' => $base . ($isApiGeoOnlineHost ? '/articles/' : '/journal/') . rawurlencode($clusterCode) . '/',
 						'changefreq' => 'weekly',
 						'priority' => '0.6'
 					];
 				}
 				$articlePath = $isApiGeoOnlineHost
 					? ($clusterCode !== '' ? '/articles/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug) . '/' : '/articles/' . rawurlencode($slug) . '/')
-					: ($clusterCode !== '' ? '/examples/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug) . '/' : '/examples/' . rawurlencode($slug) . '/');
+					: ($clusterCode !== '' ? '/journal/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug) . '/' : '/journal/' . rawurlencode($slug) . '/');
 				$result[] = [
 					'loc' => $base . $articlePath,
 					'changefreq' => 'weekly',
@@ -1417,8 +1427,8 @@ class Render {
 				$clusterCode = trim((string)($row['cluster_code'] ?? ''));
 				$loc = $base
 					. ($clusterCode !== ''
-						? '/blog/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug) . '/'
-						: '/blog/' . rawurlencode($slug) . '/');
+						? '/journal/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug) . '/'
+						: '/journal/' . rawurlencode($slug) . '/');
 				$images = [];
 				foreach (['preview_image_url', 'preview_image_thumb_url'] as $imgKey) {
 					$raw = trim((string)($row[$imgKey] ?? ''));
