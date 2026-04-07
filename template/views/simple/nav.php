@@ -36,32 +36,32 @@ $sectionBasePaths = [
     'fun' => '/fun/',
 ];
 $sectionIcons = [
-    'journal' => '+',
-    'playbooks' => '#',
-    'signals' => '!',
-    'fun' => '~',
+    'journal' => '✦',
+    'playbooks' => '⚙',
+    'signals' => '⌁',
+    'fun' => '✺',
 ];
 $topicIconMap = [
-    'источники' => '>',
-    'sources' => '>',
-    'фарм' => 'F',
-    'farm' => 'F',
-    'ai creatives' => 'A',
-    'ai-креативы' => 'A',
-    'ai креативы' => 'A',
-    'операции' => 'O',
-    'operations' => 'O',
-    'policy shifts' => 'P',
-    'policy shift' => 'P',
-    'регуляторика снг' => 'R',
-    'cis regulation' => 'R',
-    'мемы команды' => 'M',
-    'team memes' => 'M',
-    'драма модерации' => 'D',
-    'moderation drama' => 'D',
+    'источники' => '⇢',
+    'sources' => '⇢',
+    'фарм' => '◩',
+    'farm' => '◩',
+    'ai creatives' => '✶',
+    'ai-креативы' => '✶',
+    'ai креативы' => '✶',
+    'операции' => '⚙',
+    'operations' => '⚙',
+    'policy shifts' => '⚖',
+    'policy shift' => '⚖',
+    'регуляторика снг' => '▣',
+    'cis regulation' => '▣',
+    'мемы команды' => '☺',
+    'team memes' => '☺',
+    'драма модерации' => '⚠',
+    'moderation drama' => '⚠',
 ];
 
-$pickTopicIcon = static function (string $title, string $fallback = '·') use ($normalizeTopicTitle, $topicIconMap): string {
+$pickTopicIcon = static function (string $title, string $fallback = '◦') use ($normalizeTopicTitle, $topicIconMap): string {
     $normalized = $normalizeTopicTitle($title);
     if ($normalized === '') {
         return $fallback;
@@ -120,14 +120,14 @@ foreach ($importantRaw as $item) {
 
 if (count($importantTopics) < 8) {
     $importantTopics = [
-        ['title' => $isRu ? 'Источники' : 'Sources', 'path' => '/journal/', 'icon' => '>'],
-        ['title' => $isRu ? 'Фарм' : 'Farm', 'path' => '/journal/', 'icon' => 'F'],
-        ['title' => 'AI Creatives', 'path' => '/playbooks/', 'icon' => 'A'],
-        ['title' => $isRu ? 'Операции' : 'Operations', 'path' => '/playbooks/', 'icon' => 'O'],
-        ['title' => 'Policy shifts', 'path' => '/signals/', 'icon' => 'P'],
-        ['title' => $isRu ? 'Регуляторика СНГ' : 'CIS regulation', 'path' => '/signals/', 'icon' => 'R'],
-        ['title' => $isRu ? 'Мемы команды' : 'Team memes', 'path' => '/fun/', 'icon' => 'M'],
-        ['title' => $isRu ? 'Драма модерации' : 'Moderation drama', 'path' => '/fun/', 'icon' => 'D'],
+        ['title' => $isRu ? 'Источники' : 'Sources', 'path' => '/journal/', 'icon' => '⇢'],
+        ['title' => $isRu ? 'Фарм' : 'Farm', 'path' => '/journal/', 'icon' => '◩'],
+        ['title' => 'AI Creatives', 'path' => '/playbooks/', 'icon' => '✶'],
+        ['title' => $isRu ? 'Операции' : 'Operations', 'path' => '/playbooks/', 'icon' => '⚙'],
+        ['title' => 'Policy shifts', 'path' => '/signals/', 'icon' => '⚖'],
+        ['title' => $isRu ? 'Регуляторика СНГ' : 'CIS regulation', 'path' => '/signals/', 'icon' => '▣'],
+        ['title' => $isRu ? 'Мемы команды' : 'Team memes', 'path' => '/fun/', 'icon' => '☺'],
+        ['title' => $isRu ? 'Драма модерации' : 'Moderation drama', 'path' => '/fun/', 'icon' => '⚠'],
     ];
 }
 
@@ -135,7 +135,7 @@ $navSections = [
     [
         'label' => $isRu ? 'Выпуск' : 'Issue',
         'items' => [
-            ['title' => $isRu ? 'Главная' : 'Home', 'path' => '/', 'icon' => '*'],
+            ['title' => $isRu ? 'Главная' : 'Home', 'path' => '/', 'icon' => '⌂'],
             ['title' => $sectionTitles['journal'], 'path' => $sectionBasePaths['journal'], 'icon' => $sectionIcons['journal']],
             ['title' => $sectionTitles['playbooks'], 'path' => $sectionBasePaths['playbooks'], 'icon' => $sectionIcons['playbooks']],
             ['title' => $sectionTitles['signals'], 'path' => $sectionBasePaths['signals'], 'icon' => $sectionIcons['signals']],
@@ -149,7 +149,7 @@ $navSections = [
     [
         'label' => $isRu ? 'Связь' : 'Reach',
         'items' => [
-            ['title' => $isRu ? 'Контакты' : 'Contact', 'path' => '/contact/', 'icon' => '@'],
+            ['title' => $isRu ? 'Контакты' : 'Contact', 'path' => '/contact/', 'icon' => '✉'],
         ],
     ],
 ];

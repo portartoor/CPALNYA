@@ -69,7 +69,8 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
 .home-z-cover{border:1px solid rgba(255,255,255,.08);overflow:hidden;background:radial-gradient(circle at 50% 22%,rgba(103,200,255,.16),transparent 26%),linear-gradient(180deg,rgba(6,11,20,.96),rgba(4,8,16,.92))}
 .home-z-cover img{display:block;width:100%;height:auto}
 .home-z-actions{display:flex;gap:10px;flex-wrap:wrap}
-.home-z-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 13px;border:1px solid rgba(122,180,255,.18);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));color:var(--shell-text);text-decoration:none;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+.home-z-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:9px 18px;border:1px solid rgba(122,180,255,.18);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));color:var(--shell-text);text-decoration:none;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+.home-z-btn-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;min-width:14px;color:#f4d56b;font-size:12px;line-height:1}
 .home-z-feature{display:grid;grid-template-columns:180px minmax(0,1fr);gap:14px;padding:14px 16px;border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(122,180,255,.05));align-items:stretch}
 .home-z-feature-media{width:180px;height:100%;min-height:100%;align-self:stretch;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));overflow:hidden}
 .home-z-feature-media img{display:block;width:100%;height:100%;object-fit:cover}
@@ -114,10 +115,10 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
                     <p><?= htmlspecialchars((string)($issue['issue_subtitle'] ?? $t('Лицо выпуска: трекинг, источники, срок жизни креативов, дисциплина командной операционки и те решения, к которым возвращаются, когда рынок снова начинает качать.', 'The face of the issue: tracking, sources, creative shelf life, team operations discipline, and the decisions people return to when the market starts shaking again.')), ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
                 <div class="home-z-actions">
-                    <a class="home-z-btn" href="/journal/"><?= htmlspecialchars($t('В журнал', 'Journal'), ENT_QUOTES, 'UTF-8') ?></a>
-                    <a class="home-z-btn" href="/playbooks/"><?= htmlspecialchars($t('Практика', 'Playbooks'), ENT_QUOTES, 'UTF-8') ?></a>
-                    <a class="home-z-btn" href="/signals/"><?= htmlspecialchars($t('Повестка', 'Signals'), ENT_QUOTES, 'UTF-8') ?></a>
-                    <a class="home-z-btn" href="/fun/"><?= htmlspecialchars($t('Фан', 'Fun'), ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="home-z-btn" href="/journal/"><span class="home-z-btn-icon" aria-hidden="true">✦</span><span><?= htmlspecialchars($t('В журнал', 'Journal'), ENT_QUOTES, 'UTF-8') ?></span></a>
+                    <a class="home-z-btn" href="/playbooks/"><span class="home-z-btn-icon" aria-hidden="true">⚙</span><span><?= htmlspecialchars($t('Практика', 'Playbooks'), ENT_QUOTES, 'UTF-8') ?></span></a>
+                    <a class="home-z-btn" href="/signals/"><span class="home-z-btn-icon" aria-hidden="true">⌁</span><span><?= htmlspecialchars($t('Повестка', 'Signals'), ENT_QUOTES, 'UTF-8') ?></span></a>
+                    <a class="home-z-btn" href="/fun/"><span class="home-z-btn-icon" aria-hidden="true">✺</span><span><?= htmlspecialchars($t('Фан', 'Fun'), ENT_QUOTES, 'UTF-8') ?></span></a>
                 </div>
                 <?php if (is_array($heroCard)): ?>
                     <?php $heroCardImage = $imageSrc((array)$heroCard); ?>

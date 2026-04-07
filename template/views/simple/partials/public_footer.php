@@ -6,46 +6,108 @@ $t = static function (string $ru, string $en) use ($isRu): string {
     return $isRu ? $ru : $en;
 };
 $year = date('Y');
+$normalizeTopicTitle = static function (string $value): string {
+    $value = trim((string)preg_replace('/\s+/u', ' ', $value));
+    if ($value === '') {
+        return '';
+    }
+    return function_exists('mb_strtolower') ? mb_strtolower($value, 'UTF-8') : strtolower($value);
+};
+$sectionTitles = [
+    'journal' => $t('Журнал', 'Journal'),
+    'playbooks' => $t('Практика', 'Playbooks'),
+    'signals' => $t('Повестка', 'Signals'),
+    'fun' => $t('Фан', 'Fun'),
+];
+$sectionBasePaths = [
+    'journal' => '/journal/',
+    'playbooks' => '/playbooks/',
+    'signals' => '/signals/',
+    'fun' => '/fun/',
+];
+$sectionIcons = [
+    'home' => '⌂',
+    'journal' => '✦',
+    'playbooks' => '⚙',
+    'signals' => '⌁',
+    'fun' => '✺',
+    'contact' => '✉',
+];
+$topicIconMap = [
+    'источники' => '⇢',
+    'sources' => '⇢',
+    'фарм' => '◩',
+    'farm' => '◩',
+    'ai creatives' => '✶',
+    'ai-креативы' => '✶',
+    'ai креативы' => '✶',
+    'операции' => '⚙',
+    'operations' => '⚙',
+    'policy shifts' => '⚖',
+    'policy shift' => '⚖',
+    'регуляторика снг' => '▣',
+    'cis regulation' => '▣',
+    'мемы команды' => '☺',
+    'team memes' => '☺',
+    'драма модерации' => '⚠',
+    'moderation drama' => '⚠',
+];
+$pickTopicIcon = static function (string $title, string $fallback = '◦') use ($normalizeTopicTitle, $topicIconMap): string {
+    $normalized = $normalizeTopicTitle($title);
+    if ($normalized === '') {
+        return $fallback;
+    }
+    return $topicIconMap[$normalized] ?? $fallback;
+};
 
-$opsLinks = [];
+$importantTopics = [];
+$importantCounts = [];
+$importantRaw = [];
 if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters')) {
-    foreach ((array)examples_popularity_fetch_top_clusters($FRMWRK, $host, $lang, 'journal', 3) as $row) {
-        $code = trim((string)($row['code'] ?? ''));
-        if ($code === '') {
-            continue;
+    foreach (['journal', 'playbooks', 'signals', 'fun'] as $sectionKey) {
+        foreach ((array)examples_popularity_fetch_top_clusters($FRMWRK, $host, $lang, $sectionKey, 2) as $row) {
+            $code = trim((string)($row['code'] ?? ''));
+            if ($code === '') {
+                continue;
+            }
+            $title = trim((string)($row['label'] ?? $code));
+            $normalizedTitle = $normalizeTopicTitle($title);
+            $normalizedParent = $normalizeTopicTitle((string)($sectionTitles[$sectionKey] ?? ''));
+            if ($normalizedTitle === '' || $normalizedTitle === $normalizedParent) {
+                continue;
+            }
+            $importantCounts[$normalizedTitle] = (int)($importantCounts[$normalizedTitle] ?? 0) + 1;
+            $importantRaw[] = [
+                'section' => $sectionKey,
+                'title' => $title,
+                'normalized_title' => $normalizedTitle,
+                'href' => function_exists('examples_cluster_list_path') ? examples_cluster_list_path($code, $host, $sectionKey) : ($sectionBasePaths[$sectionKey] ?? '/'),
+                'icon' => $pickTopicIcon($title),
+            ];
         }
-        $opsLinks[] = [
-            'href' => function_exists('examples_cluster_list_path') ? examples_cluster_list_path($code, $host, 'journal') : '/journal/',
-            'label' => (string)($row['label'] ?? $code),
-        ];
     }
 }
-if (count($opsLinks) < 3) {
-    $opsLinks = [
-        ['href' => '/journal/', 'label' => $t('Источники', 'Sources')],
-        ['href' => '/journal/', 'label' => $t('Фарм', 'Farm')],
-        ['href' => '/journal/', 'label' => $t('Креативы', 'Creatives')],
+foreach ($importantRaw as $item) {
+    $label = $item['title'];
+    if ((int)($importantCounts[$item['normalized_title']] ?? 0) > 1) {
+        $label .= ' (// ' . (string)($sectionTitles[$item['section']] ?? $item['section']) . ')';
+    }
+    $importantTopics[] = [
+        'href' => $item['href'],
+        'label' => $label,
+        'icon' => $item['icon'],
     ];
 }
-
-$howToLinks = [];
-if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters')) {
-    foreach ((array)examples_popularity_fetch_top_clusters($FRMWRK, $host, $lang, 'playbooks', 3) as $row) {
-        $code = trim((string)($row['code'] ?? ''));
-        if ($code === '') {
-            continue;
-        }
-        $howToLinks[] = [
-            'href' => function_exists('examples_cluster_list_path') ? examples_cluster_list_path($code, $host, 'playbooks') : '/playbooks/',
-            'label' => (string)($row['label'] ?? $code),
-        ];
-    }
-}
-if (count($howToLinks) < 3) {
-    $howToLinks = [
-        ['href' => '/playbooks/?topic=farm', 'label' => $t('Фарм-гайды', 'Farm Guides')],
-        ['href' => '/playbooks/?topic=tracking', 'label' => $t('Трекинг', 'Tracking')],
-        ['href' => '/playbooks/?topic=creatives', 'label' => $t('Креативы', 'Creatives')],
+if (count($importantTopics) < 8) {
+    $importantTopics = [
+        ['href' => '/journal/', 'label' => $t('Источники', 'Sources'), 'icon' => '⇢'],
+        ['href' => '/journal/', 'label' => $t('Фарм', 'Farm'), 'icon' => '◩'],
+        ['href' => '/playbooks/', 'label' => 'AI Creatives', 'icon' => '✶'],
+        ['href' => '/playbooks/', 'label' => $t('Операции', 'Operations'), 'icon' => '⚙'],
+        ['href' => '/signals/', 'label' => 'Policy shifts', 'icon' => '⚖'],
+        ['href' => '/signals/', 'label' => $t('Регуляторика СНГ', 'CIS regulation'), 'icon' => '▣'],
+        ['href' => '/fun/', 'label' => $t('Мемы команды', 'Team memes'), 'icon' => '☺'],
+        ['href' => '/fun/', 'label' => $t('Драма модерации', 'Moderation drama'), 'icon' => '⚠'],
     ];
 }
 
@@ -53,26 +115,21 @@ $footerSections = [
     [
         'title' => $t('Выпуск', 'Issue'),
         'links' => [
-            ['href' => '/', 'label' => $t('Главная', 'Home')],
-            ['href' => '/journal/', 'label' => $t('Журнал', 'Journal')],
-            ['href' => '/playbooks/', 'label' => $t('Практика', 'Playbooks')],
+            ['href' => '/', 'label' => $t('Главная', 'Home'), 'icon' => $sectionIcons['home']],
+            ['href' => '/journal/', 'label' => $sectionTitles['journal'], 'icon' => $sectionIcons['journal']],
+            ['href' => '/playbooks/', 'label' => $sectionTitles['playbooks'], 'icon' => $sectionIcons['playbooks']],
+            ['href' => '/signals/', 'label' => $sectionTitles['signals'], 'icon' => $sectionIcons['signals']],
+            ['href' => '/fun/', 'label' => $sectionTitles['fun'], 'icon' => $sectionIcons['fun']],
         ],
     ],
     [
-        'title' => $t('Операционка', 'Ops'),
-        'links' => $opsLinks,
-    ],
-    [
-        'title' => 'HowTo',
-        'links' => array_merge(
-            [['href' => '/playbooks/', 'label' => $t('Все HowTo', 'All HowTo')]],
-            $howToLinks
-        ),
+        'title' => $t('Важные темы', 'Important Topics'),
+        'links' => $importantTopics,
     ],
     [
         'title' => $t('Связь', 'Reach'),
         'links' => [
-            ['href' => '/contact/', 'label' => $t('Контакты', 'Contact')],
+            ['href' => '/contact/', 'label' => $t('Контакты', 'Contact'), 'icon' => $sectionIcons['contact']],
         ],
     ],
 ];
@@ -94,7 +151,10 @@ $footerSections = [
                         <h4><?= htmlspecialchars((string)$section['title'], ENT_QUOTES, 'UTF-8') ?></h4>
                         <nav aria-label="<?= htmlspecialchars((string)$section['title'], ENT_QUOTES, 'UTF-8') ?>">
                             <?php foreach ((array)$section['links'] as $link): ?>
-                                <a href="<?= htmlspecialchars((string)$link['href'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)$link['label'], ENT_QUOTES, 'UTF-8') ?></a>
+                                <a href="<?= htmlspecialchars((string)$link['href'], ENT_QUOTES, 'UTF-8') ?>">
+                                    <span class="public-editorial-link-icon" aria-hidden="true"><?= htmlspecialchars((string)($link['icon'] ?? '◦'), ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span><?= htmlspecialchars((string)$link['label'], ENT_QUOTES, 'UTF-8') ?></span>
+                                </a>
                             <?php endforeach; ?>
                         </nav>
                     </section>
@@ -126,7 +186,8 @@ $footerSections = [
 .public-editorial-map-group{padding:14px;border:1px solid rgba(127,164,223,.16);background:rgba(255,255,255,.03)}
 .public-editorial-map-group h4{margin:0 0 12px;font:700 1rem/1 "Space Grotesk","Sora",sans-serif;color:#edf3fb;letter-spacing:-.02em}
 .public-editorial-map-group nav{display:grid;gap:8px}
-.public-editorial-map-group a{color:#94aac8;text-decoration:none}
+.public-editorial-map-group a{display:inline-flex;align-items:center;gap:8px;color:#94aac8;text-decoration:none}
+.public-editorial-link-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;min-width:14px;color:#f4d56b;font-size:12px;line-height:1}
 .public-editorial-map-group a:hover{color:#edf3fb}
 .public-editorial-footer-bottom{margin-top:18px;padding-top:16px;border-top:1px solid rgba(127,164,223,.18)}
 .public-editorial-copy{color:#94aac8;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
