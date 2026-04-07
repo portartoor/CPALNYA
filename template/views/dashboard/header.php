@@ -946,24 +946,6 @@ if ($isAdminPanel) {
 						</a>
 					</li>
 					<li class="side-nav-item">
-						<a href="/adminpanel/services/" class="side-nav-link">
-							<span class="menu-icon"><i class="ti ti-briefcase"></i></span>
-							<span class="menu-text">Services Catalog</span>
-						</a>
-					</li>
-					<li class="side-nav-item">
-						<a href="/adminpanel/projects/" class="side-nav-link">
-							<span class="menu-icon"><i class="ti ti-folders"></i></span>
-							<span class="menu-text">Products Catalog</span>
-						</a>
-					</li>
-					<li class="side-nav-item">
-						<a href="/adminpanel/cases/" class="side-nav-link">
-							<span class="menu-icon"><i class="ti ti-briefcase-2"></i></span>
-							<span class="menu-text">Cases Catalog</span>
-						</a>
-					</li>
-					<li class="side-nav-item">
 						<a href="/adminpanel/seo-generator/" class="side-nav-link">
 							<span class="menu-icon"><i class="ti ti-wand"></i></span>
 							<span class="menu-text"><?= $isRuUi ? 'SEO РіРµРЅРµСЂР°С‚РѕСЂ' : 'SEO Generator' ?></span>

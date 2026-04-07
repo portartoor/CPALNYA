@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if (!function_exists('seo_gen_settings_table_name')) {
     function seo_gen_settings_table_name(): string
@@ -195,9 +195,9 @@ if (!function_exists('seo_gen_settings_default')) {
             'enabled' => true,
             'langs' => ['en', 'ru'],
             'domain_host' => '',
-            'domain_host_en' => 'portcore.online',
-            'domain_host_ru' => 'portcore.ru',
-            'author_name' => 'Portcore Team',
+            'domain_host_en' => 'cpalnya.ru',
+            'domain_host_ru' => 'cpalnya.ru',
+            'author_name' => 'CPALNYA Editorial Desk',
             'daily_min' => 1,
             'daily_max' => 3,
             'max_per_run' => 2,
@@ -206,8 +206,8 @@ if (!function_exists('seo_gen_settings_default')) {
             'today_first_delay_min' => 15,
             'auto_expand_retries' => 1,
             'expand_context_chars' => 7000,
-            'prompt_version' => 'seo-cron-v1',
-            'seed_salt' => 'portcore-seo-articles',
+            'prompt_version' => 'cpalnya-generator-v1',
+            'seed_salt' => 'cpalnya-affiliate-content',
             'narrative_person' => 'first_person_singular',
             'tone_variability' => 60,
             'portfolio_bofu_weight' => 30,
@@ -221,7 +221,7 @@ if (!function_exists('seo_gen_settings_default')) {
             'indexnow_key' => '',
             'indexnow_key_location' => '',
             'indexnow_endpoint' => '',
-            'indexnow_hosts' => ['portcore.ru', 'portcore.online'],
+            'indexnow_hosts' => ['cpalnya.ru'],
             'indexnow_ping_on_publish' => true,
             'indexnow_submit_limit' => 100,
             'indexnow_retry_delay_minutes' => 15,
@@ -251,31 +251,31 @@ if (!function_exists('seo_gen_settings_default')) {
             'topic_analysis_system_prompt' => '',
             'topic_analysis_user_prompt_append' => '',
 
-            'styles_en' => ['technical guide', 'playbook', 'architecture note', 'implementation tutorial'],
+            'styles_en' => ['editorial breakdown', 'trend memo', 'operator playbook', 'step-by-step tutorial'],
             'styles_ru' => ['экспертный', 'пошаговый', 'практический playbook', 'аналитический'],
             'clusters_en' => [
-                'scalable B2B SaaS architecture patterns',
-                'high-availability microservices and reliability engineering',
-                'secure API integration for enterprise systems',
-                'observability, metrics and operational excellence',
-                'DevOps and CI/CD strategies for high-load products',
-                'business process automation and analytics platforms',
+                'facebook farm setup and account resilience',
+                'tiktok affiliate funnels and creative iteration',
+                'telegram communities mini apps and retention',
+                'tracker attribution postbacks and signal recovery',
+                'anti-detect browsers team SOP and workflows',
+                'nutra crypto igaming finance traffic shifts in 2026',
             ],
             'clusters_ru' => [
-                'GeoIP и antifraud в login/signup flow',
+                'Facebook farm и антибан в 2026',
                 'снижение chargeback через гео-сигналы',
                 'risk-based authentication и step-up KYC',
                 'детект multi-account и abuse patterns',
                 'снижение false positive в антифроде',
-                'backend интеграция GeoIP в PHP/Node/Python',
+                'backend-интеграция трекеров, postback и антидетект-стека',
             ],
             'intent_verticals_en' => [
-                'fintech compliance platforms',
-                'high-load streaming products',
-                'enterprise ERP and CRM integration estates',
-                'marketplace trust and safety stacks',
-                'multi-tenant B2B SaaS platforms',
-                'real-time analytics products',
+                'affiliate media teams',
+                'solo media buyers',
+                'in-house arbitrage teams',
+                'creative production teams',
+                'tracker and analytics operators',
+                'offer owners and affiliate managers',
             ],
             'intent_verticals_ru' => [
                 'финтех-платформы с требованиями комплаенса',
@@ -286,12 +286,12 @@ if (!function_exists('seo_gen_settings_default')) {
                 'продукты real-time аналитики',
             ],
             'intent_scenarios_en' => [
-                'latency troubleshooting under production load',
-                'migration from monolith to modular services',
-                'Kubernetes multi-cluster rollout',
-                'cost optimization at scale',
-                'incident recovery and resilience hardening',
-                'backward-compatible API version transition',
+                'farm bans and account trust recovery',
+                'creative fatigue and testing loop rebuild',
+                'tracker misattribution and postback debugging',
+                'landing domain and hosting recovery after moderation hit',
+                'team SOP rollout for scaling buyers and farmers',
+                'source mix rebalance after platform policy changes',
             ],
             'intent_scenarios_ru' => [
                 'диагностика задержек под production-нагрузкой',
@@ -302,12 +302,12 @@ if (!function_exists('seo_gen_settings_default')) {
                 'переход API-версий с обратной совместимостью',
             ],
             'intent_objectives_en' => [
-                'reduce p95 latency without breaking reliability',
-                'strengthen policy enforcement and auditability',
-                'decrease error rates during peak traffic',
-                'improve change-failure rate in releases',
-                'cut infra spend while preserving SLO',
-                'shorten time-to-debug in incident response',
+                'stabilize traffic delivery and account lifespan',
+                'improve test-to-win rate on creative batches',
+                'reduce tracking blind spots and data loss',
+                'speed up team onboarding and repeatability',
+                'protect profitable bundles from operational failures',
+                'turn tactical notes into reusable playbooks',
             ],
             'intent_objectives_ru' => [
                 'снизить p95 latency без потери надежности',
@@ -318,12 +318,12 @@ if (!function_exists('seo_gen_settings_default')) {
                 'сократить время диагностики в incident response',
             ],
             'intent_constraints_en' => [
-                'strict compliance and audit requirements',
-                'multi-region traffic variability',
-                'legacy integration dependencies',
-                'limited engineering bandwidth',
-                'SLA and contractual uptime targets',
-                'complex stakeholder governance',
+                'platform moderation and policy volatility',
+                'budget pressure on tests and farm spend',
+                'signal loss after privacy and attribution changes',
+                'small teams with overlapping roles',
+                'fast offer turnover and short shelf life',
+                'fragmented infrastructure across tools and contractors',
             ],
             'intent_constraints_ru' => [
                 'жесткие требования комплаенса и аудита',
@@ -334,12 +334,12 @@ if (!function_exists('seo_gen_settings_default')) {
                 'сложный stakeholder-governance',
             ],
             'intent_artifacts_en' => [
-                'implementation playbook',
-                'troubleshooting guide',
-                'migration blueprint',
-                'operations runbook',
-                'decision memo',
-                'architecture checklist',
+                'how-to guide',
+                'operator checklist',
+                'launch SOP',
+                'troubleshooting memo',
+                'creative testing matrix',
+                'reusable setup template',
             ],
             'intent_artifacts_ru' => [
                 'практический playbook внедрения',
@@ -350,12 +350,12 @@ if (!function_exists('seo_gen_settings_default')) {
                 'чеклист архитектурной готовности',
             ],
             'intent_outcomes_en' => [
-                'faster incident MTTR and fewer regressions',
-                'better conversion and lower operational risk',
-                'higher delivery throughput with stable quality',
-                'improved reliability without runaway cloud costs',
-                'clearer governance with measurable technical KPIs',
-                'stronger retention through platform stability',
+                'more stable source scaling',
+                'faster issue resolution inside the team',
+                'cleaner attribution and decision making',
+                'better reuse of winning setups',
+                'less chaos in daily operations',
+                'higher survival rate of profitable funnels',
             ],
             'intent_outcomes_ru' => [
                 'быстрее incident MTTR и меньше регрессий',
@@ -366,14 +366,12 @@ if (!function_exists('seo_gen_settings_default')) {
                 'лучше удержание за счет стабильности платформы',
             ],
             'service_focus_en' => [
-                'business websites and conversion architecture',
-                'corporate portals and account areas',
-                'CMS and CRM integration',
-                'workflow automation and bots',
-                'MVP delivery and validation',
-                'web application architecture audits',
-                'technical SEO implementation',
-                'AI-assisted engineering workflows',
+                'journal articles on affiliate trends',
+                'hands-on playbooks and SOPs',
+                'case studies with metrics and breakdowns',
+                'creative systems and testing workflows',
+                'tracker templates and troubleshooting',
+                'team operations and backstage infrastructure',
             ],
             'service_focus_ru' => [
                 'разработка сайтов под коммерческие задачи',
@@ -386,24 +384,19 @@ if (!function_exists('seo_gen_settings_default')) {
                 'ИИ в разработке и проектировании',
             ],
             'forbidden_topics_en' => [
-                'competitor brand comparisons',
-                'vendor ranking lists',
+                'generic vendor rankings without practical value',
+                'empty motivation content with no operator insight',
             ],
             'forbidden_topics_ru' => [
                 'сравнение брендов и конкурентов',
                 'рейтинги вендоров',
             ],
             'article_structures_en' => [
-                'Introduction -> FAQ grid -> Cases -> Code examples -> Conclusion',
-                'Problem framing -> Constraints -> Solution architecture -> Implementation steps -> Checklist',
-                'Business context -> Risk scenarios -> Technical deep dive -> Anti-patterns -> Summary',
-                'Quick start -> Minimal code path -> Production hardening -> Monitoring -> Next steps',
-                'Myth vs reality -> Evidence -> Practical approach -> Reference snippets -> Wrap-up',
-                'Before/after comparison -> Migration steps -> Validation -> Rollback plan -> Conclusion',
-                'Use case map -> Decision matrix -> Integration blueprint -> QA checklist -> CTA',
-                'Incident postmortem style -> Root causes -> Fix design -> Code samples -> Prevention',
-                'Playbook format -> Step 1..N -> Metrics -> Common failures -> Final recommendations',
-                'Executive summary -> Technical appendix -> Security notes -> Testing strategy -> Conclusion',
+                'Hook -> what changed -> operator impact -> examples -> checklist',
+                'Problem -> stack -> exact steps -> failure cases -> verification',
+                'Case context -> setup -> metrics -> bottlenecks -> reusable template',
+                'Trend brief -> source signals -> implications -> action plan -> summary',
+                'How-to -> prerequisites -> implementation -> debugging -> final SOP',
             ],
             'article_structures_ru' => [
                 'Вступление -> Сетка вопрос-ответ -> Кейсы -> Примеры кода -> Заключение',
@@ -428,7 +421,7 @@ if (!function_exists('seo_gen_settings_default')) {
 
             'article_system_prompt_en' => '',
             'article_system_prompt_ru' => '',
-            'article_user_prompt_append_en' => '',
+            'article_user_prompt_append_en' => 'Write for affiliate operators. Prefer practical details, current platform behavior, tradeoffs, and reusable workflows over generic theory.',
             'article_user_prompt_append_ru' => '',
 
             'expand_system_prompt_en' => '',
@@ -436,7 +429,7 @@ if (!function_exists('seo_gen_settings_default')) {
             'expand_user_prompt_append_en' => '',
             'expand_user_prompt_append_ru' => '',
 
-            'preview_channel_enabled' => false,
+            'preview_channel_enabled' => true,
             'preview_channel_chat_id' => '',
             'preview_post_max_words' => 220,
             'preview_caption_max_words' => 80,
@@ -446,9 +439,9 @@ if (!function_exists('seo_gen_settings_default')) {
             'preview_llm_model' => '',
             'preview_context_chars' => 14000,
 
-            'preview_image_enabled' => false,
-            'preview_image_model' => '',
-            'preview_image_size' => '768x512',
+            'preview_image_enabled' => true,
+            'preview_image_model' => 'google/gemini-2.5-flash-image',
+            'preview_image_size' => '1536x1024',
             'preview_image_anchor_enforced' => true,
             'preview_image_anchor_append' => '',
             'preview_image_style_options' => ['schematic', 'realistic', 'abstract', 'moody'],
@@ -499,7 +492,7 @@ if (!function_exists('seo_gen_settings_default')) {
                 ['key' => 'abstract_signal', 'weight' => 0.55, 'label_en' => 'Abstract signal', 'label_ru' => 'Абстрактный сигнал', 'instruction' => 'Signal-driven abstract composition with strong semantic anchors.'],
                 ['key' => 'hybrid_mix', 'weight' => 0.7, 'label_en' => 'Hybrid mix', 'label_ru' => 'Гибридный микс', 'instruction' => 'Balanced mix of people, systems and signal motifs.'],
             ],
-            'preview_image_prompt_template' => 'Create a {{image_style}} editorial hero illustration for article "{{title}}" in {{lang}} language. Theme: B2B systems architecture, product engineering, security, reliability, analytics. No text, no logos, 16:9.',
+            'preview_image_prompt_template' => 'Create a {{image_style}} editorial hero image for article "{{title}}" in {{lang}}. Theme: CPA backstage, media buying operations, trackers, creatives, sources, affiliate workflows, dark neon city-console mood. No text, no logos, 16:9.',
             'campaigns' => seo_gen_default_campaigns(),
         ];
     }
@@ -572,10 +565,10 @@ if (!function_exists('seo_gen_settings_normalize')) {
         $settings['domain_host_ru'] = strtolower(trim((string)($settings['domain_host_ru'] ?? '')));
         $settings['domain_host_ru'] = preg_replace('/^www\./i', '', $settings['domain_host_ru']);
         if ($settings['domain_host_en'] === '') {
-            $settings['domain_host_en'] = 'portcore.online';
+            $settings['domain_host_en'] = 'cpalnya.ru';
         }
         if ($settings['domain_host_ru'] === '') {
-            $settings['domain_host_ru'] = 'portcore.ru';
+            $settings['domain_host_ru'] = 'cpalnya.ru';
         }
 
         $settings['langs'] = array_values(array_unique(array_filter(array_map(

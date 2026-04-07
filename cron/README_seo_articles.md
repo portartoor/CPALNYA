@@ -42,7 +42,7 @@ Execute:
 Recommended frequency:
 
 ```bash
-*/15 * * * * /usr/bin/php /home/geoip/public_html/cron/generate_seo_articles.php >> /home/geoip/logs/seo_articles_cron.log 2>&1
+*/15 * * * * /usr/bin/php /home/cpalnya/public_html/cron/generate_seo_articles.php >> /home/cpalnya/logs/seo_articles_cron.log 2>&1
 ```
 
 Queue mode (recommended for production):
@@ -91,7 +91,7 @@ Examples:
 
 ```bash
 # Safe test: run yesterday in dry-run mode for RU only
-/usr/bin/php /home/geoip/public_html/cron/generate_seo_articles.php --date=$(date -u -d 'yesterday' +%F) --lang=ru --force --dry-run --max-per-run=1
+/usr/bin/php /home/cpalnya/public_html/cron/generate_seo_articles.php --date=$(date -u -d 'yesterday' +%F) --lang=ru --force --dry-run --max-per-run=1
 
 # Real forced generation: create 4-8 Journal or Playbooks materials immediately
 /usr/bin/php /home/cpalnya/public_html/cron/generate_seo_articles.php --campaign=journal --date=$(date +%F) --lang=ru --force --max-per-run=4

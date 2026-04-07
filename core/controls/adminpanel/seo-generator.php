@@ -261,8 +261,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         $incoming['today_first_delay_min'] = admin_seo_gen_post_int('today_first_delay_min', 15);
         $incoming['auto_expand_retries'] = admin_seo_gen_post_int('auto_expand_retries', 1);
         $incoming['expand_context_chars'] = admin_seo_gen_post_int('expand_context_chars', 7000);
-        $incoming['prompt_version'] = admin_seo_gen_post_string('prompt_version', 'seo-cron-v1');
-        $incoming['seed_salt'] = admin_seo_gen_post_string('seed_salt', 'geoip-seo-articles');
+        $incoming['prompt_version'] = admin_seo_gen_post_string('prompt_version', 'cpalnya-generator-v1');
+        $incoming['seed_salt'] = admin_seo_gen_post_string('seed_salt', 'cpalnya-affiliate-content');
         $incoming['tone_variability'] = admin_seo_gen_post_int('tone_variability', 60);
         $incoming['portfolio_bofu_weight'] = admin_seo_gen_post_int('portfolio_bofu_weight', 30);
         $incoming['portfolio_mofu_weight'] = admin_seo_gen_post_int('portfolio_mofu_weight', 30);

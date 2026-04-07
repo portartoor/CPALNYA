@@ -718,10 +718,10 @@ function seo_host_for_lang(string $lang): string
         $host = trim((string)($GLOBALS['SeoArticlePrimaryHost'] ?? ''));
     }
     if ($host === '') {
-        $host = ($lang === 'ru') ? 'portcore.ru' : 'portcore.online';
+        $host = 'cpalnya.ru';
     }
     $host = strtolower(preg_replace('/^www\./i', '', $host));
-    return $host !== '' ? $host : (($lang === 'ru') ? 'portcore.ru' : 'portcore.online');
+    return $host !== '' ? $host : 'cpalnya.ru';
 }
 
 function seo_fetch_articles_missing_images(mysqli $db, int $limit, array $langs = [], bool $forceRebuild = false): array
@@ -881,10 +881,10 @@ function seo_preview_assets_host(): string
 {
     $host = trim((string)($GLOBALS['SeoArticlePrimaryHost'] ?? ''));
     if ($host === '') {
-        $host = trim((string)($_SERVER['HTTP_HOST'] ?? 'portcore.ru'));
+        $host = trim((string)($_SERVER['HTTP_HOST'] ?? 'cpalnya.ru'));
     }
     $host = strtolower(preg_replace('/^www\./i', '', $host));
-    return $host !== '' ? $host : 'portcore.ru';
+    return $host !== '' ? $host : 'cpalnya.ru';
 }
 
 function seo_preview_assets_url_from_relative(string $relative): string
@@ -5719,7 +5719,7 @@ function seo_publish_article(
     }
     if ((bool)($cfg['examples_has_ai_prompt_version'] ?? false)) {
         $insertColumns[] = 'ai_prompt_version';
-        $insertValues[] = "'" . mysqli_real_escape_string($db, (string)($cfg['prompt_version'] ?? 'seo-cron-v1')) . "'";
+        $insertValues[] = "'" . mysqli_real_escape_string($db, (string)($cfg['prompt_version'] ?? 'cpalnya-generator-v1')) . "'";
     }
     if ((bool)($cfg['examples_has_ai_generated_at'] ?? false)) {
         $insertColumns[] = 'ai_generated_at';
@@ -5827,12 +5827,12 @@ $cfg = [
     'word_max' => (int)seo_cfg('SeoArticleCronWordMax', 5000),
     'auto_expand_retries' => (int)seo_cfg('SeoArticleCronAutoExpandRetries', 1),
     'expand_context_chars' => (int)seo_cfg('SeoArticleCronExpandContextChars', 7000),
-    'author_name' => trim((string)seo_cfg('SeoArticleCronAuthorName', 'Portcore Team')),
+    'author_name' => trim((string)seo_cfg('SeoArticleCronAuthorName', 'CPALNYA Editorial Desk')),
     'domain_host' => strtolower(trim((string)seo_cfg('SeoArticleCronDomainHost', ''))),
     'domain_host_en' => strtolower(trim((string)seo_cfg('SeoArticleCronDomainHostEn', ''))),
     'domain_host_ru' => strtolower(trim((string)seo_cfg('SeoArticleCronDomainHostRu', ''))),
     'max_per_run' => (int)seo_cfg('SeoArticleCronMaxPerRun', 2),
-    'seed_salt' => (string)seo_cfg('SeoArticleCronSeedSalt', 'portcore-seo-articles'),
+    'seed_salt' => (string)seo_cfg('SeoArticleCronSeedSalt', 'cpalnya-affiliate-content'),
     'notify_schedule' => (bool)seo_cfg('SeoArticleCronNotifySchedule', false),
     'notify_daily_schedule' => (bool)seo_cfg('SeoArticleCronNotifyDailySchedule', true),
     'today_first_delay_min' => (int)seo_cfg('SeoArticleCronTodayFirstDelayMinutes', 15),
@@ -5855,12 +5855,12 @@ $cfg = [
     'indexnow_key' => trim((string)seo_cfg('IndexNowKey', '')),
     'indexnow_key_location' => trim((string)seo_cfg('IndexNowKeyLocation', '')),
     'indexnow_endpoint' => trim((string)seo_cfg('IndexNowEndpoint', '')),
-    'indexnow_hosts' => (array)seo_cfg('IndexNowHosts', ['portcore.ru', 'portcore.online']),
+    'indexnow_hosts' => (array)seo_cfg('IndexNowHosts', ['cpalnya.ru']),
     'indexnow_ping_on_publish' => (bool)seo_cfg('IndexNowPingOnPublish', true),
     'indexnow_submit_limit' => (int)seo_cfg('IndexNowSubmitLimit', 100),
     'indexnow_retry_delay_minutes' => (int)seo_cfg('IndexNowRetryDelayMinutes', 15),
     'telegram_autopost_enabled' => false,
-    'prompt_version' => trim((string)seo_cfg('SeoArticleCronPromptVersion', 'seo-cron-v1')),
+    'prompt_version' => trim((string)seo_cfg('SeoArticleCronPromptVersion', 'cpalnya-generator-v1')),
     'tone_variability' => (int)seo_cfg('SeoArticleToneVariability', 60),
     'portfolio_bofu_weight' => 30,
     'portfolio_mofu_weight' => 30,
@@ -5949,7 +5949,7 @@ if ($cfg['llm_provider'] === 'openrouter') {
     $cfg['openai_model'] = trim((string)($cfg['openrouter_model'] ?? 'openai/gpt-4o-2024-11-20'));
     if (empty($cfg['openai_headers'])) {
         $ref = trim((string)seo_cfg('OpenRouterHttpReferer', ''));
-        $title = trim((string)seo_cfg('OpenRouterAppTitle', 'portcore SEO Cron'));
+        $title = trim((string)seo_cfg('OpenRouterAppTitle', 'CPALNYA Content Generator'));
         $headers = [];
         if ($ref !== '') {
             $headers[] = 'HTTP-Referer: ' . $ref;
@@ -5972,9 +5972,9 @@ $cfg['domain_host_en'] = preg_replace('/^www\./i', '', $cfg['domain_host_en']);
 $cfg['domain_host_ru'] = strtolower(trim((string)($cfg['domain_host_ru'] ?? '')));
 $cfg['domain_host_ru'] = preg_replace('/^www\./i', '', $cfg['domain_host_ru']);
 if ($cfg['domain_host'] === '') {
-    $cfg['domain_host'] = 'portcore.ru';
+    $cfg['domain_host'] = 'cpalnya.ru';
 }
-$cfg['domain_host_en'] = $cfg['domain_host_en'] !== '' ? $cfg['domain_host_en'] : 'portcore.online';
+$cfg['domain_host_en'] = $cfg['domain_host_en'] !== '' ? $cfg['domain_host_en'] : 'cpalnya.ru';
 $cfg['domain_host_ru'] = $cfg['domain_host_ru'] !== '' ? $cfg['domain_host_ru'] : $cfg['domain_host'];
 $GLOBALS['SeoArticlePrimaryHost'] = $cfg['domain_host'];
 $GLOBALS['SeoArticleHosts'] = [
@@ -6031,7 +6031,7 @@ if ($cfg['preview_llm_model'] === '') {
     $cfg['preview_llm_model'] = (string)$cfg['openai_model'];
 }
 if ($cfg['author_name'] === '') {
-    $cfg['author_name'] = 'Portcore Team';
+    $cfg['author_name'] = 'CPALNYA Editorial Desk';
 }
 $cfg['indexnow_enabled'] = (bool)($cfg['indexnow_enabled'] ?? false);
 $cfg['indexnow_key'] = trim((string)($cfg['indexnow_key'] ?? ''));
@@ -6052,7 +6052,7 @@ $cfg['indexnow_hosts'] = function_exists('indexnow_clean_host')
         return preg_match('/^[a-z0-9.-]+$/', $h) ? trim($h, '.') : '';
     }, (array)($cfg['indexnow_hosts'] ?? [])))));
 if (empty($cfg['indexnow_hosts'])) {
-    $cfg['indexnow_hosts'] = ['portcore.ru', 'portcore.online'];
+    $cfg['indexnow_hosts'] = ['cpalnya.ru'];
 }
 
 $runtime = seo_runtime_options();

@@ -1,0 +1,321 @@
+{
+  "enabled": true,
+  "langs": [
+    "ru",
+    "en"
+  ],
+  "domain_host": "cpalnya.ru",
+  "domain_host_en": "cpalnya.ru",
+  "domain_host_ru": "cpalnya.ru",
+  "author_name": "CPALNYA Editorial Desk",
+  "daily_min": 2,
+  "daily_max": 4,
+  "max_per_run": 8,
+  "word_min": 1800,
+  "word_max": 4200,
+  "today_first_delay_min": 15,
+  "auto_expand_retries": 2,
+  "expand_context_chars": 9000,
+  "prompt_version": "cpalnya-generator-v1",
+  "seed_salt": "cpalnya-affiliate-content",
+  "notify_schedule": false,
+  "notify_daily_schedule": true,
+  "llm_provider": "openrouter",
+  "openai_api_key": "YOUR_OPENAI_API_KEY",
+  "openai_base_url": "https://api.openai.com/v1",
+  "openai_model": "gpt-4.1-mini",
+  "openai_timeout": 120,
+  "openai_headers": [],
+  "openrouter_api_key": "YOUR_OPENROUTER_API_KEY",
+  "openrouter_base_url": "https://openrouter.ai/api/v1",
+  "openrouter_model": "google/gemini-2.0-flash-001",
+  "openai_proxy_enabled": false,
+  "openai_proxy_host": "",
+  "openai_proxy_port": 0,
+  "openai_proxy_type": "http",
+  "openai_proxy_username": "",
+  "openai_proxy_password": "",
+  "openai_proxy_pool_enabled": false,
+  "openai_proxy_pool": [],
+  "topic_analysis_enabled": true,
+  "topic_analysis_limit": 120,
+  "topic_analysis_system_prompt": "",
+  "topic_analysis_user_prompt_append": "Prioritize CPA, affiliate operations, media buying workflows, trackers, creatives, moderation, farm, source volatility and 2026 platform shifts. Avoid generic B2B/SaaS angles.",
+  "styles_en": [
+    "editorial breakdown",
+    "trend memo",
+    "operator playbook",
+    "step-by-step tutorial",
+    "case note",
+    "troubleshooting guide"
+  ],
+  "styles_ru": [
+    "редакционный разбор",
+    "аналитическая записка",
+    "операционный playbook",
+    "пошаговый tutorial",
+    "кейсовый разбор",
+    "troubleshooting guide"
+  ],
+  "clusters_en": [
+    "facebook farm setup and account resilience",
+    "tiktok affiliate funnels and creative iteration",
+    "telegram communities mini apps and retention",
+    "tracker attribution postbacks and signal recovery",
+    "anti-detect browsers team SOP and workflows",
+    "nutra crypto igaming finance traffic shifts in 2026"
+  ],
+  "clusters_ru": [
+    "настройка и прогрев Facebook farm",
+    "TikTok-воронки и итерации креативов под affiliate",
+    "Telegram-комьюнити, mini apps и удержание аудитории",
+    "трекеры, postback, атрибуция и восстановление сигналов",
+    "anti-detect браузеры, роли команды и SOP",
+    "сдвиги трафика в nutra, crypto, iGaming и finance в 2026"
+  ],
+  "article_structures_en": [
+    "Hook -> what changed -> operator impact -> examples -> checklist",
+    "Problem -> stack -> exact steps -> failure cases -> verification",
+    "Case context -> setup -> metrics -> bottlenecks -> reusable template",
+    "Trend brief -> source signals -> implications -> action plan -> summary",
+    "How-to -> prerequisites -> implementation -> debugging -> final SOP"
+  ],
+  "article_structures_ru": [
+    "Хук -> что изменилось -> влияние на оператора -> примеры -> чеклист",
+    "Проблема -> стек -> точные шаги -> типовые фейлы -> проверка",
+    "Контекст кейса -> сетап -> метрики -> узкие места -> шаблон",
+    "Trend brief -> сигналы источника -> выводы -> план действий -> итог",
+    "How-to -> prerequisites -> внедрение -> отладка -> финальный SOP"
+  ],
+  "moods": [
+    {
+      "key": "editorial",
+      "weight": 1,
+      "label_en": "editorial",
+      "label_ru": "редакционная"
+    },
+    {
+      "key": "operator_practical",
+      "weight": 0.95,
+      "label_en": "operator practical",
+      "label_ru": "операционная практическая"
+    },
+    {
+      "key": "case_driven",
+      "weight": 0.9,
+      "label_en": "case driven",
+      "label_ru": "кейсовая"
+    },
+    {
+      "key": "trend_analytical",
+      "weight": 0.85,
+      "label_en": "trend analytical",
+      "label_ru": "аналитика трендов"
+    },
+    {
+      "key": "step_by_step",
+      "weight": 0.95,
+      "label_en": "step by step",
+      "label_ru": "пошаговая"
+    },
+    {
+      "key": "backstage",
+      "weight": 0.8,
+      "label_en": "backstage",
+      "label_ru": "закулисная"
+    }
+  ],
+  "article_system_prompt_en": "",
+  "article_system_prompt_ru": "",
+  "article_user_prompt_append_en": "Write for affiliate operators. Prefer practical details, current platform behavior, tradeoffs, and reusable workflows over generic theory.",
+  "article_user_prompt_append_ru": "Пиши для операторов affiliate-команд. Приоритет: практические детали, актуальное поведение платформ, tradeoffs и переиспользуемые workflows, а не общая теория.",
+  "expand_system_prompt_en": "",
+  "expand_system_prompt_ru": "",
+  "expand_user_prompt_append_en": "",
+  "expand_user_prompt_append_ru": "",
+  "preview_channel_enabled": true,
+  "preview_channel_chat_id": "",
+  "preview_post_max_words": 220,
+  "preview_caption_max_words": 80,
+  "preview_post_min_words": 70,
+  "preview_caption_min_words": 26,
+  "preview_use_llm": true,
+  "preview_llm_model": "",
+  "preview_context_chars": 14000,
+  "preview_image_enabled": true,
+  "preview_image_model": "google/gemini-2.5-flash-image",
+  "preview_image_size": "1536x1024",
+  "preview_image_style_options": [
+    "schematic",
+    "realistic",
+    "abstract",
+    "moody"
+  ],
+  "image_color_schemes": [
+    {
+      "key": "dark",
+      "weight": 1,
+      "instruction": "Dark cinematic palette, deep shadows, high contrast accents."
+    },
+    {
+      "key": "neon",
+      "weight": 0.75,
+      "instruction": "Neon cyber palette with glowing accents on dark base."
+    },
+    {
+      "key": "obsidian_blue",
+      "weight": 0.72,
+      "instruction": "Obsidian dark base with cool blue highlights and clean editorial contrast."
+    },
+    {
+      "key": "charcoal_teal",
+      "weight": 0.66,
+      "instruction": "Charcoal foundation with muted teal emphasis and low-noise gradients."
+    },
+    {
+      "key": "midnight_amber",
+      "weight": 0.58,
+      "instruction": "Deep midnight palette with warm amber accents."
+    }
+  ],
+  "image_compositions": [
+    {
+      "key": "deep_perspective_pull",
+      "weight": 0.85,
+      "label_en": "Deep perspective pull",
+      "label_ru": "Глубокая перспектива",
+      "instruction": "Strong perspective vanishing point pulling viewer inward."
+    },
+    {
+      "key": "visual_corridor",
+      "weight": 0.8,
+      "label_en": "Visual corridor",
+      "label_ru": "Коридор взгляда",
+      "instruction": "Corridor-like depth guiding attention forward."
+    },
+    {
+      "key": "dynamic_diagonal",
+      "weight": 0.72,
+      "label_en": "Dynamic diagonal",
+      "label_ru": "Динамическая диагональ",
+      "instruction": "Strong diagonal flow with dynamic motion and tension."
+    }
+  ],
+  "preview_image_prompt_template": "Create a {{image_style}} editorial hero image for article \"{{title}}\" in {{lang}}. Theme: CPA backstage, media buying operations, trackers, creatives, sources, affiliate workflows, dark neon city-console mood. No text, no logos, 16:9.",
+  "campaigns": {
+    "journal": {
+      "key": "journal",
+      "title": "Journal",
+      "title_ru": "Журнал",
+      "description": "Editorial stream around affiliate strategy, source trends, platform shifts and operating models.",
+      "description_ru": "Редакционный поток про стратегию арбитража, изменения источников, рыночные сдвиги и операционные модели.",
+      "material_section": "journal",
+      "enabled": true,
+      "daily_min": 4,
+      "daily_max": 6,
+      "max_per_run": 2,
+      "word_min": 1800,
+      "word_max": 3200,
+      "seed_salt_suffix": "journal",
+      "styles_en": [
+        "trend briefing",
+        "editorial breakdown",
+        "market memo",
+        "operating analysis"
+      ],
+      "styles_ru": [
+        "редакционный разбор",
+        "аналитическая записка",
+        "trend briefing",
+        "стратегический обзор"
+      ],
+      "clusters_en": [
+        "meta ads resilience and account farming",
+        "tiktok shop and short-form affiliate funnels",
+        "telegram mini apps and community retention",
+        "ai creatives workflow and compliance",
+        "tracker stacks attribution and signal loss",
+        "nutra finance igaming and crypto demand shifts"
+      ],
+      "clusters_ru": [
+        "Meta Ads в 2026: фарм, BM-устойчивость и антибан",
+        "TikTok и short-form воронки под affiliate-офферы",
+        "Telegram Mini Apps, комьюнити и retention в арбитраже",
+        "AI-креативы, compliance и контроль prompt-пайплайна",
+        "трекеры, атрибуция и потеря сигналов после privacy-сдвигов",
+        "сдвиги спроса по nutra, finance, iGaming и crypto в 2026"
+      ],
+      "article_structures_en": [
+        "Trend summary -> what changed -> who wins -> operating implications -> checklist",
+        "Source shift -> risks -> adaptation patterns -> examples -> next steps",
+        "Myth vs reality -> evidence -> playbook signals -> conclusion"
+      ],
+      "article_structures_ru": [
+        "Краткий тренд -> что изменилось -> кто выигрывает -> операционные выводы -> чеклист",
+        "Сдвиг источника -> риски -> адаптация -> примеры -> следующие шаги",
+        "Миф и реальность -> факты -> рабочие сигналы -> вывод"
+      ],
+      "article_system_prompt_en": "",
+      "article_system_prompt_ru": "",
+      "article_user_prompt_append_en": "Focus on 2026 affiliate traffic trends, operator decisions, signal quality and practical strategic implications.",
+      "article_user_prompt_append_ru": "Фокус на трендах арбитража трафика 2026, операционных решениях команды, качестве сигналов и прикладных стратегических выводах."
+    },
+    "playbooks": {
+      "key": "playbooks",
+      "title": "Playbooks",
+      "title_ru": "HowTo",
+      "description": "Case studies, how-to guides, troubleshooting notes and reusable operational solutions.",
+      "description_ru": "Кейсы, how-to гайды, troubleshooting-материалы и переиспользуемые рабочие решения.",
+      "material_section": "playbooks",
+      "enabled": true,
+      "daily_min": 4,
+      "daily_max": 8,
+      "max_per_run": 3,
+      "word_min": 1600,
+      "word_max": 3600,
+      "seed_salt_suffix": "playbooks",
+      "styles_en": [
+        "step-by-step tutorial",
+        "troubleshooting guide",
+        "case note",
+        "operator playbook"
+      ],
+      "styles_ru": [
+        "пошаговый how-to",
+        "гайд по устранению проблем",
+        "операционный playbook",
+        "технический кейс"
+      ],
+      "clusters_en": [
+        "facebook farm setup and warmup",
+        "cloaking moderation-safe routing",
+        "tracker postback templates and debugging",
+        "anti-detect browser operations and team SOP",
+        "creative testing matrix and iteration loops",
+        "payment domains hosting and landing recovery"
+      ],
+      "clusters_ru": [
+        "настройка и прогрев Facebook farm",
+        "cloaking и безопасная маршрутизация под модерацию",
+        "tracker postback-шаблоны, макросы и отладка",
+        "anti-detect браузеры, роли команды и SOP",
+        "матрица тестирования креативов и цикл итераций",
+        "платежки, домены, хостинг и восстановление лендингов"
+      ],
+      "article_structures_en": [
+        "Problem -> prerequisites -> exact steps -> failure cases -> verification",
+        "Goal -> stack -> implementation -> screenshots/code -> rollback plan",
+        "Case context -> setup -> metrics -> bottlenecks -> reusable template"
+      ],
+      "article_structures_ru": [
+        "Проблема -> prerequisites -> точные шаги -> типовые фейлы -> проверка",
+        "Цель -> стек -> внедрение -> код/настройки -> rollback-план",
+        "Контекст кейса -> сетап -> метрики -> узкие места -> переиспользуемый шаблон"
+      ],
+      "article_system_prompt_en": "",
+      "article_system_prompt_ru": "",
+      "article_user_prompt_append_en": "Favor practical implementation, troubleshooting depth, reusable snippets, SOPs and exact operator steps.",
+      "article_user_prompt_append_ru": "Смещай акцент в сторону практической реализации, troubleshooting, переиспользуемых фрагментов, SOP и точных шагов оператора."
+    }
+  }
+}
