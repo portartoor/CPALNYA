@@ -109,6 +109,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && $DB) {
             $message = 'Footer block deleted.';
             $messageType = 'success';
         }
+    } elseif ($action === 'refresh_default_footer_blocks') {
+        if (function_exists('footer_seo_blocks_refresh_defaults')) {
+            $inserted = footer_seo_blocks_refresh_defaults($DB);
+            $message = 'Default footer block library refreshed. Inserted: ' . (int)$inserted;
+            $messageType = 'success';
+        }
     }
 }
 

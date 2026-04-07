@@ -92,7 +92,11 @@
             </div>
         </div>
     <?php else: ?>
-        <div class="d-flex justify-content-end mb-3">
+        <div class="d-flex justify-content-end gap-2 mb-3">
+            <form method="POST" onsubmit="return confirm('Refresh the default footer block library for cpalnya.ru?');">
+                <input type="hidden" name="action" value="refresh_default_footer_blocks">
+                <button class="btn btn-outline-secondary" type="submit">Refresh Default Library</button>
+            </form>
             <a class="btn btn-primary" href="/adminpanel/footer-blocks/?create=1">Create Block</a>
         </div>
         <div class="card">
