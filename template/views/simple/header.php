@@ -474,11 +474,11 @@ if (isset($_GET['header_search_preview'])) {
     }
 
     .simple-header {
-        position: relative;
-        left: auto;
-        right: auto;
-        top: auto;
-        z-index: 20;
+        position: fixed;
+        left: 18px;
+        right: 18px;
+        top: 14px;
+        z-index: 999;
         display: grid;
         grid-template-columns: minmax(220px, 300px) minmax(320px, 1fr) auto;
         gap: 10px 16px;
@@ -501,10 +501,6 @@ if (isset($_GET['header_search_preview'])) {
         pointer-events: none;
     }
     .simple-header.is-scrolled {
-        position: fixed;
-        left: 18px;
-        right: 18px;
-        top: 14px;
         z-index: 999;
         transform: translateY(0);
         padding: 10px 16px;
@@ -1206,16 +1202,12 @@ if (isset($_GET['header_search_preview'])) {
         :root { --simple-header-height: 88px; }
         body { padding-top: 0; }
         .simple-header {
-            left: auto;
-            right: auto;
-            top: auto;
-            margin: 10px 10px 0;
-            padding: 12px 14px;
-        }
-        .simple-header.is-scrolled {
             left: 10px;
             right: 10px;
             top: 10px;
+            padding: 12px 14px;
+        }
+        .simple-header.is-scrolled {
             z-index: 999;
         }
         .pc-logo-main { font-size: 28px; }
@@ -1434,7 +1426,7 @@ if (isset($_GET['header_search_preview'])) {
         var syncHeader = function () {
             var isScrolled = window.scrollY > 18;
             header.classList.toggle('is-scrolled', isScrolled);
-            document.body.style.paddingTop = isScrolled ? (String(measuredHeaderOffset) + 'px') : '0px';
+            document.body.style.paddingTop = String(measuredHeaderOffset) + 'px';
         };
         measureExpandedHeaderOffset();
         window.addEventListener('scroll', syncHeader, { passive: true });
