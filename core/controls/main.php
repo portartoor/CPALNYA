@@ -6,6 +6,7 @@ $isRu = ($lang === 'ru');
 $journalItems = [];
 $playbookItems = [];
 $issue = [];
+$heroFeature = null;
 
 if (is_file(DIR . 'core/controls/examples/_common.php')) {
     require_once DIR . 'core/controls/examples/_common.php';
@@ -32,6 +33,15 @@ foreach ($journalItems as &$row) {
 }
 unset($row);
 
+if (!empty($journalItems)) {
+    $heroPool = array_values(array_filter((array)$journalItems, static function ($item): bool {
+        return is_array($item) && trim((string)($item['slug'] ?? '')) !== '';
+    }));
+    if (!empty($heroPool)) {
+        $heroFeature = $heroPool[array_rand($heroPool)];
+    }
+}
+
 foreach ($playbookItems as &$row) {
     $thumb = trim((string)($row['preview_image_thumb_url'] ?? ''));
     $full = trim((string)($row['preview_image_url'] ?? ''));
@@ -52,13 +62,14 @@ if ($issueImage === '') {
     $issueImage = trim((string)($issue['hero_image_data'] ?? ''));
 }
 if ($issueImage === '') {
-    $issueImage = '/april2026.png';
+    $issueImage = '/april2026_new.png';
 }
 
 $ModelPage['home_portal'] = [
     'lang' => $lang,
     'issue' => $issue,
     'issue_image' => $issueImage,
+    'hero_feature' => is_array($heroFeature) ? $heroFeature : null,
     'journal_items' => array_values((array)$journalItems),
     'playbook_items' => array_values((array)$playbookItems),
 ];

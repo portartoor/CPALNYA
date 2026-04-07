@@ -44,12 +44,133 @@ $renderIssueText = static function (string $text, string $class = ''): string {
 
     return $html;
 };
+$splitContentByFirstH2 = static function (string $html): array {
+    $html = trim($html);
+    if ($html === '') {
+        return ['intro' => '', 'body' => ''];
+    }
+
+    $prevUseInternal = libxml_use_internal_errors(true);
+    $doc = new DOMDocument('1.0', 'UTF-8');
+    $wrapped = '<div id="cp-content-root">' . $html . '</div>';
+    $loaded = $doc->loadHTML('<?xml encoding="utf-8" ?>' . $wrapped, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    if (!$loaded) {
+        libxml_clear_errors();
+        libxml_use_internal_errors($prevUseInternal);
+        return ['intro' => '', 'body' => $html];
+    }
+
+    $root = $doc->getElementById('cp-content-root');
+    if (!$root instanceof DOMElement) {
+        libxml_clear_errors();
+        libxml_use_internal_errors($prevUseInternal);
+        return ['intro' => '', 'body' => $html];
+    }
+
+    $nodes = [];
+    foreach ($root->childNodes as $childNode) {
+        if ($childNode instanceof DOMText && trim((string)$childNode->nodeValue) === '') {
+            continue;
+        }
+        $nodes[] = $childNode;
+    }
+
+    $firstH2Removed = false;
+    $filtered = [];
+    foreach ($nodes as $node) {
+        $isH2 = ($node instanceof DOMElement) && strtolower($node->tagName) === 'h2';
+        if ($isH2 && !$firstH2Removed) {
+            $firstH2Removed = true;
+            continue;
+        }
+        $filtered[] = $node;
+    }
+
+    $introDoc = new DOMDocument('1.0', 'UTF-8');
+    $introWrap = $introDoc->createElement('div');
+    $introDoc->appendChild($introWrap);
+
+    $bodyDoc = new DOMDocument('1.0', 'UTF-8');
+    $bodyWrap = $bodyDoc->createElement('div');
+    $bodyDoc->appendChild($bodyWrap);
+
+    $introMode = true;
+    foreach ($filtered as $node) {
+        $isParagraph = ($node instanceof DOMElement) && strtolower($node->tagName) === 'p';
+        if ($introMode && $isParagraph) {
+            $introWrap->appendChild($introDoc->importNode($node, true));
+            continue;
+        }
+        $introMode = false;
+        $bodyWrap->appendChild($bodyDoc->importNode($node, true));
+    }
+
+    $readInner = static function (DOMNode $node, DOMDocument $ownerDoc): string {
+        $out = '';
+        foreach ($node->childNodes as $child) {
+            $out .= (string)$ownerDoc->saveHTML($child);
+        }
+        return trim($out);
+    };
+
+    $introHtml = $readInner($introWrap, $introDoc);
+    $bodyHtml = $readInner($bodyWrap, $bodyDoc);
+
+    libxml_clear_errors();
+    libxml_use_internal_errors($prevUseInternal);
+
+    return ['intro' => $introHtml, 'body' => $bodyHtml];
+};
+$stripChecklistBrackets = static function (string $html): string {
+    $html = trim($html);
+    if ($html === '' || strpos($html, '[') === false) {
+        return $html;
+    }
+
+    $prevUseInternal = libxml_use_internal_errors(true);
+    $doc = new DOMDocument('1.0', 'UTF-8');
+    $wrapped = '<div id="cp-checklist-root">' . $html . '</div>';
+    $loaded = $doc->loadHTML('<?xml encoding="utf-8" ?>' . $wrapped, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    if (!$loaded) {
+        libxml_clear_errors();
+        libxml_use_internal_errors($prevUseInternal);
+        return preg_replace('/\[\s*\]\s*/u', '', $html) ?? $html;
+    }
+
+    $xpath = new DOMXPath($doc);
+    $nodes = $xpath->query('//text()');
+    if ($nodes instanceof DOMNodeList) {
+        foreach ($nodes as $textNode) {
+            $parentName = strtolower((string)($textNode->parentNode->nodeName ?? ''));
+            if (in_array($parentName, ['script', 'style', 'code', 'pre'], true)) {
+                continue;
+            }
+            $textNode->nodeValue = (string)(preg_replace('/\[\s*\]\s*/u', '', (string)$textNode->nodeValue) ?? (string)$textNode->nodeValue);
+        }
+    }
+
+    $root = $doc->getElementById('cp-checklist-root');
+    if (!$root instanceof DOMElement) {
+        libxml_clear_errors();
+        libxml_use_internal_errors($prevUseInternal);
+        return preg_replace('/\[\s*\]\s*/u', '', $html) ?? $html;
+    }
+
+    $out = '';
+    foreach ($root->childNodes as $child) {
+        $out .= (string)$doc->saveHTML($child);
+    }
+
+    libxml_clear_errors();
+    libxml_use_internal_errors($prevUseInternal);
+    return trim($out);
+};
 $issueImage = trim((string)($issue['hero_image_url'] ?? ''));
 if ($issueImage === '') {
     $issueImage = trim((string)($issue['hero_image_data'] ?? ''));
 }
 if ($issueImage === '') {
-    $issueImage = '/april2026.png';
+    $issueImage = '/april2026_new.png';
 }
 $buildPageUrl = static function (?string $cluster = '', int $pageNum = 1): string {
     $base = function_exists('examples_cluster_list_path')
@@ -122,7 +243,37 @@ if ($selected) {
 .jrnl-detail-cover{overflow:visible;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02)}
 .jrnl-detail-cover img{width:100%;height:auto;display:block;object-fit:contain}
 .jrnl-detail-content{font-size:16px;line-height:1.82;color:var(--shell-text)}
-.jrnl-detail-content h2,.jrnl-detail-content h3{font-family:"Space Grotesk","Sora",sans-serif;letter-spacing:-.03em}
+.jrnl-detail-intro{display:grid;gap:0;margin-top:2px}
+.jrnl-detail-intro p{margin:0 0 14px;color:rgba(224,236,255,.92);font-size:18px;line-height:1.86}
+.jrnl-detail-content h1,.jrnl-detail-content h2,.jrnl-detail-content h3,.jrnl-detail-content h4{font-family:"Space Grotesk","Sora",sans-serif;color:var(--shell-text);line-height:1.18;letter-spacing:-.03em;margin:22px 0 12px}
+.jrnl-detail-content p{margin:0 0 14px;line-height:1.82;color:rgba(221,233,250,.92)}
+.jrnl-detail-content > p,.jrnl-detail-content > ul,.jrnl-detail-content > ol,.jrnl-detail-content > blockquote,.jrnl-detail-content > table,.jrnl-detail-content > pre,.jrnl-detail-content > hr,.jrnl-detail-content > figure,.jrnl-detail-content > img,.jrnl-detail-content > div,.jrnl-detail-content > section{padding:6px 28px;box-sizing:border-box}
+.jrnl-detail-content > p:empty,.jrnl-detail-content > div:empty,.jrnl-detail-content > section:empty{display:none}
+.jrnl-detail-content > ul li,.jrnl-detail-content > ol li{padding:0}
+.jrnl-detail-content p strong{color:#f4f8ff}
+.jrnl-detail-content p a,.jrnl-detail-content li a,.jrnl-detail-content blockquote a,.jrnl-detail-content td a,.jrnl-detail-content th a{color:#d6ebff;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(122,180,255,.28);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(122,180,255,.1));padding:1px 8px;font-weight:600;line-height:1.4;font-size:.95em;transition:color .18s ease,border-color .18s ease,background .18s ease,transform .18s ease;vertical-align:baseline}
+.jrnl-detail-content p a::after,.jrnl-detail-content li a::after,.jrnl-detail-content blockquote a::after,.jrnl-detail-content td a::after,.jrnl-detail-content th a::after{content:"↗";font-size:11px;opacity:.76;transform:translateY(-1px)}
+.jrnl-detail-content p a:hover,.jrnl-detail-content li a:hover,.jrnl-detail-content blockquote a:hover,.jrnl-detail-content td a:hover,.jrnl-detail-content th a:hover{color:#fff;border-color:rgba(122,180,255,.52);background:linear-gradient(180deg,rgba(122,180,255,.18),rgba(39,223,192,.18));transform:translateY(-1px)}
+.jrnl-detail-content .related-links a{text-transform:lowercase}
+.jrnl-detail-content .related-links a::first-letter{text-transform:uppercase}
+.jrnl-detail-content ul,.jrnl-detail-content ol{margin:0 0 14px;padding:0}
+.jrnl-detail-content ul{padding-left:28px;list-style:none}
+.jrnl-detail-content p + ul{padding-left:50px}
+.jrnl-detail-content h2 + ul{padding-left:28px}
+.jrnl-detail-content ul li,.jrnl-detail-content ol li{margin:0 0 8px;line-height:1.7;color:rgba(221,233,250,.92)}
+.jrnl-detail-content ul li{position:relative;padding-left:22px}
+.jrnl-detail-content ul li::before{content:"•";position:absolute;left:0;top:0;color:#78dfff;font-weight:700}
+.jrnl-detail-content ol{padding-left:74px}
+.jrnl-detail-content img{max-width:100%;height:auto;border-radius:12px;border:1px solid rgba(122,180,255,.18)}
+.jrnl-detail-content blockquote{margin:0 0 14px;padding:12px 14px 12px 16px;border-left:3px solid rgba(122,180,255,.48);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(122,180,255,.05));color:rgba(207,224,247,.92);border-radius:6px;position:relative}
+.jrnl-detail-content blockquote::before{content:"“";position:absolute;left:8px;top:-4px;font-size:28px;color:rgba(122,180,255,.52);line-height:1}
+.jrnl-detail-content table{width:100%;max-width:100%;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;border-collapse:collapse;margin:12px 0 12px 28px;padding:5px;background:rgba(5,10,20,.88);border:1px solid rgba(122,180,255,.18)}
+.jrnl-detail-content thead,.jrnl-detail-content tbody,.jrnl-detail-content tr{display:table;width:100%;table-layout:fixed}
+.jrnl-detail-content th,.jrnl-detail-content td{border:1px solid rgba(122,180,255,.18);padding:8px 10px;vertical-align:top;min-width:140px;word-break:break-word;overflow-wrap:anywhere}
+.jrnl-detail-content th{background:rgba(122,180,255,.1);color:#eef7ff;font-weight:700}
+.jrnl-detail-content code{background:rgba(122,180,255,.12);color:#d6ebff;padding:2px 6px;border-radius:5px}
+.jrnl-detail-content pre{margin:0 0 14px;padding:12px;background:#0a1527;color:#dbeaff;overflow-x:auto;border-radius:8px;border:1px solid rgba(122,180,255,.14)}
+.jrnl-detail-content hr{border:0;border-top:1px solid rgba(122,180,255,.16);margin:18px 0}
 .jrnl-actions{display:flex;gap:12px;flex-wrap:wrap}
 .jrnl-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border:1px solid rgba(122,180,255,.18);background:linear-gradient(135deg,rgba(115,184,255,.22),rgba(39,223,192,.18));color:var(--shell-text);text-decoration:none;font-weight:700}
 .jrnl-share{display:flex;flex-wrap:wrap;gap:10px}
@@ -142,6 +293,12 @@ if ($selected) {
 <section class="jrnl">
     <div class="jrnl-shell">
         <?php if ($selected): ?>
+            <?php
+            $selectedContentHtml = (string)($selected['content_html'] ?? '');
+            $selectedSplit = $splitContentByFirstH2($selectedContentHtml);
+            $selectedIntroHtml = $stripChecklistBrackets((string)($selectedSplit['intro'] ?? ''));
+            $selectedBodyHtml = $stripChecklistBrackets((string)($selectedSplit['body'] ?? $selectedContentHtml));
+            ?>
             <article class="jrnl-detail">
                 <span class="jrnl-kicker"><?= htmlspecialchars((string)($issue['issue_title'] ?? $t('Журнал', 'Journal')), ENT_QUOTES, 'UTF-8') ?></span>
                 <h1><?= htmlspecialchars((string)($selected['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h1>
@@ -159,7 +316,10 @@ if ($selected) {
                     </div>
                 <?php endif; ?>
                 <div class="jrnl-detail-body">
-                    <div class="jrnl-detail-content"><?= (string)($selected['content_html'] ?? '') ?></div>
+                    <?php if ($selectedIntroHtml !== ''): ?>
+                        <div class="jrnl-detail-intro"><?= $selectedIntroHtml ?></div>
+                    <?php endif; ?>
+                    <div class="jrnl-detail-content"><?= $selectedBodyHtml ?></div>
                     <div class="jrnl-actions">
                         <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Назад в journal', 'Back to journal'), ENT_QUOTES, 'UTF-8') ?></a>
                     </div>
