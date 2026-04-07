@@ -19,30 +19,87 @@ $sectionIcons = [
     'fun' => '✺',
     'contact' => '✉',
 ];
+$buildClusterLink = static function (array $cluster, string $section, string $fallbackIcon = '•'): array {
+    $code = trim((string)($cluster['code'] ?? ''));
+    $label = trim((string)($cluster['label'] ?? $code));
+    if ($code === '' || $label === '') {
+        return [];
+    }
+    $href = function_exists('examples_cluster_list_path')
+        ? examples_cluster_list_path($code, null, $section)
+        : '/' . trim($section, '/') . '/' . $code . '/';
+    return [
+        'href' => $href,
+        'label' => $label,
+        'icon' => $fallbackIcon,
+    ];
+};
+$playbookClusters = function_exists('examples_fetch_clusters')
+    ? array_values((array)examples_fetch_clusters($FRMWRK, (string)$host, $isRu ? 'ru' : 'en', 6, 'playbooks'))
+    : [];
+$journalClusters = function_exists('examples_fetch_clusters')
+    ? array_values((array)examples_fetch_clusters($FRMWRK, (string)$host, $isRu ? 'ru' : 'en', 4, 'journal'))
+    : [];
+$signalsClusters = function_exists('examples_fetch_clusters')
+    ? array_values((array)examples_fetch_clusters($FRMWRK, (string)$host, $isRu ? 'ru' : 'en', 3, 'signals'))
+    : [];
+$funClusters = function_exists('examples_fetch_clusters')
+    ? array_values((array)examples_fetch_clusters($FRMWRK, (string)$host, $isRu ? 'ru' : 'en', 3, 'fun'))
+    : [];
+$practiceTopicLinks = [];
+foreach (array_slice($playbookClusters, 0, 3) as $cluster) {
+    $link = $buildClusterLink((array)$cluster, 'playbooks', '⚙');
+    if ($link) {
+        $practiceTopicLinks[] = $link;
+    }
+}
+$otherTopicLinks = [];
+foreach (array_slice($journalClusters, 0, 2) as $cluster) {
+    $link = $buildClusterLink((array)$cluster, 'journal', '✦');
+    if ($link) {
+        $otherTopicLinks[] = $link;
+    }
+}
+foreach (array_slice($signalsClusters, 0, 1) as $cluster) {
+    $link = $buildClusterLink((array)$cluster, 'signals', '⌁');
+    if ($link) {
+        $otherTopicLinks[] = $link;
+    }
+}
+foreach (array_slice($funClusters, 0, 1) as $cluster) {
+    $link = $buildClusterLink((array)$cluster, 'fun', '✺');
+    if ($link) {
+        $otherTopicLinks[] = $link;
+    }
+}
 $footerSections = [
     [
         'title' => $t('Выпуск', 'Issue'),
         'links' => [
             ['href' => '/', 'label' => $t('Главная', 'Home'), 'icon' => $sectionIcons['home']],
             ['href' => '/journal/', 'label' => $sectionTitles['journal'], 'icon' => $sectionIcons['journal']],
-        ],
-    ],
-    [
-        'title' => $sectionTitles['playbooks'],
-        'links' => [
-            ['href' => '/playbooks/', 'label' => $t('Все материалы', 'All materials'), 'icon' => $sectionIcons['playbooks']],
-        ],
-    ],
-    [
-        'title' => $sectionTitles['signals'],
-        'links' => [
-            ['href' => '/signals/', 'label' => $t('Все материалы', 'All materials'), 'icon' => $sectionIcons['signals']],
-        ],
-    ],
-    [
-        'title' => $t('Фан / Связь', 'Fun / Reach'),
-        'links' => [
+            ['href' => '/playbooks/', 'label' => $sectionTitles['playbooks'], 'icon' => $sectionIcons['playbooks']],
+            ['href' => '/signals/', 'label' => $sectionTitles['signals'], 'icon' => $sectionIcons['signals']],
             ['href' => '/fun/', 'label' => $sectionTitles['fun'], 'icon' => $sectionIcons['fun']],
+        ],
+    ],
+    [
+        'title' => $t('Темы практики', 'Practice topics'),
+        'links' => !empty($practiceTopicLinks) ? $practiceTopicLinks : [
+            ['href' => '/playbooks/', 'label' => $sectionTitles['playbooks'], 'icon' => $sectionIcons['playbooks']],
+        ],
+    ],
+    [
+        'title' => $t('Остальные темы', 'Other topics'),
+        'links' => !empty($otherTopicLinks) ? $otherTopicLinks : [
+            ['href' => '/journal/', 'label' => $sectionTitles['journal'], 'icon' => $sectionIcons['journal']],
+            ['href' => '/signals/', 'label' => $sectionTitles['signals'], 'icon' => $sectionIcons['signals']],
+            ['href' => '/fun/', 'label' => $sectionTitles['fun'], 'icon' => $sectionIcons['fun']],
+        ],
+    ],
+    [
+        'title' => $t('Контакты', 'Contacts'),
+        'links' => [
             ['href' => '/contact/', 'label' => $t('Контакты', 'Contact'), 'icon' => $sectionIcons['contact']],
         ],
     ],
@@ -96,7 +153,7 @@ $footerSections = [
 .public-editorial-intro{display:grid;gap:14px}
 .public-editorial-intro h3{margin:0;font:700 2rem/1 "Space Grotesk","Sora",sans-serif;color:#edf3fb;letter-spacing:-.04em}
 .public-editorial-intro p{margin:0;color:#9fb2ce;line-height:1.72}
-.public-editorial-map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.public-editorial-map{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .public-editorial-map-group{padding:14px;border:1px solid rgba(127,164,223,.16);background:rgba(255,255,255,.03)}
 .public-editorial-map-group h4{margin:0 0 12px;font:700 1rem/1 "Space Grotesk","Sora",sans-serif;color:#edf3fb;letter-spacing:-.02em}
 .public-editorial-map-group nav{display:grid;gap:8px}
@@ -108,7 +165,6 @@ $footerSections = [
 .public-back-to-top{position:fixed;right:28px;bottom:28px;z-index:200;display:inline-flex;gap:8px;align-items:center;padding:10px 12px;border-radius:0;border:1px solid rgba(127,164,223,.26);background:rgba(7,13,24,.84);color:#e7eff9;opacity:0;visibility:hidden;transform:translateX(22px);transition:opacity .24s ease,visibility .24s ease,transform .28s cubic-bezier(.16,1,.3,1);cursor:pointer}
 .public-back-to-top.is-visible{position:fixed;opacity:1;visibility:visible;transform:translateX(0)}
 .public-back-to-top-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;min-width:14px;font-size:16px;line-height:1;color:#f4d56b;transform:translateY(-1px)}
-@media (max-width:1180px){.public-editorial-map{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:980px){.public-editorial-footer-top,.public-editorial-map{grid-template-columns:1fr}}
 </style>
 <script>

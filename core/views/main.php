@@ -111,8 +111,7 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
                 <h1><?= htmlspecialchars((string)($issue['issue_title'] ?? $t("Апрель '26", "April '26")), ENT_QUOTES, 'UTF-8') ?></h1>
                 <div class="home-z-hero-lead">
                     <p><?= htmlspecialchars($t('Журнал про арбитраж трафика как живую редакционную среду: здесь важны не витринные обещания, а внутренний ритм affiliate-команд, где источники дрейфуют, связки пересобираются, креативы быстро стареют, а решения принимаются под давлением реального рынка.', 'A journal about traffic arbitrage as a living editorial environment: not showcase promises, but the internal rhythm of affiliate teams, where sources drift, bundles get rebuilt, creatives age fast, and decisions are made under real market pressure.'), ENT_QUOTES, 'UTF-8') ?></p>
-                    <p><?= htmlspecialchars($t('ЦПАЛЬНЯ собирает это не как ленту, а как номер. Редакционные разборы, market notes, backstage-наблюдения и практические материалы работают здесь вместе, чтобы показывать механику affiliate-операций изнутри, а не пересказывать внешний шум отрасли.', 'ЦПАЛЬНЯ assembles this not as a feed, but as an issue. Editorial breakdowns, market notes, backstage observations, and practical materials work together here to show affiliate operations from the inside rather than repeating outside industry noise.'), ENT_QUOTES, 'UTF-8') ?></p>
-                    <p><?= htmlspecialchars((string)($issue['issue_subtitle'] ?? $t('Апрель ’26: выпуск о backstage affiliate-операций. Не о фасаде индустрии, а о ее нервной системе: источниках трафика, фарме, креативных связках, трекерах, модерации и операционных playbooks. Это редакционный срез месяца для тех, кто привык видеть за цифрами механику и собирать из хаоса рабочую систему.', 'April ’26: an issue about the backstage of affiliate operations. Not the facade of the industry, but its nervous system: traffic sources, farm, creative bundles, trackers, moderation, and operational playbooks. A monthly editorial cut for readers who look past the numbers and build working systems out of chaos.')), ENT_QUOTES, 'UTF-8') ?></p>
+                    <p><?= htmlspecialchars((string)($issue['issue_subtitle'] ?? $t('ЦПАЛЬНЯ собирает это не как ленту, а как номер. Апрель ’26 посвящен backstage affiliate-операций: источникам трафика, фарму, креативным связкам, трекерам, модерации и операционным playbooks. Это редакционный срез месяца для тех, кто привык видеть за цифрами механику и собирать из хаоса рабочую систему.', 'ЦПАЛЬНЯ assembles this not as a feed, but as an issue. April ’26 is about the backstage of affiliate operations: traffic sources, farm, creative bundles, trackers, moderation, and operational playbooks. A monthly editorial cut for readers who look past the numbers and build working systems out of chaos.')), ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
                 <div class="home-z-actions">
                     <a class="home-z-btn" href="/journal/"><span class="home-z-btn-icon" aria-hidden="true">✦</span><span><?= htmlspecialchars($t('В журнал', 'Journal'), ENT_QUOTES, 'UTF-8') ?></span></a>
@@ -149,7 +148,7 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
                 <div class="home-z-block-head">
                     <div class="home-z-block-title">
                         <span class="home-z-tag"><?= htmlspecialchars($t('Журнал', 'Journal'), ENT_QUOTES, 'UTF-8') ?></span>
-                        <h2><?= htmlspecialchars($t('Редакционные материалы номера', 'Editorial stories from the issue'), ENT_QUOTES, 'UTF-8') ?></h2>
+                        <h2><?= htmlspecialchars($t('Материалы номера', 'Issue stories'), ENT_QUOTES, 'UTF-8') ?></h2>
                     </div>
                     <a class="home-z-block-link" href="/journal/"><?= htmlspecialchars($t('Все материалы', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
                 </div>
@@ -178,7 +177,7 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
                 <div class="home-z-block-head">
                     <div class="home-z-block-title">
                         <span class="home-z-tag"><?= htmlspecialchars($t('Практика', 'Playbooks'), ENT_QUOTES, 'UTF-8') ?></span>
-                        <h2><?= htmlspecialchars($t('Рабочие материалы и how-to', 'Working notes and how-to playbooks'), ENT_QUOTES, 'UTF-8') ?></h2>
+                        <h2><?= htmlspecialchars($t('Практика и how-to', 'How-to playbooks'), ENT_QUOTES, 'UTF-8') ?></h2>
                     </div>
                     <a class="home-z-block-link" href="/playbooks/"><?= htmlspecialchars($t('Все материалы', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
                 </div>
@@ -207,7 +206,7 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
                 <div class="home-z-block-head">
                     <div class="home-z-block-title">
                         <span class="home-z-tag"><?= htmlspecialchars($t('Повестка', 'Signals'), ENT_QUOTES, 'UTF-8') ?></span>
-                        <h2><?= htmlspecialchars($t('Политика, новости и сигналы', 'Policy, news and market signals'), ENT_QUOTES, 'UTF-8') ?></h2>
+                        <h2><?= htmlspecialchars($t('Новости и сигналы', 'News and signals'), ENT_QUOTES, 'UTF-8') ?></h2>
                     </div>
                     <a class="home-z-block-link" href="/signals/"><?= htmlspecialchars($t('Все материалы', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
                 </div>
@@ -236,7 +235,7 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
                 <div class="home-z-block-head">
                     <div class="home-z-block-title">
                         <span class="home-z-tag"><?= htmlspecialchars($t('Фан', 'Fun'), ENT_QUOTES, 'UTF-8') ?></span>
-                        <h2><?= htmlspecialchars($t('Отдых, мемы и нишевой абсурд', 'Satire, memes and niche absurdity'), ENT_QUOTES, 'UTF-8') ?></h2>
+                        <h2><?= htmlspecialchars($t('Мемы и фан', 'Memes and fun'), ENT_QUOTES, 'UTF-8') ?></h2>
                     </div>
                     <a class="home-z-block-link" href="/fun/"><?= htmlspecialchars($t('Все материалы', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
                 </div>
