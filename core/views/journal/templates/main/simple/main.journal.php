@@ -82,7 +82,8 @@ if ($selected) {
 .jrnl-kicker,.jrnl-tag,.jrnl-meta{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;max-height:30px;border:1px solid rgba(122,180,255,.2);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
 .jrnl-copy{display:grid;gap:8px}
 .jrnl-copy h1,.jrnl-detail h1{margin:0;font:700 2rem/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.048em}
-.jrnl-copy h2,.jrnl-related h2{margin:0;font:700 1.5rem/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.048em}
+.jrnl-copy h2{margin:0;font:700 2rem/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.048em}
+.jrnl-related h2{margin:0;font:700 1.5rem/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.048em}
 .jrnl-copy p,.jrnl-detail p,.jrnl-card p{margin:0;color:var(--shell-muted);line-height:1.62}
 .jrnl-copy p + p{margin-top:2px}
 .jrnl-copy .jrnl-hero-description{max-width:66ch}
