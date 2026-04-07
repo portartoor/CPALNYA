@@ -11,10 +11,11 @@ if (strpos($host, ':') !== false) {
 }
 $isRu = (bool)preg_match('/\.ru$/', $host);
 $lang = $isRu ? 'ru' : 'en';
-$pickIcon = static function (string $code): string {
+
+$pickIcon = static function (string $code, string $fallback = '#'): string {
     $code = trim($code);
     if ($code === '') {
-        return '#';
+        return $fallback;
     }
     if (function_exists('mb_substr')) {
         return mb_strtoupper((string)mb_substr($code, 0, 1, 'UTF-8'), 'UTF-8');
@@ -22,50 +23,70 @@ $pickIcon = static function (string $code): string {
     return strtoupper(substr($code, 0, 1));
 };
 
-$opsItems = [];
-if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters')) {
-    foreach ((array)examples_popularity_fetch_top_clusters($FRMWRK, $host, $lang, 'journal', 3) as $row) {
-        $code = trim((string)($row['code'] ?? ''));
-        if ($code === '') {
-            continue;
-        }
-        $opsItems[] = [
-            'title' => (string)($row['label'] ?? $code),
-            'path' => function_exists('examples_cluster_list_path') ? examples_cluster_list_path($code, $host, 'journal') : '/journal/',
-            'icon' => $pickIcon($code),
-        ];
-    }
-}
-if (count($opsItems) < 3) {
-    $opsItems = [
-        ['title' => $isRu ? 'Источники' : 'Sources', 'path' => '/journal/', 'icon' => '>'],
-        ['title' => $isRu ? 'Фарм' : 'Farm', 'path' => '/journal/', 'icon' => 'F'],
-        ['title' => $isRu ? 'Креативы' : 'Creatives', 'path' => '/journal/', 'icon' => 'C'],
-    ];
-}
-
-$howToItems = [
-    ['title' => $isRu ? 'Все HowTo' : 'All HowTo', 'path' => '/playbooks/', 'icon' => 'H'],
+$sectionTitles = [
+    'journal' => $isRu ? 'Журнал' : 'Journal',
+    'playbooks' => $isRu ? 'Практика' : 'Playbooks',
+    'signals' => $isRu ? 'Повестка' : 'Signals',
+    'fun' => $isRu ? 'Фан' : 'Fun',
 ];
-if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters')) {
-    foreach ((array)examples_popularity_fetch_top_clusters($FRMWRK, $host, $lang, 'playbooks', 3) as $row) {
+$sectionBasePaths = [
+    'journal' => '/journal/',
+    'playbooks' => '/playbooks/',
+    'signals' => '/signals/',
+    'fun' => '/fun/',
+];
+$sectionIcons = [
+    'journal' => '+',
+    'playbooks' => '#',
+    'signals' => '!',
+    'fun' => '~',
+];
+
+$buildClusterPath = static function (string $section, string $code) use ($host, $sectionBasePaths): string {
+    if (function_exists('examples_cluster_list_path')) {
+        return examples_cluster_list_path($code, $host, $section);
+    }
+    return $sectionBasePaths[$section] ?? '/';
+};
+
+$fetchSectionTopics = static function (string $section, int $limit = 3) use ($FRMWRK, $host, $lang, $pickIcon, $buildClusterPath): array {
+    $items = [];
+    if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters')) {
+        foreach ((array)examples_popularity_fetch_top_clusters($FRMWRK, $host, $lang, $section, $limit) as $row) {
+            $code = trim((string)($row['code'] ?? ''));
+            if ($code === '') {
+                continue;
+            }
+            $items[] = [
+                'title' => (string)($row['label'] ?? $code),
+                'path' => $buildClusterPath($section, $code),
+                'icon' => $pickIcon($code),
+            ];
+        }
+    }
+    return array_slice($items, 0, $limit);
+};
+
+$importantTopics = [];
+if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters_global')) {
+    foreach ((array)examples_popularity_fetch_top_clusters_global($FRMWRK, $host, $lang, 3) as $row) {
+        $section = trim((string)($row['section'] ?? 'journal'));
         $code = trim((string)($row['code'] ?? ''));
-        if ($code === '') {
+        if ($code === '' || !isset($sectionBasePaths[$section])) {
             continue;
         }
-        $howToItems[] = [
+        $importantTopics[] = [
             'title' => (string)($row['label'] ?? $code),
-            'path' => function_exists('examples_cluster_list_path') ? examples_cluster_list_path($code, $host, 'playbooks') : '/playbooks/',
+            'path' => $buildClusterPath($section, $code),
             'icon' => $pickIcon($code),
         ];
     }
 }
-if (count($howToItems) < 4) {
-    $howToItems = [
-        ['title' => $isRu ? 'Все HowTo' : 'All HowTo', 'path' => '/playbooks/', 'icon' => 'H'],
-        ['title' => $isRu ? 'Фарм-гайды' : 'Farm Guides', 'path' => '/playbooks/?topic=farm', 'icon' => 'F'],
-        ['title' => $isRu ? 'Трекинг' : 'Tracking', 'path' => '/playbooks/?topic=tracking', 'icon' => 'T'],
-        ['title' => $isRu ? 'Креативы' : 'Creatives', 'path' => '/playbooks/?topic=creatives', 'icon' => 'K'],
+if (count($importantTopics) < 3) {
+    $importantTopics = [
+        ['title' => $isRu ? 'Источники' : 'Sources', 'path' => '/journal/', 'icon' => '>'],
+        ['title' => $isRu ? 'Фарм' : 'Farm', 'path' => '/playbooks/', 'icon' => 'F'],
+        ['title' => $isRu ? 'AI Creatives' : 'AI Creatives', 'path' => '/playbooks/', 'icon' => 'A'],
     ];
 }
 
@@ -74,23 +95,44 @@ $navSections = [
         'label' => $isRu ? 'Выпуск' : 'Issue',
         'items' => [
             ['title' => $isRu ? 'Главная' : 'Home', 'path' => '/', 'icon' => '*'],
-            ['title' => $isRu ? 'Журнал' : 'Journal', 'path' => '/journal/', 'icon' => '+'],
-            ['title' => $isRu ? 'Практика' : 'Playbooks', 'path' => '/playbooks/', 'icon' => '#'],
+            ['title' => $sectionTitles['journal'], 'path' => $sectionBasePaths['journal'], 'icon' => $sectionIcons['journal']],
+            ['title' => $sectionTitles['playbooks'], 'path' => $sectionBasePaths['playbooks'], 'icon' => $sectionIcons['playbooks']],
+            ['title' => $sectionTitles['signals'], 'path' => $sectionBasePaths['signals'], 'icon' => $sectionIcons['signals']],
+            ['title' => $sectionTitles['fun'], 'path' => $sectionBasePaths['fun'], 'icon' => $sectionIcons['fun']],
         ],
     ],
     [
-        'label' => $isRu ? 'Операционка' : 'Ops',
-        'items' => $opsItems,
+        'label' => $isRu ? 'Важные темы' : 'Important Topics',
+        'items' => $importantTopics,
     ],
-    [
-        'label' => 'HowTo',
-        'items' => $howToItems,
-    ],
-    [
-        'label' => $isRu ? 'Связь' : 'Reach',
-        'items' => [
-            ['title' => $isRu ? 'Контакты' : 'Contact', 'path' => '/contact/', 'icon' => '@'],
-        ],
+];
+
+foreach (['journal', 'playbooks', 'signals', 'fun'] as $sectionKey) {
+    $items = $fetchSectionTopics($sectionKey, 3);
+    if (empty($items)) {
+        $items = [
+            [
+                'title' => $sectionTitles[$sectionKey],
+                'path' => $sectionBasePaths[$sectionKey],
+                'icon' => $sectionIcons[$sectionKey],
+            ],
+        ];
+    }
+    array_unshift($items, [
+        'title' => $sectionTitles[$sectionKey],
+        'path' => $sectionBasePaths[$sectionKey],
+        'icon' => $sectionIcons[$sectionKey],
+    ]);
+    $navSections[] = [
+        'label' => $sectionTitles[$sectionKey],
+        'items' => array_slice($items, 0, 4),
+    ];
+}
+
+$navSections[] = [
+    'label' => $isRu ? 'Связь' : 'Reach',
+    'items' => [
+        ['title' => $isRu ? 'Контакты' : 'Contact', 'path' => '/contact/', 'icon' => '@'],
     ],
 ];
 

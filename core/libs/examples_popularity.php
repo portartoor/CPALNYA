@@ -1,5 +1,16 @@
 <?php
 
+if (!function_exists('examples_popularity_normalize_section')) {
+    function examples_popularity_normalize_section(string $materialSection): string
+    {
+        $materialSection = strtolower(trim($materialSection));
+        if (in_array($materialSection, ['journal', 'playbooks', 'signals', 'fun'], true)) {
+            return $materialSection;
+        }
+        return 'journal';
+    }
+}
+
 if (!function_exists('examples_popularity_table_exists')) {
     function examples_popularity_table_exists(mysqli $db, string $table): bool
     {
@@ -76,7 +87,7 @@ if (!function_exists('examples_popularity_fetch_top_clusters')) {
 
         $hostSafe = mysqli_real_escape_string($db, strtolower(trim($host)));
         $langSafe = mysqli_real_escape_string($db, strtolower(trim($lang)));
-        $sectionSafe = mysqli_real_escape_string($db, trim($materialSection) === 'playbooks' ? 'playbooks' : 'journal');
+        $sectionSafe = mysqli_real_escape_string($db, examples_popularity_normalize_section($materialSection));
         $limit = max(1, min(10, $limit));
 
         $rows = $FRMWRK->DBRecords(
@@ -144,7 +155,7 @@ if (!function_exists('examples_popularity_view_map')) {
 
         $hostSafe = mysqli_real_escape_string($db, strtolower(trim($host)));
         $langSafe = mysqli_real_escape_string($db, strtolower(trim($lang)));
-        $sectionSafe = mysqli_real_escape_string($db, trim($materialSection) === 'playbooks' ? 'playbooks' : 'journal');
+        $sectionSafe = mysqli_real_escape_string($db, examples_popularity_normalize_section($materialSection));
         $conditions = [];
         foreach ($pairs as [$cluster, $slug]) {
             $conditions[] = "(cluster_code = '" . mysqli_real_escape_string($db, $cluster) . "' AND slug = '" . mysqli_real_escape_string($db, $slug) . "')";
@@ -171,6 +182,58 @@ if (!function_exists('examples_popularity_view_map')) {
         }
 
         return $map;
+    }
+}
+
+if (!function_exists('examples_popularity_fetch_top_clusters_global')) {
+    function examples_popularity_fetch_top_clusters_global($FRMWRK, string $host, string $lang, int $limit = 3): array
+    {
+        if (!is_object($FRMWRK) || !method_exists($FRMWRK, 'DB')) {
+            return [];
+        }
+        $db = $FRMWRK->DB();
+        if (!$db) {
+            return [];
+        }
+
+        examples_popularity_ensure_tables($db);
+
+        $hostSafe = mysqli_real_escape_string($db, strtolower(trim($host)));
+        $langSafe = mysqli_real_escape_string($db, strtolower(trim($lang)));
+        $limit = max(1, min(12, $limit));
+
+        $rows = $FRMWRK->DBRecords(
+            "SELECT material_section, cluster_code, cluster_label, MAX(views_count) AS views_count
+             FROM examples_cluster_popularity_cache
+             WHERE (domain_host = '{$hostSafe}' OR domain_host = '')
+               AND lang_code = '{$langSafe}'
+               AND material_section IN ('journal','playbooks','signals','fun')
+               AND COALESCE(cluster_code, '') <> ''
+             GROUP BY material_section, cluster_code, cluster_label
+             ORDER BY views_count DESC, cluster_label ASC, cluster_code ASC
+             LIMIT {$limit}"
+        );
+
+        $out = [];
+        foreach ((array)$rows as $row) {
+            $code = trim((string)($row['cluster_code'] ?? ''));
+            if ($code === '') {
+                continue;
+            }
+            $section = examples_popularity_normalize_section((string)($row['material_section'] ?? 'journal'));
+            $label = trim((string)($row['cluster_label'] ?? ''));
+            if ($label === '' && function_exists('examples_cluster_label')) {
+                $label = examples_cluster_label($code, $lang);
+            }
+            $out[] = [
+                'section' => $section,
+                'code' => $code,
+                'label' => $label !== '' ? $label : $code,
+                'views_count' => (int)($row['views_count'] ?? 0),
+            ];
+        }
+
+        return $out;
     }
 }
 
