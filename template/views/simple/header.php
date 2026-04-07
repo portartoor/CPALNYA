@@ -881,7 +881,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     <div class="simple-header-center">
         <form class="simple-header-search" method="get" action="/journal/">
             <input type="text" name="q" data-search-input placeholder="<?= htmlspecialchars($isRu ? 'Поиск: Facebook farm, антидетект, tracker setup, nutra funnel' : 'Search: Facebook farm, anti-detect, tracker setup, nutra funnel', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-            <button type="submit"><?= htmlspecialchars($isRu ? 'Найти в выпуске' : 'Search issue', ENT_QUOTES, 'UTF-8') ?></button>
+            <button type="submit"><?= htmlspecialchars($isRu ? 'Найти в выпусках' : 'Search issues', ENT_QUOTES, 'UTF-8') ?></button>
         </form>
     </div>
 

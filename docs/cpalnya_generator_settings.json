@@ -617,7 +617,7 @@
   "preview_use_llm": true,
   "preview_llm_model": "",
   "preview_context_chars": 14000,
-  "preview_image_enabled": false,
+  "preview_image_enabled": true,
   "preview_image_model": "",
   "preview_image_size": "1536x1024",
   "preview_image_style_options": [

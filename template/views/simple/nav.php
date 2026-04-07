@@ -30,12 +30,11 @@ $navSections = [
         ],
     ],
     [
-        'label' => $isRu ? 'Библиотека' : 'Library',
+        'label' => 'HowTo',
         'items' => [
-            ['title' => 'Assets', 'path' => '/solutions/downloads/', 'icon' => 'D'],
-            ['title' => 'Playbooks', 'path' => '/solutions/articles/', 'icon' => 'P'],
-            ['title' => $isRu ? 'Кейсы' : 'Cases', 'path' => '/cases/', 'icon' => 'K'],
-            ['title' => $isRu ? 'Продукты' : 'Products', 'path' => '/projects/', 'icon' => 'R'],
+            ['title' => $isRu ? 'Фарм-гайды' : 'Farm Guides', 'path' => '/journal/?section=playbooks&topic=farm', 'icon' => 'H'],
+            ['title' => $isRu ? 'Трекинг' : 'Tracking', 'path' => '/journal/?section=playbooks&topic=tracking', 'icon' => 'P'],
+            ['title' => $isRu ? 'Креативы' : 'Creatives', 'path' => '/journal/?section=playbooks&topic=creatives', 'icon' => 'K'],
         ],
     ],
     [
@@ -51,9 +50,14 @@ foreach ($navSections as $sectionBlock):
     <span class="nav-section-label"><?= htmlspecialchars((string)$sectionBlock['label'], ENT_QUOTES, 'UTF-8') ?></span>
     <?php foreach ($sectionBlock['items'] as $item):
         $path = (string)$item['path'];
-        $isActive = ($path === '/')
+        $pathForMatch = parse_url($path, PHP_URL_PATH);
+        $pathForMatch = is_string($pathForMatch) && $pathForMatch !== '' ? $pathForMatch : $path;
+        if ($pathForMatch !== '/' && substr($pathForMatch, -1) !== '/') {
+            $pathForMatch .= '/';
+        }
+        $isActive = ($pathForMatch === '/')
             ? ($currentPath === '/')
-            : (strpos($currentPath, $path) === 0);
+            : (strpos($currentPath, $pathForMatch) === 0);
     ?>
         <a class="<?= $isActive ? 'is-active' : '' ?>" href="<?= htmlspecialchars($path, ENT_QUOTES, 'UTF-8') ?>">
             <span class="nav-item-icon" aria-hidden="true"><?= htmlspecialchars((string)$item['icon'], ENT_QUOTES, 'UTF-8') ?></span>
