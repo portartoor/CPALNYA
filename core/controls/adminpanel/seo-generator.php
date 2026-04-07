@@ -211,29 +211,31 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $scheduleDate)) {
     $scheduleDate = gmdate('Y-m-d');
 }
 $scheduleRows = [];
+$queueRows = [];
 $hasCronRunsTable = admin_seo_gen_table_exists($DB, 'seo_article_cron_runs');
+$hasQueueTable = admin_seo_gen_table_exists($DB, 'seo_article_generation_queue');
 $hasExamplesTable = admin_seo_gen_table_exists($DB, 'examples_articles');
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     $action = (string)($_POST['action'] ?? '');
-    if ($action === 'update_schedule_time') {
-        if (!$hasCronRunsTable) {
-            $message = 'Table seo_article_cron_runs is missing.';
+    if ($action === 'update_queue_time') {
+        if (!$hasQueueTable) {
+            $message = 'Table seo_article_generation_queue is missing.';
             $messageType = 'danger';
         } else {
-            $runId = (int)($_POST['run_id'] ?? 0);
+            $queueId = (int)($_POST['queue_id'] ?? 0);
             $rowDate = trim((string)($_POST['job_date'] ?? ''));
             $time = trim((string)($_POST['planned_time'] ?? ''));
-            if ($runId <= 0 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $rowDate) || !preg_match('/^\d{2}:\d{2}$/', $time)) {
+            if ($queueId <= 0 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $rowDate) || !preg_match('/^\d{2}:\d{2}$/', $time)) {
                 $message = 'Invalid schedule update payload.';
                 $messageType = 'danger';
             } else {
                 $plannedAt = $rowDate . ' ' . $time . ':00';
                 $plannedAtSafe = mysqli_real_escape_string($DB, $plannedAt);
                 $jobDateSafe = mysqli_real_escape_string($DB, $rowDate);
-                $sql = "UPDATE seo_article_cron_runs
+                $sql = "UPDATE seo_article_generation_queue
                         SET planned_at = '{$plannedAtSafe}', updated_at = NOW()
-                        WHERE id = {$runId} AND job_date = '{$jobDateSafe}'
+                        WHERE id = {$queueId} AND job_date = '{$jobDateSafe}'
                         LIMIT 1";
                 if (mysqli_query($DB, $sql)) {
                     $message = 'Schedule time updated.';
@@ -248,7 +250,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     if ($action === 'save_seo_generator_settings') {
         $incoming = $seoGeneratorSettings;
         $incoming['enabled'] = admin_seo_gen_post_bool('enabled', false);
-        $incoming['langs'] = seo_gen_settings_parse_lines(admin_seo_gen_post_string('langs', 'en' . PHP_EOL . 'ru'), 10);
+        $incomingLangs = seo_gen_settings_parse_lines(admin_seo_gen_post_string('langs', 'ru'), 10);
+        $incoming['langs'] = in_array('ru', $incomingLangs, true) ? ['ru'] : ['ru'];
         $incoming['domain_host'] = admin_seo_gen_post_string('domain_host');
         $incoming['domain_host_en'] = admin_seo_gen_post_string('domain_host_en');
         $incoming['domain_host_ru'] = admin_seo_gen_post_string('domain_host_ru');
@@ -289,6 +292,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         $incoming['openrouter_api_key'] = admin_seo_gen_post_string('openrouter_api_key');
         $incoming['openrouter_base_url'] = admin_seo_gen_post_string('openrouter_base_url');
         $incoming['openrouter_model'] = admin_seo_gen_post_string('openrouter_model');
+        $incoming['openrouter_fallback_model'] = admin_seo_gen_post_string('openrouter_fallback_model', 'openai/gpt-4o-2024-11-20');
 
         $incoming['openai_proxy_enabled'] = admin_seo_gen_post_bool('openai_proxy_enabled', false);
         $incoming['openai_proxy_host'] = admin_seo_gen_post_string('openai_proxy_host');
@@ -420,6 +424,25 @@ if ($hasCronRunsTable) {
     if ($res) {
         while ($row = mysqli_fetch_assoc($res)) {
             $scheduleRows[] = $row;
+        }
+        mysqli_free_result($res);
+    }
+}
+
+if ($hasQueueTable) {
+    $dateSafe = mysqli_real_escape_string($DB, $scheduleDate);
+    $sql = "SELECT id, job_date, lang_code, campaign_key, force_mode, dry_run, max_per_run, status, attempts,
+                   planned_at, started_at, finished_at, last_exit_code, last_output, last_error, created_at, updated_at
+            FROM seo_article_generation_queue
+            WHERE job_date = '{$dateSafe}'
+            ORDER BY
+                CASE campaign_key WHEN 'journal' THEN 1 WHEN 'playbooks' THEN 2 ELSE 9 END,
+                planned_at ASC,
+                id ASC";
+    $res = mysqli_query($DB, $sql);
+    if ($res) {
+        while ($row = mysqli_fetch_assoc($res)) {
+            $queueRows[] = $row;
         }
         mysqli_free_result($res);
     }

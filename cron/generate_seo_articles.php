@@ -5912,7 +5912,7 @@ $cfg = [
     'openrouter_api_key' => trim((string)seo_cfg('OpenRouterApiKey', '')),
     'openrouter_base_url' => trim((string)seo_cfg('OpenRouterBaseUrl', 'https://openrouter.ai/api/v1')),
     'openrouter_model' => trim((string)seo_cfg('OpenRouterModel', 'openai/gpt-4o-2024-11-20')),
-    'openrouter_fallback_model' => trim((string)seo_cfg('OpenRouterFallbackModel', 'google/gemini-2.0-flash-001')),
+    'openrouter_fallback_model' => trim((string)seo_cfg('OpenRouterFallbackModel', 'openai/gpt-4o-2024-11-20')),
     'openai_api_key' => trim((string)seo_cfg('OpenAIApiKey', '')),
     'openai_base_url' => trim((string)seo_cfg('OpenAIBaseUrl', 'https://api.openai.com/v1')),
     'openai_model' => trim((string)seo_cfg('OpenAIModel', 'gpt-4.1-mini')),
@@ -5959,9 +5959,9 @@ if ($cfg['llm_provider'] === 'openrouter') {
         }
         $cfg['openai_headers'] = $headers;
     }
-    $cfg['openrouter_fallback_model'] = trim((string)($cfg['openrouter_fallback_model'] ?? 'google/gemini-2.0-flash-001'));
+    $cfg['openrouter_fallback_model'] = trim((string)($cfg['openrouter_fallback_model'] ?? 'openai/gpt-4o-2024-11-20'));
     if ($cfg['openrouter_fallback_model'] === '') {
-        $cfg['openrouter_fallback_model'] = 'google/gemini-2.0-flash-001';
+        $cfg['openrouter_fallback_model'] = 'openai/gpt-4o-2024-11-20';
     }
 }
 

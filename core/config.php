@@ -91,7 +91,7 @@ $OpenAIProxyPool = [
 
 // SEO articles auto-generation cron
 $SeoArticleCronEnabled = true; // set true after API key is configured
-$SeoArticleCronLanguages = ['en', 'ru'];
+$SeoArticleCronLanguages = ['ru'];
 $SeoArticleCronDailyMin = 1;
 $SeoArticleCronDailyMax = 3;
 $SeoArticleCronWordMin = 2000;
@@ -103,8 +103,8 @@ $SeoArticleCronNotifyDailySchedule = true; // send one daily Telegram summary wi
 $SeoArticleCronTodayFirstDelayMinutes = 15; // first slot for today starts no earlier than now + N minutes (UTC)
 $SeoArticleTelegramPreviewEnabled = true; // publish generated article preview post to dedicated Telegram channel
 $SeoArticleTelegramPreviewChatId = '-1003652654755';
-$SeoArticlePreviewImageEnabled = true; // try to generate preview image and attach to Telegram post
-$SeoArticlePreviewImageModel = 'google/gemini-2.5-flash-image';
+$SeoArticlePreviewImageEnabled = false; // try to generate preview image and attach to Telegram post
+$SeoArticlePreviewImageModel = '';
 $SeoArticlePreviewImageSize = '768x512'; // smaller image for Telegram preview posts
 $SeoArticlePreviewImagePromptTemplate = 'Create a {{image_style}} premium editorial illustration for article "{{title}}" ({{lang}}). Focus on GeoIP and antifraud B2B context. Excerpt: {{excerpt}}. Context: {{context}}. No text, no logos, clean modern style, 16:9.';
 $SeoArticleTelegramPreviewPostMaxWords = 220; // hard limit <= 700 words for text-only preview post
@@ -114,17 +114,17 @@ $SeoArticleTelegramPreviewCaptionMinWords = 26; // if caption is too short, auto
 $SeoArticleTelegramPreviewUseLLM = true; // generate Telegram preview text via LLM from full article content
 $SeoArticleTelegramPreviewModel = ''; // empty = use OpenRouter/OpenAI model from main cron config
 $SeoArticleTelegramPreviewContextChars = 14000; // how much article context is sent to LLM for preview generation
-$SeoArticleCronAuthorName = 'GeoIP Team';
+$SeoArticleCronAuthorName = 'CPALNYA Editorial Desk';
 $SeoArticleCronDomainHost = ''; // empty = all domains
 $SeoArticleCronMaxPerRun = 2; // safety guard per single cron execution
-$SeoArticleCronSeedSalt = 'geoip-seo-articles-2026';
+$SeoArticleCronSeedSalt = 'cpalnya-affiliate-content';
 
 // IndexNow
 $IndexNowEnabled = false;
 $IndexNowKey = '';
 $IndexNowKeyLocation = '';
 $IndexNowEndpoint = '';
-$IndexNowHosts = ['portcore.ru', 'portcore.online'];
+$IndexNowHosts = ['cpalnya.ru'];
 $IndexNowPingOnPublish = true;
 $IndexNowSubmitLimit = 100;
 $IndexNowRetryDelayMinutes = 15;

@@ -87,12 +87,12 @@
                                         <div class="col-md-3"><label class="form-label">Word Max</label><input class="form-control req" type="number" name="word_max" value="<?= (int)($s['word_max'] ?? 5000) ?>"></div>
                                         <div class="col-md-3"><label class="form-label">Today Delay (min)</label><input class="form-control" type="number" name="today_first_delay_min" value="<?= (int)($s['today_first_delay_min'] ?? 15) ?>"></div>
                                         <div class="col-md-3"><label class="form-label">Auto Expand Retries</label><input class="form-control" type="number" name="auto_expand_retries" value="<?= (int)($s['auto_expand_retries'] ?? 1) ?>"></div>
-                                        <div class="col-md-6"><label class="form-label">Languages</label><textarea class="form-control" rows="2" name="langs"><?= htmlspecialchars(implode("\n", (array)($s['langs'] ?? []))) ?></textarea><div class="wiz-help">One per line: en, ru.</div></div>
+                                        <div class="col-md-6"><label class="form-label">Languages</label><textarea class="form-control" rows="2" name="langs"><?= htmlspecialchars(implode("\n", (array)($s['langs'] ?? []))) ?></textarea><div class="wiz-help">Generator is locked to Russian output. Keep only <code>ru</code>.</div></div>
                                         <div class="col-md-6"><label class="form-label">Expand Context Chars</label><input class="form-control" type="number" name="expand_context_chars" value="<?= (int)($s['expand_context_chars'] ?? 7000) ?>"></div>
                                         <div class="col-md-4"><label class="form-label">Author Name</label><input class="form-control" name="author_name" value="<?= htmlspecialchars((string)($s['author_name'] ?? '')) ?>"></div>
                                         <div class="col-md-4"><label class="form-label">Domain Host (legacy)</label><input class="form-control" name="domain_host" value="<?= htmlspecialchars((string)($s['domain_host'] ?? '')) ?>"></div>
-                                        <div class="col-md-4"><label class="form-label">Domain Host EN</label><input class="form-control" name="domain_host_en" value="<?= htmlspecialchars((string)($s['domain_host_en'] ?? 'portcore.online')) ?>"></div>
-                                        <div class="col-md-4"><label class="form-label">Domain Host RU</label><input class="form-control" name="domain_host_ru" value="<?= htmlspecialchars((string)($s['domain_host_ru'] ?? 'portcore.ru')) ?>"></div>
+                                        <div class="col-md-4"><label class="form-label">Domain Host EN</label><input class="form-control" name="domain_host_en" value="<?= htmlspecialchars((string)($s['domain_host_en'] ?? 'cpalnya.ru')) ?>"></div>
+                                        <div class="col-md-4"><label class="form-label">Domain Host RU</label><input class="form-control" name="domain_host_ru" value="<?= htmlspecialchars((string)($s['domain_host_ru'] ?? 'cpalnya.ru')) ?>"></div>
                                         <div class="col-md-2"><label class="form-label">Prompt Version</label><input class="form-control" name="prompt_version" value="<?= htmlspecialchars((string)($s['prompt_version'] ?? '')) ?>"></div>
                                         <div class="col-md-2"><label class="form-label">Seed Salt</label><input class="form-control" name="seed_salt" value="<?= htmlspecialchars((string)($s['seed_salt'] ?? '')) ?>"></div>
                                         <div class="col-md-4"><label class="form-label">Tone Variability (0-100)</label><input class="form-control" type="number" min="0" max="100" name="tone_variability" value="<?= (int)($s['tone_variability'] ?? 60) ?>"><div class="wiz-help">Higher value => more diverse tone and pacing; lower => stricter enterprise tone.</div></div>
@@ -166,6 +166,7 @@
                                         <div class="col-md-6"><label class="form-label">OpenAI Headers</label><textarea class="form-control" rows="2" name="openai_headers"><?= htmlspecialchars(implode("\n", (array)($s['openai_headers'] ?? []))) ?></textarea></div>
                                         <div class="col-md-3"><label class="form-label">OpenRouter Base URL</label><input class="form-control req" name="openrouter_base_url" value="<?= htmlspecialchars((string)($s['openrouter_base_url'] ?? '')) ?>"></div>
                                         <div class="col-md-3"><label class="form-label">OpenRouter Model</label><input class="form-control req" name="openrouter_model" value="<?= htmlspecialchars((string)($s['openrouter_model'] ?? '')) ?>"></div>
+                                        <div class="col-md-6"><label class="form-label">OpenRouter Fallback Model</label><input class="form-control" name="openrouter_fallback_model" value="<?= htmlspecialchars((string)($s['openrouter_fallback_model'] ?? 'openai/gpt-4o-2024-11-20')) ?>"><div class="wiz-help">Used only if the main OpenRouter route returns a region/provider block. Do not leave an old Google model here unless you explicitly want that fallback.</div></div>
                                         <div class="col-md-12"><label class="form-label">OpenRouter API Key</label><input class="form-control" name="openrouter_api_key" id="openrouter_api_key" value="<?= htmlspecialchars((string)($s['openrouter_api_key'] ?? '')) ?>"></div>
                                         <div class="col-12"><hr class="my-1"></div>
                                         <div class="col-md-2"><label class="form-label">Proxy Enabled</label><select class="form-select" name="openai_proxy_enabled"><option value="1" <?= !empty($s['openai_proxy_enabled']) ? 'selected' : '' ?>>Yes</option><option value="0" <?= empty($s['openai_proxy_enabled']) ? 'selected' : '' ?>>No</option></select></div>
@@ -249,6 +250,7 @@
                                         <div class="col-md-2"><label class="form-label">Image Generation</label><select class="form-select" name="preview_image_enabled" id="preview_image_enabled"><option value="1" <?= !empty($s['preview_image_enabled']) ? 'selected' : '' ?>>Enabled</option><option value="0" <?= empty($s['preview_image_enabled']) ? 'selected' : '' ?>>Disabled</option></select></div>
                                         <div class="col-md-4"><label class="form-label">Image Model</label><input class="form-control" name="preview_image_model" id="preview_image_model" value="<?= htmlspecialchars((string)($s['preview_image_model'] ?? '')) ?>"></div>
                                         <div class="col-md-2"><label class="form-label">Image Size</label><input class="form-control" name="preview_image_size" id="preview_image_size" value="<?= htmlspecialchars((string)($s['preview_image_size'] ?? '768x512')) ?>"></div>
+                                        <div class="col-12"><div class="alert alert-warning py-2 mb-0">If image previews use a Google model through OpenRouter, geo restrictions can still fail the run even when the main text model is OpenAI. The safe options are: disable image previews or switch the image model to a provider available for your server region.</div></div>
                                         <div class="col-md-4"><label class="form-label">Anchor Enforcement</label><select class="form-select" name="preview_image_anchor_enforced"><option value="1" <?= !empty($s['preview_image_anchor_enforced']) ? 'selected' : '' ?>>Enabled</option><option value="0" <?= empty($s['preview_image_anchor_enforced']) ? 'selected' : '' ?>>Disabled</option></select><div class="wiz-help">Injects mandatory anchors from article: primary concept + operational context.</div></div>
                                         <div class="col-md-4"><label class="form-label">Image Styles</label><textarea class="form-control" rows="2" name="preview_image_style_options"><?= htmlspecialchars(implode("\n", (array)($s['preview_image_style_options'] ?? []))) ?></textarea></div>
                                         <div class="col-md-12"><label class="form-label">Image Color Schemes (key | weight | instruction)</label><textarea class="form-control font-monospace" rows="6" name="image_color_schemes"><?= htmlspecialchars(implode("\n", $colorSchemeLines)) ?></textarea></div>
@@ -288,8 +290,8 @@
     <div class="card mt-4">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
-                <h6 class="mb-1">Generation Schedule</h6>
-                <div class="text-muted small">View daily slots, statuses and edit planned time.</div>
+                <h6 class="mb-1">Generation Queue</h6>
+                <div class="text-muted small">Daily queue for `journal` and `playbooks`, with status, attempts, logs and planned time.</div>
             </div>
             <form method="GET" class="d-flex align-items-center gap-2">
                 <label class="small text-muted mb-0">Date</label>
@@ -298,9 +300,9 @@
             </form>
         </div>
         <div class="card-body">
-            <?php if (empty($hasCronRunsTable)): ?>
-                <div class="alert alert-warning mb-0">Table <code>seo_article_cron_runs</code> not found.</div>
-            <?php elseif (empty($scheduleRows)): ?>
+            <?php if (empty($hasQueueTable)): ?>
+                <div class="alert alert-warning mb-0">Table <code>seo_article_generation_queue</code> not found.</div>
+            <?php elseif (empty($queueRows)): ?>
                 <div class="text-muted">No schedule rows for <?= htmlspecialchars((string)($scheduleDate ?? '')) ?>.</div>
             <?php else: ?>
                 <div class="table-responsive">
@@ -308,17 +310,17 @@
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Lang / Slot</th>
+                            <th>Campaign / Lang</th>
                             <th>Planned At</th>
                             <th>Status</th>
                             <th>Attempts</th>
-                            <th>Article</th>
-                            <th>Message</th>
+                            <th>Run Params</th>
+                            <th>Last Result</th>
                             <th>Edit Time</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <?php foreach ((array)$scheduleRows as $row): ?>
+                        <?php foreach ((array)$queueRows as $row): ?>
                             <?php
                             $plannedAtRaw = (string)($row['planned_at'] ?? '');
                             $plannedTime = '';
@@ -329,32 +331,36 @@
                             $badge = 'secondary';
                             if ($status === 'success') { $badge = 'success'; }
                             elseif ($status === 'failed') { $badge = 'danger'; }
-                            elseif ($status === 'running') { $badge = 'warning'; }
-                            elseif ($status === 'pending') { $badge = 'info'; }
-                            $articleSlug = trim((string)($row['article_slug'] ?? ''));
-                            $articleTitle = trim((string)($row['article_title'] ?? ''));
-                            $articleUrl = $articleSlug !== '' ? ('/examples/article/' . rawurlencode($articleSlug) . '/') : '';
+                            elseif ($status === 'processing') { $badge = 'warning'; }
+                            elseif ($status === 'queued') { $badge = 'info'; }
+                            $campaignKey = trim((string)($row['campaign_key'] ?? ''));
+                            $lastError = trim((string)($row['last_error'] ?? ''));
+                            $lastOutput = trim((string)($row['last_output'] ?? ''));
+                            $lastResult = $lastError !== '' ? $lastError : $lastOutput;
+                            if (mb_strlen($lastResult) > 220) {
+                                $lastResult = mb_substr($lastResult, 0, 220) . '...';
+                            }
                             ?>
                             <tr>
                                 <td><?= (int)($row['id'] ?? 0) ?></td>
-                                <td><b><?= htmlspecialchars((string)($row['lang_code'] ?? '')) ?></b> / slot <?= (int)($row['slot_index'] ?? 0) ?></td>
+                                <td>
+                                    <div><b><?= htmlspecialchars($campaignKey !== '' ? $campaignKey : 'default') ?></b></div>
+                                    <div class="text-muted small"><?= htmlspecialchars((string)($row['lang_code'] ?? '')) ?></div>
+                                </td>
                                 <td><code><?= htmlspecialchars($plannedAtRaw) ?></code></td>
                                 <td><span class="badge text-bg-<?= $badge ?>"><?= htmlspecialchars($status) ?></span></td>
                                 <td><?= (int)($row['attempts'] ?? 0) ?></td>
                                 <td>
-                                    <?php if ($articleUrl !== ''): ?>
-                                        <a href="<?= htmlspecialchars($articleUrl) ?>" target="_blank" rel="noopener noreferrer">
-                                            #<?= (int)($row['article_id'] ?? 0) ?> <?= htmlspecialchars($articleTitle !== '' ? $articleTitle : $articleSlug) ?>
-                                        </a>
-                                    <?php else: ?>
-                                        <span class="text-muted">-</span>
-                                    <?php endif; ?>
+                                    <div class="small">max_per_run: <b><?= (int)($row['max_per_run'] ?? 0) ?></b></div>
+                                    <div class="small">force: <b><?= !empty($row['force_mode']) ? 'yes' : 'no' ?></b></div>
+                                    <div class="small">dry_run: <b><?= !empty($row['dry_run']) ? 'yes' : 'no' ?></b></div>
+                                    <div class="small text-muted">exit: <?= (int)($row['last_exit_code'] ?? 0) ?></div>
                                 </td>
-                                <td style="max-width:360px"><span class="text-muted small"><?= htmlspecialchars((string)($row['message'] ?? '')) ?></span></td>
+                                <td style="max-width:420px"><span class="text-muted small"><?= htmlspecialchars($lastResult !== '' ? $lastResult : '-') ?></span></td>
                                 <td>
                                     <form method="POST" class="d-flex gap-1">
-                                        <input type="hidden" name="action" value="update_schedule_time">
-                                        <input type="hidden" name="run_id" value="<?= (int)($row['id'] ?? 0) ?>">
+                                        <input type="hidden" name="action" value="update_queue_time">
+                                        <input type="hidden" name="queue_id" value="<?= (int)($row['id'] ?? 0) ?>">
                                         <input type="hidden" name="job_date" value="<?= htmlspecialchars((string)($row['job_date'] ?? '')) ?>">
                                         <input type="time" name="planned_time" class="form-control form-control-sm" value="<?= htmlspecialchars($plannedTime) ?>" required>
                                         <button class="btn btn-sm btn-outline-primary" type="submit">Save</button>
@@ -368,6 +374,68 @@
             <?php endif; ?>
         </div>
     </div>
+
+    <?php if (!empty($hasCronRunsTable)): ?>
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-1">Legacy Slot Table</h6>
+                <div class="text-muted small">Old `seo_article_cron_runs` rows are kept here for debugging while the new queue is primary.</div>
+            </div>
+            <div class="card-body">
+                <?php if (empty($scheduleRows)): ?>
+                    <div class="text-muted">No legacy slot rows for <?= htmlspecialchars((string)($scheduleDate ?? '')) ?>.</div>
+                <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Lang / Slot</th>
+                                <th>Planned At</th>
+                                <th>Status</th>
+                                <th>Attempts</th>
+                                <th>Article</th>
+                                <th>Message</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ((array)$scheduleRows as $row): ?>
+                                <?php
+                                $status = strtolower((string)($row['status'] ?? 'pending'));
+                                $badge = 'secondary';
+                                if ($status === 'success') { $badge = 'success'; }
+                                elseif ($status === 'failed') { $badge = 'danger'; }
+                                elseif ($status === 'running') { $badge = 'warning'; }
+                                elseif ($status === 'pending') { $badge = 'info'; }
+                                $articleSlug = trim((string)($row['article_slug'] ?? ''));
+                                $articleTitle = trim((string)($row['article_title'] ?? ''));
+                                $articleUrl = $articleSlug !== '' ? ('/examples/article/' . rawurlencode($articleSlug) . '/') : '';
+                                ?>
+                                <tr>
+                                    <td><?= (int)($row['id'] ?? 0) ?></td>
+                                    <td><b><?= htmlspecialchars((string)($row['lang_code'] ?? '')) ?></b> / slot <?= (int)($row['slot_index'] ?? 0) ?></td>
+                                    <td><code><?= htmlspecialchars((string)($row['planned_at'] ?? '')) ?></code></td>
+                                    <td><span class="badge text-bg-<?= $badge ?>"><?= htmlspecialchars($status) ?></span></td>
+                                    <td><?= (int)($row['attempts'] ?? 0) ?></td>
+                                    <td>
+                                        <?php if ($articleUrl !== ''): ?>
+                                            <a href="<?= htmlspecialchars($articleUrl) ?>" target="_blank" rel="noopener noreferrer">
+                                                #<?= (int)($row['article_id'] ?? 0) ?> <?= htmlspecialchars($articleTitle !== '' ? $articleTitle : $articleSlug) ?>
+                                            </a>
+                                        <?php else: ?>
+                                            <span class="text-muted">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td style="max-width:360px"><span class="text-muted small"><?= htmlspecialchars((string)($row['message'] ?? '')) ?></span></td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endif; ?>
 </div>
 <script>
 (function(){

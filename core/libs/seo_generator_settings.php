@@ -193,7 +193,7 @@ if (!function_exists('seo_gen_settings_default')) {
     {
         return [
             'enabled' => true,
-            'langs' => ['en', 'ru'],
+            'langs' => ['ru'],
             'domain_host' => '',
             'domain_host_en' => 'cpalnya.ru',
             'domain_host_ru' => 'cpalnya.ru',
@@ -236,6 +236,7 @@ if (!function_exists('seo_gen_settings_default')) {
             'openrouter_api_key' => '',
             'openrouter_base_url' => 'https://openrouter.ai/api/v1',
             'openrouter_model' => 'openai/gpt-4o-2024-11-20',
+            'openrouter_fallback_model' => 'openai/gpt-4o-2024-11-20',
 
             'openai_proxy_enabled' => false,
             'openai_proxy_host' => '',
@@ -252,7 +253,7 @@ if (!function_exists('seo_gen_settings_default')) {
             'topic_analysis_user_prompt_append' => '',
 
             'styles_en' => ['editorial breakdown', 'trend memo', 'operator playbook', 'step-by-step tutorial'],
-            'styles_ru' => ['экспертный', 'пошаговый', 'практический playbook', 'аналитический'],
+            'styles_ru' => ['редакционный разбор', 'пошаговый how-to', 'операционный playbook', 'аналитический'],
             'clusters_en' => [
                 'facebook farm setup and account resilience',
                 'tiktok affiliate funnels and creative iteration',
@@ -263,11 +264,11 @@ if (!function_exists('seo_gen_settings_default')) {
             ],
             'clusters_ru' => [
                 'Facebook farm и антибан в 2026',
-                'снижение chargeback через гео-сигналы',
-                'risk-based authentication и step-up KYC',
-                'детект multi-account и abuse patterns',
-                'снижение false positive в антифроде',
-                'backend-интеграция трекеров, postback и антидетект-стека',
+                'TikTok-воронки и итерации креативов под affiliate',
+                'Telegram-комьюнити и Mini Apps в арбитраже',
+                'трекеры, postback и потеря атрибуции',
+                'фарм, BM-устойчивость и anti-ban операционка',
+                'креативные циклы, UGC и AI-пайплайн команды',
             ],
             'intent_verticals_en' => [
                 'affiliate media teams',
@@ -439,8 +440,8 @@ if (!function_exists('seo_gen_settings_default')) {
             'preview_llm_model' => '',
             'preview_context_chars' => 14000,
 
-            'preview_image_enabled' => true,
-            'preview_image_model' => 'google/gemini-2.5-flash-image',
+            'preview_image_enabled' => false,
+            'preview_image_model' => '',
             'preview_image_size' => '1536x1024',
             'preview_image_anchor_enforced' => true,
             'preview_image_anchor_append' => '',
@@ -556,6 +557,7 @@ if (!function_exists('seo_gen_settings_normalize')) {
         $settings['openrouter_base_url'] = trim((string)$settings['openrouter_base_url']);
         $settings['openai_model'] = trim((string)$settings['openai_model']);
         $settings['openrouter_model'] = trim((string)$settings['openrouter_model']);
+        $settings['openrouter_fallback_model'] = trim((string)($settings['openrouter_fallback_model'] ?? 'openai/gpt-4o-2024-11-20'));
         $settings['openai_api_key'] = trim((string)$settings['openai_api_key']);
         $settings['openrouter_api_key'] = trim((string)$settings['openrouter_api_key']);
         $settings['domain_host'] = strtolower(trim((string)($settings['domain_host'] ?? '')));
@@ -578,9 +580,7 @@ if (!function_exists('seo_gen_settings_normalize')) {
             },
             (array)$settings['langs']
         ))));
-        if (empty($settings['langs'])) {
-            $settings['langs'] = ['en', 'ru'];
-        }
+        $settings['langs'] = ['ru'];
 
         $settings['styles_en'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['styles_en']), 120);
         $settings['styles_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['styles_ru']), 120);
