@@ -235,7 +235,7 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
                 <div class="home-z-block-head">
                     <div class="home-z-block-title">
                         <span class="home-z-tag"><?= htmlspecialchars($t('Фан', 'Fun'), ENT_QUOTES, 'UTF-8') ?></span>
-                        <h2><?= htmlspecialchars($t('Мемы и фан', 'Memes and fun'), ENT_QUOTES, 'UTF-8') ?></h2>
+                        <h2><?= htmlspecialchars($t('Легкая редакция', 'Light editorial'), ENT_QUOTES, 'UTF-8') ?></h2>
                     </div>
                     <a class="home-z-block-link" href="/fun/"><?= htmlspecialchars($t('Все материалы', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
                 </div>
