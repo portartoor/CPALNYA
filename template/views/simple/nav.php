@@ -17,7 +17,7 @@ $navSections = [
         'items' => [
             ['title' => $isRu ? 'Главная' : 'Home', 'path' => '/', 'icon' => '*'],
             ['title' => $isRu ? 'Журнал' : 'Journal', 'path' => '/journal/', 'icon' => '+'],
-            ['title' => $isRu ? 'Темы' : 'Topics', 'path' => '/journal/', 'icon' => '#'],
+            ['title' => $isRu ? 'Практика' : 'Playbooks', 'path' => '/playbooks/', 'icon' => '#'],
         ],
     ],
     [
