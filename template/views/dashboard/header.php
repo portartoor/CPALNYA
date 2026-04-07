@@ -958,6 +958,12 @@ if ($isAdminPanel) {
 						</a>
 					</li>
 					<li class="side-nav-item">
+						<a href="/adminpanel/footer-blocks/" class="side-nav-link">
+							<span class="menu-icon"><i class="ti ti-article"></i></span>
+							<span class="menu-text">Footer SEO Blocks</span>
+						</a>
+					</li>
+					<li class="side-nav-item">
 						<a href="/adminpanel/seo-generator/" class="side-nav-link">
 							<span class="menu-icon"><i class="ti ti-wand"></i></span>
 							<span class="menu-text"><?= $isRuUi ? 'SEO РіРµРЅРµСЂР°С‚РѕСЂ' : 'SEO Generator' ?></span>

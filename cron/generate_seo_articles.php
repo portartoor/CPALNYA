@@ -137,6 +137,8 @@ function seo_apply_db_settings_to_cfg(array $cfg, array $dbSettings): array
         'openai_model', 'openai_timeout', 'openai_headers', 'openai_proxy_pool_enabled', 'openai_proxy_pool',
         'topic_analysis_enabled', 'topic_analysis_limit', 'topic_analysis_system_prompt',
         'topic_analysis_user_prompt_append', 'styles_en', 'styles_ru', 'clusters_en', 'clusters_ru', 'moods',
+        'signals_news_enabled', 'signals_news_max_items', 'signals_news_lookback_hours', 'signals_news_timeout',
+        'signals_news_feeds',
         'intent_verticals_en', 'intent_verticals_ru', 'intent_scenarios_en', 'intent_scenarios_ru',
         'intent_objectives_en', 'intent_objectives_ru', 'intent_constraints_en', 'intent_constraints_ru',
         'intent_artifacts_en', 'intent_artifacts_ru', 'intent_outcomes_en', 'intent_outcomes_ru',
@@ -601,6 +603,290 @@ function seo_topic_analysis_cache_save(mysqli $db, string $jobDate, string $lang
          VALUES ('{$jobDateSafe}', '{$langSafe}', '{$domainSafe}', '{$hashSafe}', '{$payloadSafe}', NOW(), NOW())
          ON DUPLICATE KEY UPDATE analysis_json = VALUES(analysis_json), updated_at = NOW()"
     );
+}
+
+function seo_live_news_default_feeds(string $lang = 'ru'): array
+{
+    if ($lang === 'ru') {
+        return [
+            'https://news.google.com/rss/search?q=affiliate+marketing+OR+digital+advertising+policy&hl=ru&gl=RU&ceid=RU:ru',
+            'https://news.google.com/rss/search?q=traffic+arbitrage+OR+adtech+regulation&hl=ru&gl=RU&ceid=RU:ru',
+            'https://news.google.com/rss/search?q=Russia+business+news+law+digital&hl=ru&gl=RU&ceid=RU:ru',
+            'https://news.google.com/rss/search?q=Russia+legislation+advertising+internet&hl=ru&gl=RU&ceid=RU:ru',
+            'https://news.google.com/rss/search?q=crypto+market+regulation+exchange&hl=ru&gl=RU&ceid=RU:ru',
+            'https://news.google.com/rss/search?q=stock+market+business+analysis+Russia&hl=ru&gl=RU&ceid=RU:ru',
+            'https://news.google.com/rss/search?q=politics+business+sanctions+payments+Russia&hl=ru&gl=RU&ceid=RU:ru',
+            'https://news.google.com/rss/search?q=telegram+policy+monetization+news&hl=ru&gl=RU&ceid=RU:ru',
+        ];
+    }
+
+    return [
+        'https://news.google.com/rss/search?q=affiliate+marketing+policy+OR+digital+advertising+regulation&hl=en-US&gl=US&ceid=US:en',
+        'https://news.google.com/rss/search?q=business+news+markets+regulation+digital+advertising&hl=en-US&gl=US&ceid=US:en',
+        'https://news.google.com/rss/search?q=crypto+market+regulation+exchange&hl=en-US&gl=US&ceid=US:en',
+        'https://news.google.com/rss/search?q=telegram+policy+monetization+news&hl=en-US&gl=US&ceid=US:en',
+    ];
+}
+
+function seo_http_get_text_with_proxy(string $url, array $proxy, int $timeoutSec, ?array &$meta = null): string
+{
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_CONNECTTIMEOUT => 8,
+        CURLOPT_TIMEOUT => max(6, $timeoutSec),
+        CURLOPT_USERAGENT => 'CPALNYA-SEO-NewsFetcher/1.0',
+        CURLOPT_HTTPHEADER => [
+            'Accept: application/rss+xml, application/xml, text/xml, application/atom+xml, text/plain;q=0.8, */*;q=0.5',
+        ],
+    ]);
+
+    $proxyEnabled = (bool)($proxy['enabled'] ?? false);
+    $proxyHost = trim((string)($proxy['host'] ?? ''));
+    $proxyPort = (int)($proxy['port'] ?? 0);
+    if ($proxyEnabled && $proxyHost !== '' && $proxyPort > 0) {
+        curl_setopt($ch, CURLOPT_PROXY, $proxyHost);
+        curl_setopt($ch, CURLOPT_PROXYPORT, $proxyPort);
+        $proxyType = strtolower(trim((string)($proxy['type'] ?? 'http')));
+        curl_setopt($ch, CURLOPT_PROXYTYPE, $proxyType === 'socks5' ? CURLPROXY_SOCKS5 : CURLPROXY_HTTP);
+        $proxyUsername = (string)($proxy['username'] ?? '');
+        $proxyPassword = (string)($proxy['password'] ?? '');
+        if ($proxyUsername !== '' || $proxyPassword !== '') {
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxyUsername . ':' . $proxyPassword);
+        }
+    }
+
+    $body = curl_exec($ch);
+    $err = curl_error($ch);
+    $http = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $contentType = (string)curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+    curl_close($ch);
+
+    $meta = [
+        'url' => $url,
+        'http' => $http,
+        'content_type' => $contentType,
+    ];
+
+    if ($body === false || $err !== '') {
+        throw new RuntimeException('News transport error: ' . $err);
+    }
+    if ($http < 200 || $http >= 300) {
+        throw new RuntimeException('News HTTP ' . $http . ' for ' . $url);
+    }
+    return (string)$body;
+}
+
+function seo_feed_item_source_label($node, string $fallback = ''): string
+{
+    if (is_object($node) && isset($node->source)) {
+        $source = trim((string)$node->source);
+        if ($source !== '') {
+            return $source;
+        }
+        if (isset($node->source->title)) {
+            $source = trim((string)$node->source->title);
+            if ($source !== '') {
+                return $source;
+            }
+        }
+    }
+    return trim($fallback);
+}
+
+function seo_parse_live_feed_items(string $xml): array
+{
+    $items = [];
+    $prev = libxml_use_internal_errors(true);
+    $feed = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+    libxml_clear_errors();
+    libxml_use_internal_errors($prev);
+    if (!$feed instanceof SimpleXMLElement) {
+        return [];
+    }
+
+    $channelSource = trim((string)($feed->channel->title ?? $feed->title ?? ''));
+    if (isset($feed->channel->item)) {
+        foreach ($feed->channel->item as $item) {
+            $title = trim(html_entity_decode(strip_tags((string)($item->title ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            $link = trim((string)($item->link ?? ''));
+            $publishedAt = trim((string)($item->pubDate ?? $item->date ?? ''));
+            $source = seo_feed_item_source_label($item, $channelSource);
+            if ($title === '' || $link === '') {
+                continue;
+            }
+            $items[] = [
+                'title' => $title,
+                'url' => $link,
+                'published_at' => $publishedAt,
+                'source' => $source,
+            ];
+        }
+    } elseif (isset($feed->entry)) {
+        foreach ($feed->entry as $entry) {
+            $title = trim(html_entity_decode(strip_tags((string)($entry->title ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            $link = '';
+            if (isset($entry->link)) {
+                foreach ($entry->link as $linkNode) {
+                    $attrs = $linkNode->attributes();
+                    $href = trim((string)($attrs['href'] ?? ''));
+                    if ($href !== '') {
+                        $link = $href;
+                        break;
+                    }
+                }
+            }
+            $publishedAt = trim((string)($entry->updated ?? $entry->published ?? ''));
+            $source = seo_feed_item_source_label($entry, $channelSource);
+            if ($title === '' || $link === '') {
+                continue;
+            }
+            $items[] = [
+                'title' => $title,
+                'url' => $link,
+                'published_at' => $publishedAt,
+                'source' => $source,
+            ];
+        }
+    }
+
+    return $items;
+}
+
+function seo_build_live_news_summary(array $items, string $lang): string
+{
+    if (empty($items)) {
+        return '';
+    }
+
+    $lines = [];
+    $i = 0;
+    foreach ($items as $item) {
+        $title = trim((string)($item['title'] ?? ''));
+        $url = trim((string)($item['url'] ?? ''));
+        if ($title === '' || $url === '') {
+            continue;
+        }
+        $source = trim((string)($item['source'] ?? ''));
+        $publishedAt = trim((string)($item['published_at'] ?? ''));
+        $prefix = $lang === 'ru' ? 'Свежее событие' : 'Fresh item';
+        $line = '- ' . $prefix . ': ' . $title;
+        if ($source !== '') {
+            $line .= ' | source=' . $source;
+        }
+        if ($publishedAt !== '') {
+            $line .= ' | published=' . $publishedAt;
+        }
+        $line .= ' | url=' . $url;
+        $lines[] = $line;
+        $i++;
+        if ($i >= 15) {
+            break;
+        }
+    }
+
+    return implode("\n", $lines);
+}
+
+function seo_fetch_live_news_context(array $cfg, string $lang, array $proxyCandidates, ?string &$usedProxyLabel = null): array
+{
+    static $runtimeCache = [];
+
+    $usedProxyLabel = null;
+    if (empty($cfg['signals_news_enabled'])) {
+        return ['items' => [], 'summary' => '', 'source' => 'disabled', 'cache_hit' => false];
+    }
+
+    $feeds = array_values(array_filter(array_map('trim', (array)($cfg['signals_news_feeds'] ?? []))));
+    if (empty($feeds)) {
+        $feeds = seo_live_news_default_feeds($lang);
+    }
+    $cacheKey = sha1(json_encode([
+        'lang' => $lang,
+        'feeds' => $feeds,
+        'limit' => (int)($cfg['signals_news_max_items'] ?? 12),
+        'lookback' => (int)($cfg['signals_news_lookback_hours'] ?? 96),
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    if (isset($runtimeCache[$cacheKey])) {
+        $usedProxyLabel = (string)($runtimeCache[$cacheKey]['used_proxy'] ?? 'runtime-cache');
+        $runtimeCache[$cacheKey]['cache_hit'] = true;
+        return $runtimeCache[$cacheKey];
+    }
+
+    $lookbackHours = max(6, min(336, (int)($cfg['signals_news_lookback_hours'] ?? 96)));
+    $maxItems = max(3, min(40, (int)($cfg['signals_news_max_items'] ?? 12)));
+    $timeoutSec = max(4, min(60, (int)($cfg['signals_news_timeout'] ?? 12)));
+    $cutoffTs = time() - ($lookbackHours * 3600);
+    $collected = [];
+    $errors = [];
+
+    foreach ($feeds as $feedUrl) {
+        $feedItems = [];
+        $candidatePool = $proxyCandidates;
+        if (count($candidatePool) > 1) {
+            shuffle($candidatePool);
+        }
+        foreach ($candidatePool as $candidate) {
+            $proxyLabel = seo_proxy_entry_label($candidate);
+            try {
+                $meta = null;
+                $xml = seo_http_get_text_with_proxy($feedUrl, $candidate, $timeoutSec, $meta);
+                $parsed = seo_parse_live_feed_items($xml);
+                if (!empty($parsed)) {
+                    $feedItems = $parsed;
+                    $usedProxyLabel = $proxyLabel;
+                    break;
+                }
+            } catch (Throwable $e) {
+                $errors[] = $proxyLabel . ': ' . $e->getMessage();
+            }
+        }
+
+        foreach ($feedItems as $item) {
+            $title = trim((string)($item['title'] ?? ''));
+            $url = trim((string)($item['url'] ?? ''));
+            if ($title === '' || $url === '') {
+                continue;
+            }
+            $publishedRaw = trim((string)($item['published_at'] ?? ''));
+            $publishedTs = $publishedRaw !== '' ? strtotime($publishedRaw) : false;
+            if ($publishedTs !== false && $publishedTs > 0 && $publishedTs < $cutoffTs) {
+                continue;
+            }
+            $dedupeKey = md5(mb_strtolower($title) . '|' . $url);
+            $collected[$dedupeKey] = [
+                'title' => $title,
+                'url' => $url,
+                'published_at' => $publishedRaw,
+                'published_ts' => $publishedTs !== false ? (int)$publishedTs : 0,
+                'source' => trim((string)($item['source'] ?? '')),
+            ];
+        }
+    }
+
+    $items = array_values($collected);
+    usort($items, static function (array $a, array $b): int {
+        return (int)($b['published_ts'] ?? 0) <=> (int)($a['published_ts'] ?? 0);
+    });
+    if (count($items) > $maxItems) {
+        $items = array_slice($items, 0, $maxItems);
+    }
+    foreach ($items as &$item) {
+        unset($item['published_ts']);
+    }
+    unset($item);
+
+    $result = [
+        'items' => $items,
+        'summary' => seo_build_live_news_summary($items, $lang),
+        'source' => !empty($items) ? 'live-rss' : 'live-empty',
+        'used_proxy' => (string)($usedProxyLabel ?? 'direct'),
+        'errors' => array_slice($errors, 0, 8),
+        'cache_hit' => false,
+    ];
+    $runtimeCache[$cacheKey] = $result;
+    return $result;
 }
 
 function seo_log_generation(mysqli $db, array $row): void
@@ -5091,7 +5377,8 @@ function seo_generate_article_payload(
     array $cfg = [],
     array $topicBans = [],
     string $topicAnalysisSummary = '',
-    array $internalLinks = []
+    array $internalLinks = [],
+    array $liveNews = []
 ): array
 {
     $isRu = $lang === 'ru';
@@ -5484,6 +5771,25 @@ function seo_generate_article_payload(
         $userPrompt .= "\nTopic coverage analysis snapshot:\n"
             . trim($topicAnalysisSummary) . "\n";
     }
+    $liveNewsSummary = trim((string)($liveNews['summary'] ?? ''));
+    $liveNewsItems = (array)($liveNews['items'] ?? []);
+    if ($liveNewsSummary !== '') {
+        if ($isRu) {
+            $userPrompt .= "\nСвежий внешний новостной контекст из интернета для этого материала:\n"
+                . $liveNewsSummary
+                . "\nИспользуй минимум 1-2 этих сигнала как фактическую основу статьи. Не пересказывай новости лентой: выбери один сильный угол и объясни, почему это важно для рынка, affiliate-операций, источников, платежей, комплаенса или поведения платформ.\n";
+        } else {
+            $userPrompt .= "\nFresh external news context from the internet for this article:\n"
+                . $liveNewsSummary
+                . "\nUse at least 1-2 of these signals as factual grounding. Do not rewrite them as a generic news digest: pick a strong angle and explain why it matters for operators, traffic sources, payments, compliance or platform behavior.\n";
+        }
+    } elseif (($cfg['campaign_material_section'] ?? '') === 'signals') {
+        if ($isRu) {
+            $userPrompt .= "\nЕсли свежий новостной контекст недоступен, все равно пиши как сигнальную статью: не общий обзор, а разбор последствий и план действий для команды.\n";
+        } else {
+            $userPrompt .= "\nIf fresh news context is unavailable, still write as a signal article: not a generic overview, but an impact analysis with an action plan.\n";
+        }
+    }
 
     if ($isRu) {
         $userPrompt .= "\n\nР”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ С‚СЂРµР±РѕРІР°РЅРёРµ РїРѕ С‚РѕРЅСѓ: РёСЃРїРѕР»СЊР·СѓР№ РЅР°СЃС‚СЂРѕРµРЅРёРµ '{$moodLabel}' Рё РїСЂРѕСЏРІР»СЏР№ РµРіРѕ С‡РµСЂРµР· Р»РµРєСЃРёРєСѓ, РїСЂРёРјРµСЂС‹ Рё РїРѕРґР°С‡Сѓ, СЃРѕС…СЂР°РЅСЏСЏ РїСЂР°РєС‚РёС‡РµСЃРєСѓСЋ РїРѕР»СЊР·Сѓ Рё РєРѕРјРјРµСЂС‡РµСЃРєРёР№ С„РѕРєСѓСЃ.";
@@ -5519,6 +5825,7 @@ function seo_generate_article_payload(
         'system_prompt' => $systemPrompt,
         'user_prompt' => $userPrompt,
         'related' => $related,
+        'live_news_count' => count($liveNewsItems),
         'structure' => $structure,
         'cluster_seed' => $cluster,
         'cluster_code' => $clusterCode,
@@ -5734,6 +6041,19 @@ function seo_publish_article(
         seo_fetch_services_links($db, $lang, $domainForLang, 20),
         seo_fetch_projects_links($db, $lang, $domainForLang, 20)
     );
+    $liveNewsContext = [];
+    if (strtolower(trim((string)($cfg['campaign_material_section'] ?? ''))) === 'signals') {
+        $liveNewsProxyLabel = null;
+        $liveNewsContext = seo_fetch_live_news_context($cfg, $lang, $proxyCandidates, $liveNewsProxyLabel);
+        if (is_string($liveNewsProxyLabel) && $liveNewsProxyLabel !== '') {
+            seo_echo('Lang ' . $lang . ': live_news ' . (string)($liveNewsContext['source'] ?? 'unknown')
+                . ', items=' . count((array)($liveNewsContext['items'] ?? []))
+                . ', proxy=' . $liveNewsProxyLabel);
+        } else {
+            seo_echo('Lang ' . $lang . ': live_news ' . (string)($liveNewsContext['source'] ?? 'unknown')
+                . ', items=' . count((array)($liveNewsContext['items'] ?? [])));
+        }
+    }
     $payload = seo_generate_article_payload(
         $recent,
         $lang,
@@ -5742,7 +6062,8 @@ function seo_publish_article(
         $cfg,
         (array)($topicAnalysis['topic_bans'] ?? []),
         (string)($topicAnalysis['analysis_summary'] ?? ''),
-        $internalLinks
+        $internalLinks,
+        $liveNewsContext
     );
     $proxyMode = seo_proxy_mode_label($cfg, $proxyCandidates);
     if (count($proxyCandidates) > 1) {
@@ -6230,6 +6551,20 @@ $cfg = [
     'topic_analysis_limit' => 120,
     'topic_analysis_system_prompt' => '',
     'topic_analysis_user_prompt_append' => '',
+    'signals_news_enabled' => true,
+    'signals_news_max_items' => 12,
+    'signals_news_lookback_hours' => 96,
+    'signals_news_timeout' => 12,
+    'signals_news_feeds' => [
+        'https://news.google.com/rss/search?q=affiliate+marketing+OR+digital+advertising+policy&hl=ru&gl=RU&ceid=RU:ru',
+        'https://news.google.com/rss/search?q=traffic+arbitrage+OR+adtech+regulation&hl=ru&gl=RU&ceid=RU:ru',
+        'https://news.google.com/rss/search?q=Russia+business+news+law+digital&hl=ru&gl=RU&ceid=RU:ru',
+        'https://news.google.com/rss/search?q=Russia+legislation+advertising+internet&hl=ru&gl=RU&ceid=RU:ru',
+        'https://news.google.com/rss/search?q=crypto+market+regulation+exchange&hl=ru&gl=RU&ceid=RU:ru',
+        'https://news.google.com/rss/search?q=stock+market+business+analysis+Russia&hl=ru&gl=RU&ceid=RU:ru',
+        'https://news.google.com/rss/search?q=politics+business+sanctions+payments+Russia&hl=ru&gl=RU&ceid=RU:ru',
+        'https://news.google.com/rss/search?q=telegram+policy+monetization+news&hl=ru&gl=RU&ceid=RU:ru',
+    ],
     'styles_en' => [],
     'styles_ru' => [],
     'clusters_en' => [],

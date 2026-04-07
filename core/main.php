@@ -173,6 +173,7 @@ class Render {
 		$publicProjectsLib = $LibsPath.'public_projects.php';
 		$publicCasesLib = $LibsPath.'public_cases.php';
 		$examplesPopularityLib = $LibsPath.'examples_popularity.php';
+		$footerSeoBlocksLib = $LibsPath.'footer_seo_blocks.php';
 		if (file_exists($analyticsLib)) {
 			include_once($analyticsLib);
 		}
@@ -208,6 +209,9 @@ class Render {
 		}
 		if (file_exists($examplesPopularityLib)) {
 			include_once($examplesPopularityLib);
+		}
+		if (file_exists($footerSeoBlocksLib)) {
+			include_once($footerSeoBlocksLib);
 		}
 		$FRMWRK = new FRMWRK();
 		$GLOBAL['main_lib']=$LibName;

@@ -5,6 +5,14 @@ $t = static function (string $ru, string $en) use ($isRu): string {
     return $isRu ? $ru : $en;
 };
 $year = date('Y');
+$footerSeoBlock = null;
+if (isset($FRMWRK) && is_object($FRMWRK) && method_exists($FRMWRK, 'DB') && function_exists('footer_seo_blocks_fetch_random')) {
+    $db = $FRMWRK->DB();
+    $currentSection = function_exists('footer_seo_blocks_detect_section')
+        ? footer_seo_blocks_detect_section((string)($_SERVER['REQUEST_URI'] ?? '/'))
+        : 'all';
+    $footerSeoBlock = footer_seo_blocks_fetch_random($db, (string)$host, $isRu ? 'ru' : 'en', $currentSection);
+}
 $sectionTitles = [
     'journal' => $t('Журнал', 'Journal'),
     'playbooks' => $t('Практика', 'Playbooks'),
@@ -106,6 +114,18 @@ $footerSections = [
 ];
 ?>
 <div class="public-layout-footer public-layout-footer--simple">
+    <?php if (is_array($footerSeoBlock)): ?>
+        <?php $footerSeoStyle = trim((string)($footerSeoBlock['style_variant'] ?? 'editorial-note')); ?>
+        <section class="public-footer-seo-block public-footer-seo-block--<?= htmlspecialchars($footerSeoStyle, ENT_QUOTES, 'UTF-8') ?>">
+            <?php if (trim((string)($footerSeoBlock['block_kicker'] ?? '')) !== ''): ?>
+                <span class="public-footer-seo-kicker"><?= htmlspecialchars((string)$footerSeoBlock['block_kicker'], ENT_QUOTES, 'UTF-8') ?></span>
+            <?php endif; ?>
+            <?php if (trim((string)($footerSeoBlock['block_title'] ?? '')) !== ''): ?>
+                <h3><?= htmlspecialchars((string)$footerSeoBlock['block_title'], ENT_QUOTES, 'UTF-8') ?></h3>
+            <?php endif; ?>
+            <div class="public-footer-seo-body"><?= (string)($footerSeoBlock['body_html'] ?? '') ?></div>
+        </section>
+    <?php endif; ?>
     <footer class="public-editorial-footer site-footer">
         <div class="public-editorial-footer-top">
             <div class="public-editorial-intro">
@@ -146,6 +166,15 @@ $footerSections = [
 
 <style>
 .public-layout-footer{max-width:1240px;margin:28px auto 22px;padding:0 18px}
+.public-footer-seo-block{margin:0 0 18px;padding:24px 26px;border:1px solid rgba(127,164,223,.22);background:linear-gradient(180deg,rgba(8,14,28,.84),rgba(6,11,22,.76));box-shadow:var(--shell-shadow)}
+.public-footer-seo-kicker{display:inline-flex;align-items:center;padding:8px 12px;margin-bottom:12px;border:1px solid rgba(127,164,223,.18);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b8c7dc}
+.public-footer-seo-block h3{margin:0 0 12px;font:700 1.7rem/1.02 "Space Grotesk","Sora",sans-serif;color:#edf3fb;letter-spacing:-.04em}
+.public-footer-seo-body{display:grid;gap:12px;color:#aabbd2;line-height:1.74}
+.public-footer-seo-body p{margin:0}
+.public-footer-seo-block--mini-story{background:linear-gradient(180deg,rgba(10,15,27,.9),rgba(15,18,31,.78))}
+.public-footer-seo-block--allegory{background:radial-gradient(circle at 18% 10%,rgba(244,213,107,.08),transparent 28%),linear-gradient(180deg,rgba(8,14,28,.88),rgba(7,11,20,.78))}
+.public-footer-seo-block--memo{background:linear-gradient(180deg,rgba(7,12,24,.88),rgba(5,9,18,.8))}
+.public-footer-seo-block--field-note{background:radial-gradient(circle at 82% 18%,rgba(120,223,255,.08),transparent 24%),linear-gradient(180deg,rgba(8,14,28,.84),rgba(6,11,22,.76))}
 .public-editorial-footer{padding:24px;border:1px solid rgba(127,164,223,.22);border-radius:0;background:rgba(8,14,28,.82);backdrop-filter:blur(10px)}
 .public-editorial-footer-top{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:28px}
 .public-editorial-kicker{display:inline-flex;align-items:center;padding:8px 12px;border:1px solid rgba(127,164,223,.2);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b8c7dc}

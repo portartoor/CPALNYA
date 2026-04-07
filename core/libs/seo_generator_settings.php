@@ -409,6 +409,20 @@ if (!function_exists('seo_gen_settings_default')) {
             'topic_analysis_limit' => 120,
             'topic_analysis_system_prompt' => '',
             'topic_analysis_user_prompt_append' => '',
+            'signals_news_enabled' => true,
+            'signals_news_max_items' => 12,
+            'signals_news_lookback_hours' => 96,
+            'signals_news_timeout' => 12,
+            'signals_news_feeds' => [
+                'https://news.google.com/rss/search?q=affiliate+marketing+OR+digital+advertising+policy&hl=ru&gl=RU&ceid=RU:ru',
+                'https://news.google.com/rss/search?q=traffic+arbitrage+OR+adtech+regulation&hl=ru&gl=RU&ceid=RU:ru',
+                'https://news.google.com/rss/search?q=Russia+business+news+law+digital&hl=ru&gl=RU&ceid=RU:ru',
+                'https://news.google.com/rss/search?q=Russia+legislation+advertising+internet&hl=ru&gl=RU&ceid=RU:ru',
+                'https://news.google.com/rss/search?q=crypto+market+regulation+exchange&hl=ru&gl=RU&ceid=RU:ru',
+                'https://news.google.com/rss/search?q=stock+market+business+analysis+Russia&hl=ru&gl=RU&ceid=RU:ru',
+                'https://news.google.com/rss/search?q=politics+business+sanctions+payments+Russia&hl=ru&gl=RU&ceid=RU:ru',
+                'https://news.google.com/rss/search?q=telegram+policy+monetization+news&hl=ru&gl=RU&ceid=RU:ru',
+            ],
 
             'styles_en' => ['editorial breakdown', 'trend memo', 'operator playbook', 'step-by-step tutorial'],
             'styles_ru' => ['редакционный разбор', 'пошаговый how-to', 'операционный playbook', 'аналитический'],
@@ -702,6 +716,10 @@ if (!function_exists('seo_gen_settings_normalize')) {
         $settings['expand_context_chars'] = max(1000, min(120000, (int)$settings['expand_context_chars']));
         $settings['openai_timeout'] = max(20, min(600, (int)$settings['openai_timeout']));
         $settings['topic_analysis_limit'] = max(20, min(1000, (int)$settings['topic_analysis_limit']));
+        $settings['signals_news_enabled'] = array_key_exists('signals_news_enabled', $settings) ? (bool)$settings['signals_news_enabled'] : true;
+        $settings['signals_news_max_items'] = max(3, min(40, (int)($settings['signals_news_max_items'] ?? 12)));
+        $settings['signals_news_lookback_hours'] = max(6, min(336, (int)($settings['signals_news_lookback_hours'] ?? 96)));
+        $settings['signals_news_timeout'] = max(4, min(60, (int)($settings['signals_news_timeout'] ?? 12)));
         $settings['narrative_person'] = strtolower(trim((string)($settings['narrative_person'] ?? 'first_person_singular')));
         if (!in_array($settings['narrative_person'], ['first_person_singular', 'first_person_plural', 'neutral'], true)) {
             $settings['narrative_person'] = 'first_person_singular';
@@ -792,6 +810,10 @@ if (!function_exists('seo_gen_settings_normalize')) {
         $settings['openai_headers'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['openai_headers']), 100);
         $settings['openai_proxy_pool'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['openai_proxy_pool']), 300);
         $settings['preview_image_style_options'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['preview_image_style_options']), 60);
+        $settings['signals_news_feeds'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['signals_news_feeds'] ?? [])), 80);
+        if (empty($settings['signals_news_feeds'])) {
+            $settings['signals_news_feeds'] = (array)($defaults['signals_news_feeds'] ?? []);
+        }
         $settings['campaigns'] = seo_gen_normalize_campaigns($settings['campaigns'] ?? []);
         $indexNowHosts = seo_gen_settings_parse_lines(implode("\n", (array)($settings['indexnow_hosts'] ?? [])), 40);
         if (empty($indexNowHosts)) {
