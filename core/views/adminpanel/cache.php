@@ -3,6 +3,7 @@ $settings = is_array($pageHtmlCacheSettings ?? null) ? $pageHtmlCacheSettings : 
 $stats = is_array($pageHtmlCacheStats ?? null) ? $pageHtmlCacheStats : page_html_cache_stats();
 
 $excludedText = implode("\n", (array)($settings['excluded_prefixes'] ?? []));
+$dynamicText = implode("\n", (array)($settings['dynamic_prefixes'] ?? []));
 $ttlRows = [];
 foreach ((array)($settings['ttl_by_prefix'] ?? []) as $prefix => $ttl) {
     $ttlRows[] = (string)$prefix . ' | ' . (int)$ttl;
@@ -77,6 +78,11 @@ $ttlText = implode("\n", $ttlRows);
                     <div class="form-text">Examples: <code>/adminpanel/</code>, <code>/api/</code>, <code>/audit/</code>.</div>
                 </div>
                 <div class="col-md-12">
+                    <label class="form-label">Dynamic / randomized prefixes (do not cache)</label>
+                    <textarea class="form-control font-monospace" rows="4" name="dynamic_prefixes"><?= htmlspecialchars($dynamicText, ENT_QUOTES, 'UTF-8') ?></textarea>
+                    <div class="form-text">Use this for pages with random content blocks or content that must stay live. Example: <code>/</code></div>
+                </div>
+                <div class="col-md-12">
                     <label class="form-label">TTL by prefix (prefix | ttl_seconds)</label>
                     <textarea class="form-control font-monospace" rows="8" name="ttl_by_prefix"><?= htmlspecialchars($ttlText, ENT_QUOTES, 'UTF-8') ?></textarea>
                     <div class="form-text">Example: <code>/blog/ | 600</code></div>
@@ -120,4 +126,3 @@ $ttlText = implode("\n", $ttlRows);
         </div>
     </div>
 </div>
-

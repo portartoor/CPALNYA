@@ -7140,12 +7140,17 @@ if (!empty($cfg['notify_daily_schedule']) && $newScheduledSlots > 0 && !empty($s
     seo_notify_telegram_schedule_summary($jobDate, $scheduleForSummary);
 }
 
-if (!$runtime['dry_run'] && $generated > 0 && function_exists('page_html_cache_purge_prefix')) {
+if (!$runtime['dry_run'] && $generated > 0) {
     $purged = 0;
-    $purged += page_html_cache_purge_prefix('/');
-    $purged += page_html_cache_purge_prefix('/journal/');
-    $purged += page_html_cache_purge_prefix('/services/');
-    $purged += page_html_cache_purge_prefix('/projects/');
+    if (function_exists('page_html_cache_purge_content_routes')) {
+        $purged += page_html_cache_purge_content_routes();
+    } elseif (function_exists('page_html_cache_purge_prefix')) {
+        $purged += page_html_cache_purge_prefix('/');
+        $purged += page_html_cache_purge_prefix('/journal/');
+        $purged += page_html_cache_purge_prefix('/playbooks/');
+        $purged += page_html_cache_purge_prefix('/signals/');
+        $purged += page_html_cache_purge_prefix('/fun/');
+    }
     seo_echo('HTML cache purge after generation: deleted=' . (int)$purged);
 }
 

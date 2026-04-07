@@ -68,10 +68,25 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             }
         }
 
+        $dynamicRaw = trim((string)($_POST['dynamic_prefixes'] ?? ''));
+        $dynamicPrefixes = [];
+        if ($dynamicRaw !== '') {
+            $lines = preg_split('/\r\n|\r|\n/', $dynamicRaw);
+            if (is_array($lines)) {
+                foreach ($lines as $line) {
+                    $line = page_html_cache_normalize_prefix((string)$line);
+                    if ($line !== '') {
+                        $dynamicPrefixes[$line] = true;
+                    }
+                }
+            }
+        }
+
         $incoming = [
             'enabled' => $enabled,
             'default_ttl' => $defaultTtl,
             'excluded_prefixes' => array_keys($excludedPrefixes),
+            'dynamic_prefixes' => array_keys($dynamicPrefixes),
             'ttl_by_prefix' => $ttlByPrefix,
             'max_file_size' => $maxFileSize,
         ];
@@ -102,4 +117,3 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 }
 
 $pageHtmlCacheStats = page_html_cache_stats();
-

@@ -6,6 +6,10 @@ require_once DIR . 'core/config.php';
 require_once DIR . 'core/libs/frmwrk/frmwrk.php';
 require_once DIR . 'core/controls/examples/_common.php';
 require_once DIR . 'core/libs/examples_popularity.php';
+$pageHtmlCacheLib = DIR . 'core/libs/page_html_cache.php';
+if (is_file($pageHtmlCacheLib)) {
+    require_once $pageHtmlCacheLib;
+}
 
 function popularity_echo(string $message): void
 {
@@ -52,7 +56,9 @@ foreach ((array)$articles as $row) {
     $slug = trim((string)($row['slug'] ?? ''));
     $cluster = trim((string)($row['cluster_code'] ?? ''));
     $section = trim((string)($row['material_section'] ?? 'journal'));
-    $section = $section === 'playbooks' ? 'playbooks' : 'journal';
+    if (!in_array($section, ['journal', 'playbooks', 'signals', 'fun'], true)) {
+        $section = 'journal';
+    }
     if ($articleId <= 0 || $slug === '') {
         continue;
     }
@@ -162,4 +168,8 @@ foreach ($clusterAgg as $row) {
 
 popularity_echo('Rebuilt article popularity rows: ' . count($articleRows));
 popularity_echo('Rebuilt cluster popularity rows: ' . count($clusterAgg));
+if (function_exists('page_html_cache_purge_content_routes')) {
+    $purged = page_html_cache_purge_content_routes();
+    popularity_echo('HTML cache purge after popularity rebuild: deleted=' . (int)$purged);
+}
 exit(0);

@@ -36,9 +36,15 @@ if (!function_exists('page_html_cache_defaults')) {
                 '/audit/',
                 '/audit',
             ],
+            'dynamic_prefixes' => [
+                '/',
+            ],
             'ttl_by_prefix' => [
                 '/' => 120,
                 '/journal/' => 600,
+                '/playbooks/' => 600,
+                '/signals/' => 300,
+                '/fun/' => 300,
                 '/services/' => 900,
                 '/projects/' => 900,
                 '/cases/' => 900,
@@ -82,6 +88,16 @@ if (!function_exists('page_html_cache_normalize')) {
             $excluded[$normalized] = true;
         }
         $settings['excluded_prefixes'] = array_keys($excluded);
+
+        $dynamic = [];
+        foreach ((array)($settings['dynamic_prefixes'] ?? []) as $prefix) {
+            $normalized = page_html_cache_normalize_prefix((string)$prefix);
+            if ($normalized === '') {
+                continue;
+            }
+            $dynamic[$normalized] = true;
+        }
+        $settings['dynamic_prefixes'] = array_keys($dynamic);
 
         $ttlByPrefix = [];
         foreach ((array)($settings['ttl_by_prefix'] ?? []) as $prefix => $ttl) {
@@ -277,6 +293,10 @@ if (!function_exists('page_html_cache_is_cacheable')) {
         }
         $excluded = (array)($settings['excluded_prefixes'] ?? []);
         if (page_html_cache_path_matches_prefixes($path, $excluded)) {
+            return false;
+        }
+        $dynamic = (array)($settings['dynamic_prefixes'] ?? []);
+        if (page_html_cache_path_matches_prefixes($path, $dynamic)) {
             return false;
         }
         $query = (string)($ctx['query'] ?? '');
@@ -546,6 +566,32 @@ if (!function_exists('page_html_cache_purge_url')) {
         }
         if (is_file($paths['html']) && @unlink($paths['html'])) {
             $deleted++;
+        }
+        return $deleted;
+    }
+}
+
+if (!function_exists('page_html_cache_purge_content_routes')) {
+    function page_html_cache_purge_content_routes(array $prefixes = []): int
+    {
+        $defaults = [
+            '/',
+            '/journal/',
+            '/playbooks/',
+            '/signals/',
+            '/fun/',
+        ];
+        $targets = [];
+        foreach (array_merge($defaults, $prefixes) as $prefix) {
+            $normalized = page_html_cache_normalize_prefix((string)$prefix);
+            if ($normalized === '') {
+                continue;
+            }
+            $targets[$normalized] = true;
+        }
+        $deleted = 0;
+        foreach (array_keys($targets) as $prefix) {
+            $deleted += page_html_cache_purge_prefix($prefix);
         }
         return $deleted;
     }

@@ -11,6 +11,10 @@ $seoSettingsLib = DIR . '/core/libs/seo_generator_settings.php';
 if (is_file($seoSettingsLib)) {
     require_once $seoSettingsLib;
 }
+$pageHtmlCacheLib = DIR . '/core/libs/page_html_cache.php';
+if (is_file($pageHtmlCacheLib)) {
+    require_once $pageHtmlCacheLib;
+}
 $indexNowLib = DIR . '/core/libs/indexnow.php';
 if (is_file($indexNowLib)) {
     require_once $indexNowLib;
@@ -156,6 +160,27 @@ function admin_examples_indexnow_enqueue(mysqli $DB, string $url, string $langCo
     ]);
 }
 
+function admin_examples_purge_cache_for_article(mysqli $DB, string $publicUrl = '', string $section = 'journal'): void
+{
+    if (!function_exists('page_html_cache_purge_content_routes')) {
+        return;
+    }
+    $prefixMap = [
+        'journal' => '/journal/',
+        'playbooks' => '/playbooks/',
+        'signals' => '/signals/',
+        'fun' => '/fun/',
+    ];
+    $prefixes = [];
+    if (isset($prefixMap[$section])) {
+        $prefixes[] = $prefixMap[$section];
+    }
+    page_html_cache_purge_content_routes($prefixes);
+    if ($publicUrl !== '' && function_exists('page_html_cache_purge_url')) {
+        page_html_cache_purge_url($publicUrl);
+    }
+}
+
 if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
     $action = (string)($_POST['action'] ?? '');
     $hasLangColumn = examples_table_has_lang_column($DB);
@@ -208,7 +233,7 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
             }
 
             if ($articleId > 0) {
-                $existingRows = $FRMWRK->DBRecords("SELECT id, slug, domain_host, " . ($hasLangColumn ? "lang_code," : "'en' AS lang_code,") . ($hasClusterColumn ? "cluster_code" : "'' AS cluster_code") . " FROM examples_articles WHERE id = " . (int)$articleId . " LIMIT 1");
+                $existingRows = $FRMWRK->DBRecords("SELECT id, slug, domain_host, " . ($hasLangColumn ? "lang_code," : "'en' AS lang_code,") . ($hasClusterColumn ? "cluster_code," : "'' AS cluster_code,") . ($hasSectionColumn ? "material_section" : "'journal' AS material_section") . " FROM examples_articles WHERE id = " . (int)$articleId . " LIMIT 1");
                 $oldUrl = '';
                 if (!empty($existingRows)) {
                     $old = $existingRows[0];
@@ -243,8 +268,12 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
                     $newUrl = admin_examples_public_url($domainHost, $langCode, $slug, $newClusterCode, $materialSection);
                     if ($oldUrl !== '' && $oldUrl !== $newUrl) {
                         admin_examples_indexnow_enqueue($DB, $oldUrl, $langCode, 'update');
+                        admin_examples_purge_cache_for_article($DB, $oldUrl, (string)($old['material_section'] ?? 'journal'));
                     }
                     admin_examples_indexnow_enqueue($DB, $newUrl, $langCode, 'update');
+                    admin_examples_purge_cache_for_article($DB, $newUrl, $materialSection);
+                } elseif ($oldUrl !== '') {
+                    admin_examples_purge_cache_for_article($DB, $oldUrl, (string)($old['material_section'] ?? 'journal'));
                 }
                 $message = 'Article updated.';
                 $messageType = 'success';
@@ -266,6 +295,7 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
                     }
                     $newUrl = admin_examples_public_url($domainHost, $langCode, $slug, $newClusterCode, $materialSection);
                     admin_examples_indexnow_enqueue($DB, $newUrl, $langCode, 'publish');
+                    admin_examples_purge_cache_for_article($DB, $newUrl, $materialSection);
                 }
                 $message = 'Article created.';
                 $messageType = 'success';
@@ -274,7 +304,7 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
     } elseif ($action === 'delete_article') {
         $articleId = (int)($_POST['article_id'] ?? 0);
         if ($articleId > 0) {
-            $rows = $FRMWRK->DBRecords("SELECT slug, domain_host, " . ($hasLangColumn ? "lang_code," : "'en' AS lang_code,") . ($hasClusterColumn ? "cluster_code" : "'' AS cluster_code") . " FROM examples_articles WHERE id = {$articleId} LIMIT 1");
+            $rows = $FRMWRK->DBRecords("SELECT slug, domain_host, " . ($hasLangColumn ? "lang_code," : "'en' AS lang_code,") . ($hasClusterColumn ? "cluster_code," : "'' AS cluster_code,") . ($hasSectionColumn ? "material_section" : "'journal' AS material_section") . " FROM examples_articles WHERE id = {$articleId} LIMIT 1");
             $deletedUrl = '';
             $deletedLang = 'en';
             if (!empty($rows)) {
@@ -285,6 +315,7 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
             mysqli_query($DB, "DELETE FROM examples_articles WHERE id = {$articleId} LIMIT 1");
             if ($deletedUrl !== '') {
                 admin_examples_indexnow_enqueue($DB, $deletedUrl, $deletedLang, 'delete');
+                admin_examples_purge_cache_for_article($DB, $deletedUrl, (string)($row['material_section'] ?? 'journal'));
             }
             $message = 'Article deleted.';
             $messageType = 'success';
