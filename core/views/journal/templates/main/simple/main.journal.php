@@ -59,15 +59,21 @@ if ($selected) {
 .jrnl-copy{display:grid;gap:16px}
 .jrnl-copy h1,.jrnl-copy h2,.jrnl-detail h1,.jrnl-related h2{margin:0;font:700 clamp(2.1rem,4.2vw,4.1rem)/.98 "Space Grotesk","Sora",sans-serif;letter-spacing:-.055em}
 .jrnl-copy p,.jrnl-detail p,.jrnl-card p{margin:0;color:var(--shell-muted);line-height:1.75}
-.jrnl-cover{min-height:320px;border:1px solid rgba(255,255,255,.08);background:
+.jrnl-cover{min-height:0;border:1px solid rgba(255,255,255,.08);background:
 radial-gradient(circle at 50% 22%,rgba(103,200,255,.16),transparent 26%),
 linear-gradient(180deg,rgba(6,11,20,.96),rgba(4,8,16,.92));
-display:flex;align-items:flex-end;justify-content:flex-start;overflow:hidden;position:relative}
-.jrnl-cover-button{padding:0;cursor:zoom-in;width:100%;text-align:left;appearance:none}
-.jrnl-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center center;padding:18px 14px 0}
+display:block;align-self:start;overflow:hidden;position:relative}
+.jrnl-cover::before,.jrnl-cover::after{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:0}
+.jrnl-cover::before{background:
+radial-gradient(circle at 0% 50%,rgba(99,244,255,.95) 0,rgba(99,244,255,.22) 12%,transparent 24%),
+radial-gradient(circle at 100% 50%,rgba(109,255,200,.88) 0,rgba(109,255,200,.18) 10%,transparent 22%);
+filter:blur(8px) saturate(1.15)}
+.jrnl-cover::after{inset:0;border:1px solid rgba(121,196,255,.16);box-shadow:0 0 0 1px rgba(105,196,255,.05) inset}
+.jrnl-cover-button{display:block;padding:0;cursor:zoom-in;width:100%;text-align:left;appearance:none;line-height:0}
+.jrnl-cover-button:hover::before,.jrnl-cover-button:focus-visible::before{opacity:1;animation:jrnlBorderFireflies 3.6s linear infinite}
+.jrnl-cover-button:hover::after,.jrnl-cover-button:focus-visible::after{border-color:rgba(122,214,255,.38);box-shadow:0 0 24px rgba(74,205,255,.22),0 0 52px rgba(58,255,198,.12),0 0 0 1px rgba(105,196,255,.1) inset}
+.jrnl-cover img{position:relative;display:block;width:100%;height:auto;max-width:none;object-fit:contain;object-position:center center;padding:0;transform-origin:50% 0;animation:jrnlCoverIntro 1.15s cubic-bezier(.16,1,.3,1) both}
 .jrnl-cover-note{position:relative;z-index:1;max-width:22ch;margin:18px;padding:14px 16px;background:rgba(4,9,18,.78);border:1px solid rgba(122,180,255,.18);font:700 1rem/1.35 "Space Grotesk","Sora",sans-serif}
-.jrnl-cover-hotspot{position:absolute;right:18px;top:18px;z-index:2;display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(5,10,18,.56);backdrop-filter:blur(16px);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#eef6ff;box-shadow:0 12px 30px rgba(2,7,20,.35)}
-.jrnl-cover-hotspot::before{content:"";width:10px;height:10px;border-radius:999px;background:linear-gradient(135deg,#9cf7ff,#66ffc6);box-shadow:0 0 18px rgba(102,255,198,.9)}
 .jrnl-tags{display:flex;flex-wrap:wrap;gap:10px}
 .jrnl-tag{color:var(--shell-muted);text-decoration:none}
 .jrnl-tag.is-active,.jrnl-tag:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
@@ -90,7 +96,7 @@ display:flex;align-items:flex-end;justify-content:flex-start;overflow:hidden;pos
 .jrnl-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border:1px solid rgba(122,180,255,.18);background:linear-gradient(135deg,rgba(115,184,255,.22),rgba(39,223,192,.18));color:var(--shell-text);text-decoration:none;font-weight:700}
 .jrnl-related-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .jrnl-empty{text-align:center}
-.jrnl-lightbox{position:fixed;inset:0;z-index:50000;display:grid;place-items:center;padding:clamp(16px,4vw,48px);pointer-events:none;opacity:0;visibility:hidden;transition:opacity .52s ease,visibility .52s ease}
+.jrnl-lightbox{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:clamp(16px,4vw,48px);pointer-events:none;opacity:0;visibility:hidden;transition:opacity .52s ease,visibility .52s ease}
 .jrnl-lightbox.is-open{opacity:1;visibility:visible;pointer-events:auto}
 .jrnl-lightbox-backdrop{position:absolute;inset:0;background:
 radial-gradient(circle at 50% 45%,rgba(91,210,255,.18),transparent 22%),
@@ -137,8 +143,20 @@ pointer-events:none}
 38%{opacity:1;transform:translateY(8px) scale(.98) rotateX(0deg) rotate(-1deg);clip-path:polygon(0 4%,100% 0,100% 100%,0 96%)}
 100%{opacity:0;transform:translateY(42px) scale(.8) rotateX(20deg) rotate(6deg);clip-path:polygon(50% 50%,50% 50%,50% 50%,50% 50%)}
 }
+@keyframes jrnlCoverIntro{
+0%{opacity:0;transform:translateY(28px) scale(.965);filter:blur(14px) saturate(.86)}
+55%{opacity:1;transform:translateY(0) scale(1.006);filter:blur(0) saturate(1)}
+100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0) saturate(1)}
+}
+@keyframes jrnlBorderFireflies{
+0%{background-position:-14% 0,114% 100%}
+25%{background-position:30% 0,70% 100%}
+50%{background-position:112% 0,-12% 100%}
+75%{background-position:70% 0,26% 100%}
+100%{background-position:-14% 0,114% 100%}
+}
 @media (max-width:1180px){.jrnl-hero,.jrnl-grid,.jrnl-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.jrnl-hero{grid-template-columns:1fr}}
-@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}.jrnl-copy h1,.jrnl-copy h2,.jrnl-detail h1{font-size:clamp(2rem,12vw,3.2rem)}.jrnl-lightbox-frame{padding:12px;border-radius:24px}.jrnl-lightbox-close{right:12px;top:12px;width:48px;height:48px}.jrnl-cover-hotspot{right:12px;top:12px;padding:8px 12px}}
+@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}.jrnl-copy h1,.jrnl-copy h2,.jrnl-detail h1{font-size:clamp(2rem,12vw,3.2rem)}.jrnl-lightbox-frame{padding:12px;border-radius:24px}.jrnl-lightbox-close{right:12px;top:12px;width:48px;height:48px}}
 </style>
 
 <section class="jrnl">
@@ -201,8 +219,6 @@ pointer-events:none}
                     aria-label="<?= htmlspecialchars($t('Открыть обложку выпуска', 'Open issue cover'), ENT_QUOTES, 'UTF-8') ?>"
                 >
                     <?php if ($issueImage !== ''): ?><img src="<?= htmlspecialchars($issueImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($issue['issue_title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?>
-                    <span class="jrnl-cover-hotspot"><?= htmlspecialchars($t('Full cover', 'Full cover'), ENT_QUOTES, 'UTF-8') ?></span>
-                    <?php if (!empty($issue['hero_note'])): ?><div class="jrnl-cover-note"><?= htmlspecialchars((string)$issue['hero_note'], ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
                 </button>
             </header>
 
@@ -281,18 +297,21 @@ pointer-events:none}
 
 <script>
 (function () {
-    var trigger = document.querySelector('[data-jrnl-cover-open]');
     var lightbox = document.getElementById('jrnlCoverLightbox');
     var image = document.getElementById('jrnlCoverLightboxImage');
-    if (!trigger || !lightbox || !image) {
+    if (!lightbox || !image) {
         return;
     }
 
-    var closeNodes = lightbox.querySelectorAll('[data-jrnl-cover-close]');
     var lastActive = null;
     var closingTimer = null;
     var isOpen = false;
     var scrollY = 0;
+    var activeTrigger = null;
+
+    if (lightbox.parentNode !== document.body) {
+        document.body.appendChild(lightbox);
+    }
 
     function lockScroll(lock) {
         if (lock) {
@@ -317,13 +336,14 @@ pointer-events:none}
         window.scrollTo(0, scrollY);
     }
 
-    function openLightbox(event) {
+    function openLightbox(trigger, event) {
         if (event) {
             event.preventDefault();
         }
-        if (isOpen) {
+        if (isOpen || !trigger) {
             return;
         }
+        activeTrigger = trigger;
         lastActive = document.activeElement;
         image.src = trigger.getAttribute('data-jrnl-cover-src') || '';
         image.alt = trigger.getAttribute('data-jrnl-cover-alt') || '';
@@ -349,6 +369,7 @@ pointer-events:none}
         lightbox.setAttribute('aria-hidden', 'true');
         image.src = '';
         image.alt = '';
+        activeTrigger = null;
         lockScroll(false);
         isOpen = false;
         if (lastActive && typeof lastActive.focus === 'function') {
@@ -369,9 +390,21 @@ pointer-events:none}
         closingTimer = setTimeout(finishClose, 720);
     }
 
-    trigger.addEventListener('click', openLightbox);
-    Array.prototype.forEach.call(closeNodes, function (node) {
-        node.addEventListener('click', closeLightbox);
+    document.addEventListener('click', function (event) {
+        var openTrigger = event.target.closest('[data-jrnl-cover-open]');
+        if (openTrigger) {
+            openLightbox(openTrigger, event);
+            return;
+        }
+
+        if (!isOpen) {
+            return;
+        }
+
+        if (event.target.closest('[data-jrnl-cover-close]')) {
+            event.preventDefault();
+            closeLightbox();
+        }
     });
 
     document.addEventListener('keydown', function (event) {

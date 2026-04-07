@@ -442,6 +442,22 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         color: var(--shell-highlight);
         font-size: 10px;
     }
+    :where(body) :is(h1, h2):not(.pc-logo-main)::before {
+        content: "//";
+        display: block;
+        margin: 0 0 .58rem;
+        color: var(--shell-highlight);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .18em;
+        line-height: 1;
+        text-transform: uppercase;
+    }
+    .simple-header :is(h1, h2)::before,
+    .simple-nav :is(h1, h2)::before,
+    .jrnl-lightbox :is(h1, h2)::before {
+        content: none;
+    }
     .pc-brand-copy span {
         display: block;
         max-width: 42ch;
