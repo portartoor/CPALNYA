@@ -946,6 +946,18 @@ if ($isAdminPanel) {
 						</a>
 					</li>
 					<li class="side-nav-item">
+						<a href="/adminpanel/signals/" class="side-nav-link">
+							<span class="menu-icon"><i class="ti ti-radio"></i></span>
+							<span class="menu-text"><?= $isRuUi ? 'Повестка / Signals' : 'Signals' ?></span>
+						</a>
+					</li>
+					<li class="side-nav-item">
+						<a href="/adminpanel/fun/" class="side-nav-link">
+							<span class="menu-icon"><i class="ti ti-mask"></i></span>
+							<span class="menu-text"><?= $isRuUi ? 'Отдых / Фан' : 'Fun' ?></span>
+						</a>
+					</li>
+					<li class="side-nav-item">
 						<a href="/adminpanel/seo-generator/" class="side-nav-link">
 							<span class="menu-icon"><i class="ti ti-wand"></i></span>
 							<span class="menu-text"><?= $isRuUi ? 'SEO РіРµРЅРµСЂР°С‚РѕСЂ' : 'SEO Generator' ?></span>

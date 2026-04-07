@@ -332,7 +332,7 @@ if ($sectionKey !== 'playbooks') {
                     <?php endif; ?>
                     <span class="jrnl-meta"><?= htmlspecialchars((string)($selected['published_at'] ?? $selected['created_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
                     <?php if (!empty($selected['author_name'])): ?><span class="jrnl-meta"><?= htmlspecialchars((string)$selected['author_name'], ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
-                    <span class="jrnl-meta jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">в—‰</i><?= (int)($selected['view_count'] ?? 0) ?></span>
+                    <span class="jrnl-meta jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($selected['view_count'] ?? 0) ?></span>
                 </div>
                 <?php if ($selectedIntroHtml !== ''): ?>
                     <div class="jrnl-detail-intro"><?= $selectedIntroHtml ?></div>
@@ -371,7 +371,7 @@ if ($sectionKey !== 'playbooks') {
                                 <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                                 <p><?= htmlspecialchars($strip((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 140), ENT_QUOTES, 'UTF-8') ?></p>
                                 <div class="jrnl-card-foot">
-                                    <span class="jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">в—‰</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                    <span class="jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
                                 </div>
                             </a>
                         <?php endforeach; ?>
@@ -417,7 +417,7 @@ if ($sectionKey !== 'playbooks') {
                             <p><?= htmlspecialchars($strip((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 160), ENT_QUOTES, 'UTF-8') ?></p>
                             <div class="jrnl-card-foot">
                                 <span><?= htmlspecialchars((string)($item['published_at'] ?? $item['created_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
-                                <span class="jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">в—‰</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                <span class="jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
                             </div>
                         </a>
                     <?php endforeach; ?>

@@ -21,11 +21,21 @@ $message = '';
 $messageType = '';
 $editArticle = null;
 $adminExamplesSection = isset($adminExamplesSection) ? trim((string)$adminExamplesSection) : trim((string)($_GET['section'] ?? ''));
-if (!in_array($adminExamplesSection, ['journal', 'playbooks'], true)) {
+$adminExamplesSections = [
+    'journal' => ['title' => 'Journal', 'admin_url' => '/adminpanel/journal/'],
+    'playbooks' => ['title' => 'Playbooks', 'admin_url' => '/adminpanel/playbooks/'],
+    'signals' => ['title' => 'Signals', 'admin_url' => '/adminpanel/signals/'],
+    'fun' => ['title' => 'Fun', 'admin_url' => '/adminpanel/fun/'],
+];
+if (!isset($adminExamplesSections[$adminExamplesSection])) {
     $adminExamplesSection = '';
 }
-$adminExamplesTitle = isset($adminExamplesTitle) ? (string)$adminExamplesTitle : ($adminExamplesSection === 'playbooks' ? 'Playbooks' : ($adminExamplesSection === 'journal' ? 'Journal' : 'Articles'));
-$adminExamplesBackUrl = isset($adminExamplesBackUrl) ? (string)$adminExamplesBackUrl : ($adminExamplesSection === 'playbooks' ? '/adminpanel/playbooks/' : ($adminExamplesSection === 'journal' ? '/adminpanel/journal/' : '/adminpanel/examples/'));
+$adminExamplesTitle = isset($adminExamplesTitle)
+    ? (string)$adminExamplesTitle
+    : ($adminExamplesSection !== '' ? (string)$adminExamplesSections[$adminExamplesSection]['title'] : 'Articles');
+$adminExamplesBackUrl = isset($adminExamplesBackUrl)
+    ? (string)$adminExamplesBackUrl
+    : ($adminExamplesSection !== '' ? (string)$adminExamplesSections[$adminExamplesSection]['admin_url'] : '/adminpanel/examples/');
 
 if (!examples_table_exists($DB)) {
     $message = 'Table examples_articles is missing. Run migration examples_articles_setup.sql first.';
@@ -103,7 +113,13 @@ function admin_examples_public_url(string $domainHost, string $langCode, string 
         $host = ($lang === 'ru') ? 'portcore.ru' : 'portcore.online';
     }
     $clusterCode = examples_slugify($clusterCode);
-    $base = ($materialSection === 'playbooks') ? '/playbooks/' : '/journal/';
+    $baseMap = [
+        'journal' => '/journal/',
+        'playbooks' => '/playbooks/',
+        'signals' => '/signals/',
+        'fun' => '/fun/',
+    ];
+    $base = $baseMap[$materialSection] ?? '/journal/';
     if ($clusterCode === '') {
         return 'https://' . $host . $base . rawurlencode($slug);
     }
@@ -156,7 +172,7 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
         $contentHtml = trim((string)($_POST['content_html'] ?? ''));
         $authorName = trim((string)($_POST['author_name'] ?? ''));
         $materialSection = trim((string)($_POST['material_section'] ?? ($adminExamplesSection !== '' ? $adminExamplesSection : 'journal')));
-        if (!in_array($materialSection, ['journal', 'playbooks'], true)) {
+        if (!isset($adminExamplesSections[$materialSection])) {
             $materialSection = 'journal';
         }
         $sortOrder = (int)($_POST['sort_order'] ?? 0);

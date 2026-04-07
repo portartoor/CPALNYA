@@ -55,6 +55,8 @@
                             <select class="form-select" name="material_section">
                                 <option value="journal" <?= $editSection === 'journal' ? 'selected' : '' ?>>Journal</option>
                                 <option value="playbooks" <?= $editSection === 'playbooks' ? 'selected' : '' ?>>Playbooks</option>
+                                <option value="signals" <?= $editSection === 'signals' ? 'selected' : '' ?>>Signals</option>
+                                <option value="fun" <?= $editSection === 'fun' ? 'selected' : '' ?>>Fun</option>
                             </select>
                         </div>
                         <div class="col-md-1">
