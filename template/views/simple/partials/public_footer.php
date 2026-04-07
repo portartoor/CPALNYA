@@ -167,10 +167,10 @@ $footerSections = [
 .public-layout-footer{max-width:1240px;margin:28px auto 22px;padding:0 18px}
 .public-footer-seo-stack{display:grid;gap:14px}
 .public-footer-tarot{padding:18px 20px;border:1px solid rgba(127,164,223,.18);background:linear-gradient(180deg,rgba(8,14,28,.74),rgba(6,11,22,.68));box-shadow:var(--shell-shadow)}
-.public-footer-tarot-row{display:flex;gap:14px;align-items:flex-start}
+.public-footer-tarot-row{display:flex;gap:14px;align-items:stretch;justify-content:center;width:90%;margin:0 auto}
 .public-footer-tarot-card{flex:1 1 0;min-width:0;margin:0;display:grid;gap:10px}
-.public-footer-tarot-visual{border:1px solid rgba(127,164,223,.14);background:rgba(255,255,255,.03);overflow:hidden}
-.public-footer-tarot-visual img{display:block;width:100%;height:auto;aspect-ratio:.56818;object-fit:cover}
+.public-footer-tarot-visual{display:flex;align-items:flex-start;justify-content:center;border:1px solid rgba(127,164,223,.14);background:rgba(255,255,255,.03);overflow:hidden}
+.public-footer-tarot-visual img{display:block;width:100%;height:auto;aspect-ratio:.56818;object-fit:contain;object-position:center top}
 .public-footer-tarot-caption{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;color:#aabbd2;font-size:11px;line-height:1.35;text-transform:uppercase;letter-spacing:.08em}
 .public-footer-tarot-name{color:#edf3fb;font-weight:700}
 .public-footer-tarot-index{color:#f4d56b;white-space:nowrap}
@@ -203,7 +203,7 @@ $footerSections = [
 .public-back-to-top.is-visible{position:fixed;right:28px;bottom:28px;opacity:1;visibility:visible;transform:translateX(0)}
 .public-back-to-top-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;min-width:14px;font-size:14px;line-height:1;color:#f4d56b}
 @media (max-width:980px){.public-editorial-footer-top,.public-editorial-map{grid-template-columns:1fr}}
-@media (max-width:760px){.public-footer-tarot-row{flex-wrap:wrap}.public-footer-tarot-card{flex:0 0 calc(50% - 7px)}}
+@media (max-width:760px){.public-footer-tarot-row{width:100%;flex-wrap:wrap}.public-footer-tarot-card{flex:0 0 calc(50% - 7px)}}
 </style>
 <script>
 (function(){
