@@ -148,7 +148,7 @@ function seo_apply_db_settings_to_cfg(array $cfg, array $dbSettings): array
         'expand_user_prompt_append_en', 'expand_user_prompt_append_ru', 'preview_image_style_options',
         'image_color_schemes', 'image_scene_families', 'image_compositions', 'image_scenarios',
         'openrouter_api_key', 'openrouter_base_url', 'openrouter_model',
-        'openrouter_fallback_model',
+        'openrouter_fallback_model', 'campaigns',
     ];
     foreach ($directKeys as $key) {
         if (array_key_exists($key, $dbSettings)) {
