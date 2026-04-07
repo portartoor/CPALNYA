@@ -307,10 +307,219 @@ if (!function_exists('footer_seo_blocks_fetch_random')) {
     }
 }
 
-if (!function_exists('footer_seo_blocks_render_html')) {
-    function footer_seo_blocks_render_html(?array $block): string
+if (!function_exists('footer_tarot_source_path')) {
+    function footer_tarot_source_path(): string
     {
-        if (!is_array($block)) {
+        return defined('DIR') ? (DIR . 'tarro.png') : '';
+    }
+}
+
+if (!function_exists('footer_tarot_card_labels')) {
+    function footer_tarot_card_labels(string $langCode = 'ru'): array
+    {
+        $labels = [];
+        for ($i = 1; $i <= 28; $i++) {
+            $labels[] = ($langCode === 'ru' ? 'Аркан ' : 'Arcana ') . str_pad((string)$i, 2, '0', STR_PAD_LEFT);
+        }
+        return $labels;
+    }
+}
+
+if (!function_exists('footer_tarot_matrix_cards')) {
+    function footer_tarot_matrix_cards(string $sourceImage, string $langCode = 'ru'): array
+    {
+        if ($sourceImage === '' || !is_file($sourceImage)) {
+            return [];
+        }
+        $imgInfo = @getimagesize($sourceImage);
+        if (!$imgInfo || empty($imgInfo[0]) || empty($imgInfo[1])) {
+            return [];
+        }
+
+        $imgW = (int)$imgInfo[0];
+        $imgH = (int)$imgInfo[1];
+        if ($imgW <= 0 || $imgH <= 0) {
+            return [];
+        }
+
+        $fullCols = 6;
+        $fullRows = 4;
+        $bottomCols = 4;
+        $bottomShift = 1;
+
+        $leftPad = (int)round($imgW * 0.018);
+        $rightPad = (int)round($imgW * 0.018);
+        $topPad = (int)round($imgH * 0.085);
+        $bottomPad = (int)round($imgH * 0.045);
+        $gapX = (int)round($imgW * 0.010);
+        $gapY = (int)round($imgH * 0.012);
+        $cardAspect = 1.76;
+
+        $cardW = (int)floor(($imgW - $leftPad - $rightPad - ($gapX * ($fullCols - 1))) / $fullCols);
+        $cardH = (int)round($cardW * $cardAspect);
+        $totalRows = $fullRows + 1;
+        $maxPossibleCardH = (int)floor(($imgH - $topPad - $bottomPad - ($gapY * ($totalRows - 1))) / $totalRows);
+        if ($cardH > $maxPossibleCardH) {
+            $cardH = $maxPossibleCardH;
+        }
+
+        $labels = footer_tarot_card_labels($langCode);
+        $cards = [];
+        $index = 1;
+
+        for ($row = 0; $row < $fullRows; $row++) {
+            for ($col = 0; $col < $fullCols; $col++) {
+                $cards[] = [
+                    'index' => $index,
+                    'name' => $labels[$index - 1] ?? (($langCode === 'ru' ? 'Аркан ' : 'Arcana ') . str_pad((string)$index, 2, '0', STR_PAD_LEFT)),
+                    'row' => $row,
+                    'col' => $col,
+                    'x' => $leftPad + $col * ($cardW + $gapX),
+                    'y' => $topPad + $row * ($cardH + $gapY),
+                    'w' => $cardW,
+                    'h' => $cardH,
+                ];
+                $index++;
+            }
+        }
+
+        $bottomRowIndex = $fullRows;
+        for ($col = 0; $col < $bottomCols; $col++) {
+            $visualCol = $bottomShift + $col;
+            $cards[] = [
+                'index' => $index,
+                'name' => $labels[$index - 1] ?? (($langCode === 'ru' ? 'Аркан ' : 'Arcana ') . str_pad((string)$index, 2, '0', STR_PAD_LEFT)),
+                'row' => $bottomRowIndex,
+                'col' => $visualCol,
+                'x' => $leftPad + $visualCol * ($cardW + $gapX),
+                'y' => $topPad + $bottomRowIndex * ($cardH + $gapY),
+                'w' => $cardW,
+                'h' => $cardH,
+            ];
+            $index++;
+        }
+
+        return $cards;
+    }
+}
+
+if (!function_exists('footer_tarot_crop_card_data_url')) {
+    function footer_tarot_crop_card_data_url($src, array $card): string
+    {
+        $w = (int)($card['w'] ?? 0);
+        $h = (int)($card['h'] ?? 0);
+        if ($w <= 0 || $h <= 0 || (!is_resource($src) && !is_object($src))) {
+            return '';
+        }
+
+        $dst = imagecreatetruecolor($w, $h);
+        if (!$dst) {
+            return '';
+        }
+        imagealphablending($dst, false);
+        imagesavealpha($dst, true);
+        $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+        imagefilledrectangle($dst, 0, 0, $w, $h, $transparent);
+        imagecopy($dst, $src, 0, 0, (int)$card['x'], (int)$card['y'], $w, $h);
+
+        ob_start();
+        imagepng($dst, null, 7);
+        $pngData = ob_get_clean();
+        imagedestroy($dst);
+        if (!is_string($pngData) || $pngData === '') {
+            return '';
+        }
+        return 'data:image/png;base64,' . base64_encode($pngData);
+    }
+}
+
+if (!function_exists('footer_tarot_pick_random')) {
+    function footer_tarot_pick_random(string $langCode = 'ru', int $count = 4): array
+    {
+        if (!function_exists('imagecreatefrompng')) {
+            return [];
+        }
+
+        $sourceImage = footer_tarot_source_path();
+        $cards = footer_tarot_matrix_cards($sourceImage, $langCode);
+        if (empty($cards)) {
+            return [];
+        }
+
+        $imgInfo = @getimagesize($sourceImage);
+        if (!$imgInfo) {
+            return [];
+        }
+        $imgType = (int)($imgInfo[2] ?? 0);
+        if ($imgType === IMAGETYPE_PNG) {
+            $src = @imagecreatefrompng($sourceImage);
+        } elseif ($imgType === IMAGETYPE_JPEG) {
+            $src = @imagecreatefromjpeg($sourceImage);
+        } elseif (defined('IMAGETYPE_WEBP') && $imgType === IMAGETYPE_WEBP && function_exists('imagecreatefromwebp')) {
+            $src = @imagecreatefromwebp($sourceImage);
+        } else {
+            $src = null;
+        }
+        if (!$src) {
+            return [];
+        }
+
+        $count = max(1, min(8, $count));
+        if (count($cards) < $count) {
+            $count = count($cards);
+        }
+        $randomIndexes = array_rand($cards, $count);
+        if (!is_array($randomIndexes)) {
+            $randomIndexes = [$randomIndexes];
+        }
+
+        $selected = [];
+        foreach ($randomIndexes as $idx) {
+            $card = $cards[(int)$idx] ?? null;
+            if (!is_array($card)) {
+                continue;
+            }
+            $card['image'] = footer_tarot_crop_card_data_url($src, $card);
+            $selected[] = $card;
+        }
+        imagedestroy($src);
+        return $selected;
+    }
+}
+
+if (!function_exists('footer_tarot_render_html')) {
+    function footer_tarot_render_html(array $cards, string $langCode = 'ru'): string
+    {
+        if (empty($cards)) {
+            return '';
+        }
+        $title = $langCode === 'ru' ? '4 случайные карты таро' : '4 random tarot cards';
+        ob_start();
+        ?>
+        <section class="public-footer-tarot" aria-label="<?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?>">
+            <div class="public-footer-tarot-row">
+                <?php foreach ($cards as $card): ?>
+                    <figure class="public-footer-tarot-card" data-card-index="<?= (int)($card['index'] ?? 0) ?>">
+                        <div class="public-footer-tarot-visual">
+                            <img src="<?= htmlspecialchars((string)($card['image'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($card['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                        </div>
+                        <figcaption class="public-footer-tarot-caption">
+                            <span class="public-footer-tarot-name"><?= htmlspecialchars((string)($card['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
+                            <span class="public-footer-tarot-index">#<?= str_pad((string)(int)($card['index'] ?? 0), 2, '0', STR_PAD_LEFT) ?></span>
+                        </figcaption>
+                    </figure>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php
+        return (string)ob_get_clean();
+    }
+}
+
+if (!function_exists('footer_seo_blocks_render_html')) {
+    function footer_seo_blocks_render_html(?array $block, array $tarotCards = [], string $langCode = 'ru'): string
+    {
+        if (!is_array($block) && empty($tarotCards)) {
             return '';
         }
         $style = trim((string)($block['style_variant'] ?? 'editorial-note'));
@@ -324,15 +533,20 @@ if (!function_exists('footer_seo_blocks_render_html')) {
 
         ob_start();
         ?>
-        <section class="public-footer-seo-block public-footer-seo-block--<?= htmlspecialchars($style, ENT_QUOTES, 'UTF-8') ?>">
-            <?php if ($kicker !== ''): ?>
-                <span class="public-footer-seo-kicker"><?= htmlspecialchars($kicker, ENT_QUOTES, 'UTF-8') ?></span>
+        <div class="public-footer-seo-stack">
+            <?= footer_tarot_render_html($tarotCards, $langCode) ?>
+            <?php if (is_array($block)): ?>
+                <section class="public-footer-seo-block public-footer-seo-block--<?= htmlspecialchars($style, ENT_QUOTES, 'UTF-8') ?>">
+                    <?php if ($kicker !== ''): ?>
+                        <span class="public-footer-seo-kicker"><?= htmlspecialchars($kicker, ENT_QUOTES, 'UTF-8') ?></span>
+                    <?php endif; ?>
+                    <?php if ($title !== ''): ?>
+                        <h3><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h3>
+                    <?php endif; ?>
+                    <div class="public-footer-seo-body"><?= $bodyHtml ?></div>
+                </section>
             <?php endif; ?>
-            <?php if ($title !== ''): ?>
-                <h3><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h3>
-            <?php endif; ?>
-            <div class="public-footer-seo-body"><?= $bodyHtml ?></div>
-        </section>
+        </div>
         <?php
         return (string)ob_get_clean();
     }
@@ -357,7 +571,8 @@ if (!function_exists('footer_seo_blocks_handle_dynamic_request')) {
         }
         $langCode = (bool)preg_match('/\.ru$/', $host) ? 'ru' : 'en';
         $block = footer_seo_blocks_fetch_random($db, $host, $langCode, 'any');
-        $html = footer_seo_blocks_render_html($block);
+        $tarotCards = footer_tarot_pick_random($langCode, 4);
+        $html = footer_seo_blocks_render_html($block, $tarotCards, $langCode);
 
         if (!headers_sent()) {
             header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
@@ -373,6 +588,15 @@ if (!function_exists('footer_seo_blocks_handle_dynamic_request')) {
                 'style' => (string)($block['style_variant'] ?? ''),
                 'title' => (string)($block['block_title'] ?? ''),
                 'kicker' => (string)($block['block_kicker'] ?? ''),
+                'cards' => array_map(static function (array $card): array {
+                    return [
+                        'index' => (int)($card['index'] ?? 0),
+                        'name' => (string)($card['name'] ?? ''),
+                        'row' => (int)($card['row'] ?? 0),
+                        'col' => (int)($card['col'] ?? 0),
+                        'image' => (string)($card['image'] ?? ''),
+                    ];
+                }, $tarotCards),
             ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             return true;
         }

@@ -6,9 +6,13 @@ $t = static function (string $ru, string $en) use ($isRu): string {
 };
 $year = date('Y');
 $footerSeoBlock = null;
+$footerTarotCards = [];
 if (isset($FRMWRK) && is_object($FRMWRK) && method_exists($FRMWRK, 'DB') && function_exists('footer_seo_blocks_fetch_random')) {
     $db = $FRMWRK->DB();
     $footerSeoBlock = footer_seo_blocks_fetch_random($db, (string)$host, $isRu ? 'ru' : 'en', 'any');
+}
+if (function_exists('footer_tarot_pick_random')) {
+    $footerTarotCards = footer_tarot_pick_random($isRu ? 'ru' : 'en', 4);
 }
 $footerSeoEndpoint = (string)parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 if ($footerSeoEndpoint === '') {
@@ -117,8 +121,8 @@ $footerSections = [
 ?>
 <div class="public-layout-footer public-layout-footer--simple">
     <div id="publicFooterSeoMount" data-endpoint="<?= htmlspecialchars($footerSeoEndpoint, ENT_QUOTES, 'UTF-8') ?>">
-        <?php if (is_array($footerSeoBlock) && function_exists('footer_seo_blocks_render_html')): ?>
-            <?= footer_seo_blocks_render_html($footerSeoBlock) ?>
+        <?php if ((is_array($footerSeoBlock) || !empty($footerTarotCards)) && function_exists('footer_seo_blocks_render_html')): ?>
+            <?= footer_seo_blocks_render_html($footerSeoBlock, $footerTarotCards, $isRu ? 'ru' : 'en') ?>
         <?php endif; ?>
     </div>
     <footer class="public-editorial-footer site-footer">
@@ -161,7 +165,17 @@ $footerSections = [
 
 <style>
 .public-layout-footer{max-width:1240px;margin:28px auto 22px;padding:0 18px}
+.public-footer-seo-stack{display:grid;gap:14px}
+.public-footer-tarot{padding:18px 20px;border:1px solid rgba(127,164,223,.18);background:linear-gradient(180deg,rgba(8,14,28,.74),rgba(6,11,22,.68));box-shadow:var(--shell-shadow)}
+.public-footer-tarot-row{display:flex;gap:14px;align-items:flex-start}
+.public-footer-tarot-card{flex:1 1 0;min-width:0;margin:0;display:grid;gap:10px}
+.public-footer-tarot-visual{border:1px solid rgba(127,164,223,.14);background:rgba(255,255,255,.03);overflow:hidden}
+.public-footer-tarot-visual img{display:block;width:100%;height:auto;aspect-ratio:.56818;object-fit:cover}
+.public-footer-tarot-caption{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;color:#aabbd2;font-size:11px;line-height:1.35;text-transform:uppercase;letter-spacing:.08em}
+.public-footer-tarot-name{color:#edf3fb;font-weight:700}
+.public-footer-tarot-index{color:#f4d56b;white-space:nowrap}
 .public-footer-seo-block{margin:0 0 18px;padding:24px 26px;border:1px solid rgba(127,164,223,.22);background:linear-gradient(180deg,rgba(8,14,28,.84),rgba(6,11,22,.76));box-shadow:var(--shell-shadow)}
+.public-footer-seo-stack .public-footer-seo-block{margin:0}
 .public-footer-seo-kicker{display:inline-flex;align-items:center;padding:8px 12px;margin-bottom:12px;border:1px solid rgba(127,164,223,.18);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b8c7dc}
 .public-footer-seo-block h3{margin:0 0 12px;font:700 1.7rem/1.02 "Space Grotesk","Sora",sans-serif;color:#edf3fb;letter-spacing:-.04em}
 .public-footer-seo-body{display:grid;gap:12px;color:#aabbd2;line-height:1.74}
@@ -189,6 +203,7 @@ $footerSections = [
 .public-back-to-top.is-visible{position:fixed;right:28px;bottom:28px;opacity:1;visibility:visible;transform:translateX(0)}
 .public-back-to-top-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;min-width:14px;font-size:14px;line-height:1;color:#f4d56b}
 @media (max-width:980px){.public-editorial-footer-top,.public-editorial-map{grid-template-columns:1fr}}
+@media (max-width:760px){.public-footer-tarot-row{flex-wrap:wrap}.public-footer-tarot-card{flex:0 0 calc(50% - 7px)}}
 </style>
 <script>
 (function(){
