@@ -81,7 +81,8 @@ if ($selected) {
 .jrnl-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:16px}
 .jrnl-kicker,.jrnl-tag,.jrnl-meta{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;max-height:30px;border:1px solid rgba(122,180,255,.2);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
 .jrnl-copy{display:grid;gap:8px}
-.jrnl-copy h1,.jrnl-copy h2,.jrnl-detail h1,.jrnl-related h2{margin:0;font:700 clamp(1.82rem,3.55vw,3.22rem)/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.048em}
+.jrnl-copy h1,.jrnl-detail h1{margin:0;font:700 2rem/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.048em}
+.jrnl-copy h2,.jrnl-related h2{margin:0;font:700 1.5rem/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.048em}
 .jrnl-copy p,.jrnl-detail p,.jrnl-card p{margin:0;color:var(--shell-muted);line-height:1.62}
 .jrnl-copy p + p{margin-top:2px}
 .jrnl-copy .jrnl-hero-description{max-width:66ch}
@@ -122,7 +123,7 @@ display:block;align-self:start;overflow:hidden;position:relative}
 100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0) saturate(1)}
 }
 @media (max-width:1180px){.jrnl-hero,.jrnl-grid,.jrnl-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.jrnl-hero{grid-template-columns:1fr}}
-@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}.jrnl-copy h1,.jrnl-copy h2,.jrnl-detail h1{font-size:clamp(2rem,12vw,3.2rem)}}
+@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}}
 </style>
 
 <section class="jrnl">
