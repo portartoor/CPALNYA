@@ -440,10 +440,7 @@ if (isset($_GET['header_search_preview'])) {
         --shell-shadow: 0 24px 60px rgba(46, 88, 170, .14);
         color-scheme: light;
     }
-    .simple-header,
-    .public-layout-footer,
-    main,
-    footer {
+    body > :not(#terrainFieldGlobal):not(.simple-header):not(.public-back-to-top) {
         position: relative;
         z-index: 1;
     }
@@ -497,7 +494,7 @@ if (isset($_GET['header_search_preview'])) {
         box-shadow: 0 14px 42px rgba(0, 4, 14, .16);
         clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
         backdrop-filter: blur(10px) saturate(116%);
-        transition: padding .24s ease, background .24s ease, box-shadow .24s ease, border-color .24s ease, transform .24s ease;
+        transition: top .24s ease, padding .24s ease, background .24s ease, box-shadow .24s ease, border-color .24s ease, transform .24s ease;
     }
     .simple-header::before {
         content: "";
@@ -508,6 +505,7 @@ if (isset($_GET['header_search_preview'])) {
     }
     .simple-header.is-scrolled {
         z-index: 999;
+        top: 0;
         transform: translateY(0);
         padding: 10px 16px;
         background: linear-gradient(180deg, rgba(6,10,18,.72), rgba(7,12,23,.58));
@@ -1215,6 +1213,7 @@ if (isset($_GET['header_search_preview'])) {
         }
         .simple-header.is-scrolled {
             z-index: 999;
+            top: 0;
         }
         .pc-logo-main { font-size: 28px; }
         .pc-brand-copy span { display: none; }
@@ -1423,7 +1422,8 @@ if (isset($_GET['header_search_preview'])) {
             var styles = window.getComputedStyle(header);
             var marginTop = parseFloat(styles.marginTop || '0') || 0;
             var marginBottom = parseFloat(styles.marginBottom || '0') || 0;
-            measuredHeaderOffset = Math.ceil(header.offsetHeight + marginTop + marginBottom);
+            var topOffset = parseFloat(styles.top || '0') || 0;
+            measuredHeaderOffset = Math.ceil(header.offsetHeight + marginTop + marginBottom + Math.max(0, topOffset));
             document.documentElement.style.setProperty('--simple-header-height', String(Math.ceil(header.offsetHeight)) + 'px');
             if (hadScrolled) {
                 header.classList.add('is-scrolled');
