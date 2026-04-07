@@ -442,7 +442,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         color: var(--shell-highlight);
         font-size: 10px;
     }
-    :where(body) :is(h1, h2):not(.pc-logo-main)::before {
+    :where(body) h1:not(.pc-logo-main)::before {
         content: "//";
         display: inline-block;
         margin: 0 .28em 0 0;
@@ -452,11 +452,25 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         letter-spacing: .18em;
         line-height: 1;
         text-transform: uppercase;
-        vertical-align: .02em;
+        position: relative;
+        top: -7px;
     }
-    .simple-header :is(h1, h2)::before,
-    .simple-nav :is(h1, h2)::before,
-    .jrnl-lightbox :is(h1, h2)::before {
+    :where(body) :is(h2, h3):not(.pc-logo-main)::before {
+        content: "//";
+        display: inline-block;
+        margin: 0 .28em 0 0;
+        color: var(--shell-highlight);
+        font-size: 1.5em;
+        font-weight: 700;
+        letter-spacing: .18em;
+        line-height: 1;
+        text-transform: uppercase;
+        position: relative;
+        top: -2px;
+    }
+    .simple-header :is(h1, h2, h3)::before,
+    .simple-nav :is(h1, h2, h3)::before,
+    .jrnl-lightbox :is(h1, h2, h3)::before {
         content: none;
     }
     .pc-brand-copy span {
