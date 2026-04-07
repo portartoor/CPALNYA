@@ -1357,6 +1357,8 @@ function seo_notify_telegram_success(string $lang, array $article, string $jobDa
     }
     $slug = (string)($article['slug'] ?? '');
     $url = $slug !== '' ? seo_article_public_url($lang, $slug, (string)($article['cluster_code'] ?? ''), (string)($article['material_section'] ?? 'journal')) : '';
+    $articleId = (int)($article['article_id'] ?? 0);
+    $materialSection = trim((string)($article['material_section'] ?? 'journal'));
     $title = htmlspecialchars((string)($article['title'] ?? ''), ENT_QUOTES, 'UTF-8');
     $excerpt = seo_strip_html_to_text((string)($article['excerpt_html'] ?? ''));
     if ($excerpt === '') {
@@ -1364,6 +1366,16 @@ function seo_notify_telegram_success(string $lang, array $article, string $jobDa
     }
     $excerpt = htmlspecialchars(seo_trim_words($excerpt, 70), ENT_QUOTES, 'UTF-8');
     $lines = ['<b>' . $title . '</b>'];
+    $meta = [];
+    if ($articleId > 0) {
+        $meta[] = 'ID: <b>' . $articleId . '</b>';
+    }
+    if ($materialSection !== '') {
+        $meta[] = 'Section: <b>' . htmlspecialchars($materialSection, ENT_QUOTES, 'UTF-8') . '</b>';
+    }
+    if (!empty($meta)) {
+        $lines[] = implode(' | ', $meta);
+    }
     if ($excerpt !== '') {
         $lines[] = '';
         $lines[] = $excerpt;

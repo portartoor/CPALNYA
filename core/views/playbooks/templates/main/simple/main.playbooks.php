@@ -219,11 +219,13 @@ $issueSubtitle = $t(
     "Гайды, troubleshooting-материалы, рабочие заметки и операционные playbooks для баеров, фармеров, трекинг-операторов, креативных команд и тех, кто держит в руках повседневную механику affiliate-производства.\n\nЭто библиотека не для вдохновения, а для возврата к рабочей форме: когда нужно быстро проверить шаг, восстановить логику сетапа, сравнить решение, перепройти критический узел воронки или просто не потерять темп в шуме ежедневной операционки.\n\nСюда приходят не за общими словами, а за следующим точным действием.",
     "How-to guides, troubleshooting notes, working memos, and reusable operating playbooks for buyers, farmers, tracking operators, creative teams, and everyone holding the daily mechanics of affiliate production together.\n\nThis is a library you return to not for inspiration, but to regain working form: to verify a step, restore setup logic, compare solutions, re-check a critical funnel junction, or simply keep tempo inside noisy daily operations.\n\nPeople come here not for generic advice, but for the exact next move."
 );
-$heroKicker = trim((string)($issue['issue_kicker'] ?? '')) !== '' ? (string)$issue['issue_kicker'] : $heroKicker;
-$heroTitle = trim((string)($issue['hero_title'] ?? '')) !== '' ? (string)$issue['hero_title'] : $heroTitle;
-$heroDescription = trim((string)($issue['hero_description'] ?? '')) !== '' ? (string)$issue['hero_description'] : $heroDescription;
-$issueTitle = trim((string)($issue['issue_title'] ?? '')) !== '' ? (string)$issue['issue_title'] : $issueTitle;
-$issueSubtitle = trim((string)($issue['issue_subtitle'] ?? '')) !== '' ? (string)$issue['issue_subtitle'] : $issueSubtitle;
+if ($sectionKey !== 'playbooks') {
+    $heroKicker = trim((string)($issue['issue_kicker'] ?? '')) !== '' ? (string)$issue['issue_kicker'] : $heroKicker;
+    $heroTitle = trim((string)($issue['hero_title'] ?? '')) !== '' ? (string)$issue['hero_title'] : $heroTitle;
+    $heroDescription = trim((string)($issue['hero_description'] ?? '')) !== '' ? (string)$issue['hero_description'] : $heroDescription;
+    $issueTitle = trim((string)($issue['issue_title'] ?? '')) !== '' ? (string)$issue['issue_title'] : $issueTitle;
+    $issueSubtitle = trim((string)($issue['issue_subtitle'] ?? '')) !== '' ? (string)$issue['issue_subtitle'] : $issueSubtitle;
+}
 ?>
 <style>
 .jrnl{max-width:1480px;margin:0 auto;padding:28px 18px 64px;color:var(--shell-text)}
