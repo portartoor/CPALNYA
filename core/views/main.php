@@ -7,6 +7,8 @@ $issueImage = trim((string)($home['issue_image'] ?? '/april2026_new2.png'));
 $heroFeature = is_array($home['hero_feature'] ?? null) ? $home['hero_feature'] : null;
 $journalItems = array_values((array)($home['journal_items'] ?? []));
 $playbookItems = array_values((array)($home['playbook_items'] ?? []));
+$signalsItems = array_values((array)($home['signals_items'] ?? []));
+$funItems = array_values((array)($home['fun_items'] ?? []));
 $cover = $journalItems[0] ?? null;
 $t = static function (string $ru, string $en) use ($isRu): string { return $isRu ? $ru : $en; };
 $excerpt = static function (string $html, int $limit = 180): string {
@@ -175,6 +177,64 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
                     <?php foreach (array_slice($playbookItems, 0, 5) as $item): ?>
                         <?php $cardImage = $imageSrc((array)$item); ?>
                         <a class="home-z-card" href="<?= htmlspecialchars($buildArticleUrl((array)$item, 'playbooks'), ENT_QUOTES, 'UTF-8') ?>">
+                            <div class="home-z-card-media">
+                                <?php if ($cardImage !== ''): ?>
+                                    <img src="<?= htmlspecialchars($cardImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                                <?php endif; ?>
+                            </div>
+                            <div class="home-z-card-copy">
+                                <div class="home-z-card-head">
+                                    <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
+                                    <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">◉</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                </div>
+                                <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+
+            <section class="home-z-block">
+                <div class="home-z-block-head">
+                    <div class="home-z-block-title">
+                        <span class="home-z-tag"><?= htmlspecialchars($t('Повестка', 'Signals'), ENT_QUOTES, 'UTF-8') ?></span>
+                        <h2><?= htmlspecialchars($t('Политика, новости и сигналы', 'Policy, news and market signals'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    </div>
+                    <a class="home-z-block-link" href="/signals/"><?= htmlspecialchars($t('Все материалы', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
+                </div>
+                <div class="home-z-list">
+                    <?php foreach (array_slice($signalsItems, 0, 5) as $item): ?>
+                        <?php $cardImage = $imageSrc((array)$item); ?>
+                        <a class="home-z-card" href="<?= htmlspecialchars($buildArticleUrl((array)$item, 'signals'), ENT_QUOTES, 'UTF-8') ?>">
+                            <div class="home-z-card-media">
+                                <?php if ($cardImage !== ''): ?>
+                                    <img src="<?= htmlspecialchars($cardImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                                <?php endif; ?>
+                            </div>
+                            <div class="home-z-card-copy">
+                                <div class="home-z-card-head">
+                                    <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
+                                    <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">◉</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                </div>
+                                <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+
+            <section class="home-z-block">
+                <div class="home-z-block-head">
+                    <div class="home-z-block-title">
+                        <span class="home-z-tag"><?= htmlspecialchars($t('Фан', 'Fun'), ENT_QUOTES, 'UTF-8') ?></span>
+                        <h2><?= htmlspecialchars($t('Отдых, мемы и нишевой абсурд', 'Satire, memes and niche absurdity'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    </div>
+                    <a class="home-z-block-link" href="/fun/"><?= htmlspecialchars($t('Все материалы', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
+                </div>
+                <div class="home-z-list">
+                    <?php foreach (array_slice($funItems, 0, 5) as $item): ?>
+                        <?php $cardImage = $imageSrc((array)$item); ?>
+                        <a class="home-z-card" href="<?= htmlspecialchars($buildArticleUrl((array)$item, 'fun'), ENT_QUOTES, 'UTF-8') ?>">
                             <div class="home-z-card-media">
                                 <?php if ($cardImage !== ''): ?>
                                     <img src="<?= htmlspecialchars($cardImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">

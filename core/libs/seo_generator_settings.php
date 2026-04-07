@@ -151,6 +151,100 @@ if (!function_exists('seo_gen_settings_default')) {
                 'article_user_prompt_append_en' => 'Favor practical implementation, troubleshooting depth, reusable snippets, SOPs and exact operator steps.',
                 'article_user_prompt_append_ru' => 'Смещай акцент в сторону практической реализации, troubleshooting, переиспользуемых фрагментов, SOP и точных шагов оператора.',
             ],
+            'signals' => [
+                'key' => 'signals',
+                'title' => 'Signals',
+                'title_ru' => 'Повестка',
+                'description' => 'Policy, platform news and regulatory shifts in traffic arbitrage across CIS and global markets.',
+                'description_ru' => 'Политика платформ, новости и регуляторные сдвиги в арбитраже трафика для СНГ и мировой практики.',
+                'material_section' => 'signals',
+                'enabled' => true,
+                'daily_min' => 2,
+                'daily_max' => 4,
+                'max_per_run' => 2,
+                'word_min' => 1400,
+                'word_max' => 2600,
+                'seed_salt_suffix' => 'signals',
+                'styles_en' => ['policy brief', 'market signal memo', 'regulatory watch', 'platform change dispatch'],
+                'styles_ru' => ['policy brief', 'обзор сигнала рынка', 'регуляторная записка', 'сводка изменений платформ'],
+                'clusters_en' => [
+                    'meta policy changes and moderation enforcement',
+                    'telegram platform shifts and monetization rules',
+                    'tiktok ads restrictions and commerce updates',
+                    'cis regulation and affiliate market implications',
+                    'global privacy moves and attribution fallout',
+                    'payment, compliance and source volatility signals',
+                ],
+                'clusters_ru' => [
+                    'изменения policy в Meta и ужесточение модерации',
+                    'сдвиги Telegram, правила монетизации и новые ограничения',
+                    'ограничения TikTok Ads и апдейты commerce-экосистемы',
+                    'регуляторные движения в СНГ и их эффект на affiliate-рынок',
+                    'privacy-сдвиги в мире и последствия для атрибуции',
+                    'сигналы по payment, compliance и волатильности источников',
+                ],
+                'article_structures_en' => [
+                    'Signal -> what changed -> operator impact -> affected geos -> action checklist',
+                    'Policy update -> enforcement pattern -> hidden risks -> response plan',
+                    'News brief -> why it matters -> who gets hit first -> mitigation steps',
+                ],
+                'article_structures_ru' => [
+                    'Сигнал -> что изменилось -> влияние на оператора -> затронутые гео -> чеклист действий',
+                    'Policy-апдейт -> паттерн enforcement -> скрытые риски -> план реакции',
+                    'Новость -> почему это важно -> кто почувствует первым -> шаги смягчения',
+                ],
+                'article_system_prompt_en' => '',
+                'article_system_prompt_ru' => '',
+                'article_user_prompt_append_en' => 'Track policy, moderation, legal and market signals around affiliate traffic. Stay concrete, date-aware and operator-relevant.',
+                'article_user_prompt_append_ru' => 'Отслеживай policy, модерацию, регуляторику и рыночные сигналы вокруг арбитража трафика. Пиши конкретно, с привязкой к текущей практике и решениям оператора.',
+            ],
+            'fun' => [
+                'key' => 'fun',
+                'title' => 'Fun',
+                'title_ru' => 'Отдых / Фан',
+                'description' => 'Entertainment, satire, meme-art and playful editorial formats about affiliate teams and traffic arbitrage culture.',
+                'description_ru' => 'Развлекательные, сатирические и мем-редакционные материалы про арбитраж, команды и культурный код ниши.',
+                'material_section' => 'fun',
+                'enabled' => true,
+                'daily_min' => 1,
+                'daily_max' => 3,
+                'max_per_run' => 1,
+                'word_min' => 1000,
+                'word_max' => 2200,
+                'seed_salt_suffix' => 'fun',
+                'styles_en' => ['satirical pamphlet', 'humorous review', 'meme editorial', 'operator parody'],
+                'styles_ru' => ['сатирический памфлет', 'юмористический обзор', 'мем-редакционка', 'операционная пародия'],
+                'clusters_en' => [
+                    'agency life and buyer folklore',
+                    'farm drama and operator superstitions',
+                    'creative fatigue as dark comedy',
+                    'tracker chaos and postback absurdity',
+                    'team memes and backstage rituals',
+                    'platform moderation as tragicomedy',
+                ],
+                'clusters_ru' => [
+                    'агентская жизнь и фольклор медиабаеров',
+                    'драма фарма и суеверия операторов',
+                    'выгорание креативов как темная комедия',
+                    'хаос трекеров и абсурд postback-ошибок',
+                    'командные мемы и backstage-ритуалы',
+                    'модерация платформ как трагикомедия',
+                ],
+                'article_structures_en' => [
+                    'Setup -> absurd escalation -> punchline -> niche truth',
+                    'Character sketch -> operational chaos -> meme payoff -> takeaway',
+                    'Mock review -> exaggeration -> real pain points -> closing jab',
+                ],
+                'article_structures_ru' => [
+                    'Сетап -> абсурдное обострение -> панчлайн -> нишевая правда',
+                    'Портрет персонажа -> операционный хаос -> мемный payoff -> вывод',
+                    'Пародийный обзор -> преувеличение -> реальные боли -> финальный укол',
+                ],
+                'article_system_prompt_en' => '',
+                'article_system_prompt_ru' => '',
+                'article_user_prompt_append_en' => 'Keep it playful, sharp and niche-native. Humor should come from real affiliate operations, not generic jokes.',
+                'article_user_prompt_append_ru' => 'Держи тон живым, ироничным и нишевым. Юмор должен рождаться из реальной affiliate-операционки, а не из общих шуток.',
+            ],
         ];
     }
 
@@ -162,7 +256,7 @@ if (!function_exists('seo_gen_settings_default')) {
         foreach ($defaults as $key => $default) {
             $row = array_merge($default, is_array($raw[$key] ?? null) ? $raw[$key] : []);
             $row['key'] = $key;
-            $row['material_section'] = in_array((string)($row['material_section'] ?? $key), ['journal', 'playbooks'], true)
+            $row['material_section'] = in_array((string)($row['material_section'] ?? $key), ['journal', 'playbooks', 'signals', 'fun'], true)
                 ? (string)$row['material_section']
                 : $key;
             $row['enabled'] = !empty($row['enabled']);

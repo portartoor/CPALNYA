@@ -9,6 +9,10 @@ $isRu = ($lang === 'ru');
 $page = max(1, (int)($playbooks['page'] ?? 1));
 $totalPages = max(1, (int)($playbooks['total_pages'] ?? 1));
 $currentCluster = trim((string)($playbooks['current_cluster'] ?? ''));
+$sectionKey = trim((string)($playbooks['section_key'] ?? 'playbooks'));
+if ($sectionKey === '') {
+    $sectionKey = 'playbooks';
+}
 $t = static function (string $ru, string $en) use ($isRu): string { return $isRu ? $ru : $en; };
 $strip = static function (string $html, int $limit = 170): string {
     $text = trim((string)preg_replace('/\s+/u', ' ', strip_tags($html)));
@@ -169,18 +173,18 @@ if ($issueImage === '') {
 if ($issueImage === '') {
     $issueImage = '/april2026_new2.png';
 }
-$buildPageUrl = static function (?string $cluster = '', int $pageNum = 1): string {
+$buildPageUrl = static function (?string $cluster = '', int $pageNum = 1) use ($sectionKey): string {
     $base = function_exists('examples_cluster_list_path')
-        ? examples_cluster_list_path((string)$cluster, null, 'playbooks')
+        ? examples_cluster_list_path((string)$cluster, null, $sectionKey)
         : '/playbooks/';
     if ($pageNum > 1) {
         $base .= '?' . http_build_query(['page' => $pageNum]);
     }
     return $base;
 };
-$buildArticleUrl = static function (string $slug, string $cluster = ''): string {
+$buildArticleUrl = static function (string $slug, string $cluster = '') use ($sectionKey): string {
     return function_exists('examples_article_url_path')
-        ? examples_article_url_path($slug, $cluster, null, 'playbooks')
+        ? examples_article_url_path($slug, $cluster, null, $sectionKey)
         : '/playbooks/';
 };
 $selectedArticleUrl = '';
@@ -215,6 +219,11 @@ $issueSubtitle = $t(
     "Гайды, troubleshooting-материалы, рабочие заметки и операционные playbooks для баеров, фармеров, трекинг-операторов, креативных команд и тех, кто держит в руках повседневную механику affiliate-производства.\n\nЭто библиотека не для вдохновения, а для возврата к рабочей форме: когда нужно быстро проверить шаг, восстановить логику сетапа, сравнить решение, перепройти критический узел воронки или просто не потерять темп в шуме ежедневной операционки.\n\nСюда приходят не за общими словами, а за следующим точным действием.",
     "How-to guides, troubleshooting notes, working memos, and reusable operating playbooks for buyers, farmers, tracking operators, creative teams, and everyone holding the daily mechanics of affiliate production together.\n\nThis is a library you return to not for inspiration, but to regain working form: to verify a step, restore setup logic, compare solutions, re-check a critical funnel junction, or simply keep tempo inside noisy daily operations.\n\nPeople come here not for generic advice, but for the exact next move."
 );
+$heroKicker = trim((string)($issue['issue_kicker'] ?? '')) !== '' ? (string)$issue['issue_kicker'] : $heroKicker;
+$heroTitle = trim((string)($issue['hero_title'] ?? '')) !== '' ? (string)$issue['hero_title'] : $heroTitle;
+$heroDescription = trim((string)($issue['hero_description'] ?? '')) !== '' ? (string)$issue['hero_description'] : $heroDescription;
+$issueTitle = trim((string)($issue['issue_title'] ?? '')) !== '' ? (string)$issue['issue_title'] : $issueTitle;
+$issueSubtitle = trim((string)($issue['issue_subtitle'] ?? '')) !== '' ? (string)$issue['issue_subtitle'] : $issueSubtitle;
 ?>
 <style>
 .jrnl{max-width:1480px;margin:0 auto;padding:28px 18px 64px;color:var(--shell-text)}
@@ -334,7 +343,7 @@ $issueSubtitle = $t(
                 <div class="jrnl-detail-body">
                     <div class="jrnl-detail-content"><?= $selectedBodyHtml ?></div>
                     <div class="jrnl-actions">
-                        <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('РќР°Р·Р°Рґ РІ РїСЂР°РєС‚РёРєСѓ', 'Back to playbooks'), ENT_QUOTES, 'UTF-8') ?></a>
+                        <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Назад в раздел', 'Back to section'), ENT_QUOTES, 'UTF-8') ?></a>
                     </div>
                     <?php if ($selectedShareUrl !== ''): ?>
                         <div class="jrnl-share">

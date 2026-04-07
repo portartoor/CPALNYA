@@ -437,7 +437,7 @@ if ($hasQueueTable) {
             FROM seo_article_generation_queue
             WHERE job_date = '{$dateSafe}'
             ORDER BY
-                CASE campaign_key WHEN 'journal' THEN 1 WHEN 'playbooks' THEN 2 ELSE 9 END,
+                CASE campaign_key WHEN 'journal' THEN 1 WHEN 'playbooks' THEN 2 WHEN 'signals' THEN 3 WHEN 'fun' THEN 4 ELSE 9 END,
                 planned_at ASC,
                 id ASC";
     $res = mysqli_query($DB, $sql);

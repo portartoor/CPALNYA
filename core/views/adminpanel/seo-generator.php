@@ -124,7 +124,7 @@
                                         <div class="col-12"><hr class="my-1"></div>
                                         <div class="col-12">
                                             <div class="wiz-title mb-0"><i class="ti ti-layers-intersect"></i> Campaigns</div>
-                                            <div class="wiz-help mb-3">Two independent generation campaigns for ЦПАЛЬНЯ. Global provider, proxy, preview and image settings are shared. Each campaign controls section, limits, topics and writing behavior.</div>
+                                            <div class="wiz-help mb-3">Four independent generation campaigns for ЦПАЛЬНЯ. Global provider, proxy, preview and image settings are shared. Each campaign controls section, limits, topics and writing behavior.</div>
                                         </div>
                                         <?php foreach ($campaigns as $campaignKey => $campaign): ?>
                                             <?php $prefix = 'campaign_' . $campaignKey . '_'; ?>
@@ -135,7 +135,7 @@
                                                             <h6 class="mb-0"><?= htmlspecialchars((string)($campaign['title'] ?? $campaignKey)) ?> / <?= htmlspecialchars((string)($campaign['title_ru'] ?? $campaignKey)) ?></h6>
                                                         </div>
                                                         <div class="col-md-2"><label class="form-label">Enabled</label><select class="form-select" name="<?= htmlspecialchars($prefix) ?>enabled"><option value="1" <?= !empty($campaign['enabled']) ? 'selected' : '' ?>>Yes</option><option value="0" <?= empty($campaign['enabled']) ? 'selected' : '' ?>>No</option></select></div>
-                                                        <div class="col-md-2"><label class="form-label">Section</label><select class="form-select" name="<?= htmlspecialchars($prefix) ?>material_section"><option value="journal" <?= (($campaign['material_section'] ?? '') === 'journal') ? 'selected' : '' ?>>Journal</option><option value="playbooks" <?= (($campaign['material_section'] ?? '') === 'playbooks') ? 'selected' : '' ?>>Playbooks</option></select></div>
+                                                        <div class="col-md-2"><label class="form-label">Section</label><select class="form-select" name="<?= htmlspecialchars($prefix) ?>material_section"><option value="journal" <?= (($campaign['material_section'] ?? '') === 'journal') ? 'selected' : '' ?>>Journal</option><option value="playbooks" <?= (($campaign['material_section'] ?? '') === 'playbooks') ? 'selected' : '' ?>>Playbooks</option><option value="signals" <?= (($campaign['material_section'] ?? '') === 'signals') ? 'selected' : '' ?>>Signals</option><option value="fun" <?= (($campaign['material_section'] ?? '') === 'fun') ? 'selected' : '' ?>>Fun</option></select></div>
                                                         <div class="col-md-2"><label class="form-label">Daily Min</label><input class="form-control" type="number" name="<?= htmlspecialchars($prefix) ?>daily_min" value="<?= (int)($campaign['daily_min'] ?? 4) ?>"></div>
                                                         <div class="col-md-2"><label class="form-label">Daily Max</label><input class="form-control" type="number" name="<?= htmlspecialchars($prefix) ?>daily_max" value="<?= (int)($campaign['daily_max'] ?? 6) ?>"></div>
                                                         <div class="col-md-2"><label class="form-label">Max Per Run</label><input class="form-control" type="number" name="<?= htmlspecialchars($prefix) ?>max_per_run" value="<?= (int)($campaign['max_per_run'] ?? 2) ?>"></div>
@@ -300,7 +300,7 @@
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
                 <h6 class="mb-1">Generation Queue</h6>
-                <div class="text-muted small">Daily queue for `journal` and `playbooks`, with status, attempts, logs and planned time.</div>
+                <div class="text-muted small">Daily queue for `journal`, `playbooks`, `signals` and `fun`, with status, attempts, logs and planned time.</div>
             </div>
             <form method="GET" class="d-flex align-items-center gap-2">
                 <label class="small text-muted mb-0">Date</label>

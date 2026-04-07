@@ -51,7 +51,16 @@ if (!function_exists('examples_default_lang_for_host')) {
 if (!function_exists('examples_section_base')) {
     function examples_section_base(string $materialSection = 'journal', ?string $host = null): string
     {
-        return $materialSection === 'playbooks' ? '/playbooks' : '/journal';
+        if ($materialSection === 'playbooks') {
+            return '/playbooks';
+        }
+        if ($materialSection === 'signals') {
+            return '/signals';
+        }
+        if ($materialSection === 'fun') {
+            return '/fun';
+        }
+        return '/journal';
     }
 }
 

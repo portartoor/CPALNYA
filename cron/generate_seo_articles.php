@@ -103,7 +103,7 @@ function seo_runtime_options(): array
         }
         if (strpos($arg, '--campaign=') === 0) {
             $value = strtolower(trim(substr($arg, 11)));
-            if (in_array($value, ['journal', 'playbooks'], true)) {
+            if (in_array($value, ['journal', 'playbooks', 'signals', 'fun'], true)) {
                 $opts['campaign'] = $value;
             }
             continue;
@@ -3818,6 +3818,132 @@ function seo_find_existing_exact_duplicate(
     return null;
 }
 
+function seo_title_head_signature(string $title): string
+{
+    $normalized = seo_normalize_duplicate_probe_text($title);
+    if ($normalized === '') {
+        return '';
+    }
+    $normalized = str_replace([' — ', ' – ', ' - ', ' :: ', ' | '], ' : ', $normalized);
+    $parts = preg_split('/\s*:\s*/u', $normalized, 2);
+    $head = trim((string)($parts[0] ?? ''));
+    if ($head !== '' && mb_strlen($head, 'UTF-8') >= 24) {
+        return $head;
+    }
+    return $normalized;
+}
+
+function seo_title_significant_tokens(string $title): array
+{
+    $normalized = seo_normalize_duplicate_probe_text($title);
+    if ($normalized === '') {
+        return [];
+    }
+    $parts = preg_split('/\s+/u', $normalized) ?: [];
+    $stop = [
+        'и','в','во','на','по','для','под','над','при','с','со','к','ко','от','до','из','у','о','об','про',
+        'the','a','an','for','of','to','in','on','by','with','from','and','or'
+    ];
+    $out = [];
+    foreach ($parts as $part) {
+        $part = trim((string)$part);
+        if ($part === '' || mb_strlen($part, 'UTF-8') < 3) {
+            continue;
+        }
+        if (in_array($part, $stop, true)) {
+            continue;
+        }
+        $out[] = $part;
+    }
+    return array_values(array_unique($out));
+}
+
+function seo_tokens_overlap_score(array $a, array $b): float
+{
+    if (empty($a) || empty($b)) {
+        return 0.0;
+    }
+    $intersection = array_values(array_intersect($a, $b));
+    if (empty($intersection)) {
+        return 0.0;
+    }
+    return count($intersection) / max(1, min(count($a), count($b)));
+}
+
+function seo_find_existing_near_duplicate_title(
+    mysqli $db,
+    string $domainHost,
+    string $lang,
+    string $materialSection,
+    string $clusterCode,
+    string $title
+): ?array {
+    $title = trim($title);
+    if ($title === '') {
+        return null;
+    }
+
+    $domainSafe = mysqli_real_escape_string($db, $domainHost);
+    $langSafe = mysqli_real_escape_string($db, $lang);
+    $sectionSafe = mysqli_real_escape_string($db, $materialSection);
+    $clusterSafe = mysqli_real_escape_string($db, $clusterCode);
+    $hasClusterCode = seo_table_has_column($db, 'examples_articles', 'cluster_code');
+    $clusterSql = $hasClusterCode
+        ? " AND COALESCE(cluster_code, '') = '{$clusterSafe}'"
+        : '';
+
+    $targetTitle = seo_normalize_duplicate_probe_text($title);
+    $targetHead = seo_title_head_signature($title);
+    $targetTokens = seo_title_significant_tokens($title);
+    if ($targetTitle === '') {
+        return null;
+    }
+
+    $sql = "SELECT id, title, slug" . ($hasClusterCode ? ", cluster_code" : "") . "
+            FROM examples_articles
+            WHERE COALESCE(domain_host, '') = '{$domainSafe}'
+              AND COALESCE(lang_code, 'en') = '{$langSafe}'
+              AND COALESCE(material_section, 'journal') = '{$sectionSafe}'
+              {$clusterSql}
+            ORDER BY id DESC
+            LIMIT 80";
+    $res = mysqli_query($db, $sql);
+    if (!$res) {
+        return null;
+    }
+
+    while ($row = mysqli_fetch_assoc($res)) {
+        $existingTitleRaw = trim((string)($row['title'] ?? ''));
+        if ($existingTitleRaw === '') {
+            continue;
+        }
+        $existingTitle = seo_normalize_duplicate_probe_text($existingTitleRaw);
+        if ($existingTitle === '') {
+            continue;
+        }
+        if ($existingTitle === $targetTitle) {
+            mysqli_free_result($res);
+            return $row;
+        }
+
+        $existingHead = seo_title_head_signature($existingTitleRaw);
+        if ($targetHead !== '' && $existingHead !== '' && $targetHead === $existingHead) {
+            mysqli_free_result($res);
+            return $row;
+        }
+
+        $existingTokens = seo_title_significant_tokens($existingTitleRaw);
+        $overlap = seo_tokens_overlap_score($targetTokens, $existingTokens);
+        if ($overlap >= 0.86) {
+            mysqli_free_result($res);
+            return $row;
+        }
+    }
+
+    mysqli_free_result($res);
+    return null;
+}
+
 function seo_apply_campaign_to_cfg(array $cfg, array $runtime): array
 {
     $campaignKey = strtolower(trim((string)($runtime['campaign'] ?? '')));
@@ -5814,7 +5940,7 @@ function seo_publish_article(
     $titleSafe = mysqli_real_escape_string($db, $title);
     $slugSafe = mysqli_real_escape_string($db, $slug);
     $clusterSafe = mysqli_real_escape_string($db, $clusterCode);
-    $materialSection = in_array((string)($cfg['campaign_material_section'] ?? 'journal'), ['journal', 'playbooks'], true)
+    $materialSection = in_array((string)($cfg['campaign_material_section'] ?? 'journal'), ['journal', 'playbooks', 'signals', 'fun'], true)
         ? (string)$cfg['campaign_material_section']
         : 'journal';
     $materialSectionSafe = mysqli_real_escape_string($db, $materialSection);
@@ -5841,6 +5967,27 @@ function seo_publish_article(
             : '';
         throw new RuntimeException(
             'Duplicate generated article matches existing article #'
+            . $existingId
+            . ($existingUrl !== '' ? ' (' . $existingUrl . ')' : '')
+        );
+    }
+
+    $existingNearDuplicate = seo_find_existing_near_duplicate_title(
+        $db,
+        $domainForLang,
+        $lang,
+        $materialSection,
+        $clusterCode,
+        $title
+    );
+    if (is_array($existingNearDuplicate)) {
+        $existingId = (int)($existingNearDuplicate['id'] ?? 0);
+        $existingSlug = trim((string)($existingNearDuplicate['slug'] ?? ''));
+        $existingUrl = $existingSlug !== ''
+            ? seo_article_public_url($lang, $existingSlug, (string)($existingNearDuplicate['cluster_code'] ?? $clusterCode), $materialSection)
+            : '';
+        throw new RuntimeException(
+            'Near-duplicate title matches existing article #'
             . $existingId
             . ($existingUrl !== '' ? ' (' . $existingUrl . ')' : '')
         );

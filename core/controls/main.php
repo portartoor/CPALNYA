@@ -5,6 +5,8 @@ $isRu = ($lang === 'ru');
 
 $journalItems = [];
 $playbookItems = [];
+$signalsItems = [];
+$funItems = [];
 $issue = [];
 $heroFeature = null;
 
@@ -18,11 +20,15 @@ if (is_file(DIR . 'core/libs/journal_issue.php')) {
 if (function_exists('examples_fetch_published_list')) {
     $journalItems = examples_fetch_published_list($FRMWRK, $host, 8, $lang, '', 'journal');
     $playbookItems = examples_fetch_published_list($FRMWRK, $host, 8, $lang, '', 'playbooks');
+    $signalsItems = examples_fetch_published_list($FRMWRK, $host, 8, $lang, '', 'signals');
+    $funItems = examples_fetch_published_list($FRMWRK, $host, 8, $lang, '', 'fun');
 }
 
 if (function_exists('examples_popularity_attach_views')) {
     $journalItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'journal', (array)$journalItems);
     $playbookItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'playbooks', (array)$playbookItems);
+    $signalsItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'signals', (array)$signalsItems);
+    $funItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'fun', (array)$funItems);
 }
 
 foreach ($journalItems as &$row) {
@@ -43,6 +49,22 @@ if (!empty($journalItems)) {
 }
 
 foreach ($playbookItems as &$row) {
+    $thumb = trim((string)($row['preview_image_thumb_url'] ?? ''));
+    $full = trim((string)($row['preview_image_url'] ?? ''));
+    $base = trim((string)($row['preview_image_data'] ?? ''));
+    $row['image_src'] = $thumb !== '' ? $thumb : ($full !== '' ? $full : $base);
+}
+unset($row);
+
+foreach ($signalsItems as &$row) {
+    $thumb = trim((string)($row['preview_image_thumb_url'] ?? ''));
+    $full = trim((string)($row['preview_image_url'] ?? ''));
+    $base = trim((string)($row['preview_image_data'] ?? ''));
+    $row['image_src'] = $thumb !== '' ? $thumb : ($full !== '' ? $full : $base);
+}
+unset($row);
+
+foreach ($funItems as &$row) {
     $thumb = trim((string)($row['preview_image_thumb_url'] ?? ''));
     $full = trim((string)($row['preview_image_url'] ?? ''));
     $base = trim((string)($row['preview_image_data'] ?? ''));
@@ -72,6 +94,8 @@ $ModelPage['home_portal'] = [
     'hero_feature' => is_array($heroFeature) ? $heroFeature : null,
     'journal_items' => array_values((array)$journalItems),
     'playbook_items' => array_values((array)$playbookItems),
+    'signals_items' => array_values((array)$signalsItems),
+    'fun_items' => array_values((array)$funItems),
 ];
 
 $ModelPage['title'] = $isRu

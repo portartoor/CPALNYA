@@ -112,7 +112,7 @@ function queue_runtime_options(): array
         }
         if (strpos($arg, '--campaign=') === 0) {
             $value = strtolower(trim(substr($arg, 11)));
-            if (in_array($value, ['journal', 'playbooks'], true)) {
+            if (in_array($value, ['journal', 'playbooks', 'signals', 'fun'], true)) {
                 $opts['campaign'] = $value;
             }
             continue;
@@ -172,7 +172,7 @@ function queue_add_task(
 ): bool {
     $jobDateSafe = mysqli_real_escape_string($db, $jobDate);
     $langSafe = mysqli_real_escape_string($db, examples_normalize_lang($lang));
-    $campaignSafe = mysqli_real_escape_string($db, in_array($campaignKey, ['journal', 'playbooks'], true) ? $campaignKey : '');
+    $campaignSafe = mysqli_real_escape_string($db, in_array($campaignKey, ['journal', 'playbooks', 'signals', 'fun'], true) ? $campaignKey : '');
     $plannedSql = $plannedAt !== null && $plannedAt !== ''
         ? "'" . mysqli_real_escape_string($db, $plannedAt) . "'"
         : 'NOW()';
@@ -433,8 +433,8 @@ if ($opts['mode'] === 'work') {
 
 queue_echo('Usage:');
 queue_echo('  --ensure');
-queue_echo('  --enqueue-test [--campaign=journal|playbooks] [--date=YYYY-MM-DD] [--planned-at="YYYY-MM-DD HH:MM:SS"]');
+queue_echo('  --enqueue-test [--campaign=journal|playbooks|signals|fun] [--date=YYYY-MM-DD] [--planned-at="YYYY-MM-DD HH:MM:SS"]');
 queue_echo('  --enqueue-daily [--date=YYYY-MM-DD]');
-queue_echo('  --enqueue --date=YYYY-MM-DD --lang=ru [--campaign=journal|playbooks] [--force|--no-force] [--dry-run] [--max-per-run=1]');
+queue_echo('  --enqueue --date=YYYY-MM-DD --lang=ru [--campaign=journal|playbooks|signals|fun] [--force|--no-force] [--dry-run] [--max-per-run=1]');
 queue_echo('  --work [--limit=2]');
 exit(0);
