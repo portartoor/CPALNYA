@@ -54,6 +54,13 @@ $imageSrc = static function (array $item): string {
     return $legacy;
 };
 $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover : null);
+$heroSection = trim((string)($heroCard['source_section'] ?? 'journal'));
+$heroSectionTitles = [
+    'journal' => $t('Журнал', 'Journal'),
+    'playbooks' => $t('Практика', 'Playbooks'),
+    'signals' => $t('Повестка', 'Signals'),
+    'fun' => $t('Фан', 'Fun'),
+];
 ?>
 <style>
 .home-z{max-width:1240px;margin:0 auto;padding:28px 18px 64px;color:var(--shell-text)}
@@ -129,10 +136,11 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
                         </div>
                         <div class="home-z-feature-copy">
                             <div class="home-z-feature-top">
-                                <span class="home-z-tag"><?= htmlspecialchars($t('Из журнала', 'From the journal'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <span class="home-z-tag"><?= htmlspecialchars($t('Случайный материал', 'Random feature'), ENT_QUOTES, 'UTF-8') ?></span>
                                 <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($heroCard['view_count'] ?? 0) ?></span>
                             </div>
-                            <h3><a href="<?= htmlspecialchars($buildArticleUrl((array)$heroCard, 'journal'), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)($heroCard['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></a></h3>
+                            <p class="home-z-meta"><?= htmlspecialchars((string)($heroSectionTitles[$heroSection] ?? $heroSectionTitles['journal']), ENT_QUOTES, 'UTF-8') ?></p>
+                            <h3><a href="<?= htmlspecialchars($buildArticleUrl((array)$heroCard, $heroSection), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)($heroCard['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></a></h3>
                             <p><?= htmlspecialchars($excerpt((string)($heroCard['excerpt_html'] ?? $heroCard['content_html'] ?? ''), 240), ENT_QUOTES, 'UTF-8') ?></p>
                         </div>
                     </div>

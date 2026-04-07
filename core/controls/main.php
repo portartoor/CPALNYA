@@ -31,46 +31,38 @@ if (function_exists('examples_popularity_attach_views')) {
     $funItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'fun', (array)$funItems);
 }
 
-foreach ($journalItems as &$row) {
-    $thumb = trim((string)($row['preview_image_thumb_url'] ?? ''));
-    $full = trim((string)($row['preview_image_url'] ?? ''));
-    $base = trim((string)($row['preview_image_data'] ?? ''));
-    $row['image_src'] = $thumb !== '' ? $thumb : ($full !== '' ? $full : $base);
-}
-unset($row);
+$decorateItems = static function (array $items, string $section): array {
+    foreach ($items as &$row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $thumb = trim((string)($row['preview_image_thumb_url'] ?? ''));
+        $full = trim((string)($row['preview_image_url'] ?? ''));
+        $base = trim((string)($row['preview_image_data'] ?? ''));
+        $row['image_src'] = $thumb !== '' ? $thumb : ($full !== '' ? $full : $base);
+        $row['source_section'] = $section;
+    }
+    unset($row);
+    return array_values($items);
+};
 
-if (!empty($journalItems)) {
-    $heroPool = array_values(array_filter((array)$journalItems, static function ($item): bool {
-        return is_array($item) && trim((string)($item['slug'] ?? '')) !== '';
-    }));
-    if (!empty($heroPool)) {
-        $heroFeature = $heroPool[array_rand($heroPool)];
+$journalItems = $decorateItems((array)$journalItems, 'journal');
+$playbookItems = $decorateItems((array)$playbookItems, 'playbooks');
+$signalsItems = $decorateItems((array)$signalsItems, 'signals');
+$funItems = $decorateItems((array)$funItems, 'fun');
+
+$heroPool = [];
+foreach ([$journalItems, $playbookItems, $signalsItems, $funItems] as $sectionItems) {
+    foreach ((array)$sectionItems as $item) {
+        if (!is_array($item) || trim((string)($item['slug'] ?? '')) === '') {
+            continue;
+        }
+        $heroPool[] = $item;
     }
 }
-
-foreach ($playbookItems as &$row) {
-    $thumb = trim((string)($row['preview_image_thumb_url'] ?? ''));
-    $full = trim((string)($row['preview_image_url'] ?? ''));
-    $base = trim((string)($row['preview_image_data'] ?? ''));
-    $row['image_src'] = $thumb !== '' ? $thumb : ($full !== '' ? $full : $base);
+if (!empty($heroPool)) {
+    $heroFeature = $heroPool[array_rand($heroPool)];
 }
-unset($row);
-
-foreach ($signalsItems as &$row) {
-    $thumb = trim((string)($row['preview_image_thumb_url'] ?? ''));
-    $full = trim((string)($row['preview_image_url'] ?? ''));
-    $base = trim((string)($row['preview_image_data'] ?? ''));
-    $row['image_src'] = $thumb !== '' ? $thumb : ($full !== '' ? $full : $base);
-}
-unset($row);
-
-foreach ($funItems as &$row) {
-    $thumb = trim((string)($row['preview_image_thumb_url'] ?? ''));
-    $full = trim((string)($row['preview_image_url'] ?? ''));
-    $base = trim((string)($row['preview_image_data'] ?? ''));
-    $row['image_src'] = $thumb !== '' ? $thumb : ($full !== '' ? $full : $base);
-}
-unset($row);
 
 if (function_exists('journal_issue_get')) {
     $db = $FRMWRK->DB();
