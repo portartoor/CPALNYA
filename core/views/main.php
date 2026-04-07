@@ -56,11 +56,9 @@ foreach ($streamItems as $item) {
             'items' => [],
         ];
     }
-    if (count($topicSections[$sectionKey]['items']) < 3) {
-        $topicSections[$sectionKey]['items'][] = $item;
-    }
+    $topicSections[$sectionKey]['items'][] = $item;
 }
-$topicSections = array_slice(array_values($topicSections), 0, 4);
+$topicSections = array_values($topicSections);
 
 $issueChips = [
     $t('арбитраж трафика', 'traffic arbitrage'),

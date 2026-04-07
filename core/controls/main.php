@@ -12,7 +12,7 @@ $featuredCases = [];
 if (is_file(DIR . 'core/controls/examples/_common.php')) {
     require_once DIR . 'core/controls/examples/_common.php';
     if (function_exists('examples_fetch_published_list')) {
-        $blogItems = examples_fetch_published_list($FRMWRK, $host, 6, $lang, '');
+        $blogItems = examples_fetch_published_list($FRMWRK, $host, 500, $lang, '', 'journal');
     }
 }
 if (function_exists('public_portal_fetch_solutions')) {
