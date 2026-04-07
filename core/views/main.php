@@ -66,14 +66,14 @@ $heroSectionTitles = [
 .home-z{max-width:1240px;margin:0 auto;padding:28px 18px 64px;color:var(--shell-text)}
 .home-z-shell{display:grid;gap:22px}
 .home-z-hero,.home-z-block{border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(6,12,24,.88),rgba(5,10,20,.76));box-shadow:var(--shell-shadow)}
-.home-z-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:18px;padding:28px}
+.home-z-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:18px;padding:28px;align-items:start}
 .home-z-copy{display:grid;gap:12px}
 .home-z-kicker,.home-z-tag,.home-z-meta{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;max-height:30px;border:1px solid rgba(122,180,255,.2);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
 .home-z h1{margin:0;font:700 2rem/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.05em}
 .home-z h2{margin:0;font:700 1.5rem/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.04em}
 .home-z-copy p,.home-z-card p{margin:0;color:var(--shell-muted);line-height:1.65}
 .home-z-hero-lead{display:grid;gap:10px;max-width:72ch}
-.home-z-cover{border:1px solid rgba(255,255,255,.08);overflow:hidden;background:radial-gradient(circle at 50% 22%,rgba(103,200,255,.16),transparent 26%),linear-gradient(180deg,rgba(6,11,20,.96),rgba(4,8,16,.92))}
+.home-z-cover{align-self:start;border:1px solid rgba(255,255,255,.08);overflow:hidden;background:radial-gradient(circle at 50% 22%,rgba(103,200,255,.16),transparent 26%),linear-gradient(180deg,rgba(6,11,20,.96),rgba(4,8,16,.92))}
 .home-z-cover img{display:block;width:100%;height:auto}
 .home-z-actions{display:flex;gap:10px;flex-wrap:wrap}
 .home-z-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:9px 18px;border:1px solid rgba(122,180,255,.18);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));color:var(--shell-text);text-decoration:none;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
@@ -117,8 +117,8 @@ $heroSectionTitles = [
                 <span class="home-z-kicker"><?= htmlspecialchars((string)($issue['issue_kicker'] ?? $t('APRIL ISSUE / ЦПАЛЬНЯ', 'APRIL ISSUE / ЦПАЛЬНЯ')), ENT_QUOTES, 'UTF-8') ?></span>
                 <h1><?= htmlspecialchars((string)($issue['issue_title'] ?? $t("Апрель '26", "April '26")), ENT_QUOTES, 'UTF-8') ?></h1>
                 <div class="home-z-hero-lead">
-                    <p><?= htmlspecialchars($t('Журнал про арбитраж трафика как живую редакционную среду: здесь важны не витринные обещания, а внутренний ритм affiliate-команд, где источники дрейфуют, связки пересобираются, креативы быстро стареют, а решения принимаются под давлением реального рынка.', 'A journal about traffic arbitrage as a living editorial environment: not showcase promises, but the internal rhythm of affiliate teams, where sources drift, bundles get rebuilt, creatives age fast, and decisions are made under real market pressure.'), ENT_QUOTES, 'UTF-8') ?></p>
-                    <p><?= htmlspecialchars((string)($issue['issue_subtitle'] ?? $t('ЦПАЛЬНЯ собирает это не как ленту, а как номер. Апрель ’26 посвящен backstage affiliate-операций: источникам трафика, фарму, креативным связкам, трекерам, модерации и операционным playbooks. Это редакционный срез месяца для тех, кто привык видеть за цифрами механику и собирать из хаоса рабочую систему.', 'ЦПАЛЬНЯ assembles this not as a feed, but as an issue. April ’26 is about the backstage of affiliate operations: traffic sources, farm, creative bundles, trackers, moderation, and operational playbooks. A monthly editorial cut for readers who look past the numbers and build working systems out of chaos.')), ENT_QUOTES, 'UTF-8') ?></p>
+                    <p><?= htmlspecialchars($t('Журнал про арбитраж трафика как живую редакционную среду: здесь важен не фасад отрасли, а внутренний ритм affiliate-команд, где источники дрейфуют, связки пересобираются, а решения принимаются под давлением реального рынка.', 'A journal about traffic arbitrage as a living editorial environment: less about the showcase layer, more about the working rhythm of affiliate teams under real market pressure.'), ENT_QUOTES, 'UTF-8') ?></p>
+                    <p><?= htmlspecialchars((string)($issue['issue_subtitle'] ?? $t('ЦПАЛЬНЯ собирает это не как ленту, а как номер. Апрель ’26 посвящен backstage affiliate-операций: источникам трафика, фарму, креативным связкам, трекерам, модерации и playbooks, к которым возвращаются, когда рынок ускоряется.', 'ЦПАЛЬНЯ assembles this not as a feed, but as an issue. April ’26 stays focused on the backstage of affiliate operations: sources, farm, creative bundles, trackers, moderation, and playbooks worth returning to when the market speeds up.')), ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
                 <div class="home-z-actions">
                     <a class="home-z-btn" href="/journal/"><span class="home-z-btn-icon" aria-hidden="true">✦</span><span><?= htmlspecialchars($t('В журнал', 'Journal'), ENT_QUOTES, 'UTF-8') ?></span></a>

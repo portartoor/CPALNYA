@@ -160,7 +160,7 @@ $footerSections = [
     </footer>
 </div>
 <button type="button" class="public-back-to-top" id="publicBackToTop" aria-label="<?= htmlspecialchars($t('Наверх', 'Back to top'), ENT_QUOTES, 'UTF-8') ?>">
-    <span class="public-back-to-top-icon" aria-hidden="true">⌃</span>
+    <span class="public-back-to-top-icon" aria-hidden="true">&#10022;</span>
     <span class="public-back-to-top-label"><?= htmlspecialchars($t('Наверх', 'Top'), ENT_QUOTES, 'UTF-8') ?></span>
 </button>
 
@@ -192,7 +192,7 @@ $footerSections = [
 .public-editorial-copy{color:#94aac8;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
 .public-back-to-top{position:fixed;right:28px;bottom:28px;z-index:200;display:inline-flex;gap:8px;align-items:center;padding:10px 12px;border-radius:0;border:1px solid rgba(127,164,223,.26);background:rgba(7,13,24,.84);color:#e7eff9;opacity:0;visibility:hidden;transform:translateX(22px);transition:opacity .24s ease,visibility .24s ease,transform .28s cubic-bezier(.16,1,.3,1);cursor:pointer}
 .public-back-to-top.is-visible{position:fixed;opacity:1;visibility:visible;transform:translateX(0)}
-.public-back-to-top-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;min-width:14px;font-size:16px;line-height:1;color:#f4d56b;transform:translateY(-1px)}
+.public-back-to-top-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;min-width:14px;font-size:14px;line-height:1;color:#f4d56b}
 @media (max-width:980px){.public-editorial-footer-top,.public-editorial-map{grid-template-columns:1fr}}
 </style>
 <script>

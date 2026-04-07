@@ -209,6 +209,128 @@ if ($titleHost !== '' && stripos($title, $titleHost) === false) {
 }
 $googleTagCode = trim((string)($_SERVER['MIRROR_GOOGLE_TAG_CODE'] ?? ''));
 $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? ''));
+
+if (!function_exists('header_search_preview_results')) {
+    function header_search_preview_results($FRMWRK, string $host, string $lang, string $query, int $limit = 12): array
+    {
+        $query = trim($query);
+        if ($query === '' || !is_object($FRMWRK) || !method_exists($FRMWRK, 'DB')) {
+            return [];
+        }
+        $db = $FRMWRK->DB();
+        if (!$db) {
+            return [];
+        }
+        $examplesCommon = defined('DIR') ? DIR . 'core/controls/examples/_common.php' : '';
+        if ($examplesCommon !== '' && is_file($examplesCommon)) {
+            require_once $examplesCommon;
+        }
+        if (!function_exists('examples_table_exists') || !examples_table_exists($db)) {
+            return [];
+        }
+
+        $host = strtolower(trim($host));
+        $lang = function_exists('examples_normalize_lang') ? examples_normalize_lang($lang) : (($lang === 'ru') ? 'ru' : 'en');
+        $limit = max(4, min(24, $limit));
+        $hostSafe = mysqli_real_escape_string($db, $host);
+        $queryLike = mysqli_real_escape_string($db, '%' . $query . '%');
+        $langCond = function_exists('examples_table_has_lang_column') && examples_table_has_lang_column($db)
+            ? "AND lang_code = '" . mysqli_real_escape_string($db, $lang) . "'"
+            : '';
+        $sectionCond = function_exists('examples_table_has_column') && examples_table_has_column($db, 'material_section')
+            ? "AND material_section IN ('journal','playbooks','signals','fun')"
+            : '';
+        $clusterSelect = (function_exists('examples_table_has_column') && examples_table_has_column($db, 'cluster_code'))
+            ? 'cluster_code'
+            : "'' AS cluster_code";
+        $materialSelect = (function_exists('examples_table_has_column') && examples_table_has_column($db, 'material_section'))
+            ? 'material_section'
+            : "'journal' AS material_section";
+        $previewSelect = function_exists('examples_preview_select_sql') ? examples_preview_select_sql($db) : '';
+
+        $sql = "SELECT id, title, slug, excerpt_html, content_html, {$clusterSelect}, {$materialSelect}{$previewSelect}
+                FROM examples_articles
+                WHERE is_published = 1
+                  AND slug IS NOT NULL
+                  AND slug <> ''
+                  AND (domain_host IS NULL OR domain_host = '' OR domain_host = '{$hostSafe}')
+                  {$langCond}
+                  {$sectionCond}
+                  AND (
+                      title LIKE '{$queryLike}'
+                      OR excerpt_html LIKE '{$queryLike}'
+                      OR content_html LIKE '{$queryLike}'
+                  )
+                ORDER BY
+                  CASE
+                    WHEN title LIKE '" . mysqli_real_escape_string($db, $query . '%') . "' THEN 0
+                    WHEN title LIKE '{$queryLike}' THEN 1
+                    ELSE 2
+                  END,
+                  COALESCE(published_at, updated_at, created_at) DESC,
+                  id DESC
+                LIMIT {$limit}";
+
+        $rows = method_exists($FRMWRK, 'DBRecords') ? (array)$FRMWRK->DBRecords($sql) : [];
+        $out = [];
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $slug = trim((string)($row['slug'] ?? ''));
+            if ($slug === '') {
+                continue;
+            }
+            $section = trim((string)($row['material_section'] ?? 'journal'));
+            if (!in_array($section, ['journal', 'playbooks', 'signals', 'fun'], true)) {
+                $section = 'journal';
+            }
+            $cluster = trim((string)($row['cluster_code'] ?? ''));
+            $url = function_exists('examples_article_url_path')
+                ? examples_article_url_path($slug, $cluster, $host, $section)
+                : '/journal/' . rawurlencode($slug) . '/';
+            $thumb = trim((string)($row['preview_image_thumb_url'] ?? ''));
+            $full = trim((string)($row['preview_image_url'] ?? ''));
+            $data = trim((string)($row['preview_image_data'] ?? ''));
+            $image = $thumb !== '' ? $thumb : ($full !== '' ? $full : $data);
+            $excerptSource = (string)($row['excerpt_html'] ?? '');
+            if (trim($excerptSource) === '') {
+                $excerptSource = (string)($row['content_html'] ?? '');
+            }
+            $excerpt = trim((string)preg_replace('/\s+/u', ' ', strip_tags($excerptSource)));
+            if ($excerpt === '' && function_exists('examples_build_excerpt')) {
+                $excerpt = examples_build_excerpt($excerptSource);
+            }
+            if (function_exists('mb_strlen') && mb_strlen($excerpt, 'UTF-8') > 110) {
+                $excerpt = rtrim((string)mb_substr($excerpt, 0, 107, 'UTF-8')) . '...';
+            }
+            $out[] = [
+                'title' => trim((string)($row['title'] ?? '')),
+                'url' => $url,
+                'image' => $image,
+                'section' => $section,
+                'excerpt' => $excerpt,
+            ];
+        }
+
+        return $out;
+    }
+}
+
+if (isset($_GET['header_search_preview'])) {
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    header('Content-Type: application/json; charset=UTF-8');
+    $rawQuery = trim((string)($_GET['q'] ?? ''));
+    $items = header_search_preview_results($FRMWRK ?? null, $titleHost, $isRu ? 'ru' : 'en', $rawQuery, 12);
+    echo json_encode([
+        'ok' => true,
+        'query' => $rawQuery,
+        'items' => $items,
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
 ?>
 <!doctype html>
 <html lang="<?= htmlspecialchars($htmlLang, ENT_QUOTES, 'UTF-8') ?>">
@@ -368,6 +490,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         box-shadow: 0 14px 42px rgba(0, 4, 14, .16);
         clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
         backdrop-filter: blur(10px) saturate(116%);
+        transition: padding .24s ease, background .24s ease, box-shadow .24s ease, border-color .24s ease, transform .24s ease;
     }
     .simple-header::before {
         content: "";
@@ -376,7 +499,13 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         background: linear-gradient(90deg, rgba(61,116,255,.08), transparent 22%, transparent 78%, rgba(39,223,192,.08)), linear-gradient(180deg, rgba(255,255,255,.03), transparent 44%), radial-gradient(circle at 82% 18%, rgba(255,154,95,.06), transparent 18%);
         pointer-events: none;
     }
-    .simple-header.is-scrolled { transform: translateY(-2px); }
+    .simple-header.is-scrolled {
+        transform: translateY(0);
+        padding: 10px 16px;
+        background: linear-gradient(180deg, rgba(6,10,18,.72), rgba(7,12,23,.58));
+        box-shadow: 0 18px 42px rgba(0, 4, 14, .22);
+        border-color: var(--shell-border-strong);
+    }
 
     .simple-brand {
         grid-column: 1;
@@ -386,6 +515,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         gap: 14px;
         min-width: 0;
         text-decoration: none;
+        transition: gap .24s ease, transform .24s ease;
     }
     .pc-logo-wrap { display: grid; gap: 4px; }
     .pc-logo {
@@ -399,6 +529,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         font: 700 34px/1 "Space Grotesk", "Sora", sans-serif;
         letter-spacing: -.08em;
         color: var(--shell-text);
+        transition: font-size .24s ease, letter-spacing .24s ease;
     }
     .pc-logo-main .pc-logo-accent {
         font-weight: 900;
@@ -422,6 +553,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         font-weight: 800;
         letter-spacing: .18em;
         text-transform: uppercase;
+        transition: min-width .24s ease, min-height .24s ease, padding .24s ease, font-size .24s ease, opacity .2s ease, transform .24s ease;
     }
     .pc-brand-copy {
         display: grid;
@@ -433,6 +565,10 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         grid-row: 1;
         min-width: 0;
         align-self: end;
+        overflow: hidden;
+        transform-origin: top;
+        transition: opacity .2s ease, max-height .24s ease, transform .24s ease, margin .24s ease;
+        max-height: 88px;
     }
     .pc-brand-copy strong {
         display: inline-flex;
@@ -505,6 +641,10 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         grid-column: 2;
         grid-row: 2;
         min-width: 0;
+        overflow: hidden;
+        transform-origin: top;
+        transition: opacity .2s ease, max-height .24s ease, transform .24s ease, margin .24s ease;
+        max-height: 88px;
     }
     .simple-header-search {
         display: grid;
@@ -516,6 +656,8 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         border: 1px solid var(--shell-border);
         background: rgba(255,255,255,.03);
         clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+        transition: opacity .2s ease, transform .24s ease, border-color .24s ease;
+        position: relative;
     }
     .simple-header-search input {
         width: 100%;
@@ -527,6 +669,100 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         color: var(--shell-text);
     }
     .simple-header-search input::placeholder { color: var(--shell-muted); }
+    .simple-search-preview {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: calc(100% + 10px);
+        display: grid;
+        gap: 12px;
+        padding: 14px;
+        border: 1px solid var(--shell-border);
+        background: var(--shell-panel-strong);
+        box-shadow: 0 18px 44px rgba(0, 4, 14, .22);
+        backdrop-filter: blur(16px);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        pointer-events: none;
+        transition: opacity .18s ease, transform .22s ease, visibility .18s ease;
+        z-index: 10020;
+        max-height: min(60vh, 520px);
+        overflow-y: auto;
+    }
+    .simple-search-preview.is-visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+    .simple-search-preview-group { display: grid; gap: 8px; }
+    .simple-search-preview-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: rgba(173, 190, 217, .82);
+        font: 700 10px/1 "Space Grotesk", "Sora", sans-serif;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+    }
+    .simple-search-preview-title::before {
+        content: "";
+        width: 14px;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(115,184,255,.45), transparent);
+    }
+    .simple-search-preview-list { display: grid; gap: 8px; }
+    .simple-search-preview-item {
+        display: grid;
+        grid-template-columns: 56px minmax(0,1fr);
+        gap: 10px;
+        align-items: start;
+        padding: 8px;
+        background: rgba(255,255,255,.03);
+        text-decoration: none;
+        color: inherit;
+        transition: background .18s ease, border-color .18s ease, transform .18s ease;
+    }
+    .simple-search-preview-item:hover,
+    .simple-search-preview-item.is-active {
+        background: rgba(255,255,255,.07);
+        transform: translateY(-1px);
+    }
+    .simple-search-preview-thumb {
+        width: 56px;
+        height: 56px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: linear-gradient(135deg, rgba(115,184,255,.18), rgba(39,223,192,.12));
+        overflow: hidden;
+    }
+    .simple-search-preview-thumb img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .simple-search-preview-copy {
+        min-width: 0;
+        display: grid;
+        gap: 4px;
+    }
+    .simple-search-preview-copy strong {
+        font-size: 13px;
+        line-height: 1.25;
+        color: var(--shell-text);
+    }
+    .simple-search-preview-copy span {
+        color: var(--shell-muted);
+        font-size: 11px;
+        line-height: 1.35;
+    }
+    .simple-search-preview-empty {
+        color: var(--shell-muted);
+        font-size: 12px;
+        line-height: 1.5;
+        padding: 4px 2px;
+    }
     .simple-header-search button,
     .simple-header-action,
     .nav-cta,
@@ -567,6 +803,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         gap: 10px;
         min-width: 0;
         flex-wrap: nowrap;
+        transition: transform .24s ease;
     }
     .simple-nav {
         grid-column: 1 / -1;
@@ -583,6 +820,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         overflow-x: auto;
         overflow-y: hidden;
         scrollbar-width: none;
+        transition: padding-top .24s ease, margin-top .24s ease, border-color .24s ease, gap .24s ease;
     }
     .simple-nav::-webkit-scrollbar { display: none; }
     .simple-nav a,
@@ -612,6 +850,49 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         color: var(--shell-text);
         background: linear-gradient(135deg, rgba(115,184,255,.18), rgba(39,223,192,.12));
         border-color: var(--shell-border-strong);
+    }
+    .simple-header.is-scrolled .simple-brand {
+        grid-row: 1;
+        gap: 10px;
+    }
+    .simple-header.is-scrolled .pc-logo-main {
+        font-size: 28px;
+        letter-spacing: -.06em;
+    }
+    .simple-header.is-scrolled .pc-logo-core {
+        min-width: 64px;
+        min-height: 20px;
+        padding: 2px 8px;
+        font-size: 9px;
+        transform: translateY(1px);
+    }
+    .simple-header.is-scrolled .simple-header-note,
+    .simple-header.is-scrolled .simple-header-center {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-8px) scaleY(.92);
+        pointer-events: none;
+        margin: 0;
+    }
+    .simple-header.is-scrolled .simple-header-right {
+        grid-row: 1;
+        align-self: center;
+    }
+    .simple-header.is-scrolled .simple-nav {
+        grid-column: 2;
+        grid-row: 1;
+        align-self: center;
+        min-width: 0;
+        padding-top: 0;
+        margin-top: 0;
+        border-top-color: transparent;
+        justify-content: flex-start;
+        gap: 6px;
+    }
+    .simple-header.is-scrolled .simple-nav a,
+    .simple-header.is-scrolled .nav-theme-toggle {
+        padding: 5px 8px;
+        font-size: 11px;
     }
     .nav-item-icon {
         display: inline-flex;
@@ -680,6 +961,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     .simple-nav-toggle span:nth-child(2) { top: 25px; }
     .simple-nav-toggle span:nth-child(3) { top: 32px; }
     .simple-nav-backdrop { display: none; }
+    body.simple-nav-open { overflow: hidden; }
 
     .neo-panel,
     .cp-card,
@@ -873,6 +1155,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
             right: 18px;
             top: calc(var(--simple-header-height) + 8px);
             width: min(92vw, 390px);
+            max-height: calc(100vh - var(--simple-header-height) - 28px);
             padding: 18px;
             border: 1px solid var(--shell-border);
             background: var(--shell-panel-strong);
@@ -885,19 +1168,31 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
             transform: translateY(-10px) scale(.98);
             opacity: 0;
             pointer-events: none;
+            overflow-y: auto;
+            overscroll-behavior: contain;
             transition: transform .22s ease, opacity .22s ease;
             z-index: 10001;
         }
         .simple-nav a,
         .nav-cta,
-        .nav-theme-toggle { width: 100%; justify-content: center; }
-        .nav-section-label { width: 100%; justify-content: flex-start; padding: 4px 2px 0; }
+        .nav-theme-toggle { width: 100%; justify-content: flex-start; min-height: 42px; padding: 11px 12px; }
+        .nav-section-label { width: 100%; justify-content: flex-start; padding: 8px 2px 2px; }
         .nav-section-label::before { width: 18px; }
         body.simple-nav-open .simple-nav { transform: none; opacity: 1; pointer-events: auto; }
         body.simple-nav-open .simple-nav-backdrop { opacity: 1; pointer-events: auto; }
         body.simple-nav-open .simple-nav-toggle span:nth-child(1) { top: 25px; transform: rotate(45deg); }
         body.simple-nav-open .simple-nav-toggle span:nth-child(2) { opacity: 0; }
         body.simple-nav-open .simple-nav-toggle span:nth-child(3) { top: 25px; transform: rotate(-45deg); }
+        .simple-header.is-scrolled {
+            padding: 12px 14px;
+        }
+        .simple-header.is-scrolled .pc-logo-main {
+            font-size: 28px;
+        }
+        .simple-header.is-scrolled .simple-nav {
+            grid-column: 1 / -1;
+            grid-row: auto;
+        }
     }
 
     @media (max-width: 720px) {
@@ -912,6 +1207,20 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         .pc-logo-main { font-size: 28px; }
         .pc-brand-copy span { display: none; }
         .simple-header-action { display: none; }
+        .simple-nav {
+            left: 10px;
+            right: 10px;
+            width: auto;
+            top: calc(var(--simple-header-height) + 6px);
+            max-height: calc(100vh - var(--simple-header-height) - 18px);
+            padding: 16px 14px;
+        }
+        .simple-nav a,
+        .nav-theme-toggle { font-size: 13px; }
+        .simple-search-preview {
+            top: calc(100% + 8px);
+            padding: 12px;
+        }
     }
     </style>
 </head>
@@ -937,6 +1246,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         <form class="simple-header-search" method="get" action="/journal/">
             <input type="text" name="q" data-search-input placeholder="<?= htmlspecialchars($isRu ? 'Поиск: Facebook farm, антидетект, tracker setup, nutra funnel' : 'Search: Facebook farm, anti-detect, tracker setup, nutra funnel', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
             <button type="submit"><?= htmlspecialchars($isRu ? 'Найти в выпусках' : 'Search issues', ENT_QUOTES, 'UTF-8') ?></button>
+            <div class="simple-search-preview" id="simple-search-preview" aria-hidden="true"></div>
         </form>
     </div>
 
@@ -947,7 +1257,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     </div>
 
     <div class="simple-nav-backdrop" data-simple-nav-close></div>
-    <nav class="simple-nav" id="simple-nav-drawer">
+    <nav class="simple-nav" id="simple-nav-drawer" aria-hidden="true">
         <?php include DIR . '/template/views/simple/nav.php'; ?>
     </nav>
 </header>
@@ -958,10 +1268,139 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     var backdrop = document.querySelector('.simple-nav-backdrop');
     var header = document.getElementById('cp-header');
     var searchInput = document.querySelector('[data-search-input]');
+    var searchForm = searchInput ? searchInput.closest('form') : null;
+    var searchPreview = document.getElementById('simple-search-preview');
     var placeholderIndex = 0;
+    var previewTimer = null;
+    var previewAbort = null;
+    var previewItems = [];
+    var previewActiveIndex = -1;
+    var previewSectionOrder = ['journal', 'playbooks', 'signals', 'fun'];
+    var searchPreviewUrl = <?= json_encode($canonicalPath . '?header_search_preview=1', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    var sectionLabels = <?= json_encode($isRu
+        ? ['journal' => 'Журнал', 'playbooks' => 'Практика', 'signals' => 'Повестка', 'fun' => 'Фан']
+        : ['journal' => 'Journal', 'playbooks' => 'Playbooks', 'signals' => 'Signals', 'fun' => 'Fun'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
     var placeholders = <?= json_encode($isRu
         ? ["Поиск: Facebook farm, антидетект, tracker setup, nutra funnel", "Поиск: TikTok creatives, BM risk, cloaking, iGaming flow", "Поиск: прогрев аккаунтов, sweepstakes, crypto angles, team SOP"]
         : ["Search: Facebook farm, anti-detect, tracker setup, nutra funnel", "Search: TikTok creatives, BM risk, cloaking, iGaming flow", "Search: account warmup, sweepstakes, crypto angles, team SOP"], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    function escapeHtml(value) {
+        return String(value || '').replace(/[&<>"']/g, function (ch) {
+            return ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'})[ch] || ch;
+        });
+    }
+    function closePreview() {
+        previewItems = [];
+        previewActiveIndex = -1;
+        if (searchPreview) {
+            searchPreview.classList.remove('is-visible');
+            searchPreview.setAttribute('aria-hidden', 'true');
+            searchPreview.innerHTML = '';
+        }
+    }
+    function renderPreview(groups) {
+        if (!searchPreview) {
+            return;
+        }
+        var html = '';
+        previewItems = [];
+        previewActiveIndex = -1;
+        var keys = previewSectionOrder.filter(function (key) {
+            return Array.isArray(groups[key]) && groups[key].length;
+        });
+        Object.keys(groups).forEach(function (key) {
+            if (keys.indexOf(key) === -1 && Array.isArray(groups[key]) && groups[key].length) {
+                keys.push(key);
+            }
+        });
+        keys.forEach(function (sectionKey) {
+            var items = groups[sectionKey] || [];
+            if (!items.length) {
+                return;
+            }
+            html += '<section class="simple-search-preview-group">';
+            html += '<div class="simple-search-preview-title">' + escapeHtml(sectionLabels[sectionKey] || sectionKey) + '</div>';
+            html += '<div class="simple-search-preview-list">';
+            items.forEach(function (item) {
+                var idx = previewItems.length;
+                previewItems.push(item);
+                html += '<a class="simple-search-preview-item" data-preview-index="' + idx + '" href="' + escapeHtml(item.url || '#') + '">';
+                html += '<span class="simple-search-preview-thumb">';
+                if (item.image) {
+                    html += '<img src="' + escapeHtml(item.image) + '" alt="' + escapeHtml(item.title || '') + '">';
+                }
+                html += '</span>';
+                html += '<span class="simple-search-preview-copy">';
+                html += '<strong>' + escapeHtml(item.title || '') + '</strong>';
+                if (item.excerpt) {
+                    html += '<span>' + escapeHtml(item.excerpt) + '</span>';
+                }
+                html += '</span>';
+                html += '</a>';
+            });
+            html += '</div></section>';
+        });
+        searchPreview.innerHTML = html;
+        searchPreview.classList.add('is-visible');
+        searchPreview.setAttribute('aria-hidden', 'false');
+    }
+    function highlightPreview(index) {
+        previewActiveIndex = index;
+        if (!searchPreview) {
+            return;
+        }
+        searchPreview.querySelectorAll('.simple-search-preview-item').forEach(function (node) {
+            node.classList.toggle('is-active', Number(node.getAttribute('data-preview-index')) === index);
+        });
+        if (index >= 0) {
+            var active = searchPreview.querySelector('.simple-search-preview-item.is-active');
+            if (active && typeof active.scrollIntoView === 'function') {
+                active.scrollIntoView({ block: 'nearest' });
+            }
+        }
+    }
+    function fetchPreview(query) {
+        if (!searchPreview) {
+            return;
+        }
+        if (previewAbort && typeof previewAbort.abort === 'function') {
+            previewAbort.abort();
+        }
+        previewAbort = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+        fetch(searchPreviewUrl + '&q=' + encodeURIComponent(query), {
+            credentials: 'same-origin',
+            signal: previewAbort ? previewAbort.signal : undefined
+        })
+            .then(function (res) { return res.ok ? res.json() : null; })
+            .then(function (data) {
+                if (!data || !Array.isArray(data.items)) {
+                    closePreview();
+                    return;
+                }
+                if (!data.items.length) {
+                    searchPreview.innerHTML = '<div class="simple-search-preview-empty"><?= htmlspecialchars($isRu ? 'Ничего не найдено' : 'No results found', ENT_QUOTES, 'UTF-8') ?></div>';
+                    searchPreview.classList.add('is-visible');
+                    searchPreview.setAttribute('aria-hidden', 'false');
+                    previewItems = [];
+                    previewActiveIndex = -1;
+                    return;
+                }
+                var grouped = {};
+                data.items.forEach(function (item) {
+                    var key = item.section || 'journal';
+                    if (!grouped[key]) {
+                        grouped[key] = [];
+                    }
+                    grouped[key].push(item);
+                });
+                renderPreview(grouped);
+            })
+            .catch(function (err) {
+                if (err && err.name === 'AbortError') {
+                    return;
+                }
+                closePreview();
+            });
+    }
     if (header) {
         var syncHeader = function () {
             header.classList.toggle('is-scrolled', window.scrollY > 18);
@@ -975,21 +1414,82 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
             searchInput.setAttribute('placeholder', placeholders[placeholderIndex]);
         }, 2600);
     }
+    if (searchInput && searchPreview) {
+        searchInput.addEventListener('input', function () {
+            var value = String(searchInput.value || '').trim();
+            if (previewTimer) {
+                window.clearTimeout(previewTimer);
+            }
+            if (value.length < 2) {
+                closePreview();
+                return;
+            }
+            previewTimer = window.setTimeout(function () {
+                fetchPreview(value);
+            }, 180);
+        });
+        searchInput.addEventListener('focus', function () {
+            var value = String(searchInput.value || '').trim();
+            if (value.length >= 2 && !searchPreview.classList.contains('is-visible')) {
+                fetchPreview(value);
+            }
+        });
+        searchInput.addEventListener('keydown', function (event) {
+            if (!searchPreview.classList.contains('is-visible')) {
+                return;
+            }
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                highlightPreview(Math.min(previewItems.length - 1, previewActiveIndex + 1));
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                highlightPreview(Math.max(-1, previewActiveIndex - 1));
+            } else if (event.key === 'Enter' && previewActiveIndex >= 0 && previewItems[previewActiveIndex] && previewItems[previewActiveIndex].url) {
+                event.preventDefault();
+                window.location.href = previewItems[previewActiveIndex].url;
+            } else if (event.key === 'Escape') {
+                closePreview();
+            }
+        });
+        document.addEventListener('click', function (event) {
+            if (!searchForm) {
+                return;
+            }
+            if (!searchForm.contains(event.target)) {
+                closePreview();
+            }
+        });
+        searchPreview.addEventListener('mouseenter', function (event) {
+            var item = event.target.closest('.simple-search-preview-item');
+            if (!item) {
+                return;
+            }
+            highlightPreview(Number(item.getAttribute('data-preview-index')));
+        });
+    }
     if (!btn || !nav) {
         return;
     }
+    function setMenuState(open) {
+        document.body.classList.toggle('simple-nav-open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        nav.setAttribute('aria-hidden', open ? 'false' : 'true');
+    }
     function closeMenu() {
-        document.body.classList.remove('simple-nav-open');
-        btn.setAttribute('aria-expanded', 'false');
+        setMenuState(false);
     }
     btn.addEventListener('click', function () {
         var isOpen = document.body.classList.contains('simple-nav-open');
-        document.body.classList.toggle('simple-nav-open', !isOpen);
-        btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+        setMenuState(!isOpen);
     });
     if (backdrop) {
         backdrop.addEventListener('click', closeMenu);
     }
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeMenu();
+        }
+    });
     nav.addEventListener('click', function (event) {
         if (event.target.closest('a') || event.target.closest('button')) {
             closeMenu();
@@ -1000,6 +1500,7 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
             closeMenu();
         }
     });
+    setMenuState(false);
 })();
 </script>
 
