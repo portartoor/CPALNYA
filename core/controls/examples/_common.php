@@ -48,17 +48,24 @@ if (!function_exists('examples_default_lang_for_host')) {
     }
 }
 
-if (!function_exists('examples_route_base')) {
-    function examples_route_base(?string $host = null): string
+if (!function_exists('examples_section_base')) {
+    function examples_section_base(string $materialSection = 'journal', ?string $host = null): string
     {
-        return '/journal';
+        return $materialSection === 'playbooks' ? '/playbooks' : '/journal';
+    }
+}
+
+if (!function_exists('examples_route_base')) {
+    function examples_route_base(?string $host = null, string $materialSection = 'journal'): string
+    {
+        return examples_section_base($materialSection, $host);
     }
 }
 
 if (!function_exists('examples_article_detail_base')) {
-    function examples_article_detail_base(?string $host = null): string
+    function examples_article_detail_base(?string $host = null, string $materialSection = 'journal'): string
     {
-        return '/journal/';
+        return examples_section_base($materialSection, $host) . '/';
     }
 }
 
@@ -138,27 +145,29 @@ if (!function_exists('examples_normalize_cluster')) {
 }
 
 if (!function_exists('examples_article_url_path')) {
-    function examples_article_url_path(string $slug, ?string $clusterCode = null, ?string $host = null): string
+    function examples_article_url_path(string $slug, ?string $clusterCode = null, ?string $host = null, string $materialSection = 'journal'): string
     {
         $slugSafe = examples_slugify($slug);
         if ($slugSafe === '') {
             $slugSafe = 'article';
         }
         $clusterSafe = examples_slugify((string)$clusterCode);
+        $base = examples_section_base($materialSection, $host);
         if ($clusterSafe === '') {
-            return '/journal/' . rawurlencode($slugSafe) . '/';
+            return $base . '/' . rawurlencode($slugSafe) . '/';
         }
-        return '/journal/' . rawurlencode($clusterSafe) . '/' . rawurlencode($slugSafe) . '/';
+        return $base . '/' . rawurlencode($clusterSafe) . '/' . rawurlencode($slugSafe) . '/';
     }
 }
 if (!function_exists('examples_cluster_list_path')) {
-    function examples_cluster_list_path(?string $clusterCode = null, ?string $host = null): string
+    function examples_cluster_list_path(?string $clusterCode = null, ?string $host = null, string $materialSection = 'journal'): string
     {
         $clusterSafe = examples_slugify((string)$clusterCode);
+        $base = examples_section_base($materialSection, $host);
         if ($clusterSafe === '') {
-            return '/journal/';
+            return $base . '/';
         }
-        return '/journal/' . rawurlencode($clusterSafe) . '/';
+        return $base . '/' . rawurlencode($clusterSafe) . '/';
     }
 }
 if (!function_exists('examples_resolve_lang')) {

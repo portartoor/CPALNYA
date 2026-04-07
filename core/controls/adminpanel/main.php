@@ -72,7 +72,7 @@ function adminpanel_section_key_from_path(string $path): string
     if ($path === '' || $path === '/') {
         return 'home';
     }
-    if (strpos($path, '/journal') === 0 || strpos($path, '/blog') === 0 || strpos($path, '/examples/article/') === 0 || strpos($path, '/articles/') === 0) {
+    if (strpos($path, '/journal') === 0 || strpos($path, '/playbooks') === 0 || strpos($path, '/blog') === 0 || strpos($path, '/examples/article/') === 0 || strpos($path, '/articles/') === 0) {
         return 'blog';
     }
     if (strpos($path, '/services') === 0) {
@@ -105,7 +105,7 @@ function adminpanel_article_slug_from_path(string $path): string
     if ($path === '') {
         return '';
     }
-    if (preg_match('~^/(?:blog|journal)/([^/]+)/?~', $path, $m)) {
+    if (preg_match('~^/(?:blog|journal|playbooks)/([^/]+)/?~', $path, $m)) {
         $slug = trim((string)$m[1]);
         if ($slug !== '' && $slug !== 'page') {
             return $slug;
@@ -459,7 +459,7 @@ $nonBotUniqueVisitors30d = (int)($sumNonBotUniq[0]['uniq'] ?? 0);
 
 // Article stats: /examples/article/*
 $articlePathWhereSql = "(
-    ((path LIKE '/blog/%' AND path NOT IN ('/blog', '/blog/')) OR (path LIKE '/journal/%' AND path NOT IN ('/journal', '/journal/')))
+    ((path LIKE '/blog/%' AND path NOT IN ('/blog', '/blog/')) OR (path LIKE '/journal/%' AND path NOT IN ('/journal', '/journal/')) OR (path LIKE '/playbooks/%' AND path NOT IN ('/playbooks', '/playbooks/')))
     OR
     path LIKE '/examples/article/%'
     OR (path LIKE '/articles/%' AND path NOT IN ('/articles', '/articles/'))
@@ -691,7 +691,7 @@ if (!empty($topArticleSlugs)) {
 $sectionCaseSql = "
     CASE
         WHEN path IS NULL OR path = '' OR path = '/' THEN 'home'
-        WHEN path LIKE '/journal%' OR path LIKE '/blog%' OR path LIKE '/examples/article/%' OR path LIKE '/articles/%' THEN 'blog'
+        WHEN path LIKE '/journal%' OR path LIKE '/playbooks%' OR path LIKE '/blog%' OR path LIKE '/examples/article/%' OR path LIKE '/articles/%' THEN 'blog'
         WHEN path LIKE '/services%' THEN 'services'
         WHEN path LIKE '/projects%' THEN 'projects'
         WHEN path LIKE '/contact%' THEN 'contact'

@@ -642,7 +642,7 @@ function seo_log_generation(mysqli $db, array $row): void
     }
 }
 
-function seo_article_public_url(string $lang, string $slug, string $clusterCode = ''): string
+function seo_article_public_url(string $lang, string $slug, string $clusterCode = '', string $materialSection = 'journal'): string
 {
     $host = seo_host_for_lang($lang);
     $lang = examples_normalize_lang($lang);
@@ -651,10 +651,11 @@ function seo_article_public_url(string $lang, string $slug, string $clusterCode 
         return '';
     }
     $clusterCode = examples_normalize_cluster((string)$clusterCode, $lang);
+    $base = ($materialSection === 'playbooks') ? '/playbooks/' : '/journal/';
     if ($clusterCode === '') {
-        return 'https://' . $host . '/journal/' . rawurlencode($slug);
+        return 'https://' . $host . $base . rawurlencode($slug);
     }
-    return 'https://' . $host . '/journal/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug);
+    return 'https://' . $host . $base . rawurlencode($clusterCode) . '/' . rawurlencode($slug);
 }
 
 function seo_public_image_url_for_lang(string $lang, string $rawUrl): string
@@ -1098,7 +1099,7 @@ function seo_backfill_missing_images(mysqli $db, array $cfg, array $runtime): in
                 'article_id' => $articleId,
                 'title' => $title,
                 'slug' => $slug,
-                'article_url' => seo_article_public_url($lang, $slug, (string)($row['cluster_code'] ?? '')),
+                'article_url' => seo_article_public_url($lang, $slug, (string)($row['cluster_code'] ?? ''), (string)($row['material_section'] ?? 'journal')),
                 'words_final' => 0,
                 'words_initial' => 0,
                 'structure_used' => '',
@@ -1148,7 +1149,7 @@ function seo_backfill_missing_images(mysqli $db, array $cfg, array $runtime): in
                 'article_id' => $articleId,
                 'title' => $title,
                 'slug' => $slug,
-                'article_url' => seo_article_public_url($lang, $slug, (string)($row['cluster_code'] ?? '')),
+                'article_url' => seo_article_public_url($lang, $slug, (string)($row['cluster_code'] ?? ''), (string)($row['material_section'] ?? 'journal')),
                 'words_final' => 0,
                 'words_initial' => 0,
                 'structure_used' => '',
@@ -1304,7 +1305,7 @@ function seo_notify_telegram_success(string $lang, array $article, string $jobDa
         return;
     }
     $slug = (string)($article['slug'] ?? '');
-    $url = $slug !== '' ? seo_article_public_url($lang, $slug, (string)($article['cluster_code'] ?? '')) : '';
+    $url = $slug !== '' ? seo_article_public_url($lang, $slug, (string)($article['cluster_code'] ?? ''), (string)($article['material_section'] ?? 'journal')) : '';
     $title = htmlspecialchars((string)($article['title'] ?? ''), ENT_QUOTES, 'UTF-8');
     $excerpt = seo_strip_html_to_text((string)($article['excerpt_html'] ?? ''));
     if ($excerpt === '') {
@@ -2036,7 +2037,7 @@ function seo_send_preview_post(array $cfg, string $lang, array $article): array
         return ['status' => 'skipped_chat_empty'];
     }
     $slug = (string)($article['slug'] ?? '');
-    $url = $slug !== '' ? seo_article_public_url($lang, $slug, (string)($article['cluster_code'] ?? '')) : '';
+    $url = $slug !== '' ? seo_article_public_url($lang, $slug, (string)($article['cluster_code'] ?? ''), (string)($article['material_section'] ?? 'journal')) : '';
     $postText = seo_build_tg_preview_text(
         $lang,
         $article,
@@ -6269,7 +6270,7 @@ foreach ($cfg['langs'] as $lang) {
                 . ', image_composition=' . $imageComposition
                 . ', proxy_mode=' . (string)($created['proxy_mode'] ?? 'direct')
                 . ', proxy_used=' . (string)($created['proxy_used'] ?? 'direct');
-            $articleUrl = seo_article_public_url($lang, (string)($created['slug'] ?? ''), (string)($created['cluster_code'] ?? ''));
+            $articleUrl = seo_article_public_url($lang, (string)($created['slug'] ?? ''), (string)($created['cluster_code'] ?? ''), (string)($created['material_section'] ?? ($cfg['campaign_material_section'] ?? 'journal')));
             $settingsSnapshot = [
                 'llm_provider' => (string)($cfg['llm_provider'] ?? ''),
                 'openai_model' => (string)($cfg['openai_model'] ?? ''),

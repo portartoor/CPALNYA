@@ -707,6 +707,7 @@ class Render {
 		} else {
 			$urls[] = ['loc' => $base.'/', 'changefreq' => 'daily', 'priority' => '1.0'];
 			$urls[] = ['loc' => $base.'/journal/', 'changefreq' => 'daily', 'priority' => '0.9'];
+			$urls[] = ['loc' => $base.'/playbooks/', 'changefreq' => 'daily', 'priority' => '0.9'];
 			$urls[] = ['loc' => $base.'/solutions/downloads/', 'changefreq' => 'weekly', 'priority' => '0.9'];
 			$urls[] = ['loc' => $base.'/solutions/articles/', 'changefreq' => 'weekly', 'priority' => '0.9'];
 			$urls[] = ['loc' => $base.'/services/', 'changefreq' => 'weekly', 'priority' => '0.9'];

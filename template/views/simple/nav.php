@@ -32,9 +32,10 @@ $navSections = [
     [
         'label' => 'HowTo',
         'items' => [
-            ['title' => $isRu ? 'Фарм-гайды' : 'Farm Guides', 'path' => '/journal/?section=playbooks&topic=farm', 'icon' => 'H'],
-            ['title' => $isRu ? 'Трекинг' : 'Tracking', 'path' => '/journal/?section=playbooks&topic=tracking', 'icon' => 'P'],
-            ['title' => $isRu ? 'Креативы' : 'Creatives', 'path' => '/journal/?section=playbooks&topic=creatives', 'icon' => 'K'],
+            ['title' => $isRu ? 'Все HowTo' : 'All HowTo', 'path' => '/playbooks/', 'icon' => 'H'],
+            ['title' => $isRu ? 'Фарм-гайды' : 'Farm Guides', 'path' => '/playbooks/?topic=farm', 'icon' => 'F'],
+            ['title' => $isRu ? 'Трекинг' : 'Tracking', 'path' => '/playbooks/?topic=tracking', 'icon' => 'T'],
+            ['title' => $isRu ? 'Креативы' : 'Creatives', 'path' => '/playbooks/?topic=creatives', 'icon' => 'K'],
         ],
     ],
     [

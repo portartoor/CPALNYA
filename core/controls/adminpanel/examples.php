@@ -91,7 +91,7 @@ if (examples_table_exists($DB) && !admin_examples_has_column($DB, 'material_sect
     @mysqli_query($DB, "ALTER TABLE examples_articles ADD KEY idx_examples_material_section (material_section)");
 }
 
-function admin_examples_public_url(string $domainHost, string $langCode, string $slug, string $clusterCode = ''): string
+function admin_examples_public_url(string $domainHost, string $langCode, string $slug, string $clusterCode = '', string $materialSection = 'journal'): string
 {
     $slug = trim($slug);
     if ($slug === '') {
@@ -103,10 +103,11 @@ function admin_examples_public_url(string $domainHost, string $langCode, string 
         $host = ($lang === 'ru') ? 'portcore.ru' : 'portcore.online';
     }
     $clusterCode = examples_slugify($clusterCode);
+    $base = ($materialSection === 'playbooks') ? '/playbooks/' : '/journal/';
     if ($clusterCode === '') {
-        return 'https://' . $host . '/journal/' . rawurlencode($slug);
+        return 'https://' . $host . $base . rawurlencode($slug);
     }
-    return 'https://' . $host . '/journal/' . rawurlencode($clusterCode) . '/' . rawurlencode($slug);
+    return 'https://' . $host . $base . rawurlencode($clusterCode) . '/' . rawurlencode($slug);
 }
 
 function admin_examples_indexnow_enabled(mysqli $DB): bool
@@ -195,7 +196,7 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
                 $oldUrl = '';
                 if (!empty($existingRows)) {
                     $old = $existingRows[0];
-                    $oldUrl = admin_examples_public_url((string)($old['domain_host'] ?? ''), (string)($old['lang_code'] ?? 'en'), (string)($old['slug'] ?? ''), (string)($old['cluster_code'] ?? ''));
+                    $oldUrl = admin_examples_public_url((string)($old['domain_host'] ?? ''), (string)($old['lang_code'] ?? 'en'), (string)($old['slug'] ?? ''), (string)($old['cluster_code'] ?? ''), (string)($old['material_section'] ?? 'journal'));
                 }
                 mysqli_query(
                     $DB,
@@ -223,7 +224,7 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
                             $newClusterCode = (string)($newClusterRows[0]['cluster_code'] ?? '');
                         }
                     }
-                    $newUrl = admin_examples_public_url($domainHost, $langCode, $slug, $newClusterCode);
+                    $newUrl = admin_examples_public_url($domainHost, $langCode, $slug, $newClusterCode, $materialSection);
                     if ($oldUrl !== '' && $oldUrl !== $newUrl) {
                         admin_examples_indexnow_enqueue($DB, $oldUrl, $langCode, 'update');
                     }
@@ -247,7 +248,7 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
                             $newClusterCode = (string)($newClusterRows[0]['cluster_code'] ?? '');
                         }
                     }
-                    $newUrl = admin_examples_public_url($domainHost, $langCode, $slug, $newClusterCode);
+                    $newUrl = admin_examples_public_url($domainHost, $langCode, $slug, $newClusterCode, $materialSection);
                     admin_examples_indexnow_enqueue($DB, $newUrl, $langCode, 'publish');
                 }
                 $message = 'Article created.';
@@ -263,7 +264,7 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
             if (!empty($rows)) {
                 $row = $rows[0];
                 $deletedLang = (string)($row['lang_code'] ?? 'en');
-                $deletedUrl = admin_examples_public_url((string)($row['domain_host'] ?? ''), $deletedLang, (string)($row['slug'] ?? ''), (string)($row['cluster_code'] ?? ''));
+                $deletedUrl = admin_examples_public_url((string)($row['domain_host'] ?? ''), $deletedLang, (string)($row['slug'] ?? ''), (string)($row['cluster_code'] ?? ''), (string)($row['material_section'] ?? 'journal'));
             }
             mysqli_query($DB, "DELETE FROM examples_articles WHERE id = {$articleId} LIMIT 1");
             if ($deletedUrl !== '') {
