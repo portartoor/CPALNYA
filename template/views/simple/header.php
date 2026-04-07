@@ -593,6 +593,8 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         padding: 8px 11px;
         background: rgba(255,255,255,.03);
         color: var(--shell-muted);
+        text-decoration: none;
+        border-bottom: 0;
         clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
         transition: color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease;
         flex: 0 0 auto;

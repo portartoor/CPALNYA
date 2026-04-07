@@ -49,7 +49,7 @@ $buildClusterPath = static function (string $section, string $code) use ($host, 
     return $sectionBasePaths[$section] ?? '/';
 };
 
-$fetchSectionTopics = static function (string $section, int $limit = 3) use ($FRMWRK, $host, $lang, $pickIcon, $buildClusterPath): array {
+$fetchSectionTopics = static function (string $section, int $limit = 2) use ($FRMWRK, $host, $lang, $pickIcon, $buildClusterPath): array {
     $items = [];
     if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters')) {
         foreach ((array)examples_popularity_fetch_top_clusters($FRMWRK, $host, $lang, $section, $limit) as $row) {
@@ -86,7 +86,7 @@ if (count($importantTopics) < 3) {
     $importantTopics = [
         ['title' => $isRu ? 'Источники' : 'Sources', 'path' => '/journal/', 'icon' => '>'],
         ['title' => $isRu ? 'Фарм' : 'Farm', 'path' => '/playbooks/', 'icon' => 'F'],
-        ['title' => $isRu ? 'AI Creatives' : 'AI Creatives', 'path' => '/playbooks/', 'icon' => 'A'],
+        ['title' => 'AI Creatives', 'path' => '/playbooks/', 'icon' => 'A'],
     ];
 }
 
@@ -108,24 +108,17 @@ $navSections = [
 ];
 
 foreach (['journal', 'playbooks', 'signals', 'fun'] as $sectionKey) {
-    $items = $fetchSectionTopics($sectionKey, 3);
-    if (empty($items)) {
-        $items = [
-            [
-                'title' => $sectionTitles[$sectionKey],
-                'path' => $sectionBasePaths[$sectionKey],
-                'icon' => $sectionIcons[$sectionKey],
-            ],
-        ];
-    }
-    array_unshift($items, [
+    $sectionItems = [[
         'title' => $sectionTitles[$sectionKey],
         'path' => $sectionBasePaths[$sectionKey],
         'icon' => $sectionIcons[$sectionKey],
-    ]);
+    ]];
+    foreach ($fetchSectionTopics($sectionKey, 2) as $topicItem) {
+        $sectionItems[] = $topicItem;
+    }
     $navSections[] = [
-        'label' => $sectionTitles[$sectionKey],
-        'items' => array_slice($items, 0, 4),
+        'label' => '',
+        'items' => $sectionItems,
     ];
 }
 
@@ -138,7 +131,9 @@ $navSections[] = [
 
 foreach ($navSections as $sectionBlock):
 ?>
-    <span class="nav-section-label"><?= htmlspecialchars((string)$sectionBlock['label'], ENT_QUOTES, 'UTF-8') ?></span>
+    <?php if (trim((string)$sectionBlock['label']) !== ''): ?>
+        <span class="nav-section-label"><?= htmlspecialchars((string)$sectionBlock['label'], ENT_QUOTES, 'UTF-8') ?></span>
+    <?php endif; ?>
     <?php foreach ($sectionBlock['items'] as $item):
         $path = (string)$item['path'];
         $pathForMatch = parse_url($path, PHP_URL_PATH);
