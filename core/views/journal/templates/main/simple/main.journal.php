@@ -20,6 +20,30 @@ $strip = static function (string $html, int $limit = 170): string {
     }
     return rtrim((string)mb_substr($text, 0, $limit - 1, 'UTF-8')) . '...';
 };
+$renderIssueText = static function (string $text, string $class = ''): string {
+    $text = trim(str_replace(["\r\n", "\r"], "\n", $text));
+    if ($text === '') {
+        return '';
+    }
+
+    $parts = preg_split("/\n\s*\n/u", $text) ?: [];
+    if (!$parts) {
+        $parts = [$text];
+    }
+
+    $html = '';
+    foreach ($parts as $part) {
+        $part = trim((string)$part);
+        if ($part === '') {
+            continue;
+        }
+        $part = preg_replace("/\n+/u", "<br>", htmlspecialchars($part, ENT_QUOTES, 'UTF-8'));
+        $classAttr = $class !== '' ? ' class="' . htmlspecialchars($class, ENT_QUOTES, 'UTF-8') . '"' : '';
+        $html .= '<p' . $classAttr . '>' . $part . '</p>';
+    }
+
+    return $html;
+};
 $issueImage = trim((string)($issue['hero_image_url'] ?? ''));
 if ($issueImage === '') {
     $issueImage = trim((string)($issue['hero_image_data'] ?? ''));
@@ -54,24 +78,65 @@ if ($selected) {
 .jrnl-shell{display:grid;gap:24px}
 .jrnl-hero,.jrnl-detail,.jrnl-card,.jrnl-related,.jrnl-empty{border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(6,12,24,.88),rgba(5,10,20,.76));box-shadow:var(--shell-shadow)}
 .jrnl-hero,.jrnl-detail,.jrnl-related,.jrnl-empty{padding:28px}
-.jrnl-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:22px}
+.jrnl-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:16px}
 .jrnl-kicker,.jrnl-tag,.jrnl-meta{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid rgba(122,180,255,.2);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
-.jrnl-copy{display:grid;gap:16px}
-.jrnl-copy h1,.jrnl-copy h2,.jrnl-detail h1,.jrnl-related h2{margin:0;font:700 clamp(2.1rem,4.2vw,4.1rem)/.98 "Space Grotesk","Sora",sans-serif;letter-spacing:-.055em}
-.jrnl-copy p,.jrnl-detail p,.jrnl-card p{margin:0;color:var(--shell-muted);line-height:1.75}
+.jrnl-copy{display:grid;gap:8px}
+.jrnl-copy h1,.jrnl-copy h2,.jrnl-detail h1,.jrnl-related h2{margin:0;font:700 clamp(1.82rem,3.55vw,3.22rem)/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.048em}
+.jrnl-copy p,.jrnl-detail p,.jrnl-card p{margin:0;color:var(--shell-muted);line-height:1.62}
+.jrnl-copy p + p{margin-top:2px}
+.jrnl-copy .jrnl-hero-description{max-width:66ch}
+.jrnl-copy .jrnl-issue-subtitle{font-size:clamp(1.02rem,1.6vw,1.24rem);line-height:1.56;color:rgba(233,242,255,.9)}
+.jrnl-copy h2{margin-top:8px}
 .jrnl-cover{min-height:0;border:1px solid rgba(255,255,255,.08);background:
 radial-gradient(circle at 50% 22%,rgba(103,200,255,.16),transparent 26%),
 linear-gradient(180deg,rgba(6,11,20,.96),rgba(4,8,16,.92));
 display:block;align-self:start;overflow:hidden;position:relative}
-.jrnl-cover::before,.jrnl-cover::after{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:0}
-.jrnl-cover::before{background:
-radial-gradient(circle at 0% 50%,rgba(99,244,255,.95) 0,rgba(99,244,255,.22) 12%,transparent 24%),
-radial-gradient(circle at 100% 50%,rgba(109,255,200,.88) 0,rgba(109,255,200,.18) 10%,transparent 22%);
-filter:blur(8px) saturate(1.15)}
-.jrnl-cover::after{inset:0;border:1px solid rgba(121,196,255,.16);box-shadow:0 0 0 1px rgba(105,196,255,.05) inset}
-.jrnl-cover-button{display:block;padding:0;cursor:zoom-in;width:100%;text-align:left;appearance:none;line-height:0}
-.jrnl-cover-button:hover::before,.jrnl-cover-button:focus-visible::before{opacity:1;animation:jrnlBorderFireflies 3.6s linear infinite}
-.jrnl-cover-button:hover::after,.jrnl-cover-button:focus-visible::after{border-color:rgba(122,214,255,.38);box-shadow:0 0 24px rgba(74,205,255,.22),0 0 52px rgba(58,255,198,.12),0 0 0 1px rgba(105,196,255,.1) inset}
+.jrnl-cover::before,.jrnl-cover::after{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .32s ease}
+.jrnl-cover::before{
+padding:1px;
+background:conic-gradient(from 0deg,
+rgba(100,240,255,0) 0deg,
+rgba(100,240,255,.98) 14deg,
+rgba(100,240,255,.12) 28deg,
+rgba(100,240,255,0) 42deg,
+rgba(255,89,199,0) 82deg,
+rgba(255,89,199,.96) 98deg,
+rgba(255,89,199,.12) 112deg,
+rgba(255,89,199,0) 128deg,
+rgba(116,255,171,0) 172deg,
+rgba(116,255,171,.98) 190deg,
+rgba(116,255,171,.14) 206deg,
+rgba(116,255,171,0) 222deg,
+rgba(255,190,92,0) 262deg,
+rgba(255,190,92,.96) 278deg,
+rgba(255,190,92,.14) 294deg,
+rgba(255,190,92,0) 310deg,
+rgba(100,240,255,0) 360deg);
+-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+-webkit-mask-composite:xor;
+mask-composite:exclude
+}
+.jrnl-cover::after{
+inset:-10px;
+background:conic-gradient(from 0deg,
+rgba(100,240,255,0) 0deg,
+rgba(100,240,255,.82) 18deg,
+rgba(100,240,255,0) 44deg,
+rgba(255,89,199,0) 88deg,
+rgba(255,89,199,.76) 110deg,
+rgba(255,89,199,0) 136deg,
+rgba(116,255,171,0) 182deg,
+rgba(116,255,171,.8) 202deg,
+rgba(116,255,171,0) 228deg,
+rgba(255,190,92,0) 272deg,
+rgba(255,190,92,.82) 292deg,
+rgba(255,190,92,0) 318deg,
+rgba(100,240,255,0) 360deg);
+filter:blur(14px) saturate(1.18)
+}
+.jrnl-cover-button{display:block;padding:0;cursor:pointer;width:100%;text-align:left;appearance:none;line-height:0}
+.jrnl-cover-button:hover::before,.jrnl-cover-button:focus-visible::before,
+.jrnl-cover-button:hover::after,.jrnl-cover-button:focus-visible::after{opacity:1;animation:jrnlBorderFireflies 3.2s linear infinite}
 .jrnl-cover img{position:relative;display:block;width:100%;height:auto;max-width:none;object-fit:contain;object-position:center center;padding:0;transform-origin:50% 0;animation:jrnlCoverIntro 1.15s cubic-bezier(.16,1,.3,1) both}
 .jrnl-cover-note{position:relative;z-index:1;max-width:22ch;margin:18px;padding:14px 16px;background:rgba(4,9,18,.78);border:1px solid rgba(122,180,255,.18);font:700 1rem/1.35 "Space Grotesk","Sora",sans-serif}
 .jrnl-tags{display:flex;flex-wrap:wrap;gap:10px}
@@ -96,7 +161,8 @@ filter:blur(8px) saturate(1.15)}
 .jrnl-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border:1px solid rgba(122,180,255,.18);background:linear-gradient(135deg,rgba(115,184,255,.22),rgba(39,223,192,.18));color:var(--shell-text);text-decoration:none;font-weight:700}
 .jrnl-related-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .jrnl-empty{text-align:center}
-.jrnl-lightbox{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:clamp(16px,4vw,48px);pointer-events:none;opacity:0;visibility:hidden;transition:opacity .52s ease,visibility .52s ease}
+.jrnl-lightbox{position:fixed;inset:0;z-index:2147483000;display:none;place-items:center;padding:clamp(16px,4vw,48px);pointer-events:none;opacity:0;visibility:hidden;transition:opacity .52s ease,visibility .52s ease}
+.jrnl-lightbox.is-open,.jrnl-lightbox.is-closing{display:grid}
 .jrnl-lightbox.is-open{opacity:1;visibility:visible;pointer-events:auto}
 .jrnl-lightbox-backdrop{position:absolute;inset:0;background:
 radial-gradient(circle at 50% 45%,rgba(91,210,255,.18),transparent 22%),
@@ -149,11 +215,9 @@ pointer-events:none}
 100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0) saturate(1)}
 }
 @keyframes jrnlBorderFireflies{
-0%{background-position:-14% 0,114% 100%}
-25%{background-position:30% 0,70% 100%}
-50%{background-position:112% 0,-12% 100%}
-75%{background-position:70% 0,26% 100%}
-100%{background-position:-14% 0,114% 100%}
+0%{transform:rotate(0deg) scale(1);filter:blur(14px) saturate(1.08)}
+50%{transform:rotate(180deg) scale(1.01);filter:blur(15px) saturate(1.22)}
+100%{transform:rotate(360deg) scale(1);filter:blur(14px) saturate(1.08)}
 }
 @media (max-width:1180px){.jrnl-hero,.jrnl-grid,.jrnl-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.jrnl-hero{grid-template-columns:1fr}}
 @media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}.jrnl-copy h1,.jrnl-copy h2,.jrnl-detail h1{font-size:clamp(2rem,12vw,3.2rem)}.jrnl-lightbox-frame{padding:12px;border-radius:24px}.jrnl-lightbox-close{right:12px;top:12px;width:48px;height:48px}}
@@ -206,9 +270,9 @@ pointer-events:none}
                 <div class="jrnl-copy">
                     <?php if (!empty($issue['issue_kicker'])): ?><span class="jrnl-kicker"><?= htmlspecialchars((string)$issue['issue_kicker'], ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
                     <h1><?= htmlspecialchars((string)($issue['hero_title'] ?? $issue['issue_title'] ?? $t('Журнал', 'Journal')), ENT_QUOTES, 'UTF-8') ?></h1>
-                    <?php if (!empty($issue['hero_description'])): ?><p><?= htmlspecialchars((string)$issue['hero_description'], ENT_QUOTES, 'UTF-8') ?></p><?php endif; ?>
+                    <?php if (!empty($issue['hero_description'])): ?><?= $renderIssueText((string)$issue['hero_description'], 'jrnl-hero-description') ?><?php endif; ?>
                     <?php if (!empty($issue['issue_title'])): ?><h2><?= htmlspecialchars((string)$issue['issue_title'], ENT_QUOTES, 'UTF-8') ?></h2><?php endif; ?>
-                    <?php if (!empty($issue['issue_subtitle'])): ?><p><?= htmlspecialchars((string)$issue['issue_subtitle'], ENT_QUOTES, 'UTF-8') ?></p><?php endif; ?>
+                    <?php if (!empty($issue['issue_subtitle'])): ?><?= $renderIssueText((string)$issue['issue_subtitle'], 'jrnl-issue-subtitle') ?><?php endif; ?>
                 </div>
                 <button
                     class="jrnl-cover jrnl-cover-button"
@@ -347,10 +411,12 @@ pointer-events:none}
         lastActive = document.activeElement;
         image.src = trigger.getAttribute('data-jrnl-cover-src') || '';
         image.alt = trigger.getAttribute('data-jrnl-cover-alt') || '';
+        clearTimeout(closingTimer);
         lightbox.classList.remove('is-closing');
-        lightbox.classList.add('is-open');
+        lightbox.style.display = 'grid';
         lightbox.setAttribute('aria-hidden', 'false');
         lockScroll(true);
+        lightbox.classList.add('is-open');
         isOpen = true;
         var closeButton = lightbox.querySelector('.jrnl-lightbox-close');
         if (closeButton) {
@@ -366,6 +432,7 @@ pointer-events:none}
 
     function finishClose() {
         lightbox.classList.remove('is-open', 'is-closing');
+        lightbox.style.display = 'none';
         lightbox.setAttribute('aria-hidden', 'true');
         image.src = '';
         image.alt = '';
