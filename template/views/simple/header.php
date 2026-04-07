@@ -440,7 +440,13 @@ if (isset($_GET['header_search_preview'])) {
         --shell-shadow: 0 24px 60px rgba(46, 88, 170, .14);
         color-scheme: light;
     }
-    body > *:not(#terrainFieldGlobal) { position: relative; z-index: 1; }
+    .simple-header,
+    .public-layout-footer,
+    main,
+    footer {
+        position: relative;
+        z-index: 1;
+    }
     a, button, input, textarea, select { font: inherit; }
     a { color: inherit; }
     img { max-width: 100%; height: auto; }
