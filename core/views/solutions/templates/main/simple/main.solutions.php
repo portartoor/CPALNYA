@@ -99,7 +99,7 @@ $notes = [
     <div class="sol-shell">
         <header class="sol-hero">
             <div class="sol-hero-copy">
-                <span class="sol-kicker"><span class="sol-icon">⬢</span><?= htmlspecialchars($t('Utility / CPALNYA Lab', 'Utility / CPALNYA Lab'), ENT_QUOTES, 'UTF-8') ?></span>
+                <span class="sol-kicker"><span class="sol-icon">⬢</span><?= htmlspecialchars($t('Utility / ЦПАЛЬНЯ Lab', 'Utility / ЦПАЛЬНЯ Lab'), ENT_QUOTES, 'UTF-8') ?></span>
                 <h1 class="neo-title"><?= htmlspecialchars($t('Раздел решений должен ощущаться как ', 'The solutions section should feel like ') , ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('операторский каталог', 'an operator catalog'), ENT_QUOTES, 'UTF-8') ?></strong><?= htmlspecialchars($t(', а не как повтор блога', ', not a repeat of the blog'), ENT_QUOTES, 'UTF-8') ?></h1>
                 <p><?= htmlspecialchars($t('Здесь пользователь должен сразу считывать ценность, стек, формат и следующий шаг. Поэтому секция собирается как плотный utility-layer с явной иконографикой, ломаной геометрией карточек и быстрым маршрутом в внедрение или обсуждение.', 'Users should read the value, stack, format and next step immediately. That is why the section is built as a dense utility layer with clear iconography, broken card geometry and a fast route into deployment or discussion.'), ENT_QUOTES, 'UTF-8') ?></p>
                 <div class="sol-tab-row">

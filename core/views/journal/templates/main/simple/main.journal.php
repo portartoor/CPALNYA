@@ -298,6 +298,10 @@ if ($selected) {
             $selectedSplit = $splitContentByFirstH2($selectedContentHtml);
             $selectedIntroHtml = $stripChecklistBrackets((string)($selectedSplit['intro'] ?? ''));
             $selectedBodyHtml = $stripChecklistBrackets((string)($selectedSplit['body'] ?? $selectedContentHtml));
+            $selectedExcerptHtml = $stripChecklistBrackets(trim((string)($selected['excerpt_html'] ?? '')));
+            if ($selectedIntroHtml === '' && $selectedExcerptHtml !== '') {
+                $selectedIntroHtml = $selectedExcerptHtml;
+            }
             ?>
             <article class="jrnl-detail">
                 <span class="jrnl-kicker"><?= htmlspecialchars((string)($issue['issue_title'] ?? $t('Журнал', 'Journal')), ENT_QUOTES, 'UTF-8') ?></span>
@@ -310,15 +314,15 @@ if ($selected) {
                     <?php if (!empty($selected['author_name'])): ?><span class="jrnl-meta"><?= htmlspecialchars((string)$selected['author_name'], ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
                     <span class="jrnl-meta jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">◉</i><?= (int)($selected['view_count'] ?? 0) ?></span>
                 </div>
+                <?php if ($selectedIntroHtml !== ''): ?>
+                    <div class="jrnl-detail-intro"><?= $selectedIntroHtml ?></div>
+                <?php endif; ?>
                 <?php if (!empty($selected['hero_image_src'])): ?>
                     <div class="jrnl-detail-cover">
                         <img src="<?= htmlspecialchars((string)$selected['hero_image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($selected['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                     </div>
                 <?php endif; ?>
                 <div class="jrnl-detail-body">
-                    <?php if ($selectedIntroHtml !== ''): ?>
-                        <div class="jrnl-detail-intro"><?= $selectedIntroHtml ?></div>
-                    <?php endif; ?>
                     <div class="jrnl-detail-content"><?= $selectedBodyHtml ?></div>
                     <div class="jrnl-actions">
                         <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Назад в journal', 'Back to journal'), ENT_QUOTES, 'UTF-8') ?></a>

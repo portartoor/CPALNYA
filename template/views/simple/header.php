@@ -6,7 +6,7 @@ if (strpos($hostForLang, ':') !== false) {
 $htmlLang = (bool)preg_match('/\.ru$/', $hostForLang) ? 'ru' : 'en';
 $isRu = ($htmlLang === 'ru');
 $logoRu = 'ЦПАЛНЯ';
-$logoMain = $isRu ? $logoRu : 'CPALNYA';
+$logoMain = 'ЦПАЛЬНЯ';
 $logoAria = $logoMain . ' portal';
 $requestPath = parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 $requestPath = is_string($requestPath) && $requestPath !== '' ? $requestPath : '/';
@@ -399,6 +399,13 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         font: 700 34px/1 "Space Grotesk", "Sora", sans-serif;
         letter-spacing: -.08em;
         color: var(--shell-text);
+    }
+    .pc-logo-main .pc-logo-accent {
+        font-weight: 900;
+        color: #ffffff;
+    }
+    .pc-logo-main .pc-logo-rest {
+        font-weight: 700;
     }
     .pc-logo-core {
         display: inline-flex;
@@ -909,8 +916,8 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     <a class="simple-brand" href="/" aria-label="<?= htmlspecialchars($logoAria, ENT_QUOTES, 'UTF-8') ?>">
         <span class="pc-logo-wrap">
             <span class="pc-logo">
-                <span class="pc-logo-main"><?= htmlspecialchars($logoMain, ENT_QUOTES, 'UTF-8') ?></span>
-                <span class="pc-logo-core">backroom</span>
+                <span class="pc-logo-main"><span class="pc-logo-accent">ЦПА</span><span class="pc-logo-rest">ЛЬНЯ</span></span>
+                <span class="pc-logo-core"><?= htmlspecialchars($isRu ? 'журнал' : 'journal', ENT_QUOTES, 'UTF-8') ?></span>
             </span>
         </span>
     </a>

@@ -3744,6 +3744,80 @@ function seo_call_openai(
     return $content;
 }
 
+function seo_normalize_duplicate_probe_text(string $html): string
+{
+    $text = strip_tags($html);
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $text = mb_strtolower($text, 'UTF-8');
+    $text = preg_replace('/\s+/u', ' ', $text);
+    $text = preg_replace('/[^\p{L}\p{N}\s]+/u', ' ', (string)$text);
+    return trim((string)preg_replace('/\s+/u', ' ', (string)$text));
+}
+
+function seo_find_existing_exact_duplicate(
+    mysqli $db,
+    string $domainHost,
+    string $lang,
+    string $materialSection,
+    string $title,
+    string $excerptHtml,
+    string $contentHtml
+): ?array {
+    $title = trim($title);
+    if ($title === '') {
+        return null;
+    }
+
+    $domainSafe = mysqli_real_escape_string($db, $domainHost);
+    $langSafe = mysqli_real_escape_string($db, $lang);
+    $sectionSafe = mysqli_real_escape_string($db, $materialSection);
+    $titleSafe = mysqli_real_escape_string($db, $title);
+
+    $normalizedTargetTitle = seo_normalize_duplicate_probe_text($title);
+    $normalizedTargetExcerpt = seo_normalize_duplicate_probe_text($excerptHtml);
+    $normalizedTargetContent = seo_normalize_duplicate_probe_text($contentHtml);
+    if ($normalizedTargetContent === '') {
+        return null;
+    }
+
+    $sql = "SELECT id, title, slug, excerpt_html, content_html
+            FROM examples_articles
+            WHERE COALESCE(domain_host, '') = '{$domainSafe}'
+              AND COALESCE(lang_code, 'en') = '{$langSafe}'
+              AND COALESCE(material_section, 'journal') = '{$sectionSafe}'
+              AND title = '{$titleSafe}'
+            ORDER BY id DESC
+            LIMIT 25";
+    $res = mysqli_query($db, $sql);
+    if (!$res) {
+        return null;
+    }
+
+    while ($row = mysqli_fetch_assoc($res)) {
+        $existingTitle = seo_normalize_duplicate_probe_text((string)($row['title'] ?? ''));
+        $existingExcerpt = seo_normalize_duplicate_probe_text((string)($row['excerpt_html'] ?? ''));
+        $existingContent = seo_normalize_duplicate_probe_text((string)($row['content_html'] ?? ''));
+        if ($existingTitle === '') {
+            continue;
+        }
+        if ($existingTitle !== $normalizedTargetTitle) {
+            continue;
+        }
+        if ($existingContent !== $normalizedTargetContent) {
+            continue;
+        }
+
+        $sameExcerpt = ($normalizedTargetExcerpt === '' || $existingExcerpt === '' || $existingExcerpt === $normalizedTargetExcerpt);
+        if ($sameExcerpt) {
+            mysqli_free_result($res);
+            return $row;
+        }
+    }
+
+    mysqli_free_result($res);
+    return null;
+}
+
 function seo_apply_campaign_to_cfg(array $cfg, array $runtime): array
 {
     $campaignKey = strtolower(trim((string)($runtime['campaign'] ?? '')));
@@ -5750,6 +5824,28 @@ function seo_publish_article(
     $langSafe = mysqli_real_escape_string($db, $lang);
     $domainSafe = mysqli_real_escape_string($db, $domainForLang);
 
+    $existingDuplicate = seo_find_existing_exact_duplicate(
+        $db,
+        $domainForLang,
+        $lang,
+        $materialSection,
+        $title,
+        $excerptHtml,
+        $contentHtml
+    );
+    if (is_array($existingDuplicate)) {
+        $existingId = (int)($existingDuplicate['id'] ?? 0);
+        $existingSlug = trim((string)($existingDuplicate['slug'] ?? ''));
+        $existingUrl = $existingSlug !== ''
+            ? seo_article_public_url($lang, $existingSlug, (string)($existingDuplicate['cluster_code'] ?? $clusterCode), $materialSection)
+            : '';
+        throw new RuntimeException(
+            'Duplicate generated article matches existing article #'
+            . $existingId
+            . ($existingUrl !== '' ? ' (' . $existingUrl . ')' : '')
+        );
+    }
+
     $insertColumns = [
         'domain_host', 'lang_code', 'title', 'slug', 'excerpt_html', 'content_html',
         'author_name', 'sort_order', 'is_published', 'published_at', 'created_at', 'updated_at',
@@ -5889,7 +5985,7 @@ $cfg = [
     'word_max' => (int)seo_cfg('SeoArticleCronWordMax', 5000),
     'auto_expand_retries' => (int)seo_cfg('SeoArticleCronAutoExpandRetries', 1),
     'expand_context_chars' => (int)seo_cfg('SeoArticleCronExpandContextChars', 7000),
-    'author_name' => trim((string)seo_cfg('SeoArticleCronAuthorName', 'CPALNYA Editorial Desk')),
+    'author_name' => trim((string)seo_cfg('SeoArticleCronAuthorName', 'Редакция ЦПАЛЬНЯ')),
     'domain_host' => strtolower(trim((string)seo_cfg('SeoArticleCronDomainHost', ''))),
     'domain_host_en' => strtolower(trim((string)seo_cfg('SeoArticleCronDomainHostEn', ''))),
     'domain_host_ru' => strtolower(trim((string)seo_cfg('SeoArticleCronDomainHostRu', ''))),
@@ -6011,7 +6107,7 @@ if ($cfg['llm_provider'] === 'openrouter') {
     $cfg['openai_model'] = trim((string)($cfg['openrouter_model'] ?? 'openai/gpt-4o-2024-11-20'));
     if (empty($cfg['openai_headers'])) {
         $ref = trim((string)seo_cfg('OpenRouterHttpReferer', ''));
-        $title = trim((string)seo_cfg('OpenRouterAppTitle', 'CPALNYA Content Generator'));
+        $title = trim((string)seo_cfg('OpenRouterAppTitle', 'ЦПАЛЬНЯ Content Generator'));
         $headers = [];
         if ($ref !== '') {
             $headers[] = 'HTTP-Referer: ' . $ref;
@@ -6093,7 +6189,7 @@ if ($cfg['preview_llm_model'] === '') {
     $cfg['preview_llm_model'] = (string)$cfg['openai_model'];
 }
 if ($cfg['author_name'] === '') {
-    $cfg['author_name'] = 'CPALNYA Editorial Desk';
+    $cfg['author_name'] = 'Редакция ЦПАЛЬНЯ';
 }
 $cfg['indexnow_enabled'] = (bool)($cfg['indexnow_enabled'] ?? false);
 $cfg['indexnow_key'] = trim((string)($cfg['indexnow_key'] ?? ''));

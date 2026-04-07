@@ -247,12 +247,12 @@ if ($selectedArticle) {
     if ($modifiedIso !== '') {
         $ModelPage['article_modified_time'] = $modifiedIso;
     }
-    $ModelPage['article_author'] = trim((string)($selectedArticle['author_name'] ?? 'CPALNYA Editorial Desk'));
+    $ModelPage['article_author'] = trim((string)($selectedArticle['author_name'] ?? 'Редакция ЦПАЛЬНЯ'));
 } else {
     $title = trim((string)($journalData['issue']['issue_title'] ?? ''));
     $subtitle = trim((string)($journalData['issue']['issue_subtitle'] ?? ''));
     $ModelPage['title'] = $ModelPage['title'] ?? ($title !== '' ? $title : ($isRu ? 'Журнал' : 'Journal'));
-    $ModelPage['description'] = $ModelPage['description'] ?? ($subtitle !== '' ? $subtitle : ($isRu ? 'Журнал CPALNYA про affiliate-операции.' : 'CPALNYA journal about affiliate operations.'));
+    $ModelPage['description'] = $ModelPage['description'] ?? ($subtitle !== '' ? $subtitle : ($isRu ? 'Журнал ЦПАЛЬНЯ про affiliate-операции.' : 'ЦПАЛЬНЯ journal about affiliate operations.'));
     $canonicalPath = examples_cluster_list_path((string)$journalData['current_cluster'], (string)$journalData['host']);
     if ((int)$journalData['page'] > 1) {
         $canonicalPath .= '?' . http_build_query(['page' => (int)$journalData['page']]);

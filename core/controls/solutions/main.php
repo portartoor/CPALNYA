@@ -59,8 +59,8 @@ $ModelPage['title'] = $isRu
     ? ($tab === 'articles' ? 'Готовые разборы и мануалы по CPA' : 'Готовые решения для арбитража трафика')
     : ($tab === 'articles' ? 'Ready-made CPA breakdowns and playbooks' : 'Ready-made solutions for affiliate traffic');
 $ModelPage['description'] = $isRu
-    ? 'База готовых решений CPALNYA: загрузки, шаблоны, аналитические каркасы и практические статьи для арбитражных команд.'
-    : 'CPALNYA ready-made base: downloads, templates, analytics frameworks and practical articles for affiliate teams.';
+    ? 'База готовых решений ЦПАЛЬНЯ: загрузки, шаблоны, аналитические каркасы и практические статьи для арбитражных команд.'
+    : 'ЦПАЛЬНЯ ready-made base: downloads, templates, analytics frameworks and practical articles for affiliate teams.';
 $ModelPage['canonical'] = $canonical;
 $ModelPage['solutions'] = $solutionsData;
 $ModelPage['portal_user'] = function_exists('public_portal_current_user') ? public_portal_current_user($FRMWRK) : null;

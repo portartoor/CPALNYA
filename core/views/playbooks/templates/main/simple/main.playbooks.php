@@ -204,7 +204,7 @@ if ($selected) {
     }
 }
 
-$heroKicker = $t('PLAYBOOKS / CPALNYA', 'PLAYBOOKS / CPALNYA');
+$heroKicker = $t('PLAYBOOKS / ЦПАЛЬНЯ', 'PLAYBOOKS / ЦПАЛЬНЯ');
 $heroTitle = $t('Практика affiliate-операционки', 'Operational playbooks for affiliate teams');
 $heroDescription = $t(
     "Раздел для тех, кто собирает affiliate-команду вокруг повторяемых действий: сетапов, чеклистов, handoff-процессов, трекинга, farm-ритма, креативных циклов и решений, которые должны переживать смену офферов, банов и платформенных сдвигов.\n\nЭто не архив сухих инструкций, а рабочая библиотека backstage-практики: здесь шаги, роли, rollback-планы и troubleshooting живут в одном поле, чтобы команда не искала опору в момент сбоя, а уже держала ее под рукой.",
@@ -307,6 +307,10 @@ $issueSubtitle = $t(
             $selectedSplit = $splitContentByFirstH2($selectedContentHtml);
             $selectedIntroHtml = $stripChecklistBrackets((string)($selectedSplit['intro'] ?? ''));
             $selectedBodyHtml = $stripChecklistBrackets((string)($selectedSplit['body'] ?? $selectedContentHtml));
+            $selectedExcerptHtml = $stripChecklistBrackets(trim((string)($selected['excerpt_html'] ?? '')));
+            if ($selectedIntroHtml === '' && $selectedExcerptHtml !== '') {
+                $selectedIntroHtml = $selectedExcerptHtml;
+            }
             ?>
             <article class="jrnl-detail">
                 <span class="jrnl-kicker"><?= htmlspecialchars((string)($issue['issue_title'] ?? $issueTitle), ENT_QUOTES, 'UTF-8') ?></span>
@@ -319,15 +323,15 @@ $issueSubtitle = $t(
                     <?php if (!empty($selected['author_name'])): ?><span class="jrnl-meta"><?= htmlspecialchars((string)$selected['author_name'], ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
                     <span class="jrnl-meta jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">◉</i><?= (int)($selected['view_count'] ?? 0) ?></span>
                 </div>
+                <?php if ($selectedIntroHtml !== ''): ?>
+                    <div class="jrnl-detail-intro"><?= $selectedIntroHtml ?></div>
+                <?php endif; ?>
                 <?php if (!empty($selected['hero_image_src'])): ?>
                     <div class="jrnl-detail-cover">
                         <img src="<?= htmlspecialchars((string)$selected['hero_image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($selected['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                     </div>
                 <?php endif; ?>
                 <div class="jrnl-detail-body">
-                    <?php if ($selectedIntroHtml !== ''): ?>
-                        <div class="jrnl-detail-intro"><?= $selectedIntroHtml ?></div>
-                    <?php endif; ?>
                     <div class="jrnl-detail-content"><?= $selectedBodyHtml ?></div>
                     <div class="jrnl-actions">
                         <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Назад в практику', 'Back to playbooks'), ENT_QUOTES, 'UTF-8') ?></a>

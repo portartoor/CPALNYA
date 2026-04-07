@@ -75,8 +75,8 @@ $ModelPage['home_portal'] = [
 ];
 
 $ModelPage['title'] = $isRu
-    ? 'CPALNYA — журнал про арбитраж трафика, affiliate-операции и практику команд'
-    : 'CPALNYA — journal of affiliate traffic, team operations and practical playbooks';
+    ? 'ЦПАЛЬНЯ — журнал про арбитраж трафика, affiliate-операции и практику команд'
+    : 'ЦПАЛЬНЯ — journal of affiliate traffic, team operations and practical playbooks';
 $ModelPage['description'] = $isRu
     ? 'Журнал и практическая библиотека про арбитраж трафика, медиабаинг, фарм, креативы, трекинг и backstage affiliate-команд.'
     : 'A journal and practical library about affiliate traffic, media buying, farm, creatives, tracking and team backstage.';

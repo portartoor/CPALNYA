@@ -671,7 +671,7 @@ if (!function_exists('public_portal_seed_blog_articles')) {
             $values[] = "'" . mysqli_real_escape_string($db, $contentHtml) . "'";
             if ($hasAuthor) {
                 $columns[] = 'author_name';
-                $values[] = "'" . mysqli_real_escape_string($db, 'CPALNYA Editorial') . "'";
+                $values[] = "'" . mysqli_real_escape_string($db, 'ЦПАЛЬНЯ Editorial') . "'";
             }
             if ($hasSort) {
                 $columns[] = 'sort_order';

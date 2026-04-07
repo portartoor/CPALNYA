@@ -101,7 +101,7 @@ $commentTree = function(array $nodes, int $depth = 0) use (&$commentTree): void 
     <div class="cpb-shell">
         <header class="cpb-hero">
             <div class="cpb-hero-copy">
-                <span class="cpb-kicker"><span class="cpb-icon">✦</span><?= htmlspecialchars($t('Editorial / CPALNYA', 'Editorial / CPALNYA'), ENT_QUOTES, 'UTF-8') ?></span>
+                <span class="cpb-kicker"><span class="cpb-icon">✦</span><?= htmlspecialchars($t('Editorial / ЦПАЛЬНЯ', 'Editorial / ЦПАЛЬНЯ'), ENT_QUOTES, 'UTF-8') ?></span>
                 <h1 class="neo-title">
                     <?php if ($selected): ?>
                         <?= htmlspecialchars((string)($selected['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>

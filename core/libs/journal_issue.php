@@ -53,7 +53,7 @@ if (!function_exists('journal_issue_defaults')) {
         if ($lang === 'ru') {
             return [
                 'lang_code' => 'ru',
-                'issue_kicker' => 'Journal / CPALNYA',
+                'issue_kicker' => 'Journal / ЦПАЛЬНЯ',
                 'issue_title' => "Апрель '26. Backstage affiliate-операций",
                 'issue_subtitle' => "Апрель '26. Выпуск о том, как сегодня устроена живая affiliate-операционка: источники трафика, медиабаинг, фарм аккаунтов, креативные связки, трекеры, модерация и операционные playbooks.\n\nНе витрина обещаний, а карта backstage-процессов для CPA-команд, которым нужен не случайный запуск, а темп, масштаб и контроль в турбулентной среде.",
                 'hero_title' => 'Журнал про операционку affiliate-команд',
@@ -66,7 +66,7 @@ if (!function_exists('journal_issue_defaults')) {
 
         return [
             'lang_code' => 'en',
-            'issue_kicker' => 'Journal / CPALNYA',
+            'issue_kicker' => 'Journal / ЦПАЛЬНЯ',
             'issue_title' => 'Issue: affiliate operations backstage',
             'issue_subtitle' => 'An editorial issue about traffic, farms, creatives, trackers, bundles and reusable operating playbooks.',
             'hero_title' => 'A journal for affiliate team operations',

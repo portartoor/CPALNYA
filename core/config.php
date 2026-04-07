@@ -114,7 +114,7 @@ $SeoArticleTelegramPreviewCaptionMinWords = 26; // if caption is too short, auto
 $SeoArticleTelegramPreviewUseLLM = true; // generate Telegram preview text via LLM from full article content
 $SeoArticleTelegramPreviewModel = ''; // empty = use OpenRouter/OpenAI model from main cron config
 $SeoArticleTelegramPreviewContextChars = 14000; // how much article context is sent to LLM for preview generation
-$SeoArticleCronAuthorName = 'CPALNYA Editorial Desk';
+$SeoArticleCronAuthorName = 'Редакция ЦПАЛЬНЯ';
 $SeoArticleCronDomainHost = ''; // empty = all domains
 $SeoArticleCronMaxPerRun = 2; // safety guard per single cron execution
 $SeoArticleCronSeedSalt = 'cpalnya-affiliate-content';

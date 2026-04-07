@@ -124,7 +124,7 @@
                                         <div class="col-12"><hr class="my-1"></div>
                                         <div class="col-12">
                                             <div class="wiz-title mb-0"><i class="ti ti-layers-intersect"></i> Campaigns</div>
-                                            <div class="wiz-help mb-3">Two independent generation campaigns for CPALNYA. Global provider, proxy, preview and image settings are shared. Each campaign controls section, limits, topics and writing behavior.</div>
+                                            <div class="wiz-help mb-3">Two independent generation campaigns for ЦПАЛЬНЯ. Global provider, proxy, preview and image settings are shared. Each campaign controls section, limits, topics and writing behavior.</div>
                                         </div>
                                         <?php foreach ($campaigns as $campaignKey => $campaign): ?>
                                             <?php $prefix = 'campaign_' . $campaignKey . '_'; ?>

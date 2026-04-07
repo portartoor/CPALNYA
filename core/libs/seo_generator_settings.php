@@ -197,7 +197,7 @@ if (!function_exists('seo_gen_settings_default')) {
             'domain_host' => '',
             'domain_host_en' => 'cpalnya.ru',
             'domain_host_ru' => 'cpalnya.ru',
-            'author_name' => 'CPALNYA Editorial Desk',
+            'author_name' => 'Редакция ЦПАЛЬНЯ',
             'daily_min' => 1,
             'daily_max' => 3,
             'max_per_run' => 2,
