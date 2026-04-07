@@ -30,6 +30,9 @@
     }
     $provider = strtolower((string)($s['llm_provider'] ?? 'openai'));
     $pt = strtolower((string)($s['openai_proxy_type'] ?? 'http'));
+    $campaigns = function_exists('seo_gen_normalize_campaigns')
+        ? seo_gen_normalize_campaigns((array)($s['campaigns'] ?? []))
+        : [];
     ?>
     <style>
         .wiz-wrap .nav-link { border: 1px solid #e9ecef; margin-bottom: 8px; text-align: left; border-radius: 10px; }
@@ -110,6 +113,43 @@
                                         <div class="col-md-6"><label class="form-label">IndexNow Key Location</label><input class="form-control" name="indexnow_key_location" value="<?= htmlspecialchars((string)($s['indexnow_key_location'] ?? '')) ?>"><div class="wiz-help">Absolute URL, path, or template. You can use <code>{host}</code> and <code>{key}</code> (e.g. <code>https://{host}/{key}.txt</code> or <code>/{key}.txt</code>).</div></div>
                                         <div class="col-md-12"><label class="form-label">IndexNow Endpoint Override</label><input class="form-control" name="indexnow_endpoint" value="<?= htmlspecialchars((string)($s['indexnow_endpoint'] ?? '')) ?>"><div class="wiz-help">Optional. Empty = default <code>https://api.indexnow.org/indexnow</code>.</div></div>
                                         <div class="col-md-12"><label class="form-label">IndexNow Hosts (one per line)</label><textarea class="form-control" rows="3" name="indexnow_hosts"><?= htmlspecialchars(implode("\n", (array)($s['indexnow_hosts'] ?? []))) ?></textarea></div>
+                                        <div class="col-12"><hr class="my-1"></div>
+                                        <div class="col-12">
+                                            <div class="wiz-title mb-0"><i class="ti ti-layers-intersect"></i> Campaigns</div>
+                                            <div class="wiz-help mb-3">Two independent generation campaigns for CPALNYA. Global provider, proxy, preview and image settings are shared. Each campaign controls section, limits, topics and writing behavior.</div>
+                                        </div>
+                                        <?php foreach ($campaigns as $campaignKey => $campaign): ?>
+                                            <?php $prefix = 'campaign_' . $campaignKey . '_'; ?>
+                                            <div class="col-12">
+                                                <div class="border rounded p-3">
+                                                    <div class="row g-3">
+                                                        <div class="col-12">
+                                                            <h6 class="mb-0"><?= htmlspecialchars((string)($campaign['title'] ?? $campaignKey)) ?> / <?= htmlspecialchars((string)($campaign['title_ru'] ?? $campaignKey)) ?></h6>
+                                                        </div>
+                                                        <div class="col-md-2"><label class="form-label">Enabled</label><select class="form-select" name="<?= htmlspecialchars($prefix) ?>enabled"><option value="1" <?= !empty($campaign['enabled']) ? 'selected' : '' ?>>Yes</option><option value="0" <?= empty($campaign['enabled']) ? 'selected' : '' ?>>No</option></select></div>
+                                                        <div class="col-md-2"><label class="form-label">Section</label><select class="form-select" name="<?= htmlspecialchars($prefix) ?>material_section"><option value="journal" <?= (($campaign['material_section'] ?? '') === 'journal') ? 'selected' : '' ?>>Journal</option><option value="playbooks" <?= (($campaign['material_section'] ?? '') === 'playbooks') ? 'selected' : '' ?>>Playbooks</option></select></div>
+                                                        <div class="col-md-2"><label class="form-label">Daily Min</label><input class="form-control" type="number" name="<?= htmlspecialchars($prefix) ?>daily_min" value="<?= (int)($campaign['daily_min'] ?? 4) ?>"></div>
+                                                        <div class="col-md-2"><label class="form-label">Daily Max</label><input class="form-control" type="number" name="<?= htmlspecialchars($prefix) ?>daily_max" value="<?= (int)($campaign['daily_max'] ?? 6) ?>"></div>
+                                                        <div class="col-md-2"><label class="form-label">Max Per Run</label><input class="form-control" type="number" name="<?= htmlspecialchars($prefix) ?>max_per_run" value="<?= (int)($campaign['max_per_run'] ?? 2) ?>"></div>
+                                                        <div class="col-md-2"><label class="form-label">Salt Suffix</label><input class="form-control" name="<?= htmlspecialchars($prefix) ?>seed_salt_suffix" value="<?= htmlspecialchars((string)($campaign['seed_salt_suffix'] ?? $campaignKey)) ?>"></div>
+                                                        <div class="col-md-3"><label class="form-label">Word Min</label><input class="form-control" type="number" name="<?= htmlspecialchars($prefix) ?>word_min" value="<?= (int)($campaign['word_min'] ?? 1800) ?>"></div>
+                                                        <div class="col-md-3"><label class="form-label">Word Max</label><input class="form-control" type="number" name="<?= htmlspecialchars($prefix) ?>word_max" value="<?= (int)($campaign['word_max'] ?? 3200) ?>"></div>
+                                                        <div class="col-md-3"><label class="form-label">Title EN</label><input class="form-control" name="<?= htmlspecialchars($prefix) ?>title" value="<?= htmlspecialchars((string)($campaign['title'] ?? '')) ?>"></div>
+                                                        <div class="col-md-3"><label class="form-label">Title RU</label><input class="form-control" name="<?= htmlspecialchars($prefix) ?>title_ru" value="<?= htmlspecialchars((string)($campaign['title_ru'] ?? '')) ?>"></div>
+                                                        <div class="col-md-6"><label class="form-label">Description EN</label><textarea class="form-control" rows="2" name="<?= htmlspecialchars($prefix) ?>description"><?= htmlspecialchars((string)($campaign['description'] ?? '')) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Description RU</label><textarea class="form-control" rows="2" name="<?= htmlspecialchars($prefix) ?>description_ru"><?= htmlspecialchars((string)($campaign['description_ru'] ?? '')) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Styles EN</label><textarea class="form-control" rows="4" name="<?= htmlspecialchars($prefix) ?>styles_en"><?= htmlspecialchars(implode("\n", (array)($campaign['styles_en'] ?? []))) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Styles RU</label><textarea class="form-control" rows="4" name="<?= htmlspecialchars($prefix) ?>styles_ru"><?= htmlspecialchars(implode("\n", (array)($campaign['styles_ru'] ?? []))) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Clusters EN</label><textarea class="form-control" rows="5" name="<?= htmlspecialchars($prefix) ?>clusters_en"><?= htmlspecialchars(implode("\n", (array)($campaign['clusters_en'] ?? []))) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Clusters RU</label><textarea class="form-control" rows="5" name="<?= htmlspecialchars($prefix) ?>clusters_ru"><?= htmlspecialchars(implode("\n", (array)($campaign['clusters_ru'] ?? []))) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Structures EN</label><textarea class="form-control" rows="4" name="<?= htmlspecialchars($prefix) ?>article_structures_en"><?= htmlspecialchars(implode("\n", (array)($campaign['article_structures_en'] ?? []))) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Structures RU</label><textarea class="form-control" rows="4" name="<?= htmlspecialchars($prefix) ?>article_structures_ru"><?= htmlspecialchars(implode("\n", (array)($campaign['article_structures_ru'] ?? []))) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Prompt Append EN</label><textarea class="form-control" rows="3" name="<?= htmlspecialchars($prefix) ?>article_user_prompt_append_en"><?= htmlspecialchars((string)($campaign['article_user_prompt_append_en'] ?? '')) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Prompt Append RU</label><textarea class="form-control" rows="3" name="<?= htmlspecialchars($prefix) ?>article_user_prompt_append_ru"><?= htmlspecialchars((string)($campaign['article_user_prompt_append_ru'] ?? '')) ?></textarea></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
                                     </div>
                                 </div>
                             </div>

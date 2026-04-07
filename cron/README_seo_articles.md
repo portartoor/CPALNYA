@@ -48,18 +48,18 @@ Recommended frequency:
 Queue mode (recommended for production):
 
 ```bash
-# 1) every hour: put daily language tasks into queue if they are missing
-5 * * * * /usr/bin/php /home/portcore/public_html/cron/seo_article_queue.php --enqueue-daily >> /home/portcore/logs/seo_article_queue.log 2>&1
+# 1) every hour: put daily campaign tasks into queue if they are missing
+5 * * * * /usr/bin/php /home/cpalnya/public_html/cron/seo_article_queue.php --enqueue-daily >> /home/cpalnya/logs/seo_article_queue.log 2>&1
 
 # 2) every 10 minutes: process queue
-*/10 * * * * /usr/bin/php /home/portcore/public_html/cron/seo_article_queue.php --work --limit=2 >> /home/portcore/logs/seo_article_queue_worker.log 2>&1
+*/10 * * * * /usr/bin/php /home/cpalnya/public_html/cron/seo_article_queue.php --work --limit=2 >> /home/cpalnya/logs/seo_article_queue_worker.log 2>&1
 ```
 
 Image backfill (restore missing preview images for existing articles):
 
 ```bash
 # every 30 minutes, restore/migrate up to 6 article preview images
-*/30 * * * * /usr/bin/php /home/portcore/public_html/cron/generate_seo_articles.php --backfill-images --image-limit=6 >> /home/portcore/logs/seo_article_backfill.log 2>&1
+*/30 * * * * /usr/bin/php /home/cpalnya/public_html/cron/generate_seo_articles.php --backfill-images --image-limit=6 >> /home/cpalnya/logs/seo_article_backfill.log 2>&1
 ```
 
 Notes:
@@ -82,6 +82,7 @@ CLI options:
 - `--date=YYYY-MM-DD` (override job date)
 - `--lang=en` or `--lang=ru` or `--lang=en,ru`
 - `--max-per-run=1`
+- `--campaign=journal` or `--campaign=playbooks`
 - `--force` (ignore time check and run all slots for selected date)
 - `--dry-run` (call OpenAI + validate result, but do not insert into DB)
 - `--proxy-check` (check all configured proxies from pool/single proxy)
@@ -92,13 +93,15 @@ Examples:
 # Safe test: run yesterday in dry-run mode for RU only
 /usr/bin/php /home/geoip/public_html/cron/generate_seo_articles.php --date=$(date -u -d 'yesterday' +%F) --lang=ru --force --dry-run --max-per-run=1
 
-# Real forced generation: create 1 EN article immediately
-/usr/bin/php /home/geoip/public_html/cron/generate_seo_articles.php --date=$(date -u -d 'yesterday' +%F) --lang=en --force --max-per-run=1
+# Real forced generation: create 4-8 Journal or Playbooks materials immediately
+/usr/bin/php /home/cpalnya/public_html/cron/generate_seo_articles.php --campaign=journal --date=$(date +%F) --lang=ru --force --max-per-run=4
+/usr/bin/php /home/cpalnya/public_html/cron/generate_seo_articles.php --campaign=playbooks --date=$(date +%F) --lang=ru --force --max-per-run=6
 
 # Check proxy pool only (no DB writes, no article generation)
-/usr/bin/php /home/geoip/public_html/cron/generate_seo_articles.php --proxy-check
+/usr/bin/php /home/cpalnya/public_html/cron/generate_seo_articles.php --proxy-check
 
-# Queue: add 2 test tasks (RU + EN), then process
-/usr/bin/php /home/portcore/public_html/cron/seo_article_queue.php --enqueue-test --date=$(date +%F)
-/usr/bin/php /home/portcore/public_html/cron/seo_article_queue.php --work --limit=2
+# Queue: add campaign tasks, then process
+/usr/bin/php /home/cpalnya/public_html/cron/seo_article_queue.php --enqueue --campaign=journal --date=$(date +%F) --lang=ru,en --max-per-run=4
+/usr/bin/php /home/cpalnya/public_html/cron/seo_article_queue.php --enqueue --campaign=playbooks --date=$(date +%F) --lang=ru,en --max-per-run=6
+/usr/bin/php /home/cpalnya/public_html/cron/seo_article_queue.php --work --limit=2
 ```

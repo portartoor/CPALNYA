@@ -930,7 +930,19 @@ if ($isAdminPanel) {
 					<li class="side-nav-item">
 						<a href="/adminpanel/examples/" class="side-nav-link">
 							<span class="menu-icon"><i class="ti ti-notebook"></i></span>
-							<span class="menu-text"><?= $isRuUi ? 'РЎС‚Р°С‚СЊРё-РїСЂРёРјРµСЂС‹' : 'Examples Articles' ?></span>
+							<span class="menu-text"><?= $isRuUi ? 'Все материалы' : 'All Materials' ?></span>
+						</a>
+					</li>
+					<li class="side-nav-item">
+						<a href="/adminpanel/journal/" class="side-nav-link">
+							<span class="menu-icon"><i class="ti ti-news"></i></span>
+							<span class="menu-text"><?= $isRuUi ? 'Журнал' : 'Journal' ?></span>
+						</a>
+					</li>
+					<li class="side-nav-item">
+						<a href="/adminpanel/playbooks/" class="side-nav-link">
+							<span class="menu-icon"><i class="ti ti-book-2"></i></span>
+							<span class="menu-text"><?= $isRuUi ? 'HowTo / Playbooks' : 'HowTo / Playbooks' ?></span>
 						</a>
 					</li>
 					<li class="side-nav-item">

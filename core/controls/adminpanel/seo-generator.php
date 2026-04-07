@@ -359,6 +359,38 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         $incoming['image_scene_families'] = admin_seo_gen_parse_image_scene_families(admin_seo_gen_post_string('image_scene_families'));
         $incoming['preview_image_prompt_template'] = admin_seo_gen_post_string('preview_image_prompt_template');
 
+        $campaignDefaults = function_exists('seo_gen_default_campaigns') ? seo_gen_default_campaigns() : [];
+        $incomingCampaigns = [];
+        foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
+            $prefix = 'campaign_' . $campaignKey . '_';
+            $incomingCampaigns[$campaignKey] = [
+                'key' => $campaignKey,
+                'title' => admin_seo_gen_post_string($prefix . 'title', (string)($campaignDefault['title'] ?? $campaignKey)),
+                'title_ru' => admin_seo_gen_post_string($prefix . 'title_ru', (string)($campaignDefault['title_ru'] ?? $campaignKey)),
+                'description' => admin_seo_gen_post_string($prefix . 'description', (string)($campaignDefault['description'] ?? '')),
+                'description_ru' => admin_seo_gen_post_string($prefix . 'description_ru', (string)($campaignDefault['description_ru'] ?? '')),
+                'material_section' => admin_seo_gen_post_string($prefix . 'material_section', (string)($campaignDefault['material_section'] ?? $campaignKey)),
+                'enabled' => admin_seo_gen_post_bool($prefix . 'enabled', !empty($campaignDefault['enabled'])),
+                'daily_min' => admin_seo_gen_post_int($prefix . 'daily_min', (int)($campaignDefault['daily_min'] ?? 4)),
+                'daily_max' => admin_seo_gen_post_int($prefix . 'daily_max', (int)($campaignDefault['daily_max'] ?? 6)),
+                'max_per_run' => admin_seo_gen_post_int($prefix . 'max_per_run', (int)($campaignDefault['max_per_run'] ?? 2)),
+                'word_min' => admin_seo_gen_post_int($prefix . 'word_min', (int)($campaignDefault['word_min'] ?? 1800)),
+                'word_max' => admin_seo_gen_post_int($prefix . 'word_max', (int)($campaignDefault['word_max'] ?? 3200)),
+                'seed_salt_suffix' => admin_seo_gen_post_string($prefix . 'seed_salt_suffix', (string)($campaignDefault['seed_salt_suffix'] ?? $campaignKey)),
+                'styles_en' => seo_gen_settings_parse_lines(admin_seo_gen_post_string($prefix . 'styles_en'), 120),
+                'styles_ru' => seo_gen_settings_parse_lines(admin_seo_gen_post_string($prefix . 'styles_ru'), 120),
+                'clusters_en' => seo_gen_settings_parse_lines(admin_seo_gen_post_string($prefix . 'clusters_en'), 120),
+                'clusters_ru' => seo_gen_settings_parse_lines(admin_seo_gen_post_string($prefix . 'clusters_ru'), 120),
+                'article_structures_en' => seo_gen_settings_parse_lines(admin_seo_gen_post_string($prefix . 'article_structures_en'), 120),
+                'article_structures_ru' => seo_gen_settings_parse_lines(admin_seo_gen_post_string($prefix . 'article_structures_ru'), 120),
+                'article_system_prompt_en' => admin_seo_gen_post_string($prefix . 'article_system_prompt_en'),
+                'article_system_prompt_ru' => admin_seo_gen_post_string($prefix . 'article_system_prompt_ru'),
+                'article_user_prompt_append_en' => admin_seo_gen_post_string($prefix . 'article_user_prompt_append_en'),
+                'article_user_prompt_append_ru' => admin_seo_gen_post_string($prefix . 'article_user_prompt_append_ru'),
+            ];
+        }
+        $incoming['campaigns'] = $incomingCampaigns;
+
         if (seo_gen_settings_save($DB, $incoming, (int)($adminpanelUser['id'] ?? 0))) {
             $seoGeneratorSettings = seo_gen_settings_get($DB);
             $message = 'SEO generator settings saved.';

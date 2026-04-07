@@ -54,6 +54,141 @@ if (!function_exists('seo_gen_settings_parse_lines')) {
 }
 
 if (!function_exists('seo_gen_settings_default')) {
+    function seo_gen_default_campaigns(): array
+    {
+        return [
+            'journal' => [
+                'key' => 'journal',
+                'title' => 'Journal',
+                'title_ru' => 'Журнал',
+                'description' => 'Editorial stream around affiliate strategy, source trends, platform shifts and operating models.',
+                'description_ru' => 'Редакционный поток про стратегию арбитража, изменения источников, рыночные сдвиги и операционные модели.',
+                'material_section' => 'journal',
+                'enabled' => true,
+                'daily_min' => 4,
+                'daily_max' => 6,
+                'max_per_run' => 2,
+                'word_min' => 1800,
+                'word_max' => 3200,
+                'seed_salt_suffix' => 'journal',
+                'styles_en' => ['trend briefing', 'editorial breakdown', 'market memo', 'operating analysis'],
+                'styles_ru' => ['редакционный разбор', 'аналитическая записка', 'trend briefing', 'стратегический обзор'],
+                'clusters_en' => [
+                    'meta ads resilience and account farming',
+                    'tiktok shop and short-form affiliate funnels',
+                    'telegram mini apps and community retention',
+                    'ai creatives workflow and compliance',
+                    'tracker stacks attribution and signal loss',
+                    'nutra finance igaming and crypto demand shifts',
+                ],
+                'clusters_ru' => [
+                    'Meta Ads в 2026: фарм, BM-устойчивость и антибан',
+                    'TikTok и short-form воронки под affiliate-офферы',
+                    'Telegram Mini Apps, комьюнити и ретеншн в арбитраже',
+                    'AI-креативы, compliance и контроль промпт-пайплайна',
+                    'трекеры, атрибуция и потеря сигналов после privacy-сдвигов',
+                    'сдвиги спроса по nutra, finance, iGaming и crypto в 2026',
+                ],
+                'article_structures_en' => [
+                    'Trend summary -> what changed -> who wins -> operating implications -> checklist',
+                    'Source shift -> risks -> adaptation patterns -> examples -> next steps',
+                    'Myth vs reality -> evidence -> playbook signals -> conclusion',
+                ],
+                'article_structures_ru' => [
+                    'Краткий тренд -> что изменилось -> кто выигрывает -> операционные выводы -> чеклист',
+                    'Сдвиг источника -> риски -> адаптация -> примеры -> следующие шаги',
+                    'Миф и реальность -> факты -> рабочие сигналы -> вывод',
+                ],
+                'article_system_prompt_en' => '',
+                'article_system_prompt_ru' => '',
+                'article_user_prompt_append_en' => 'Focus on 2026 affiliate traffic trends, operator decisions, signal quality and practical strategic implications.',
+                'article_user_prompt_append_ru' => 'Фокус на трендах арбитража трафика 2026, операционных решениях команды, качестве сигналов и прикладных стратегических выводах.',
+            ],
+            'playbooks' => [
+                'key' => 'playbooks',
+                'title' => 'Playbooks',
+                'title_ru' => 'HowTo',
+                'description' => 'Case studies, how-to guides, troubleshooting notes and reusable operational solutions.',
+                'description_ru' => 'Кейсы, how-to гайды, troubleshooting-материалы и переиспользуемые рабочие решения.',
+                'material_section' => 'playbooks',
+                'enabled' => true,
+                'daily_min' => 4,
+                'daily_max' => 8,
+                'max_per_run' => 3,
+                'word_min' => 1600,
+                'word_max' => 3600,
+                'seed_salt_suffix' => 'playbooks',
+                'styles_en' => ['step-by-step tutorial', 'troubleshooting guide', 'case note', 'operator playbook'],
+                'styles_ru' => ['пошаговый how-to', 'гайд по устранению проблем', 'операционный playbook', 'технический кейс'],
+                'clusters_en' => [
+                    'facebook farm setup and warmup',
+                    'cloaking moderation-safe routing',
+                    'tracker postback templates and debugging',
+                    'anti-detect browser operations and team SOP',
+                    'creative testing matrix and iteration loops',
+                    'payment domains hosting and landing recovery',
+                ],
+                'clusters_ru' => [
+                    'настройка и прогрев Facebook farm',
+                    'cloaking и безопасная маршрутизация под модерацию',
+                    'tracker postback-шаблоны, макросы и отладка',
+                    'anti-detect браузеры, роли команды и SOP',
+                    'матрица тестирования креативов и цикл итераций',
+                    'платежки, домены, хостинг и восстановление лендингов',
+                ],
+                'article_structures_en' => [
+                    'Problem -> prerequisites -> exact steps -> failure cases -> verification',
+                    'Goal -> stack -> implementation -> screenshots/code -> rollback plan',
+                    'Case context -> setup -> metrics -> bottlenecks -> reusable template',
+                ],
+                'article_structures_ru' => [
+                    'Проблема -> prerequisites -> точные шаги -> типовые фейлы -> проверка',
+                    'Цель -> стек -> внедрение -> код/настройки -> rollback-план',
+                    'Контекст кейса -> сетап -> метрики -> узкие места -> переиспользуемый шаблон',
+                ],
+                'article_system_prompt_en' => '',
+                'article_system_prompt_ru' => '',
+                'article_user_prompt_append_en' => 'Favor practical implementation, troubleshooting depth, reusable snippets, SOPs and exact operator steps.',
+                'article_user_prompt_append_ru' => 'Смещай акцент в сторону практической реализации, troubleshooting, переиспользуемых фрагментов, SOP и точных шагов оператора.',
+            ],
+        ];
+    }
+
+    function seo_gen_normalize_campaigns($raw): array
+    {
+        $defaults = seo_gen_default_campaigns();
+        $raw = is_array($raw) ? $raw : [];
+        $out = [];
+        foreach ($defaults as $key => $default) {
+            $row = array_merge($default, is_array($raw[$key] ?? null) ? $raw[$key] : []);
+            $row['key'] = $key;
+            $row['material_section'] = in_array((string)($row['material_section'] ?? $key), ['journal', 'playbooks'], true)
+                ? (string)$row['material_section']
+                : $key;
+            $row['enabled'] = !empty($row['enabled']);
+            $row['daily_min'] = max(1, min(24, (int)($row['daily_min'] ?? $default['daily_min'])));
+            $row['daily_max'] = max($row['daily_min'], min(48, (int)($row['daily_max'] ?? $default['daily_max'])));
+            $row['max_per_run'] = max(1, min(12, (int)($row['max_per_run'] ?? $default['max_per_run'])));
+            $row['word_min'] = max(600, min(12000, (int)($row['word_min'] ?? $default['word_min'])));
+            $row['word_max'] = max($row['word_min'], min(20000, (int)($row['word_max'] ?? $default['word_max'])));
+            $row['seed_salt_suffix'] = trim((string)($row['seed_salt_suffix'] ?? $default['seed_salt_suffix']));
+            if ($row['seed_salt_suffix'] === '') {
+                $row['seed_salt_suffix'] = $default['seed_salt_suffix'];
+            }
+            foreach (['styles_en', 'styles_ru', 'clusters_en', 'clusters_ru', 'article_structures_en', 'article_structures_ru'] as $listKey) {
+                $row[$listKey] = seo_gen_settings_parse_lines(implode("\n", (array)($row[$listKey] ?? [])), 120);
+                if (empty($row[$listKey])) {
+                    $row[$listKey] = (array)$default[$listKey];
+                }
+            }
+            foreach (['title', 'title_ru', 'description', 'description_ru', 'article_system_prompt_en', 'article_system_prompt_ru', 'article_user_prompt_append_en', 'article_user_prompt_append_ru'] as $textKey) {
+                $row[$textKey] = trim((string)($row[$textKey] ?? $default[$textKey] ?? ''));
+            }
+            $out[$key] = $row;
+        }
+        return $out;
+    }
+
     function seo_gen_settings_default(): array
     {
         return [
@@ -365,6 +500,7 @@ if (!function_exists('seo_gen_settings_default')) {
                 ['key' => 'hybrid_mix', 'weight' => 0.7, 'label_en' => 'Hybrid mix', 'label_ru' => 'Гибридный микс', 'instruction' => 'Balanced mix of people, systems and signal motifs.'],
             ],
             'preview_image_prompt_template' => 'Create a {{image_style}} editorial hero illustration for article "{{title}}" in {{lang}} language. Theme: B2B systems architecture, product engineering, security, reliability, analytics. No text, no logos, 16:9.',
+            'campaigns' => seo_gen_default_campaigns(),
         ];
     }
 }
@@ -478,6 +614,7 @@ if (!function_exists('seo_gen_settings_normalize')) {
         $settings['openai_headers'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['openai_headers']), 100);
         $settings['openai_proxy_pool'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['openai_proxy_pool']), 300);
         $settings['preview_image_style_options'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['preview_image_style_options']), 60);
+        $settings['campaigns'] = seo_gen_normalize_campaigns($settings['campaigns'] ?? []);
         $indexNowHosts = seo_gen_settings_parse_lines(implode("\n", (array)($settings['indexnow_hosts'] ?? [])), 40);
         if (empty($indexNowHosts)) {
             $indexNowHosts = (array)($defaults['indexnow_hosts'] ?? []);

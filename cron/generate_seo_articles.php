@@ -39,6 +39,7 @@ function seo_runtime_options(): array
         'langs' => [],
         'max_per_run' => null,
         'image_limit' => null,
+        'campaign' => '',
     ];
 
     $argv = isset($GLOBALS['argv']) && is_array($GLOBALS['argv']) ? $GLOBALS['argv'] : [];
@@ -97,6 +98,13 @@ function seo_runtime_options(): array
             $value = (int)trim(substr($arg, 14));
             if ($value > 0) {
                 $opts['image_limit'] = $value;
+            }
+            continue;
+        }
+        if (strpos($arg, '--campaign=') === 0) {
+            $value = strtolower(trim(substr($arg, 11)));
+            if (in_array($value, ['journal', 'playbooks'], true)) {
+                $opts['campaign'] = $value;
             }
             continue;
         }
@@ -364,6 +372,10 @@ function seo_ensure_examples_image_columns(mysqli $db): void
     if (!seo_table_has_column($db, 'examples_articles', 'cluster_code')) {
         @mysqli_query($db, "ALTER TABLE examples_articles ADD COLUMN cluster_code VARCHAR(64) NOT NULL DEFAULT 'general' AFTER lang_code");
         @mysqli_query($db, "ALTER TABLE examples_articles ADD KEY idx_examples_cluster_code (cluster_code)");
+    }
+    if (!seo_table_has_column($db, 'examples_articles', 'material_section')) {
+        @mysqli_query($db, "ALTER TABLE examples_articles ADD COLUMN material_section VARCHAR(32) NOT NULL DEFAULT 'journal' AFTER cluster_code");
+        @mysqli_query($db, "ALTER TABLE examples_articles ADD KEY idx_examples_material_section (material_section)");
     }
 }
 
@@ -3676,6 +3688,45 @@ function seo_call_openai(
     return $content;
 }
 
+function seo_apply_campaign_to_cfg(array $cfg, array $runtime): array
+{
+    $campaignKey = strtolower(trim((string)($runtime['campaign'] ?? '')));
+    if ($campaignKey === '' || empty($cfg['campaigns'][$campaignKey]) || !is_array($cfg['campaigns'][$campaignKey])) {
+        $cfg['campaign_key'] = '';
+        $cfg['campaign_material_section'] = 'journal';
+        return $cfg;
+    }
+
+    $campaign = $cfg['campaigns'][$campaignKey];
+    $cfg['campaign_key'] = $campaignKey;
+    $cfg['campaign_material_section'] = (string)($campaign['material_section'] ?? $campaignKey);
+    $cfg['enabled'] = !empty($campaign['enabled']) && !empty($cfg['enabled']);
+    $cfg['daily_min'] = (int)($campaign['daily_min'] ?? $cfg['daily_min']);
+    $cfg['daily_max'] = (int)($campaign['daily_max'] ?? $cfg['daily_max']);
+    $cfg['max_per_run'] = (int)($campaign['max_per_run'] ?? $cfg['max_per_run']);
+    $cfg['word_min'] = (int)($campaign['word_min'] ?? $cfg['word_min']);
+    $cfg['word_max'] = (int)($campaign['word_max'] ?? $cfg['word_max']);
+    $cfg['seed_salt'] = trim((string)($cfg['seed_salt'] ?? 'seo-articles')) . '::' . trim((string)($campaign['seed_salt_suffix'] ?? $campaignKey));
+    foreach ([
+        'styles_en',
+        'styles_ru',
+        'clusters_en',
+        'clusters_ru',
+        'article_structures_en',
+        'article_structures_ru',
+        'article_system_prompt_en',
+        'article_system_prompt_ru',
+        'article_user_prompt_append_en',
+        'article_user_prompt_append_ru',
+    ] as $key) {
+        if (array_key_exists($key, $campaign)) {
+            $cfg[$key] = $campaign[$key];
+        }
+    }
+
+    return $cfg;
+}
+
 function seo_normalize_llm_content_to_text($content): string
 {
     if (is_string($content)) {
@@ -5627,6 +5678,10 @@ function seo_publish_article(
     $titleSafe = mysqli_real_escape_string($db, $title);
     $slugSafe = mysqli_real_escape_string($db, $slug);
     $clusterSafe = mysqli_real_escape_string($db, $clusterCode);
+    $materialSection = in_array((string)($cfg['campaign_material_section'] ?? 'journal'), ['journal', 'playbooks'], true)
+        ? (string)$cfg['campaign_material_section']
+        : 'journal';
+    $materialSectionSafe = mysqli_real_escape_string($db, $materialSection);
     $excerptSafe = mysqli_real_escape_string($db, $excerptHtml);
     $contentSafe = mysqli_real_escape_string($db, $contentHtml);
     $authorSafe = mysqli_real_escape_string($db, $cfg['author_name']);
@@ -5644,6 +5699,10 @@ function seo_publish_article(
     if ((bool)($cfg['examples_has_cluster_code'] ?? false)) {
         $insertColumns[] = 'cluster_code';
         $insertValues[] = "'{$clusterSafe}'";
+    }
+    if ((bool)($cfg['examples_has_material_section'] ?? false)) {
+        $insertColumns[] = 'material_section';
+        $insertValues[] = "'{$materialSectionSafe}'";
     }
 
     if ((bool)($cfg['examples_has_is_ai_generated'] ?? false)) {
@@ -5708,6 +5767,7 @@ function seo_publish_article(
         'title' => $title,
         'slug' => $slug,
         'cluster_code' => $clusterCode,
+        'material_section' => $materialSection,
         'cluster_source' => $clusterSource,
         'excerpt_html' => $excerptHtml,
         'content_html' => $contentHtml,
@@ -5999,6 +6059,9 @@ $runtime = seo_runtime_options();
 if ($runtime['max_per_run'] !== null) {
     $cfg['max_per_run'] = max(1, min(30, (int)$runtime['max_per_run']));
 }
+if (!empty($runtime['campaign'])) {
+    $cfg = seo_apply_campaign_to_cfg($cfg, $runtime);
+}
 
 $langList = [];
 foreach ($cfg['langs'] as $langRaw) {
@@ -6052,6 +6115,7 @@ $cfg['examples_has_ai_model'] = seo_table_has_column($DB, 'examples_articles', '
 $cfg['examples_has_ai_prompt_version'] = seo_table_has_column($DB, 'examples_articles', 'ai_prompt_version');
 $cfg['examples_has_ai_generated_at'] = seo_table_has_column($DB, 'examples_articles', 'ai_generated_at');
 $cfg['examples_has_cluster_code'] = seo_table_has_column($DB, 'examples_articles', 'cluster_code');
+$cfg['examples_has_material_section'] = seo_table_has_column($DB, 'examples_articles', 'material_section');
 $cfg['examples_has_preview_image_url'] = seo_table_has_column($DB, 'examples_articles', 'preview_image_url');
 $cfg['examples_has_preview_image_thumb_url'] = seo_table_has_column($DB, 'examples_articles', 'preview_image_thumb_url');
 $cfg['examples_has_preview_image_style'] = seo_table_has_column($DB, 'examples_articles', 'preview_image_style');
@@ -6072,6 +6136,9 @@ if ($runtime['dry_run']) {
     seo_echo('Dry-run mode enabled: articles are generated but not inserted into DB.');
 }
 seo_echo('Job date: ' . $jobDate);
+if (!empty($cfg['campaign_key'])) {
+    seo_echo('Campaign: ' . $cfg['campaign_key'] . ' -> section=' . (string)($cfg['campaign_material_section'] ?? 'journal'));
+}
 seo_echo('LLM provider: ' . $cfg['llm_provider'] . ', model: ' . $cfg['openai_model']);
 if ($cfg['llm_provider'] === 'openrouter' && !empty($cfg['openrouter_fallback_model'])) {
     seo_echo('OpenRouter fallback model: ' . (string)$cfg['openrouter_fallback_model']);

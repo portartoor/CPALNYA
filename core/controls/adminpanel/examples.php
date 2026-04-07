@@ -20,6 +20,12 @@ $adminpanelUser = adminpanel_require_auth($FRMWRK);
 $message = '';
 $messageType = '';
 $editArticle = null;
+$adminExamplesSection = isset($adminExamplesSection) ? trim((string)$adminExamplesSection) : trim((string)($_GET['section'] ?? ''));
+if (!in_array($adminExamplesSection, ['journal', 'playbooks'], true)) {
+    $adminExamplesSection = '';
+}
+$adminExamplesTitle = isset($adminExamplesTitle) ? (string)$adminExamplesTitle : ($adminExamplesSection === 'playbooks' ? 'Playbooks' : ($adminExamplesSection === 'journal' ? 'Journal' : 'Articles'));
+$adminExamplesBackUrl = isset($adminExamplesBackUrl) ? (string)$adminExamplesBackUrl : ($adminExamplesSection === 'playbooks' ? '/adminpanel/playbooks/' : ($adminExamplesSection === 'journal' ? '/adminpanel/journal/' : '/adminpanel/examples/'));
 
 if (!examples_table_exists($DB)) {
     $message = 'Table examples_articles is missing. Run migration examples_articles_setup.sql first.';
@@ -80,6 +86,11 @@ function admin_examples_has_column(mysqli $DB, string $column): bool
     return $res && mysqli_num_rows($res) > 0;
 }
 
+if (examples_table_exists($DB) && !admin_examples_has_column($DB, 'material_section')) {
+    @mysqli_query($DB, "ALTER TABLE examples_articles ADD COLUMN material_section VARCHAR(32) NOT NULL DEFAULT 'journal' AFTER cluster_code");
+    @mysqli_query($DB, "ALTER TABLE examples_articles ADD KEY idx_examples_material_section (material_section)");
+}
+
 function admin_examples_public_url(string $domainHost, string $langCode, string $slug, string $clusterCode = ''): string
 {
     $slug = trim($slug);
@@ -132,6 +143,7 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
     $action = (string)($_POST['action'] ?? '');
     $hasLangColumn = examples_table_has_lang_column($DB);
     $hasClusterColumn = admin_examples_has_column($DB, 'cluster_code');
+    $hasSectionColumn = admin_examples_has_column($DB, 'material_section');
 
     if ($action === 'save_article') {
         $articleId = (int)($_POST['article_id'] ?? 0);
@@ -142,6 +154,10 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
         $excerptHtml = trim((string)($_POST['excerpt_html'] ?? ''));
         $contentHtml = trim((string)($_POST['content_html'] ?? ''));
         $authorName = trim((string)($_POST['author_name'] ?? ''));
+        $materialSection = trim((string)($_POST['material_section'] ?? ($adminExamplesSection !== '' ? $adminExamplesSection : 'journal')));
+        if (!in_array($materialSection, ['journal', 'playbooks'], true)) {
+            $materialSection = 'journal';
+        }
         $sortOrder = (int)($_POST['sort_order'] ?? 0);
         $isPublished = ((int)($_POST['is_published'] ?? 0) === 1) ? 1 : 0;
         $publishedAtInput = trim((string)($_POST['published_at'] ?? ''));
@@ -190,8 +206,9 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
                          slug = '{$slugSafe}',
                          excerpt_html = '{$excerptSafe}',
                          content_html = '{$contentSafe}',
-                         author_name = '{$authorSafe}',
-                         sort_order = " . (int)$sortOrder . ",
+                        author_name = '{$authorSafe}',
+                        " . ($hasSectionColumn ? "material_section = '" . mysqli_real_escape_string($DB, $materialSection) . "'," : "") . "
+                        sort_order = " . (int)$sortOrder . ",
                          is_published = " . (int)$isPublished . ",
                          published_at = {$publishedAtSql},
                          updated_at = NOW()
@@ -218,9 +235,9 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
                 mysqli_query(
                     $DB,
                     "INSERT INTO examples_articles
-                        (" . ($hasLangColumn ? "domain_host, lang_code," : "domain_host,") . " title, slug, excerpt_html, content_html, author_name, sort_order, is_published, published_at, created_at, updated_at)
+                        (" . ($hasLangColumn ? "domain_host, lang_code," : "domain_host,") . ($hasSectionColumn ? " material_section," : "") . " title, slug, excerpt_html, content_html, author_name, sort_order, is_published, published_at, created_at, updated_at)
                      VALUES
-                        ('{$domainSafe}', " . ($hasLangColumn ? "'{$langSafe}'," : "") . " '{$titleSafe}', '{$slugSafe}', '{$excerptSafe}', '{$contentSafe}', '{$authorSafe}', " . (int)$sortOrder . ", " . (int)$isPublished . ", {$publishedAtSql}, NOW(), NOW())"
+                        ('{$domainSafe}', " . ($hasLangColumn ? "'{$langSafe}'," : "") . ($hasSectionColumn ? " '" . mysqli_real_escape_string($DB, $materialSection) . "'," : "") . " '{$titleSafe}', '{$slugSafe}', '{$excerptSafe}', '{$contentSafe}', '{$authorSafe}', " . (int)$sortOrder . ", " . (int)$isPublished . ", {$publishedAtSql}, NOW(), NOW())"
                 );
                 if ($isPublished === 1) {
                     $newClusterCode = '';
@@ -261,7 +278,11 @@ if (examples_table_exists($DB) && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'PO
 if (examples_table_exists($DB)) {
     $editId = (int)($_GET['edit'] ?? 0);
     if ($editId > 0) {
-        $editRows = $FRMWRK->DBRecords("SELECT * FROM examples_articles WHERE id = {$editId} LIMIT 1");
+        $sectionWhere = '';
+        if ($adminExamplesSection !== '' && admin_examples_has_column($DB, 'material_section')) {
+            $sectionWhere = " AND material_section = '" . mysqli_real_escape_string($DB, $adminExamplesSection) . "'";
+        }
+        $editRows = $FRMWRK->DBRecords("SELECT * FROM examples_articles WHERE id = {$editId}{$sectionWhere} LIMIT 1");
         if (!empty($editRows)) {
             $editArticle = $editRows[0];
         }
@@ -272,12 +293,19 @@ $articles = [];
 if (examples_table_exists($DB)) {
     $hasLangColumn = examples_table_has_lang_column($DB);
     $hasAiColumn = admin_examples_has_column($DB, 'is_ai_generated');
+    $hasSectionColumn = admin_examples_has_column($DB, 'material_section');
+    $sectionFilterSql = '';
+    if ($adminExamplesSection !== '' && $hasSectionColumn) {
+        $sectionFilterSql = " WHERE material_section = '" . mysqli_real_escape_string($DB, $adminExamplesSection) . "'";
+    }
     $articles = $FRMWRK->DBRecords(
         "SELECT id, domain_host, "
         . ($hasLangColumn ? "lang_code," : "'en' AS lang_code,")
         . ($hasAiColumn ? " COALESCE(is_ai_generated, 0) AS is_ai_generated," : " 0 AS is_ai_generated,")
+        . ($hasSectionColumn ? " material_section," : " 'journal' AS material_section,")
         . " title, slug, is_published, sort_order, published_at, updated_at
          FROM examples_articles
+         {$sectionFilterSql}
          ORDER BY updated_at DESC, id DESC"
     );
 }

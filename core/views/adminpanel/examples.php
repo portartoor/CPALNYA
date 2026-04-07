@@ -15,8 +15,8 @@
 
     <?php if ($isEditorScreen): ?>
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0"><?= !empty($editArticle) ? 'Edit Article' : 'Create Article' ?></h5>
-            <a class="btn btn-outline-secondary" href="/adminpanel/examples/">Back to list</a>
+            <h5 class="mb-0"><?= !empty($editArticle) ? 'Edit ' . htmlspecialchars((string)$adminExamplesTitle) . ' Item' : 'Create ' . htmlspecialchars((string)$adminExamplesTitle) . ' Item' ?></h5>
+            <a class="btn btn-outline-secondary" href="<?= htmlspecialchars((string)$adminExamplesBackUrl) ?>">Back to list</a>
         </div>
         <div class="card mb-3">
             <div class="card-body">
@@ -48,6 +48,14 @@
                         <div class="col-md-6">
                             <label class="form-label">Author</label>
                             <input class="form-control" name="author_name" value="<?= htmlspecialchars((string)($editArticle['author_name'] ?? '')) ?>">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Section</label>
+                            <?php $editSection = (string)($editArticle['material_section'] ?? ($adminExamplesSection !== '' ? $adminExamplesSection : 'journal')); ?>
+                            <select class="form-select" name="material_section">
+                                <option value="journal" <?= $editSection === 'journal' ? 'selected' : '' ?>>Journal</option>
+                                <option value="playbooks" <?= $editSection === 'playbooks' ? 'selected' : '' ?>>Playbooks</option>
+                            </select>
                         </div>
                         <div class="col-md-1">
                             <label class="form-label">Sort</label>
@@ -87,8 +95,8 @@
                             <div id="content_html_preview" class="border rounded mt-3 p-3 bg-light" style="display:none;"></div>
                         </div>
                         <div class="col-12 d-flex gap-2">
-                            <button class="btn btn-primary" type="submit"><?= !empty($editArticle) ? 'Update Article' : 'Create Article' ?></button>
-                            <a class="btn btn-outline-secondary" href="/adminpanel/examples/">Cancel</a>
+                            <button class="btn btn-primary" type="submit"><?= !empty($editArticle) ? 'Update Item' : 'Create Item' ?></button>
+                            <a class="btn btn-outline-secondary" href="<?= htmlspecialchars((string)$adminExamplesBackUrl) ?>">Cancel</a>
                         </div>
                     </div>
                 </form>
@@ -96,10 +104,10 @@
         </div>
     <?php else: ?>
         <div class="d-flex justify-content-end mb-3">
-            <a class="btn btn-primary" href="/adminpanel/examples/?create=1">Create Article</a>
+            <a class="btn btn-primary" href="<?= htmlspecialchars((string)$adminExamplesBackUrl) ?>?create=1">Create Item</a>
         </div>
         <div class="card">
-            <div class="card-header"><h5 class="mb-0">Articles</h5></div>
+            <div class="card-header"><h5 class="mb-0"><?= htmlspecialchars((string)$adminExamplesTitle) ?></h5></div>
             <div class="card-body table-responsive">
                 <table class="table table-striped align-middle">
                     <thead>
@@ -109,6 +117,7 @@
                             <th>Slug</th>
                             <th>Domain</th>
                             <th>Lang</th>
+                            <th>Section</th>
                             <th>AI</th>
                             <th>Published</th>
                             <th>Updated</th>
@@ -123,6 +132,7 @@
                                 <td><code><?= htmlspecialchars((string)$row['slug']) ?></code></td>
                                 <td><?= htmlspecialchars((string)($row['domain_host'] ?: 'all')) ?></td>
                                 <td><?= htmlspecialchars(strtoupper((string)($row['lang_code'] ?? 'en'))) ?></td>
+                                <td><?= htmlspecialchars((string)($row['material_section'] ?? 'journal')) ?></td>
                                 <td>
                                     <?php if ((int)($row['is_ai_generated'] ?? 0) === 1): ?>
                                         <span class="badge bg-info text-dark">AI</span>
@@ -133,7 +143,7 @@
                                 <td><?= ((int)$row['is_published'] === 1) ? 'yes' : 'no' ?></td>
                                 <td><?= htmlspecialchars((string)$row['updated_at']) ?></td>
                                 <td class="d-flex gap-2">
-                                    <a class="btn btn-sm btn-outline-primary" href="/adminpanel/examples/?edit=<?= (int)$row['id'] ?>">Edit</a>
+                                    <a class="btn btn-sm btn-outline-primary" href="<?= htmlspecialchars((string)$adminExamplesBackUrl) ?>?edit=<?= (int)$row['id'] ?>">Edit</a>
                                     <form method="POST" onsubmit="return confirm('Delete this article?');">
                                         <input type="hidden" name="action" value="delete_article">
                                         <input type="hidden" name="article_id" value="<?= (int)$row['id'] ?>">
