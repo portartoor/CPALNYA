@@ -211,6 +211,95 @@ $googleTagCode = trim((string)($_SERVER['MIRROR_GOOGLE_TAG_CODE'] ?? ''));
 $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? ''));
 
 if (!function_exists('header_search_preview_results')) {
+    function header_search_preview_tokens(string $query): array
+    {
+        $query = trim((string)preg_replace('/\s+/u', ' ', $query));
+        if ($query === '') {
+            return [];
+        }
+        $parts = preg_split('/[\s,.;:!?()\[\]{}"\'«»\/\\\\|+-]+/u', $query) ?: [];
+        $tokens = [];
+        foreach ($parts as $part) {
+            $part = trim((string)$part);
+            if ($part === '') {
+                continue;
+            }
+            if (function_exists('mb_strlen') && mb_strlen($part, 'UTF-8') < 2) {
+                continue;
+            }
+            $key = function_exists('mb_strtolower') ? mb_strtolower($part, 'UTF-8') : strtolower($part);
+            $tokens[$key] = $part;
+        }
+        return array_values($tokens);
+    }
+
+    function header_search_preview_mark(string $text, array $tokens): string
+    {
+        $safe = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+        if ($safe === '' || empty($tokens)) {
+            return $safe;
+        }
+        $pattern = '/' . implode('|', array_map(static function (string $token): string {
+            return preg_quote($token, '/');
+        }, $tokens)) . '/iu';
+        return (string)preg_replace($pattern, '<mark>$0</mark>', $safe);
+    }
+
+    function header_search_preview_snippet(string $text, array $tokens, int $radius = 64, int $maxLen = 140): string
+    {
+        $text = trim((string)preg_replace('/\s+/u', ' ', strip_tags($text)));
+        if ($text === '') {
+            return '';
+        }
+        $offset = null;
+        foreach ($tokens as $token) {
+            if ($token === '') {
+                continue;
+            }
+            if (function_exists('mb_stripos')) {
+                $found = mb_stripos($text, $token, 0, 'UTF-8');
+                if ($found !== false) {
+                    $offset = (int)$found;
+                    break;
+                }
+            } else {
+                $found = stripos($text, $token);
+                if ($found !== false) {
+                    $offset = (int)$found;
+                    break;
+                }
+            }
+        }
+        if ($offset === null) {
+            if (function_exists('mb_strlen') && mb_strlen($text, 'UTF-8') > $maxLen) {
+                return rtrim((string)mb_substr($text, 0, $maxLen - 3, 'UTF-8')) . '...';
+            }
+            return $text;
+        }
+
+        if (function_exists('mb_substr') && function_exists('mb_strlen')) {
+            $start = max(0, $offset - $radius);
+            $snippet = mb_substr($text, $start, $maxLen, 'UTF-8');
+            if ($start > 0) {
+                $snippet = '...' . ltrim($snippet);
+            }
+            if (($start + mb_strlen($snippet, 'UTF-8')) < mb_strlen($text, 'UTF-8')) {
+                $snippet = rtrim($snippet, ". \t\n\r\0\x0B") . '...';
+            }
+            return $snippet;
+        }
+
+        $start = max(0, $offset - $radius);
+        $snippet = substr($text, $start, $maxLen);
+        if ($start > 0) {
+            $snippet = '...' . ltrim($snippet);
+        }
+        if (($start + strlen($snippet)) < strlen($text)) {
+            $snippet = rtrim($snippet) . '...';
+        }
+        return $snippet;
+    }
+
     function header_search_preview_results($FRMWRK, string $host, string $lang, string $query, int $limit = 12): array
     {
         $query = trim($query);
@@ -230,6 +319,7 @@ if (!function_exists('header_search_preview_results')) {
         }
 
         $host = strtolower(trim($host));
+        $tokens = header_search_preview_tokens($query);
         $lang = function_exists('examples_normalize_lang') ? examples_normalize_lang($lang) : (($lang === 'ru') ? 'ru' : 'en');
         $limit = max(4, min(24, $limit));
         $hostSafe = mysqli_real_escape_string($db, $host);
@@ -293,23 +383,23 @@ if (!function_exists('header_search_preview_results')) {
             $full = trim((string)($row['preview_image_url'] ?? ''));
             $data = trim((string)($row['preview_image_data'] ?? ''));
             $image = $thumb !== '' ? $thumb : ($full !== '' ? $full : $data);
+            $title = trim((string)($row['title'] ?? ''));
             $excerptSource = (string)($row['excerpt_html'] ?? '');
             if (trim($excerptSource) === '') {
                 $excerptSource = (string)($row['content_html'] ?? '');
             }
-            $excerpt = trim((string)preg_replace('/\s+/u', ' ', strip_tags($excerptSource)));
+            $excerpt = header_search_preview_snippet($excerptSource, $tokens, 72, 148);
             if ($excerpt === '' && function_exists('examples_build_excerpt')) {
                 $excerpt = examples_build_excerpt($excerptSource);
             }
-            if (function_exists('mb_strlen') && mb_strlen($excerpt, 'UTF-8') > 110) {
-                $excerpt = rtrim((string)mb_substr($excerpt, 0, 107, 'UTF-8')) . '...';
-            }
             $out[] = [
-                'title' => trim((string)($row['title'] ?? '')),
+                'title' => $title,
+                'title_html' => header_search_preview_mark($title, $tokens),
                 'url' => $url,
                 'image' => $image,
                 'section' => $section,
                 'excerpt' => $excerpt,
+                'excerpt_html' => header_search_preview_mark($excerpt, $tokens),
             ];
         }
 
@@ -763,6 +853,11 @@ if (isset($_GET['header_search_preview'])) {
         color: var(--shell-muted);
         font-size: 11px;
         line-height: 1.35;
+    }
+    .simple-search-preview-copy mark {
+        padding: 0 .16em;
+        background: rgba(244, 213, 107, .22);
+        color: #fff3bf;
     }
     .simple-search-preview-empty {
         color: var(--shell-muted);
@@ -1341,9 +1436,9 @@ if (isset($_GET['header_search_preview'])) {
                 }
                 html += '</span>';
                 html += '<span class="simple-search-preview-copy">';
-                html += '<strong>' + escapeHtml(item.title || '') + '</strong>';
+                html += '<strong>' + (item.title_html || escapeHtml(item.title || '')) + '</strong>';
                 if (item.excerpt) {
-                    html += '<span>' + escapeHtml(item.excerpt) + '</span>';
+                    html += '<span>' + (item.excerpt_html || escapeHtml(item.excerpt)) + '</span>';
                 }
                 html += '</span>';
                 html += '</a>';
