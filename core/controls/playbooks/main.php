@@ -187,6 +187,15 @@ if (function_exists('examples_fetch_published_count') && function_exists('exampl
         $row['image_src'] = $thumb !== '' ? $thumb : ($full !== '' ? $full : $base);
         $playbooksData['items'][] = $row;
     }
+    if (function_exists('examples_popularity_attach_views')) {
+        $playbooksData['items'] = examples_popularity_attach_views(
+            $FRMWRK,
+            (string)$playbooksData['host'],
+            (string)$playbooksData['lang'],
+            'playbooks',
+            (array)$playbooksData['items']
+        );
+    }
 }
 
 $scheme = (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ? 'https' : 'http';
@@ -217,6 +226,15 @@ $normalizeIso = static function ($value): string {
 
 if ($selectedArticle) {
     $selectedArticle['hero_image_src'] = $pickArticleImage($selectedArticle);
+    if (function_exists('examples_popularity_attach_single_view')) {
+        $selectedArticle = examples_popularity_attach_single_view(
+            $FRMWRK,
+            (string)$playbooksData['host'],
+            (string)$playbooksData['lang'],
+            'playbooks',
+            $selectedArticle
+        );
+    }
     $playbooksData['selected'] = $selectedArticle;
     $articleTitle = trim((string)($selectedArticle['title'] ?? ''));
     if ($articleTitle === '') {

@@ -3,38 +3,72 @@ $host = function_exists('public_portal_host') ? public_portal_host() : strtolowe
 $lang = function_exists('public_portal_lang') ? public_portal_lang($host) : 'en';
 $isRu = ($lang === 'ru');
 
-$blogItems = [];
-$featuredDownloads = [];
-$featuredArticles = [];
-$featuredProjects = [];
-$featuredCases = [];
+$journalItems = [];
+$playbookItems = [];
+$issue = [];
 
 if (is_file(DIR . 'core/controls/examples/_common.php')) {
     require_once DIR . 'core/controls/examples/_common.php';
-    if (function_exists('examples_fetch_published_list')) {
-        $blogItems = examples_fetch_published_list($FRMWRK, $host, 500, $lang, '', 'journal');
+}
+if (is_file(DIR . 'core/libs/journal_issue.php')) {
+    require_once DIR . 'core/libs/journal_issue.php';
+}
+
+if (function_exists('examples_fetch_published_list')) {
+    $journalItems = examples_fetch_published_list($FRMWRK, $host, 8, $lang, '', 'journal');
+    $playbookItems = examples_fetch_published_list($FRMWRK, $host, 8, $lang, '', 'playbooks');
+}
+
+if (function_exists('examples_popularity_attach_views')) {
+    $journalItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'journal', (array)$journalItems);
+    $playbookItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'playbooks', (array)$playbookItems);
+}
+
+foreach ($journalItems as &$row) {
+    $thumb = trim((string)($row['preview_image_thumb_url'] ?? ''));
+    $full = trim((string)($row['preview_image_url'] ?? ''));
+    $base = trim((string)($row['preview_image_data'] ?? ''));
+    $row['image_src'] = $thumb !== '' ? $thumb : ($full !== '' ? $full : $base);
+}
+unset($row);
+
+foreach ($playbookItems as &$row) {
+    $thumb = trim((string)($row['preview_image_thumb_url'] ?? ''));
+    $full = trim((string)($row['preview_image_url'] ?? ''));
+    $base = trim((string)($row['preview_image_data'] ?? ''));
+    $row['image_src'] = $thumb !== '' ? $thumb : ($full !== '' ? $full : $base);
+}
+unset($row);
+
+if (function_exists('journal_issue_get')) {
+    $db = $FRMWRK->DB();
+    if ($db) {
+        $issue = (array)journal_issue_get($db, $lang);
     }
 }
-if (function_exists('public_portal_fetch_solutions')) {
-    $featuredDownloads = array_slice(public_portal_fetch_solutions($FRMWRK, $host, $lang, 'download'), 0, 3);
-    $featuredArticles = array_slice(public_portal_fetch_solutions($FRMWRK, $host, $lang, 'article'), 0, 3);
+
+$issueImage = trim((string)($issue['hero_image_url'] ?? ''));
+if ($issueImage === '') {
+    $issueImage = trim((string)($issue['hero_image_data'] ?? ''));
 }
-if (function_exists('public_projects_fetch_published')) {
-    $featuredProjects = array_slice((array)public_projects_fetch_published($FRMWRK, $host, $lang), 0, 3);
-}
-if (function_exists('public_cases_fetch_published')) {
-    $featuredCases = array_slice((array)public_cases_fetch_published($FRMWRK, $host, $lang), 0, 3);
+if ($issueImage === '') {
+    $issueImage = '/april2026.png';
 }
 
 $ModelPage['home_portal'] = [
     'lang' => $lang,
-    'blog_items' => $blogItems,
-    'downloads' => $featuredDownloads,
-    'solution_articles' => $featuredArticles,
-    'projects' => $featuredProjects,
-    'cases' => $featuredCases,
+    'issue' => $issue,
+    'issue_image' => $issueImage,
+    'journal_items' => array_values((array)$journalItems),
+    'playbook_items' => array_values((array)$playbookItems),
 ];
 
-$ModelPage['title'] = $isRu ? 'CPALNYA - портал по CPA, арбитражу трафика и закулисью affiliate-рынка' : 'CPALNYA - CPA, affiliate traffic and behind-the-scenes performance portal';
-$ModelPage['description'] = $isRu ? 'CPALNYA объединяет статьи, готовые решения, техничку, SEO-хабы и продуктовые воронки для арбитража трафика, affiliate-команд и медиабаинга.' : 'CPALNYA combines articles, ready-made solutions, technical guides, SEO hubs and product funnels for affiliate teams and media buying.';
-$ModelPage['keywords'] = $isRu ? 'арбитраж трафика, CPA, affiliate marketing, кейсы, статьи, готовые решения, трекеры, медиабаинг, SEO' : 'affiliate marketing, CPA, traffic arbitrage, playbooks, ready-made solutions, media buying, trackers, SEO hub';
+$ModelPage['title'] = $isRu
+    ? 'CPALNYA — журнал про арбитраж трафика, affiliate-операции и практику команд'
+    : 'CPALNYA — journal of affiliate traffic, team operations and practical playbooks';
+$ModelPage['description'] = $isRu
+    ? 'Журнал и практическая библиотека про арбитраж трафика, медиабаинг, фарм, креативы, трекинг и backstage affiliate-команд.'
+    : 'A journal and practical library about affiliate traffic, media buying, farm, creatives, tracking and team backstage.';
+$ModelPage['keywords'] = $isRu
+    ? 'арбитраж трафика, affiliate, cpa, медиабаинг, фарм, трекеры, креативы, playbooks'
+    : 'affiliate, cpa, media buying, traffic arbitrage, trackers, creatives, playbooks';

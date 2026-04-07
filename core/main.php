@@ -172,6 +172,7 @@ class Render {
 		$publicServicesLib = $LibsPath.'public_services.php';
 		$publicProjectsLib = $LibsPath.'public_projects.php';
 		$publicCasesLib = $LibsPath.'public_cases.php';
+		$examplesPopularityLib = $LibsPath.'examples_popularity.php';
 		if (file_exists($analyticsLib)) {
 			include_once($analyticsLib);
 		}
@@ -204,6 +205,9 @@ class Render {
 		}
 		if (file_exists($publicCasesLib)) {
 			include_once($publicCasesLib);
+		}
+		if (file_exists($examplesPopularityLib)) {
+			include_once($examplesPopularityLib);
 		}
 		$FRMWRK = new FRMWRK();
 		$GLOBAL['main_lib']=$LibName;

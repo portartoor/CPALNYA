@@ -60,6 +60,19 @@ $buildPageUrl = static function (?string $cluster = '', int $pageNum = 1): strin
     }
     return $base;
 };
+$buildArticleUrl = static function (string $slug, string $cluster = ''): string {
+    return function_exists('examples_article_url_path')
+        ? examples_article_url_path($slug, $cluster)
+        : '/journal/';
+};
+$selectedArticleUrl = '';
+if ($selected) {
+    $selectedArticleUrl = $buildArticleUrl((string)($selected['slug'] ?? ''), (string)($selected['cluster_code'] ?? ''));
+}
+$selectedShareUrl = $selectedArticleUrl !== ''
+    ? (((!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ? 'https' : 'http') . '://' . (string)($_SERVER['HTTP_HOST'] ?? '') . $selectedArticleUrl)
+    : '';
+$selectedShareTitle = trim((string)($selected['title'] ?? ''));
 $relatedItems = [];
 if ($selected) {
     foreach ($items as $item) {
@@ -82,20 +95,14 @@ if ($selected) {
 .jrnl-kicker,.jrnl-tag,.jrnl-meta{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;max-height:30px;border:1px solid rgba(122,180,255,.2);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
 .jrnl-copy{display:grid;gap:8px}
 .jrnl-copy h1,.jrnl-detail h1{margin:0;font:700 2rem/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.048em}
-.jrnl-copy h2{margin:0;font:700 2rem/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.048em}
+.jrnl-copy h2{margin:8px 0 0;font:700 2rem/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.048em}
 .jrnl-related h2{margin:0;font:700 1.5rem/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.048em}
 .jrnl-copy p,.jrnl-detail p,.jrnl-card p{margin:0;color:var(--shell-muted);line-height:1.62}
 .jrnl-copy p + p{margin-top:2px}
 .jrnl-copy .jrnl-hero-description{max-width:66ch}
 .jrnl-copy .jrnl-issue-subtitle{font-size:clamp(1.02rem,1.6vw,1.24rem);line-height:1.56;color:rgba(233,242,255,.9)}
-.jrnl-copy h2{margin-top:8px}
-.jrnl-cover{min-height:0;border:1px solid rgba(255,255,255,.08);background:
-radial-gradient(circle at 50% 22%,rgba(103,200,255,.16),transparent 26%),
-linear-gradient(180deg,rgba(6,11,20,.96),rgba(4,8,16,.92));
-display:block;align-self:start;overflow:hidden;position:relative}
-.jrnl-cover-button{display:block;padding:0;width:100%;text-align:left;appearance:none;line-height:0;cursor:default}
+.jrnl-cover{min-height:0;border:1px solid rgba(255,255,255,.08);background:radial-gradient(circle at 50% 22%,rgba(103,200,255,.16),transparent 26%),linear-gradient(180deg,rgba(6,11,20,.96),rgba(4,8,16,.92));display:block;align-self:start;overflow:hidden;position:relative}
 .jrnl-cover img{position:relative;display:block;width:100%;height:auto;max-width:none;object-fit:contain;object-position:center center;padding:0;transform-origin:50% 0;animation:jrnlCoverIntro 1.15s cubic-bezier(.16,1,.3,1) both}
-.jrnl-cover-note{position:relative;z-index:1;max-width:22ch;margin:18px;padding:14px 16px;background:rgba(4,9,18,.78);border:1px solid rgba(122,180,255,.18);font:700 1rem/1.35 "Space Grotesk","Sora",sans-serif}
 .jrnl-tags{display:flex;flex-wrap:wrap;gap:10px}
 .jrnl-tag{color:var(--shell-muted);text-decoration:none}
 .jrnl-tag.is-active,.jrnl-tag:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
@@ -105,6 +112,8 @@ display:block;align-self:start;overflow:hidden;position:relative}
 .jrnl-card-media img{width:100%;height:100%;object-fit:cover;display:block}
 .jrnl-card h3{margin:0;font:700 1.28rem/1.15 "Space Grotesk","Sora",sans-serif;letter-spacing:-.03em}
 .jrnl-card-foot{display:flex;justify-content:space-between;gap:10px;color:var(--shell-muted);font-size:12px;text-transform:uppercase;letter-spacing:.12em}
+.jrnl-stat{display:inline-flex;align-items:center;gap:7px}
+.jrnl-stat-eye{display:inline-block;font-style:normal;font-size:13px;line-height:1;opacity:.82}
 .jrnl-pager{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
 .jrnl-pager a,.jrnl-pager span{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:10px 14px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-muted);text-decoration:none}
 .jrnl-pager .is-active{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.12)}
@@ -116,6 +125,9 @@ display:block;align-self:start;overflow:hidden;position:relative}
 .jrnl-detail-content h2,.jrnl-detail-content h3{font-family:"Space Grotesk","Sora",sans-serif;letter-spacing:-.03em}
 .jrnl-actions{display:flex;gap:12px;flex-wrap:wrap}
 .jrnl-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border:1px solid rgba(122,180,255,.18);background:linear-gradient(135deg,rgba(115,184,255,.22),rgba(39,223,192,.18));color:var(--shell-text);text-decoration:none;font-weight:700}
+.jrnl-share{display:flex;flex-wrap:wrap;gap:10px}
+.jrnl-share a{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-muted);text-decoration:none}
+.jrnl-share a:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
 .jrnl-related-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .jrnl-empty{text-align:center}
 @keyframes jrnlCoverIntro{
@@ -139,6 +151,7 @@ display:block;align-self:start;overflow:hidden;position:relative}
                     <?php endif; ?>
                     <span class="jrnl-meta"><?= htmlspecialchars((string)($selected['published_at'] ?? $selected['created_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
                     <?php if (!empty($selected['author_name'])): ?><span class="jrnl-meta"><?= htmlspecialchars((string)$selected['author_name'], ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
+                    <span class="jrnl-meta jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">◉</i><?= (int)($selected['view_count'] ?? 0) ?></span>
                 </div>
                 <?php if (!empty($selected['hero_image_src'])): ?>
                     <div class="jrnl-detail-cover">
@@ -150,6 +163,15 @@ display:block;align-self:start;overflow:hidden;position:relative}
                     <div class="jrnl-actions">
                         <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Назад в journal', 'Back to journal'), ENT_QUOTES, 'UTF-8') ?></a>
                     </div>
+                    <?php if ($selectedShareUrl !== ''): ?>
+                        <div class="jrnl-share">
+                            <a href="https://t.me/share/url?url=<?= rawurlencode($selectedShareUrl) ?>&text=<?= rawurlencode($selectedShareTitle) ?>" target="_blank" rel="noopener noreferrer">Telegram</a>
+                            <a href="https://twitter.com/intent/tweet?url=<?= rawurlencode($selectedShareUrl) ?>&text=<?= rawurlencode($selectedShareTitle) ?>" target="_blank" rel="noopener noreferrer">X</a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=<?= rawurlencode($selectedShareUrl) ?>" target="_blank" rel="noopener noreferrer">Facebook</a>
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?= rawurlencode($selectedShareUrl) ?>" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                            <a href="https://wa.me/?text=<?= rawurlencode($selectedShareTitle . ' ' . $selectedShareUrl) ?>" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </article>
 
@@ -159,11 +181,14 @@ display:block;align-self:start;overflow:hidden;position:relative}
                     <div class="jrnl-related-grid">
                         <?php foreach ($relatedItems as $item): ?>
                             <?php $cluster = trim((string)($item['cluster_code'] ?? '')); ?>
-                            <a class="jrnl-card" href="<?= htmlspecialchars(function_exists('examples_article_url_path') ? examples_article_url_path((string)($item['slug'] ?? ''), $cluster) : '/journal/', ENT_QUOTES, 'UTF-8') ?>">
+                            <a class="jrnl-card" href="<?= htmlspecialchars($buildArticleUrl((string)($item['slug'] ?? ''), $cluster), ENT_QUOTES, 'UTF-8') ?>">
                                 <div class="jrnl-card-media"><?php if (!empty($item['image_src'])): ?><img src="<?= htmlspecialchars((string)$item['image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?></div>
                                 <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('Материал', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
                                 <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                                 <p><?= htmlspecialchars($strip((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 140), ENT_QUOTES, 'UTF-8') ?></p>
+                                <div class="jrnl-card-foot">
+                                    <span class="jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">◉</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                </div>
                             </a>
                         <?php endforeach; ?>
                     </div>
@@ -178,14 +203,7 @@ display:block;align-self:start;overflow:hidden;position:relative}
                     <?php if (!empty($issue['issue_title'])): ?><h2><?= htmlspecialchars((string)$issue['issue_title'], ENT_QUOTES, 'UTF-8') ?></h2><?php endif; ?>
                     <?php if (!empty($issue['issue_subtitle'])): ?><?= $renderIssueText((string)$issue['issue_subtitle'], 'jrnl-issue-subtitle') ?><?php endif; ?>
                 </div>
-                <div
-                    class="jrnl-cover jrnl-cover-button"
-                    type="button"
-                    data-jrnl-cover-open
-                    data-jrnl-cover-src="<?= htmlspecialchars($issueImage, ENT_QUOTES, 'UTF-8') ?>"
-                    data-jrnl-cover-alt="<?= htmlspecialchars((string)($issue['issue_title'] ?? $issue['hero_title'] ?? 'Journal cover'), ENT_QUOTES, 'UTF-8') ?>"
-                    aria-label="<?= htmlspecialchars($t('Открыть обложку выпуска', 'Open issue cover'), ENT_QUOTES, 'UTF-8') ?>"
-                >
+                <div class="jrnl-cover">
                     <?php if ($issueImage !== ''): ?><img src="<?= htmlspecialchars($issueImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($issue['issue_title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?>
                 </div>
             </header>
@@ -208,14 +226,14 @@ display:block;align-self:start;overflow:hidden;position:relative}
                 <div class="jrnl-grid">
                     <?php foreach ($items as $item): ?>
                         <?php $cluster = trim((string)($item['cluster_code'] ?? '')); ?>
-                        <a class="jrnl-card" href="<?= htmlspecialchars(function_exists('examples_article_url_path') ? examples_article_url_path((string)($item['slug'] ?? ''), $cluster) : '/journal/', ENT_QUOTES, 'UTF-8') ?>">
+                        <a class="jrnl-card" href="<?= htmlspecialchars($buildArticleUrl((string)($item['slug'] ?? ''), $cluster), ENT_QUOTES, 'UTF-8') ?>">
                             <div class="jrnl-card-media"><?php if (!empty($item['image_src'])): ?><img src="<?= htmlspecialchars((string)$item['image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?></div>
                             <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('Материал', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
                             <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                             <p><?= htmlspecialchars($strip((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 160), ENT_QUOTES, 'UTF-8') ?></p>
                             <div class="jrnl-card-foot">
                                 <span><?= htmlspecialchars((string)($item['published_at'] ?? $item['created_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
-                                <span><?= htmlspecialchars($t('Открыть', 'Open'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <span class="jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">◉</i><?= (int)($item['view_count'] ?? 0) ?></span>
                             </div>
                         </a>
                     <?php endforeach; ?>

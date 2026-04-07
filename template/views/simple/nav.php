@@ -10,6 +10,64 @@ if (strpos($host, ':') !== false) {
     $host = explode(':', $host, 2)[0];
 }
 $isRu = (bool)preg_match('/\.ru$/', $host);
+$lang = $isRu ? 'ru' : 'en';
+$pickIcon = static function (string $code): string {
+    $code = trim($code);
+    if ($code === '') {
+        return '#';
+    }
+    if (function_exists('mb_substr')) {
+        return mb_strtoupper((string)mb_substr($code, 0, 1, 'UTF-8'), 'UTF-8');
+    }
+    return strtoupper(substr($code, 0, 1));
+};
+
+$opsItems = [];
+if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters')) {
+    foreach ((array)examples_popularity_fetch_top_clusters($FRMWRK, $host, $lang, 'journal', 3) as $row) {
+        $code = trim((string)($row['code'] ?? ''));
+        if ($code === '') {
+            continue;
+        }
+        $opsItems[] = [
+            'title' => (string)($row['label'] ?? $code),
+            'path' => function_exists('examples_cluster_list_path') ? examples_cluster_list_path($code, $host, 'journal') : '/journal/',
+            'icon' => $pickIcon($code),
+        ];
+    }
+}
+if (count($opsItems) < 3) {
+    $opsItems = [
+        ['title' => $isRu ? 'Источники' : 'Sources', 'path' => '/journal/', 'icon' => '>'],
+        ['title' => $isRu ? 'Фарм' : 'Farm', 'path' => '/journal/', 'icon' => 'F'],
+        ['title' => $isRu ? 'Креативы' : 'Creatives', 'path' => '/journal/', 'icon' => 'C'],
+    ];
+}
+
+$howToItems = [
+    ['title' => $isRu ? 'Все HowTo' : 'All HowTo', 'path' => '/playbooks/', 'icon' => 'H'],
+];
+if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters')) {
+    foreach ((array)examples_popularity_fetch_top_clusters($FRMWRK, $host, $lang, 'playbooks', 3) as $row) {
+        $code = trim((string)($row['code'] ?? ''));
+        if ($code === '') {
+            continue;
+        }
+        $howToItems[] = [
+            'title' => (string)($row['label'] ?? $code),
+            'path' => function_exists('examples_cluster_list_path') ? examples_cluster_list_path($code, $host, 'playbooks') : '/playbooks/',
+            'icon' => $pickIcon($code),
+        ];
+    }
+}
+if (count($howToItems) < 4) {
+    $howToItems = [
+        ['title' => $isRu ? 'Все HowTo' : 'All HowTo', 'path' => '/playbooks/', 'icon' => 'H'],
+        ['title' => $isRu ? 'Фарм-гайды' : 'Farm Guides', 'path' => '/playbooks/?topic=farm', 'icon' => 'F'],
+        ['title' => $isRu ? 'Трекинг' : 'Tracking', 'path' => '/playbooks/?topic=tracking', 'icon' => 'T'],
+        ['title' => $isRu ? 'Креативы' : 'Creatives', 'path' => '/playbooks/?topic=creatives', 'icon' => 'K'],
+    ];
+}
 
 $navSections = [
     [
@@ -22,21 +80,11 @@ $navSections = [
     ],
     [
         'label' => $isRu ? 'Операционка' : 'Ops',
-        'items' => [
-            ['title' => $isRu ? 'Источники' : 'Sources', 'path' => '/journal/', 'icon' => '>'],
-            ['title' => $isRu ? 'Фарм' : 'Farm', 'path' => '/journal/', 'icon' => 'F'],
-            ['title' => $isRu ? 'Креативы' : 'Creatives', 'path' => '/journal/', 'icon' => 'C'],
-            ['title' => $isRu ? 'Трекеры' : 'Trackers', 'path' => '/journal/', 'icon' => 'T'],
-        ],
+        'items' => $opsItems,
     ],
     [
         'label' => 'HowTo',
-        'items' => [
-            ['title' => $isRu ? 'Все HowTo' : 'All HowTo', 'path' => '/playbooks/', 'icon' => 'H'],
-            ['title' => $isRu ? 'Фарм-гайды' : 'Farm Guides', 'path' => '/playbooks/?topic=farm', 'icon' => 'F'],
-            ['title' => $isRu ? 'Трекинг' : 'Tracking', 'path' => '/playbooks/?topic=tracking', 'icon' => 'T'],
-            ['title' => $isRu ? 'Креативы' : 'Creatives', 'path' => '/playbooks/?topic=creatives', 'icon' => 'K'],
-        ],
+        'items' => $howToItems,
     ],
     [
         'label' => $isRu ? 'Связь' : 'Reach',
