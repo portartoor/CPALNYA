@@ -1,8 +1,7 @@
-{
+﻿{
   "enabled": true,
   "langs": [
-    "ru",
-    "en"
+    "ru"
   ],
   "domain_host": "cpalnya.ru",
   "domain_host_en": "cpalnya.ru",
@@ -12,12 +11,19 @@
   "daily_max": 4,
   "max_per_run": 8,
   "word_min": 1800,
-  "word_max": 4200,
+  "word_max": 5000,
   "today_first_delay_min": 15,
-  "auto_expand_retries": 2,
+  "auto_expand_retries": 4,
   "expand_context_chars": 9000,
   "prompt_version": "cpalnya-generator-v1",
   "seed_salt": "cpalnya-affiliate-content",
+  "narrative_person": "first_person_plural",
+  "tone_variability": 68,
+  "portfolio_bofu_weight": 18,
+  "portfolio_mofu_weight": 30,
+  "portfolio_authority_weight": 18,
+  "portfolio_case_weight": 22,
+  "portfolio_product_weight": 12,
   "notify_schedule": false,
   "notify_daily_schedule": true,
   "llm_provider": "openrouter",
@@ -29,6 +35,7 @@
   "openrouter_api_key": "YOUR_OPENROUTER_API_KEY",
   "openrouter_base_url": "https://openrouter.ai/api/v1",
   "openrouter_model": "google/gemini-2.0-flash-001",
+  "openrouter_fallback_model": "openai/gpt-4o-2024-11-20",
   "openai_proxy_enabled": false,
   "openai_proxy_host": "",
   "openai_proxy_port": 0,
@@ -40,52 +47,460 @@
   "topic_analysis_enabled": true,
   "topic_analysis_limit": 120,
   "topic_analysis_system_prompt": "",
-  "topic_analysis_user_prompt_append": "Prioritize CPA, affiliate operations, media buying workflows, trackers, creatives, moderation, farm, source volatility and 2026 platform shifts. Avoid generic B2B/SaaS angles.",
+  "topic_analysis_user_prompt_append": "Prioritize CPA, affiliate operations, media buying workflows, trackers, creatives, moderation, farm, source volatility and 2026 platform shifts. Avoid generic SaaS, fintech, antifraud and enterprise architecture angles unless they are directly tied to affiliate operations.",
   "styles_en": [
     "editorial breakdown",
-    "trend memo",
-    "operator playbook",
-    "step-by-step tutorial",
-    "case note",
-    "troubleshooting guide"
+    "advanced editorial breakdown",
+    "deep dive trend analysis",
+    "operator handbook",
+    "implementation tutorial",
+    "step-by-step execution guide",
+    "hands-on media buying walkthrough",
+    "practical tracking guide",
+    "tracker debugging memo",
+    "creative systems note",
+    "affiliate operations playbook",
+    "team SOP document",
+    "troubleshooting guide",
+    "backstage memo",
+    "source analysis brief",
+    "market shift report",
+    "offer strategy note",
+    "creative testing framework",
+    "farm operations guide",
+    "account resilience handbook",
+    "launch checklist",
+    "moderation survival guide",
+    "routing and cloaking brief",
+    "anti-detect operations memo",
+    "landing recovery guide",
+    "case study deep dive",
+    "real-world case analysis",
+    "before-and-after comparison",
+    "bundle teardown",
+    "postmortem breakdown",
+    "root cause analysis",
+    "decision-making framework",
+    "risk tradeoff memo",
+    "benchmark study",
+    "trend report",
+    "industry outlook analysis",
+    "opinionated operator column",
+    "myth-busting article",
+    "future traffic outlook",
+    "strategy paper",
+    "team workflow note",
+    "playbook compendium",
+    "anti-pattern catalog",
+    "knowledge base article",
+    "quick reference sheet",
+    "cheat sheet",
+    "field report",
+    "lessons learned article",
+    "retrospective analysis",
+    "play-by-play breakdown",
+    "checklist-driven guide",
+    "minimal viable setup guide",
+    "zero-to-launch guide",
+    "advanced expert commentary",
+    "problem-solution format",
+    "question-driven exploration",
+    "use-case catalog",
+    "campaign architecture memo",
+    "operator readiness guide",
+    "runbook format",
+    "automation handbook",
+    "content production workflow",
+    "prompt workflow note",
+    "journal issue opener",
+    "editorial scene-setting note"
   ],
   "styles_ru": [
     "редакционный разбор",
-    "аналитическая записка",
+    "углубленный редакционный разбор",
+    "глубокий трендовый анализ",
+    "операционный handbook",
+    "гайд по внедрению",
+    "пошаговое руководство",
+    "hands-on walkthrough",
+    "практический гайд по трекингу",
+    "записка по отладке трекера",
+    "разбор системы креативов",
     "операционный playbook",
-    "пошаговый tutorial",
-    "кейсовый разбор",
-    "troubleshooting guide"
+    "командный SOP",
+    "troubleshooting guide",
+    "закулисная записка",
+    "обзор источника",
+    "отчет по сдвигам рынка",
+    "записка по стратегии офферов",
+    "фреймворк тестов креативов",
+    "гайд по фарму",
+    "handbook по устойчивости аккаунтов",
+    "launch checklist",
+    "гайд по выживанию под модерацией",
+    "разбор routing и cloaking",
+    "memo по anti-detect операциям",
+    "гайд по восстановлению лендингов",
+    "глубокий кейсовый разбор",
+    "анализ реального кейса",
+    "сравнение до и после",
+    "разбор связки",
+    "постмортем",
+    "root cause analysis",
+    "фреймворк принятия решений",
+    "записка по risk tradeoff",
+    "бенчмаркинг",
+    "trend report",
+    "отраслевой обзор",
+    "авторская колонка оператора",
+    "мифы и реальность",
+    "прогноз по трафику",
+    "стратегическая записка",
+    "заметка по командному workflow",
+    "сборник playbook",
+    "каталог антипаттернов",
+    "knowledge base article",
+    "шпаргалка",
+    "cheat sheet",
+    "полевой отчет",
+    "lessons learned",
+    "ретроспектива",
+    "пошаговый разбор",
+    "чеклист-ориентированный гайд",
+    "гайд по минимально рабочему сетапу",
+    "zero-to-launch guide",
+    "экспертный комментарий",
+    "формат проблема-решение",
+    "разбор через вопросы",
+    "каталог use-case",
+    "записка по архитектуре кампании",
+    "гайд по готовности оператора",
+    "runbook",
+    "руководство по автоматизации",
+    "workflow продакшна контента",
+    "записка по prompt workflow",
+    "открывающая статья номера",
+    "редакционное вступление"
   ],
   "clusters_en": [
     "facebook farm setup and account resilience",
+    "business manager trust recovery and warmup systems",
     "tiktok affiliate funnels and creative iteration",
     "telegram communities mini apps and retention",
     "tracker attribution postbacks and signal recovery",
     "anti-detect browsers team SOP and workflows",
-    "nutra crypto igaming finance traffic shifts in 2026"
+    "nutra traffic shifts in 2026",
+    "crypto affiliate demand and compliance pressure",
+    "igaming funnels and payout volatility",
+    "finance offer screening and source stability",
+    "dating funnels and moderation survival",
+    "sweepstakes source quality control",
+    "creative fatigue and batch testing systems",
+    "ugc workflows for affiliate teams",
+    "ai creatives generation and review loops",
+    "landing page recovery after bans",
+    "cloaking and moderation-safe routing",
+    "domain rotation and hosting failover",
+    "tracker stack comparisons for 2026",
+    "postback debugging and macro hygiene",
+    "team roles for buyers farmers and assistants",
+    "affiliate backoffice operating models",
+    "telegram distribution as owned media layer",
+    "source mix rebalancing after policy changes",
+    "offer research systems for operators",
+    "bundle documentation and handoff quality",
+    "sop libraries for scaling media teams",
+    "creative testing matrices and win-rate lift",
+    "funnel rebuilds after attribution loss",
+    "conversion path bottleneck analysis",
+    "farm economics and account lifespan",
+    "agency accounts and risk concentration",
+    "payment page recovery and checkout continuity",
+    "anti-ban behavior patterns and operational hygiene",
+    "bridge pages prelanders and content strategy",
+    "whitehat shells and compliance buffers",
+    "grayhat-to-clean migration patterns",
+    "journalistic angle on affiliate backstage operations",
+    "market maps for buyers and traffic teams",
+    "playbooks for day-to-day arbitration operations"
   ],
   "clusters_ru": [
     "настройка и прогрев Facebook farm",
+    "восстановление trust у Business Manager и аккаунтов",
     "TikTok-воронки и итерации креативов под affiliate",
     "Telegram-комьюнити, mini apps и удержание аудитории",
     "трекеры, postback, атрибуция и восстановление сигналов",
     "anti-detect браузеры, роли команды и SOP",
-    "сдвиги трафика в nutra, crypto, iGaming и finance в 2026"
+    "сдвиги трафика в nutra в 2026",
+    "crypto-аффилейт и давление compliance",
+    "iGaming-воронки и волатильность payout",
+    "finance-офферы и устойчивость источников",
+    "dating-воронки и выживание под модерацией",
+    "sweepstakes и контроль качества трафика",
+    "выгорание креативов и система batch-тестов",
+    "UGC workflow для affiliate-команд",
+    "генерация AI-креативов и цикл ревью",
+    "восстановление лендингов после банов",
+    "cloaking и moderation-safe routing",
+    "ротация доменов и failover по хостингу",
+    "сравнение tracker-стеков 2026",
+    "отладка postback и hygiene макросов",
+    "роли баеров, фармеров и ассистентов",
+    "операционные модели affiliate backoffice",
+    "Telegram как owned media слой",
+    "пересборка source mix после смены правил платформ",
+    "системы исследования офферов для команды",
+    "документация связок и качество handoff",
+    "библиотека SOP для масштабирования команды",
+    "матрицы тестирования креативов и рост win-rate",
+    "пересборка воронок после потери атрибуции",
+    "анализ узких мест конверсионного пути",
+    "экономика фарма и срок жизни аккаунтов",
+    "agency accounts и концентрация рисков",
+    "восстановление платежных страниц и checkout continuity",
+    "anti-ban паттерны и операционная hygiene",
+    "bridge page, преленды и контентная стратегия",
+    "whitehat-оболочки и compliance buffers",
+    "миграция из grayhat в более чистые схемы",
+    "журнальный взгляд на закулисье affiliate-операций",
+    "карты рынка для баеров и traffic-команд",
+    "playbooks для ежедневной арбитражной операционки"
+  ],
+  "intent_verticals_en": [
+    "affiliate media teams",
+    "solo media buyers",
+    "in-house arbitrage teams",
+    "creative production teams",
+    "tracker and analytics operators",
+    "offer owners and affiliate managers",
+    "farming teams",
+    "launch assistants and support operators",
+    "traffic analysts",
+    "telegram distribution teams",
+    "performance creatives teams",
+    "hybrid editorial-commerce teams"
+  ],
+  "intent_verticals_ru": [
+    "affiliate-команды",
+    "соло-медиабайеры",
+    "in-house арбитражные команды",
+    "продакшн креативов",
+    "операторы трекеров и аналитики",
+    "овнеры офферов и affiliate-менеджеры",
+    "фарм-команды",
+    "launch-ассистенты и саппорт",
+    "трафик-аналитики",
+    "telegram-distribution команды",
+    "команды performance-креативов",
+    "гибридные editorial-commerce команды"
+  ],
+  "intent_scenarios_en": [
+    "farm bans and account trust recovery",
+    "creative fatigue and testing loop rebuild",
+    "tracker misattribution and postback debugging",
+    "landing domain and hosting recovery after moderation hit",
+    "team SOP rollout for scaling buyers and farmers",
+    "source mix rebalance after platform policy changes",
+    "funnel decline after signal loss",
+    "bundle handoff between operators",
+    "launching with a new source under high uncertainty",
+    "stabilizing profitable campaigns after rapid scale",
+    "recovering from checkout or payment page failures",
+    "replacing broken creative pipelines with AI-assisted workflows"
+  ],
+  "intent_scenarios_ru": [
+    "баны фарма и восстановление trust у аккаунтов",
+    "выгорание креативов и перестройка цикла тестов",
+    "ошибки атрибуции и отладка postback",
+    "восстановление доменов и хостинга после модерации",
+    "внедрение SOP для масштабирования баеров и фармеров",
+    "пересборка source mix после изменений правил платформ",
+    "падение воронки после потери сигналов",
+    "handoff связки между операторами",
+    "запуск нового источника в условиях высокой неопределенности",
+    "стабилизация прибыльных кампаний после резкого скейла",
+    "восстановление после сбоев checkout или payment page",
+    "замена сломанного пайплайна креативов на AI-assisted workflow"
+  ],
+  "intent_objectives_en": [
+    "stabilize traffic delivery and account lifespan",
+    "improve test-to-win rate on creative batches",
+    "reduce tracking blind spots and data loss",
+    "speed up team onboarding and repeatability",
+    "protect profitable bundles from operational failures",
+    "turn tactical notes into reusable playbooks",
+    "increase documentation quality across the team",
+    "decrease dependency on one operator",
+    "raise moderation survival rates",
+    "restore decision quality after attribution problems",
+    "improve launch velocity without chaos",
+    "reduce avoidable manual errors"
+  ],
+  "intent_objectives_ru": [
+    "стабилизировать открут и срок жизни аккаунтов",
+    "поднять долю выигрышных креативных тестов",
+    "снизить слепые зоны трекинга и потери данных",
+    "ускорить онбординг команды и повторяемость результата",
+    "защитить прибыльные связки от операционных сбоев",
+    "превратить тактические заметки в переиспользуемые playbooks",
+    "поднять качество документации внутри команды",
+    "снизить зависимость от одного оператора",
+    "повысить выживаемость под модерацией",
+    "восстановить качество решений после проблем с атрибуцией",
+    "ускорить запуск без управленческого хаоса",
+    "снизить число ручных ошибок"
+  ],
+  "intent_constraints_en": [
+    "platform moderation and policy volatility",
+    "budget pressure on tests and farm spend",
+    "signal loss after privacy and attribution changes",
+    "small teams with overlapping roles",
+    "fast offer turnover and short shelf life",
+    "fragmented infrastructure across tools and contractors",
+    "high operational dependency on tacit knowledge",
+    "burnout risk in buyers and creatives teams",
+    "uneven quality of handoffs and checklists",
+    "source instability and payout shifts",
+    "limited reliable benchmarks in public",
+    "rapidly changing creative shelf life"
+  ],
+  "intent_constraints_ru": [
+    "волатильность модерации и правил платформ",
+    "давление на бюджет тестов и расход на фарм",
+    "потеря сигналов после privacy-сдвигов",
+    "маленькие команды с пересекающимися ролями",
+    "быстрая смена офферов и короткий срок жизни связок",
+    "разрозненная инфраструктура и подрядчики",
+    "сильная зависимость от неформальных знаний",
+    "риск выгорания у баеров и креативной команды",
+    "неровное качество handoff и чеклистов",
+    "нестабильность источников и payout",
+    "мало надежных открытых benchmark",
+    "быстрое старение креативов"
+  ],
+  "intent_artifacts_en": [
+    "how-to guide",
+    "operator checklist",
+    "launch SOP",
+    "troubleshooting memo",
+    "creative testing matrix",
+    "reusable setup template",
+    "bundle card",
+    "handoff document",
+    "source map",
+    "failure postmortem",
+    "team workflow map",
+    "decision memo"
+  ],
+  "intent_artifacts_ru": [
+    "how-to гайд",
+    "чеклист оператора",
+    "launch SOP",
+    "troubleshooting memo",
+    "матрица тестов креативов",
+    "переиспользуемый шаблон настройки",
+    "карточка связки",
+    "handoff-документ",
+    "карта источника",
+    "постмортем по сбою",
+    "карта team workflow",
+    "decision memo"
+  ],
+  "intent_outcomes_en": [
+    "more stable source scaling",
+    "faster issue resolution inside the team",
+    "cleaner attribution and decision making",
+    "better reuse of winning setups",
+    "less chaos in daily operations",
+    "higher survival rate of profitable funnels",
+    "clearer operating standards for newcomers",
+    "stronger editorial authority in the niche",
+    "more searchable evergreen operational content",
+    "better conversion from content into loyalty and return visits",
+    "stronger internal knowledge retention",
+    "higher confidence under uncertain platform changes"
+  ],
+  "intent_outcomes_ru": [
+    "более стабильное масштабирование источников",
+    "более быстрое решение проблем внутри команды",
+    "более чистая атрибуция и решения",
+    "лучшее переиспользование выигрышных сетапов",
+    "меньше хаоса в ежедневной операционке",
+    "выше живучесть прибыльных воронок",
+    "более понятные стандарты для новичков",
+    "сильнее editorial-authority в нише",
+    "больше evergreen-контента под поиск",
+    "выше возвратность аудитории и лояльность",
+    "лучше удержание внутренних знаний",
+    "выше уверенность команды при смене правил платформ"
+  ],
+  "service_focus_en": [
+    "journal articles on affiliate trends",
+    "hands-on playbooks and SOPs",
+    "case studies with metrics and breakdowns",
+    "creative systems and testing workflows",
+    "tracker templates and troubleshooting",
+    "team operations and backstage infrastructure",
+    "source maps and moderation survival",
+    "documentation of bundles and winning setups",
+    "launch checklists for new operators",
+    "editorial coverage of platform shifts"
+  ],
+  "service_focus_ru": [
+    "журнальные статьи по трендам арбитража",
+    "практические playbooks и SOP",
+    "кейсы с цифрами и разбором",
+    "системы креативов и тестовые циклы",
+    "шаблоны трекеров и troubleshooting",
+    "командная операционка и backstage-инфраструктура",
+    "карты источников и выживание под модерацией",
+    "документация связок и выигрышных сетапов",
+    "launch-чеклисты для новых операторов",
+    "редакционное покрытие изменений платформ"
+  ],
+  "forbidden_topics_en": [
+    "generic vendor rankings without practical value",
+    "empty motivation content with no operator insight",
+    "broad SaaS thought leadership unrelated to affiliate traffic",
+    "fintech antifraud narratives unrelated to CPA operations",
+    "thin SEO filler with no tactical depth",
+    "clickbait trend headlines without evidence"
+  ],
+  "forbidden_topics_ru": [
+    "пустые рейтинги без практической ценности",
+    "мотивационный контент без операторской пользы",
+    "широкие SaaS-рассуждения без связи с affiliate",
+    "антифрод/финтех-нарративы вне CPA-операций",
+    "тонкий SEO-филлер без тактической глубины",
+    "кликбейтные заголовки про тренды без фактуры"
   ],
   "article_structures_en": [
     "Hook -> what changed -> operator impact -> examples -> checklist",
     "Problem -> stack -> exact steps -> failure cases -> verification",
     "Case context -> setup -> metrics -> bottlenecks -> reusable template",
     "Trend brief -> source signals -> implications -> action plan -> summary",
-    "How-to -> prerequisites -> implementation -> debugging -> final SOP"
+    "How-to -> prerequisites -> implementation -> debugging -> final SOP",
+    "Editorial opener -> market context -> backstage realities -> operator takeaways -> conclusion",
+    "Myth vs reality -> evidence -> working model -> examples -> summary",
+    "Source review -> trust factors -> risk points -> adaptation plan -> final notes",
+    "Launch memo -> assets -> routing -> tracking -> QA -> wrap-up",
+    "Postmortem -> failure chain -> fixes -> safeguards -> reusable lessons",
+    "Checklist-first -> environment -> setup -> validation -> scaling notes -> conclusion",
+    "Case-by-case comparison -> bundle A vs bundle B -> constraints -> result -> takeaways"
   ],
   "article_structures_ru": [
     "Хук -> что изменилось -> влияние на оператора -> примеры -> чеклист",
     "Проблема -> стек -> точные шаги -> типовые фейлы -> проверка",
     "Контекст кейса -> сетап -> метрики -> узкие места -> шаблон",
     "Trend brief -> сигналы источника -> выводы -> план действий -> итог",
-    "How-to -> prerequisites -> внедрение -> отладка -> финальный SOP"
+    "How-to -> prerequisites -> внедрение -> отладка -> финальный SOP",
+    "Редакционное вступление -> контекст рынка -> закулисная реальность -> выводы для оператора -> итог",
+    "Миф и реальность -> факты -> рабочая модель -> примеры -> вывод",
+    "Обзор источника -> trust-факторы -> риск-точки -> план адаптации -> финальные заметки",
+    "Launch memo -> ассеты -> routing -> tracking -> QA -> итог",
+    "Постмортем -> цепочка сбоя -> фиксы -> safeguards -> уроки",
+    "Чеклист-сначала -> окружение -> настройка -> валидация -> scaling notes -> заключение",
+    "Сравнение кейсов -> связка A vs связка B -> ограничения -> результат -> выводы"
   ],
   "moods": [
     {
@@ -102,13 +517,13 @@
     },
     {
       "key": "case_driven",
-      "weight": 0.9,
+      "weight": 0.92,
       "label_en": "case driven",
       "label_ru": "кейсовая"
     },
     {
       "key": "trend_analytical",
-      "weight": 0.85,
+      "weight": 0.88,
       "label_en": "trend analytical",
       "label_ru": "аналитика трендов"
     },
@@ -120,15 +535,75 @@
     },
     {
       "key": "backstage",
-      "weight": 0.8,
+      "weight": 0.85,
       "label_en": "backstage",
       "label_ru": "закулисная"
+    },
+    {
+      "key": "opinionated",
+      "weight": 0.62,
+      "label_en": "opinionated",
+      "label_ru": "с выраженной позицией"
+    },
+    {
+      "key": "field_report",
+      "weight": 0.8,
+      "label_en": "field report",
+      "label_ru": "полевой отчет"
+    },
+    {
+      "key": "playbook_style",
+      "weight": 0.95,
+      "label_en": "playbook style",
+      "label_ru": "формат playbook"
+    },
+    {
+      "key": "troubleshooting",
+      "weight": 0.93,
+      "label_en": "troubleshooting",
+      "label_ru": "troubleshooting"
+    },
+    {
+      "key": "journal_issue",
+      "weight": 0.74,
+      "label_en": "journal issue",
+      "label_ru": "журнальный выпуск"
+    },
+    {
+      "key": "market_map",
+      "weight": 0.72,
+      "label_en": "market map",
+      "label_ru": "карта рынка"
+    },
+    {
+      "key": "launch_ops",
+      "weight": 0.9,
+      "label_en": "launch operations",
+      "label_ru": "операции запуска"
+    },
+    {
+      "key": "operator_postmortem",
+      "weight": 0.87,
+      "label_en": "operator postmortem",
+      "label_ru": "операционный постмортем"
+    },
+    {
+      "key": "framework_based",
+      "weight": 0.82,
+      "label_en": "framework based",
+      "label_ru": "framework-подход"
+    },
+    {
+      "key": "contrarian",
+      "weight": 0.52,
+      "label_en": "contrarian",
+      "label_ru": "контр-интуитивный"
     }
   ],
   "article_system_prompt_en": "",
   "article_system_prompt_ru": "",
-  "article_user_prompt_append_en": "Write for affiliate operators. Prefer practical details, current platform behavior, tradeoffs, and reusable workflows over generic theory.",
-  "article_user_prompt_append_ru": "Пиши для операторов affiliate-команд. Приоритет: практические детали, актуальное поведение платформ, tradeoffs и переиспользуемые workflows, а не общая теория.",
+  "article_user_prompt_append_en": "Write for affiliate operators, media buyers, farmers and tracker owners. Prefer practical details, current platform behavior, tradeoffs, checklists and reusable workflows over generic theory. Keep topical gravity around CPA, sources, creatives, moderation, tracking, farm, offers and backstage operations.",
+  "article_user_prompt_append_ru": "Пиши для операторов affiliate-команд, медиабаеров, фармеров и владельцев трекеров. Приоритет: практические детали, текущее поведение платформ, tradeoffs, чеклисты и переиспользуемые workflows, а не общая теория. Центр тяжести тем: CPA, источники, креативы, модерация, трекинг, фарм, офферы и backstage-операции.",
   "expand_system_prompt_en": "",
   "expand_system_prompt_ru": "",
   "expand_user_prompt_append_en": "",
@@ -149,59 +624,618 @@
     "schematic",
     "realistic",
     "abstract",
-    "moody"
+    "moody",
+    "cinematic",
+    "editorial",
+    "dark_ui",
+    "backstage"
   ],
   "image_color_schemes": [
+    {
+      "key": "corporate_navy",
+      "weight": 0.42,
+      "instruction": "Corporate navy palette with structured contrast and restrained accent highlights."
+    },
+    {
+      "key": "slate_minimal",
+      "weight": 0.46,
+      "instruction": "Slate gray minimalist palette with low-saturation blue accents."
+    },
+    {
+      "key": "graphite_gold",
+      "weight": 0.38,
+      "instruction": "Graphite base with subtle brushed gold accent lines."
+    },
+    {
+      "key": "midnight_cyan",
+      "weight": 0.72,
+      "instruction": "Dark midnight base with restrained cyan glow accents."
+    },
+    {
+      "key": "storm_blue",
+      "weight": 0.5,
+      "instruction": "Stormy blue-gray palette with cool layered shadows."
+    },
+    {
+      "key": "steel_teal",
+      "weight": 0.58,
+      "instruction": "Steel gray base with muted teal accents."
+    },
+    {
+      "key": "carbon_orange",
+      "weight": 0.43,
+      "instruction": "Carbon black palette with controlled industrial orange highlights."
+    },
+    {
+      "key": "executive_black",
+      "weight": 0.54,
+      "instruction": "Executive black and white palette with sharp clarity and premium tone."
+    },
+    {
+      "key": "night_mode_soft",
+      "weight": 0.57,
+      "instruction": "Soft dark UI palette with reduced glare and smooth contrast."
+    },
+    {
+      "key": "clean_gray",
+      "weight": 0.33,
+      "instruction": "Clean gray professional palette with subtle blue undertone."
+    },
+    {
+      "key": "amber_focus",
+      "weight": 0.45,
+      "instruction": "Neutral base with amber directional highlights."
+    },
+    {
+      "key": "matte_black",
+      "weight": 0.65,
+      "instruction": "Matte black low-reflection palette with refined light edges."
+    },
+    {
+      "key": "minimalist_blue",
+      "weight": 0.36,
+      "instruction": "Light modern blue palette with high readability and calm tone."
+    },
+    {
+      "key": "shadow_contrast",
+      "weight": 0.52,
+      "instruction": "Deep shadow contrast palette with selective illuminated focal areas."
+    },
+    {
+      "key": "tech_slate",
+      "weight": 0.49,
+      "instruction": "Tech slate palette with balanced cool tones and UI clarity."
+    },
+    {
+      "key": "ink_blue",
+      "weight": 0.61,
+      "instruction": "Dark ink blue base with subtle high-contrast text highlights."
+    },
+    {
+      "key": "crisp_ui_dark",
+      "weight": 0.67,
+      "instruction": "Clean dark UI palette optimized for readability and depth."
+    },
+    {
+      "key": "navy_silver",
+      "weight": 0.44,
+      "instruction": "Navy base with silver edge highlights."
+    },
+    {
+      "key": "midnight_amber",
+      "weight": 0.64,
+      "instruction": "Deep midnight palette with warm amber accents."
+    },
+    {
+      "key": "cyber_blue_subtle",
+      "weight": 0.7,
+      "instruction": "Subtle cyber blue glow on dark structured base."
+    },
+    {
+      "key": "charcoal_teal",
+      "weight": 0.69,
+      "instruction": "Charcoal foundation with muted teal emphasis."
+    },
+    {
+      "key": "obsidian_blue",
+      "weight": 0.78,
+      "instruction": "Obsidian dark base with refined cool highlights."
+    },
+    {
+      "key": "slate_cyan_focus",
+      "weight": 0.62,
+      "instruction": "Slate gray with controlled cyan focus points."
+    },
+    {
+      "key": "deep_teal_black",
+      "weight": 0.66,
+      "instruction": "Deep teal and near-black palette with subtle depth layering."
+    },
+    {
+      "key": "monochrome_blue",
+      "weight": 0.57,
+      "instruction": "Blue-toned monochrome palette with technical editorial tone."
+    },
     {
       "key": "dark",
       "weight": 1,
       "instruction": "Dark cinematic palette, deep shadows, high contrast accents."
     },
     {
+      "key": "light",
+      "weight": 0.34,
+      "instruction": "Light clean palette, high readability, soft contrast."
+    },
+    {
+      "key": "colordull",
+      "weight": 0.49,
+      "instruction": "Muted desaturated palette, restrained color intensity."
+    },
+    {
+      "key": "noir",
+      "weight": 0.58,
+      "instruction": "Noir monochrome leaning palette, dramatic lighting."
+    },
+    {
       "key": "neon",
-      "weight": 0.75,
+      "weight": 0.76,
       "instruction": "Neon cyber palette with glowing accents on dark base."
     },
     {
-      "key": "obsidian_blue",
-      "weight": 0.72,
-      "instruction": "Obsidian dark base with cool blue highlights and clean editorial contrast."
+      "key": "teal_orange",
+      "weight": 0.52,
+      "instruction": "Teal and orange blockbuster palette with balanced warm/cool contrast."
     },
     {
-      "key": "charcoal_teal",
-      "weight": 0.66,
-      "instruction": "Charcoal foundation with muted teal emphasis and low-noise gradients."
-    },
-    {
-      "key": "midnight_amber",
-      "weight": 0.58,
-      "instruction": "Deep midnight palette with warm amber accents."
+      "key": "industrial",
+      "weight": 0.48,
+      "instruction": "Industrial palette with graphite, steel blue, and warning accent tones."
     }
   ],
   "image_compositions": [
     {
+      "key": "center_weighted",
+      "weight": 0.62,
+      "label_en": "Weighted center",
+      "label_ru": "Центр с акцентом",
+      "instruction": "Centered composition with weighted focal mass and subtle directional imbalance."
+    },
+    {
+      "key": "off_axis_center",
+      "weight": 0.54,
+      "label_en": "Off-axis center",
+      "label_ru": "Смещенная ось",
+      "instruction": "Slightly rotated central axis creating modern tension."
+    },
+    {
       "key": "deep_perspective_pull",
-      "weight": 0.85,
+      "weight": 0.9,
       "label_en": "Deep perspective pull",
       "label_ru": "Глубокая перспектива",
       "instruction": "Strong perspective vanishing point pulling viewer inward."
     },
     {
+      "key": "compressed_foreground",
+      "weight": 0.48,
+      "label_en": "Compressed foreground",
+      "label_ru": "Сжатый передний план",
+      "instruction": "Large foreground mass framing distant focal subject."
+    },
+    {
+      "key": "vertical_dominance",
+      "weight": 0.5,
+      "label_en": "Vertical dominance",
+      "label_ru": "Вертикальное доминирование",
+      "instruction": "Tall vertical composition emphasizing hierarchy and authority."
+    },
+    {
+      "key": "horizontal_flow",
+      "weight": 0.57,
+      "label_en": "Horizontal flow",
+      "label_ru": "Горизонтальный поток",
+      "instruction": "Wide lateral flow guiding attention across the frame."
+    },
+    {
+      "key": "low_angle_power",
+      "weight": 0.42,
+      "label_en": "Low-angle power",
+      "label_ru": "Низкий ракурс",
+      "instruction": "Low-angle composition enhancing authority and structural weight."
+    },
+    {
+      "key": "high_angle_overview",
+      "weight": 0.56,
+      "label_en": "High-angle overview",
+      "label_ru": "Вид сверху",
+      "instruction": "Elevated overview composition for analytical dominance."
+    },
+    {
+      "key": "deep_field_focus",
+      "weight": 0.55,
+      "label_en": "Deep field focus",
+      "label_ru": "Глубина резкости",
+      "instruction": "Extended depth of field emphasizing layered complexity."
+    },
+    {
+      "key": "diagonal_split",
+      "weight": 0.58,
+      "label_en": "Diagonal split",
+      "label_ru": "Диагональное разделение",
+      "instruction": "Clear diagonal division between conceptual zones."
+    },
+    {
+      "key": "edge_framing",
+      "weight": 0.49,
+      "label_en": "Edge framing",
+      "label_ru": "Краевое обрамление",
+      "instruction": "Active borders guiding attention inward."
+    },
+    {
+      "key": "clustered_mass",
+      "weight": 0.52,
+      "label_en": "Clustered mass",
+      "label_ru": "Кластерная масса",
+      "instruction": "Dense grouping of elements forming weighted focus."
+    },
+    {
+      "key": "overlapping_planes",
+      "weight": 0.61,
+      "label_en": "Overlapping planes",
+      "label_ru": "Перекрывающиеся плоскости",
+      "instruction": "Layered planes intersecting for dynamic depth."
+    },
+    {
+      "key": "corner_to_corner_flow",
+      "weight": 0.63,
+      "label_en": "Corner flow",
+      "label_ru": "Поток по диагонали",
+      "instruction": "Visual movement connecting opposite corners."
+    },
+    {
+      "key": "expanded_background",
+      "weight": 0.57,
+      "label_en": "Expanded background",
+      "label_ru": "Расширенный фон",
+      "instruction": "Large atmospheric background with small focal subject."
+    },
+    {
+      "key": "cross_axis_intersection",
+      "weight": 0.54,
+      "label_en": "Cross-axis",
+      "label_ru": "Пересечение осей",
+      "instruction": "Strong cross intersection dividing visual zones."
+    },
+    {
+      "key": "layered_horizon",
+      "weight": 0.6,
+      "label_en": "Layered horizon",
+      "label_ru": "Многоуровневый горизонт",
+      "instruction": "Multiple horizontal bands with narrative layering."
+    },
+    {
+      "key": "depth_funnel",
+      "weight": 0.67,
+      "label_en": "Depth funnel",
+      "label_ru": "Воронка глубины",
+      "instruction": "Perspective funnel guiding eye toward central vanishing point."
+    },
+    {
       "key": "visual_corridor",
-      "weight": 0.8,
+      "weight": 0.82,
       "label_en": "Visual corridor",
       "label_ru": "Коридор взгляда",
       "instruction": "Corridor-like depth guiding attention forward."
     },
     {
+      "key": "deep_center_anchor",
+      "weight": 0.59,
+      "label_en": "Deep center anchor",
+      "label_ru": "Глубокий центр",
+      "instruction": "Heavy central anchor grounded by layered depth."
+    },
+    {
+      "key": "centered",
+      "weight": 0.5,
+      "label_en": "Centered",
+      "label_ru": "Центрированная",
+      "instruction": "Centered focal composition with clear subject priority."
+    },
+    {
       "key": "dynamic_diagonal",
-      "weight": 0.72,
+      "weight": 0.74,
       "label_en": "Dynamic diagonal",
-      "label_ru": "Динамическая диагональ",
+      "label_ru": "Динамическая",
       "instruction": "Strong diagonal flow with dynamic motion and tension."
+    },
+    {
+      "key": "broken_reflection",
+      "weight": 0.34,
+      "label_en": "Broken reflection",
+      "label_ru": "Ломаное отражение",
+      "instruction": "Fragmented mirrored composition, asymmetry with reflective motifs."
+    },
+    {
+      "key": "golden_ratio",
+      "weight": 0.46,
+      "label_en": "Golden ratio",
+      "label_ru": "Золотое сечение",
+      "instruction": "Golden ratio based layout for balanced visual hierarchy."
+    },
+    {
+      "key": "rule_of_thirds",
+      "weight": 0.58,
+      "label_en": "Rule of thirds",
+      "label_ru": "Правило третей",
+      "instruction": "Rule-of-thirds placement with off-center focal points."
+    },
+    {
+      "key": "asymmetrical_balance",
+      "weight": 0.53,
+      "label_en": "Asymmetrical balance",
+      "label_ru": "Асимметричный баланс",
+      "instruction": "Asymmetrical but balanced layout with weighted visual masses."
     }
   ],
-  "preview_image_prompt_template": "Create a {{image_style}} editorial hero image for article \"{{title}}\" in {{lang}}. Theme: CPA backstage, media buying operations, trackers, creatives, sources, affiliate workflows, dark neon city-console mood. No text, no logos, 16:9.",
+  "preview_image_prompt_template": "Create a high-quality {{image_style}} hero image for article \"{{title}}\" ({{lang}}). Use context: {{excerpt}}. Additional context: {{context}}. Visual theme: CPA backstage, media buying operations, creative testing rooms, tracker dashboards, dark neon city-console mood, layered perspective, no text, no logos.",
+  "image_scenarios": [
+    {
+      "key": "traffic_control_room",
+      "weight": 1,
+      "label_en": "Traffic control room",
+      "label_ru": "Комната управления трафиком",
+      "instruction": "Affiliate operators reviewing traffic, creatives and attribution on multiple screens."
+    },
+    {
+      "key": "creative_war_room",
+      "weight": 0.88,
+      "label_en": "Creative war room",
+      "label_ru": "Креативная war room",
+      "instruction": "Walls of ad concepts, hooks, thumbnails and testing boards in a backstage studio."
+    },
+    {
+      "key": "tracker_signal_grid",
+      "weight": 0.84,
+      "label_en": "Tracker signal grid",
+      "label_ru": "Сетка сигналов трекера",
+      "instruction": "Routing nodes, postbacks, event paths and analytics overlays in a dark console style."
+    },
+    {
+      "key": "neon_city_funnels",
+      "weight": 0.9,
+      "label_en": "Neon city funnels",
+      "label_ru": "Неоновый город и воронки",
+      "instruction": "Dark futuristic city with glowing routes, towers and flowing traffic signals."
+    },
+    {
+      "key": "farm_desk_cluster",
+      "weight": 0.73,
+      "label_en": "Farm desk cluster",
+      "label_ru": "Фарм-зона",
+      "instruction": "Rows of controlled devices, profiles, trust dashboards and operator checklists."
+    },
+    {
+      "key": "source_map_console",
+      "weight": 0.68,
+      "label_en": "Source map console",
+      "label_ru": "Консоль карты источников",
+      "instruction": "Source routes, cost zones, performance overlays and signal pathways."
+    },
+    {
+      "key": "landing_recovery_scene",
+      "weight": 0.64,
+      "label_en": "Landing recovery",
+      "label_ru": "Восстановление лендингов",
+      "instruction": "Rapid rebuild of landing assets, domains and routing in a crisis setup."
+    },
+    {
+      "key": "editorial_backroom",
+      "weight": 0.62,
+      "label_en": "Editorial backroom",
+      "label_ru": "Редакционный backroom",
+      "instruction": "Magazine desk mixing notes, dashboards, performance maps and operator documents."
+    },
+    {
+      "key": "moderation_checkpoint",
+      "weight": 0.58,
+      "label_en": "Moderation checkpoint",
+      "label_ru": "Точка модерации",
+      "instruction": "A stylized checkpoint filtering creatives, accounts and landing flows."
+    },
+    {
+      "key": "bundle_card_table",
+      "weight": 0.52,
+      "label_en": "Bundle table",
+      "label_ru": "Стол со связками",
+      "instruction": "Cards, metrics, notes and source maps arranged like a tactical operations board."
+    },
+    {
+      "key": "night_shift_team",
+      "weight": 0.55,
+      "label_en": "Night shift team",
+      "label_ru": "Ночная смена",
+      "instruction": "A small affiliate team working in a dark control-room environment with urgency and focus."
+    },
+    {
+      "key": "signal_corridor",
+      "weight": 0.61,
+      "label_en": "Signal corridor",
+      "label_ru": "Коридор сигналов",
+      "instruction": "A perspective corridor of signals, trackers and decision nodes moving into the distance."
+    }
+  ],
+  "updated_at": "2026-04-07 00:00:00",
+  "article_cluster_taxonomy_en": [
+    {
+      "key": "sources",
+      "weight": 1,
+      "label_en": "Sources",
+      "label_ru": "Источники",
+      "keywords": "facebook ads, tiktok ads, native, push, pop, telegram, source, media buy, placements, scale"
+    },
+    {
+      "key": "farm",
+      "weight": 0.95,
+      "label_en": "Farm",
+      "label_ru": "Фарм",
+      "keywords": "farm, account, bm, trust, warmup, agency account, profile, anti ban, browser profile, spend"
+    },
+    {
+      "key": "creatives",
+      "weight": 0.96,
+      "label_en": "Creatives",
+      "label_ru": "Креативы",
+      "keywords": "creative, hook, angle, ugc, static, video, fatigue, script, thumbnail, test batch"
+    },
+    {
+      "key": "tracking",
+      "weight": 0.97,
+      "label_en": "Tracking",
+      "label_ru": "Трекинг",
+      "keywords": "tracker, postback, attribution, pixel, event, signal loss, macro, campaign id, click id"
+    },
+    {
+      "key": "offers",
+      "weight": 0.84,
+      "label_en": "Offers",
+      "label_ru": "Офферы",
+      "keywords": "offer, nutra, crypto, finance, igaming, dating, cpa, payout, approve, geo"
+    },
+    {
+      "key": "operations",
+      "weight": 0.9,
+      "label_en": "Operations",
+      "label_ru": "Операционка",
+      "keywords": "ops, sop, workflow, handoff, team role, assistant, farmer, buyer, qa, backoffice"
+    },
+    {
+      "key": "cases",
+      "weight": 0.88,
+      "label_en": "Cases",
+      "label_ru": "Кейсы",
+      "keywords": "case study, bundle, setup, roi, cpa, approve, scale, lesson learned, metrics"
+    },
+    {
+      "key": "howto",
+      "weight": 0.92,
+      "label_en": "HowTo",
+      "label_ru": "HowTo",
+      "keywords": "how to, tutorial, exact steps, troubleshooting, fix, checklist, implementation, setup"
+    },
+    {
+      "key": "moderation",
+      "weight": 0.86,
+      "label_en": "Moderation",
+      "label_ru": "Модерация",
+      "keywords": "moderation, policy, ban, reject, review, trust, disapprove, safe route, compliance buffer"
+    },
+    {
+      "key": "telegram",
+      "weight": 0.71,
+      "label_en": "Telegram",
+      "label_ru": "Telegram",
+      "keywords": "telegram, mini app, channel, retention, owned media, distribution, post, bot, traffic loop"
+    },
+    {
+      "key": "ai_creatives",
+      "weight": 0.78,
+      "label_en": "AI Creatives",
+      "label_ru": "AI-креативы",
+      "keywords": "ai creative, prompt, generation, review loop, moderation risk, asset pipeline, thumbnail"
+    },
+    {
+      "key": "team_scaling",
+      "weight": 0.74,
+      "label_en": "Team Scaling",
+      "label_ru": "Масштабирование команды",
+      "keywords": "team scale, hiring, training, onboarding, knowledge base, standards, delegation, operating rhythm"
+    }
+  ],
+  "article_cluster_taxonomy_ru": [
+    {
+      "key": "sources",
+      "weight": 1,
+      "label_en": "Sources",
+      "label_ru": "Источники",
+      "keywords": "facebook ads, tiktok ads, native, push, pop, telegram, источник, закуп, placements, масштабирование"
+    },
+    {
+      "key": "farm",
+      "weight": 0.95,
+      "label_en": "Farm",
+      "label_ru": "Фарм",
+      "keywords": "фарм, аккаунт, bm, trust, прогрев, агентский аккаунт, профиль, антибан, browser profile, spend"
+    },
+    {
+      "key": "creatives",
+      "weight": 0.96,
+      "label_en": "Creatives",
+      "label_ru": "Креативы",
+      "keywords": "креатив, hook, angle, ugc, статика, видео, выгорание, сценарий, thumbnail, batch-тест"
+    },
+    {
+      "key": "tracking",
+      "weight": 0.97,
+      "label_en": "Tracking",
+      "label_ru": "Трекинг",
+      "keywords": "трекер, postback, атрибуция, pixel, событие, потеря сигнала, макрос, campaign id, click id"
+    },
+    {
+      "key": "offers",
+      "weight": 0.84,
+      "label_en": "Offers",
+      "label_ru": "Офферы",
+      "keywords": "оффер, nutra, crypto, finance, igaming, dating, cpa, payout, approve, geo"
+    },
+    {
+      "key": "operations",
+      "weight": 0.9,
+      "label_en": "Operations",
+      "label_ru": "Операционка",
+      "keywords": "операционка, sop, workflow, handoff, роль команды, ассистент, фармер, баер, qa, backoffice"
+    },
+    {
+      "key": "cases",
+      "weight": 0.88,
+      "label_en": "Cases",
+      "label_ru": "Кейсы",
+      "keywords": "кейс, связка, сетап, roi, cpa, approve, scale, выводы, метрики"
+    },
+    {
+      "key": "howto",
+      "weight": 0.92,
+      "label_en": "HowTo",
+      "label_ru": "HowTo",
+      "keywords": "how to, tutorial, точные шаги, troubleshooting, fix, чеклист, внедрение, настройка"
+    },
+    {
+      "key": "moderation",
+      "weight": 0.86,
+      "label_en": "Moderation",
+      "label_ru": "Модерация",
+      "keywords": "модерация, policy, бан, отклонение, review, trust, disapprove, safe route, compliance buffer"
+    },
+    {
+      "key": "telegram",
+      "weight": 0.71,
+      "label_en": "Telegram",
+      "label_ru": "Telegram",
+      "keywords": "telegram, mini app, канал, удержание, owned media, distribution, пост, бот, traffic loop"
+    },
+    {
+      "key": "ai_creatives",
+      "weight": 0.78,
+      "label_en": "AI Creatives",
+      "label_ru": "AI-креативы",
+      "keywords": "ai creative, prompt, генерация, цикл ревью, риск модерации, asset pipeline, thumbnail"
+    },
+    {
+      "key": "team_scaling",
+      "weight": 0.74,
+      "label_en": "Team Scaling",
+      "label_ru": "Масштабирование команды",
+      "keywords": "масштабирование команды, найм, обучение, онбординг, knowledge base, стандарты, делегирование, operating rhythm"
+    }
+  ],
   "campaigns": {
     "journal": {
       "key": "journal",
@@ -221,13 +1255,17 @@
         "trend briefing",
         "editorial breakdown",
         "market memo",
-        "operating analysis"
+        "operating analysis",
+        "issue opener",
+        "niche outlook"
       ],
       "styles_ru": [
         "редакционный разбор",
         "аналитическая записка",
         "trend briefing",
-        "стратегический обзор"
+        "стратегический обзор",
+        "открывающая статья номера",
+        "обзор ниши"
       ],
       "clusters_en": [
         "meta ads resilience and account farming",
@@ -235,7 +1273,9 @@
         "telegram mini apps and community retention",
         "ai creatives workflow and compliance",
         "tracker stacks attribution and signal loss",
-        "nutra finance igaming and crypto demand shifts"
+        "nutra finance igaming and crypto demand shifts",
+        "market map for 2026 affiliate niches",
+        "operator staffing and backstage systems"
       ],
       "clusters_ru": [
         "Meta Ads в 2026: фарм, BM-устойчивость и антибан",
@@ -243,17 +1283,21 @@
         "Telegram Mini Apps, комьюнити и retention в арбитраже",
         "AI-креативы, compliance и контроль prompt-пайплайна",
         "трекеры, атрибуция и потеря сигналов после privacy-сдвигов",
-        "сдвиги спроса по nutra, finance, iGaming и crypto в 2026"
+        "сдвиги спроса по nutra, finance, iGaming и crypto в 2026",
+        "карта ниши affiliate в 2026",
+        "устройство operator/backstage систем внутри команд"
       ],
       "article_structures_en": [
         "Trend summary -> what changed -> who wins -> operating implications -> checklist",
         "Source shift -> risks -> adaptation patterns -> examples -> next steps",
-        "Myth vs reality -> evidence -> playbook signals -> conclusion"
+        "Myth vs reality -> evidence -> playbook signals -> conclusion",
+        "Issue opener -> niche context -> backstage insights -> operator takeaways -> summary"
       ],
       "article_structures_ru": [
         "Краткий тренд -> что изменилось -> кто выигрывает -> операционные выводы -> чеклист",
         "Сдвиг источника -> риски -> адаптация -> примеры -> следующие шаги",
-        "Миф и реальность -> факты -> рабочие сигналы -> вывод"
+        "Миф и реальность -> факты -> рабочие сигналы -> вывод",
+        "Открывающая статья номера -> контекст ниши -> backstage-инсайты -> выводы для оператора -> итог"
       ],
       "article_system_prompt_en": "",
       "article_system_prompt_ru": "",
@@ -278,13 +1322,17 @@
         "step-by-step tutorial",
         "troubleshooting guide",
         "case note",
-        "operator playbook"
+        "operator playbook",
+        "setup memo",
+        "launch checklist"
       ],
       "styles_ru": [
         "пошаговый how-to",
         "гайд по устранению проблем",
         "операционный playbook",
-        "технический кейс"
+        "технический кейс",
+        "setup memo",
+        "launch checklist"
       ],
       "clusters_en": [
         "facebook farm setup and warmup",
@@ -292,7 +1340,9 @@
         "tracker postback templates and debugging",
         "anti-detect browser operations and team SOP",
         "creative testing matrix and iteration loops",
-        "payment domains hosting and landing recovery"
+        "payment domains hosting and landing recovery",
+        "team handoff templates and operator documentation",
+        "day one setup for new media buyers"
       ],
       "clusters_ru": [
         "настройка и прогрев Facebook farm",
@@ -300,17 +1350,21 @@
         "tracker postback-шаблоны, макросы и отладка",
         "anti-detect браузеры, роли команды и SOP",
         "матрица тестирования креативов и цикл итераций",
-        "платежки, домены, хостинг и восстановление лендингов"
+        "платежки, домены, хостинг и восстановление лендингов",
+        "шаблоны handoff и документация оператора",
+        "day one setup для нового медиабайера"
       ],
       "article_structures_en": [
         "Problem -> prerequisites -> exact steps -> failure cases -> verification",
         "Goal -> stack -> implementation -> screenshots/code -> rollback plan",
-        "Case context -> setup -> metrics -> bottlenecks -> reusable template"
+        "Case context -> setup -> metrics -> bottlenecks -> reusable template",
+        "Checklist -> stack -> actions -> QA -> scale notes -> summary"
       ],
       "article_structures_ru": [
         "Проблема -> prerequisites -> точные шаги -> типовые фейлы -> проверка",
         "Цель -> стек -> внедрение -> код/настройки -> rollback-план",
-        "Контекст кейса -> сетап -> метрики -> узкие места -> переиспользуемый шаблон"
+        "Контекст кейса -> сетап -> метрики -> узкие места -> переиспользуемый шаблон",
+        "Чеклист -> стек -> действия -> QA -> заметки по масштабу -> итог"
       ],
       "article_system_prompt_en": "",
       "article_system_prompt_ru": "",

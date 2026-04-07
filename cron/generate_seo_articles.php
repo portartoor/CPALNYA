@@ -5820,7 +5820,7 @@ function seo_publish_article(
 $cfg = [
     'llm_provider' => strtolower(trim((string)seo_cfg('LLMProvider', 'openai'))),
     'enabled' => (bool)seo_cfg('SeoArticleCronEnabled', false),
-    'langs' => (array)seo_cfg('SeoArticleCronLanguages', ['en', 'ru']),
+    'langs' => (array)seo_cfg('SeoArticleCronLanguages', ['ru']),
     'daily_min' => (int)seo_cfg('SeoArticleCronDailyMin', 1),
     'daily_max' => (int)seo_cfg('SeoArticleCronDailyMax', 3),
     'word_min' => (int)seo_cfg('SeoArticleCronWordMin', 2000),
@@ -6070,7 +6070,7 @@ foreach ($cfg['langs'] as $langRaw) {
         $langList[] = $lang;
     }
 }
-$cfg['langs'] = $langList ?: ['en', 'ru'];
+$cfg['langs'] = $langList ?: ['ru'];
 if (!empty($runtime['langs'])) {
     $cfg['langs'] = $runtime['langs'];
 }

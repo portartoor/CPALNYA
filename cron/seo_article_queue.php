@@ -20,7 +20,7 @@ function queue_runtime_options(): array
     $opts = [
         'mode' => 'help',
         'job_date' => date('Y-m-d'),
-        'langs' => ['ru', 'en'],
+        'langs' => ['ru'],
         'force' => true,
         'dry_run' => false,
         'max_per_run' => 1,
@@ -312,7 +312,7 @@ function queue_fetch_tasks(mysqli $db, int $limit): array
 
 function queue_detect_languages_from_settings(mysqli $db): array
 {
-    $default = ['ru', 'en'];
+    $default = ['ru'];
     $sql = "SELECT settings_json
             FROM seo_generator_settings
             ORDER BY id DESC
@@ -342,7 +342,7 @@ function queue_detect_languages_from_settings(mysqli $db): array
             $langs[] = $lang;
         }
     }
-    return !empty($langs) ? $langs : $default;
+    return ['ru'];
 }
 
 $opts = queue_runtime_options();
@@ -428,6 +428,6 @@ queue_echo('Usage:');
 queue_echo('  --ensure');
 queue_echo('  --enqueue-test [--campaign=journal|playbooks] [--date=YYYY-MM-DD] [--planned-at="YYYY-MM-DD HH:MM:SS"]');
 queue_echo('  --enqueue-daily [--date=YYYY-MM-DD]');
-queue_echo('  --enqueue --date=YYYY-MM-DD --lang=ru,en [--campaign=journal|playbooks] [--force|--no-force] [--dry-run] [--max-per-run=1]');
+queue_echo('  --enqueue --date=YYYY-MM-DD --lang=ru [--campaign=journal|playbooks] [--force|--no-force] [--dry-run] [--max-per-run=1]');
 queue_echo('  --work [--limit=2]');
 exit(0);

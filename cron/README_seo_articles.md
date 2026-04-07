@@ -9,7 +9,7 @@ Set:
 
 Optional tuning:
 
-- `$SeoArticleCronLanguages = ['en', 'ru']`
+- `$SeoArticleCronLanguages = ['ru']`
 - `$SeoArticleCronDailyMin = 1`
 - `$SeoArticleCronDailyMax = 3`
 - `$SeoArticleCronWordMin = 2000`
@@ -70,8 +70,8 @@ Notes:
 
 How scheduling works:
 
-- Script plans deterministic random slots per day and per language.
-- Daily target is `1..3` articles (configurable) for each language.
+- Script plans deterministic random slots per day for the configured language list.
+- In CPALNYA setup the target language is RU only.
 - On each run it checks due slots and generates missing articles.
 - State and retry attempts are stored in `seo_article_cron_runs`.
 
@@ -80,7 +80,7 @@ How scheduling works:
 CLI options:
 
 - `--date=YYYY-MM-DD` (override job date)
-- `--lang=en` or `--lang=ru` or `--lang=en,ru`
+- `--lang=ru`
 - `--max-per-run=1`
 - `--campaign=journal` or `--campaign=playbooks`
 - `--force` (ignore time check and run all slots for selected date)
@@ -101,7 +101,7 @@ Examples:
 /usr/bin/php /home/cpalnya/public_html/cron/generate_seo_articles.php --proxy-check
 
 # Queue: add campaign tasks, then process
-/usr/bin/php /home/cpalnya/public_html/cron/seo_article_queue.php --enqueue --campaign=journal --date=$(date +%F) --lang=ru,en --max-per-run=4
-/usr/bin/php /home/cpalnya/public_html/cron/seo_article_queue.php --enqueue --campaign=playbooks --date=$(date +%F) --lang=ru,en --max-per-run=6
+/usr/bin/php /home/cpalnya/public_html/cron/seo_article_queue.php --enqueue --campaign=journal --date=$(date +%F) --lang=ru --max-per-run=4
+/usr/bin/php /home/cpalnya/public_html/cron/seo_article_queue.php --enqueue --campaign=playbooks --date=$(date +%F) --lang=ru --max-per-run=6
 /usr/bin/php /home/cpalnya/public_html/cron/seo_article_queue.php --work --limit=2
 ```
