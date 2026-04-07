@@ -445,55 +445,81 @@ if (!function_exists('seo_gen_settings_default')) {
             'preview_image_size' => '1536x1024',
             'preview_image_anchor_enforced' => true,
             'preview_image_anchor_append' => '',
-            'preview_image_style_options' => ['schematic', 'realistic', 'abstract', 'moody'],
+            'preview_image_style_options' => ['schematic', 'realistic', 'abstract', 'moody', 'cinematic', 'editorial', 'dark_ui', 'backstage', 'surveillance', 'ops_console'],
             'image_color_schemes' => [
                 ['key' => 'dark', 'weight' => 1.0, 'instruction' => 'Dark cinematic palette, deep shadows, high contrast accents.'],
-                ['key' => 'light', 'weight' => 0.9, 'instruction' => 'Light clean palette, high readability, soft contrast.'],
-                ['key' => 'colordull', 'weight' => 0.6, 'instruction' => 'Muted desaturated palette, restrained color intensity.'],
-                ['key' => 'noir', 'weight' => 0.45, 'instruction' => 'Noir monochrome leaning palette, dramatic lighting.'],
-                ['key' => 'neon', 'weight' => 0.35, 'instruction' => 'Neon cyber palette with glowing accents on dark base.'],
-                ['key' => 'pastel', 'weight' => 0.35, 'instruction' => 'Pastel palette, soft gradients, low harshness.'],
-                ['key' => 'teal_orange', 'weight' => 0.55, 'instruction' => 'Teal and orange blockbuster palette with balanced warm/cool contrast.'],
-                ['key' => 'earthy', 'weight' => 0.5, 'instruction' => 'Earthy natural palette: clay, olive, sand, and low saturation browns.'],
-                ['key' => 'ice_blue', 'weight' => 0.48, 'instruction' => 'Cold ice-blue palette with crisp highlights and restrained warmth.'],
-                ['key' => 'sunset', 'weight' => 0.5, 'instruction' => 'Sunset palette with amber, coral, and magenta gradients.'],
-                ['key' => 'duotone', 'weight' => 0.42, 'instruction' => 'Strong duotone palette limited to two dominant colors plus neutrals.'],
-                ['key' => 'monochrome', 'weight' => 0.44, 'instruction' => 'Monochrome palette with tonal depth and controlled contrast.'],
-                ['key' => 'vaporwave', 'weight' => 0.34, 'instruction' => 'Vaporwave-inspired palette: pink, cyan, and retro glow atmosphere.'],
-                ['key' => 'industrial', 'weight' => 0.46, 'instruction' => 'Industrial palette with graphite, steel blue, and warning accent tones.'],
-                ['key' => 'forest', 'weight' => 0.43, 'instruction' => 'Forest palette with deep greens, moss, and subtle amber highlights.'],
-                ['key' => 'high_key', 'weight' => 0.4, 'instruction' => 'High-key bright palette with airy whites and gentle contrast edges.'],
+                ['key' => 'midnight_cyan', 'weight' => 0.82, 'instruction' => 'Dark midnight base with restrained cyan glow accents and tracker-screen energy.'],
+                ['key' => 'charcoal_teal', 'weight' => 0.74, 'instruction' => 'Charcoal foundation with muted teal emphasis and backstage operations mood.'],
+                ['key' => 'obsidian_blue', 'weight' => 0.78, 'instruction' => 'Obsidian dark base with refined cool highlights and layered console depth.'],
+                ['key' => 'matte_black', 'weight' => 0.72, 'instruction' => 'Matte black low-reflection palette with sharp edge lighting and premium editorial restraint.'],
+                ['key' => 'neon', 'weight' => 0.68, 'instruction' => 'Neon cyber palette with glowing accents on dark base, suitable for affiliate city-console scenes.'],
+                ['key' => 'slate_cyan_focus', 'weight' => 0.62, 'instruction' => 'Slate gray with controlled cyan focus points and dashboard-like precision.'],
+                ['key' => 'midnight_amber', 'weight' => 0.58, 'instruction' => 'Deep midnight palette with warm amber alert accents for moderation and warning motifs.'],
+                ['key' => 'carbon_orange', 'weight' => 0.55, 'instruction' => 'Carbon black palette with controlled industrial orange highlights and urgent operations tone.'],
+                ['key' => 'graphite_gold', 'weight' => 0.4, 'instruction' => 'Graphite base with brushed gold accents for high-value operator desk scenes.'],
+                ['key' => 'storm_blue', 'weight' => 0.5, 'instruction' => 'Stormy blue-gray palette with cool layered shadows and strategic editorial calm.'],
+                ['key' => 'tech_slate', 'weight' => 0.54, 'instruction' => 'Tech slate palette with balanced cool tones and UI clarity.'],
+                ['key' => 'ink_blue', 'weight' => 0.64, 'instruction' => 'Dark ink blue base with subtle high-contrast highlights and newsroom-tech crossover feel.'],
+                ['key' => 'noir', 'weight' => 0.52, 'instruction' => 'Noir monochrome leaning palette, dramatic lighting, secrecy and backstage tension.'],
+                ['key' => 'industrial', 'weight' => 0.48, 'instruction' => 'Industrial graphite, steel blue and warning accent palette for routing, hosting and recovery topics.'],
+                ['key' => 'teal_orange', 'weight' => 0.5, 'instruction' => 'Balanced teal-orange blockbuster palette for dynamic funnels and active decision scenes.'],
+                ['key' => 'light', 'weight' => 0.28, 'instruction' => 'Light clean palette for whitehat, documentation or compliance-buffer contexts.'],
+                ['key' => 'colordull', 'weight' => 0.49, 'instruction' => 'Muted desaturated palette, restrained color intensity and tactical seriousness.'],
+                ['key' => 'duotone', 'weight' => 0.42, 'instruction' => 'Strong duotone palette with two dominant operational colors and disciplined neutrals.'],
+                ['key' => 'monochrome', 'weight' => 0.44, 'instruction' => 'Monochrome palette with tonal depth and controlled contrast, suited for analytic or postmortem scenes.'],
             ],
             'image_compositions' => [
-                ['key' => 'centered', 'weight' => 1.0, 'label_en' => 'Centered', 'label_ru' => 'Центированная', 'instruction' => 'Centered focal composition with clear subject priority.'],
-                ['key' => 'dynamic_diagonal', 'weight' => 0.9, 'label_en' => 'Dynamic diagonal', 'label_ru' => 'Динамическая', 'instruction' => 'Strong diagonal flow with dynamic motion and tension.'],
-                ['key' => 'broken_reflection', 'weight' => 0.45, 'label_en' => 'Broken reflection', 'label_ru' => 'Ломаное отражение', 'instruction' => 'Fragmented mirrored composition, asymmetry with reflective motifs.'],
-                ['key' => 'golden_ratio', 'weight' => 0.75, 'label_en' => 'Golden ratio', 'label_ru' => 'Золотое сечение', 'instruction' => 'Golden ratio based layout for balanced visual hierarchy.'],
-                ['key' => 'mosaic', 'weight' => 0.55, 'label_en' => 'Mosaic', 'label_ru' => 'Мозаика', 'instruction' => 'Mosaic modular blocks composition with structured segmentation.'],
-                ['key' => 'expressionist', 'weight' => 0.38, 'label_en' => 'Expressionist', 'label_ru' => 'Экспрессия', 'instruction' => 'Expressive composition with dramatic rhythm and emotional contrast.'],
-                ['key' => 'rule_of_thirds', 'weight' => 0.82, 'label_en' => 'Rule of thirds', 'label_ru' => 'Правило третей', 'instruction' => 'Rule-of-thirds placement with off-center focal points.'],
-                ['key' => 'symmetrical', 'weight' => 0.62, 'label_en' => 'Symmetrical', 'label_ru' => 'Симметрия', 'instruction' => 'Symmetrical composition with strong vertical axis and balance.'],
-                ['key' => 'asymmetrical_balance', 'weight' => 0.66, 'label_en' => 'Asymmetrical balance', 'label_ru' => 'Асимметричный баланс', 'instruction' => 'Asymmetrical but balanced layout with weighted visual masses.'],
-                ['key' => 'radial_focus', 'weight' => 0.41, 'label_en' => 'Radial focus', 'label_ru' => 'Радиальный фокус', 'instruction' => 'Radial composition radiating from central core or hotspot.'],
-                ['key' => 'spiral_flow', 'weight' => 0.34, 'label_en' => 'Spiral flow', 'label_ru' => 'Спираль', 'instruction' => 'Spiral flow guiding eye through layered content depth.'],
-                ['key' => 'depth_layers', 'weight' => 0.64, 'label_en' => 'Depth layers', 'label_ru' => 'Глубинные слои', 'instruction' => 'Foreground-midground-background layering for spatial depth.'],
-                ['key' => 'split_screen', 'weight' => 0.4, 'label_en' => 'Split screen', 'label_ru' => 'Разделенный экран', 'instruction' => 'Split-screen composition contrasting two states or scenarios.'],
-                ['key' => 'timeline_sequence', 'weight' => 0.37, 'label_en' => 'Timeline sequence', 'label_ru' => 'Последовательность', 'instruction' => 'Sequential timeline composition with progressive narrative.'],
-                ['key' => 'grid_modular', 'weight' => 0.58, 'label_en' => 'Modular grid', 'label_ru' => 'Модульная сетка', 'instruction' => 'Strict modular grid composition with aligned structural blocks.'],
-                ['key' => 'minimal_negative_space', 'weight' => 0.5, 'label_en' => 'Minimal negative space', 'label_ru' => 'Минимализм', 'instruction' => 'Minimal composition with deliberate negative space dominance.'],
-                ['key' => 'cinematic_wide', 'weight' => 0.48, 'label_en' => 'Cinematic wide', 'label_ru' => 'Кинематографичный wide', 'instruction' => 'Cinematic wide framing with panoramic storytelling emphasis.'],
-                ['key' => 'isometric', 'weight' => 0.35, 'label_en' => 'Isometric', 'label_ru' => 'Изометрия', 'instruction' => 'Isometric composition with technical 3D-like perspective.'],
-                ['key' => 'collage_data', 'weight' => 0.33, 'label_en' => 'Data collage', 'label_ru' => 'Коллаж данных', 'instruction' => 'Data-collage composition blending charts, signals and abstract forms.'],
-                ['key' => 'vortex_tension', 'weight' => 0.29, 'label_en' => 'Vortex tension', 'label_ru' => 'Вихрь', 'instruction' => 'Vortex-like composition creating directional pull and tension.'],
+                ['key' => 'centered', 'weight' => 0.66, 'label_en' => 'Centered', 'label_ru' => 'Центрированная', 'instruction' => 'Centered focal composition with clear subject priority.'],
+                ['key' => 'deep_perspective_pull', 'weight' => 0.88, 'label_en' => 'Deep perspective pull', 'label_ru' => 'Глубокая перспектива', 'instruction' => 'Strong perspective vanishing point pulling the viewer into a console-like operating space.'],
+                ['key' => 'visual_corridor', 'weight' => 0.84, 'label_en' => 'Visual corridor', 'label_ru' => 'Коридор взгляда', 'instruction' => 'Corridor-like depth guiding attention through funnels, routing or layered workstations.'],
+                ['key' => 'dynamic_diagonal', 'weight' => 0.78, 'label_en' => 'Dynamic diagonal', 'label_ru' => 'Динамическая', 'instruction' => 'Strong diagonal flow with motion and tactical urgency.'],
+                ['key' => 'grid_modular', 'weight' => 0.74, 'label_en' => 'Modular grid', 'label_ru' => 'Модульная сетка', 'instruction' => 'Strict modular grid composition with aligned structural blocks and dashboard logic.'],
+                ['key' => 'split_screen', 'weight' => 0.58, 'label_en' => 'Split screen', 'label_ru' => 'Разделенный экран', 'instruction' => 'Split-screen contrast between before and after, approved and banned, signal and blind zone.'],
+                ['key' => 'collage_data', 'weight' => 0.55, 'label_en' => 'Data collage', 'label_ru' => 'Коллаж данных', 'instruction' => 'Layered data collage mixing charts, cards, routing maps and operator notes.'],
+                ['key' => 'overhead_desk', 'weight' => 0.49, 'label_en' => 'Overhead desk', 'label_ru' => 'Вид на стол сверху', 'instruction' => 'Top-down desk layout showing bundle cards, metrics sheets, devices and tactical artifacts.'],
+                ['key' => 'clustered_mass', 'weight' => 0.58, 'label_en' => 'Clustered mass', 'label_ru' => 'Кластерная масса', 'instruction' => 'Dense grouping of tools and actors forming a single weighted operational focus.'],
+                ['key' => 'mosaic', 'weight' => 0.5, 'label_en' => 'Mosaic', 'label_ru' => 'Мозаика', 'instruction' => 'Mosaic modular blocks composition with structured segmentation and parallel workflows.'],
+                ['key' => 'rule_of_thirds', 'weight' => 0.6, 'label_en' => 'Rule of thirds', 'label_ru' => 'Правило третей', 'instruction' => 'Rule-of-thirds placement with off-center focal points and editorial balance.'],
+                ['key' => 'asymmetrical_balance', 'weight' => 0.57, 'label_en' => 'Asymmetrical balance', 'label_ru' => 'Асимметричный баланс', 'instruction' => 'Asymmetrical but balanced layout with weighted consoles, screens or human actors.'],
+                ['key' => 'timeline_sequence', 'weight' => 0.46, 'label_en' => 'Timeline sequence', 'label_ru' => 'Последовательность', 'instruction' => 'Sequential timeline composition for postmortems, rollout steps and troubleshooting chains.'],
+                ['key' => 'radial_focus', 'weight' => 0.36, 'label_en' => 'Radial focus', 'label_ru' => 'Радиальный фокус', 'instruction' => 'Radial composition around a central alert, decision engine or key asset.'],
+                ['key' => 'cinematic_wide', 'weight' => 0.52, 'label_en' => 'Cinematic wide', 'label_ru' => 'Кинематографичный wide', 'instruction' => 'Wide cinematic framing for rooms, teams and city-like source ecosystems.'],
+                ['key' => 'isometric', 'weight' => 0.38, 'label_en' => 'Isometric', 'label_ru' => 'Изометрия', 'instruction' => 'Isometric systems view of trackers, routing and operations infrastructure.'],
+                ['key' => 'minimal_negative_space', 'weight' => 0.4, 'label_en' => 'Minimal negative space', 'label_ru' => 'Минимализм', 'instruction' => 'Intentional negative space around one strong operator symbol or dashboard fragment.'],
+                ['key' => 'broken_reflection', 'weight' => 0.34, 'label_en' => 'Broken reflection', 'label_ru' => 'Ломаное отражение', 'instruction' => 'Fragmented mirrored composition for ambiguity, moderation risk and split outcomes.'],
             ],
             'image_scene_families' => [
-                ['key' => 'characters', 'weight' => 1.0, 'label_en' => 'Characters', 'label_ru' => 'Персонажи', 'instruction' => 'Human-centered scene with business actors and clear decision context.'],
-                ['key' => 'infrastructure_tech', 'weight' => 0.9, 'label_en' => 'Infrastructure & Tech', 'label_ru' => 'Инфраструктура и техника', 'instruction' => 'Systems, APIs, networks and service components as primary subject.'],
-                ['key' => 'nature_metaphor', 'weight' => 0.45, 'label_en' => 'Nature metaphor', 'label_ru' => 'Природная метафора', 'instruction' => 'Natural metaphor adapted to risk flow and system behavior.'],
-                ['key' => 'abstract_signal', 'weight' => 0.55, 'label_en' => 'Abstract signal', 'label_ru' => 'Абстрактный сигнал', 'instruction' => 'Signal-driven abstract composition with strong semantic anchors.'],
-                ['key' => 'hybrid_mix', 'weight' => 0.7, 'label_en' => 'Hybrid mix', 'label_ru' => 'Гибридный микс', 'instruction' => 'Balanced mix of people, systems and signal motifs.'],
+                ['key' => 'operators', 'weight' => 1.0, 'label_en' => 'Operators', 'label_ru' => 'Операторы', 'instruction' => 'Human-centered affiliate operators, buyers, farmers or analysts making concrete decisions.'],
+                ['key' => 'control_rooms', 'weight' => 0.94, 'label_en' => 'Control rooms', 'label_ru' => 'Операционные комнаты', 'instruction' => 'Rooms of screens, dashboards, tactical maps and coordinated activity.'],
+                ['key' => 'devices_farm', 'weight' => 0.88, 'label_en' => 'Devices and farm', 'label_ru' => 'Устройства и фарм', 'instruction' => 'Phones, workstations, browser profiles and trust-management setups as the main subject.'],
+                ['key' => 'trackers_dashboards', 'weight' => 0.9, 'label_en' => 'Trackers and dashboards', 'label_ru' => 'Трекеры и дашборды', 'instruction' => 'Tracker interfaces, attribution signals, path maps and event logic.'],
+                ['key' => 'creative_studio', 'weight' => 0.86, 'label_en' => 'Creative studio', 'label_ru' => 'Креативная студия', 'instruction' => 'Hooks, concepts, thumbnails, scripts and testing boards in production context.'],
+                ['key' => 'routing_infrastructure', 'weight' => 0.84, 'label_en' => 'Routing infrastructure', 'label_ru' => 'Инфраструктура маршрутизации', 'instruction' => 'Domains, hosting, redirects, path logic and resilient delivery systems.'],
+                ['key' => 'editorial_backstage', 'weight' => 0.74, 'label_en' => 'Editorial backstage', 'label_ru' => 'Редакционное закулисье', 'instruction' => 'Magazine-meets-operations environment with notes, metrics and scene-setting atmosphere.'],
+                ['key' => 'abstract_signal', 'weight' => 0.46, 'label_en' => 'Abstract signal', 'label_ru' => 'Абстрактный сигнал', 'instruction' => 'Signal-driven abstract composition anchored to tracking, moderation or traffic movement.'],
+                ['key' => 'hybrid_mix', 'weight' => 0.68, 'label_en' => 'Hybrid mix', 'label_ru' => 'Гибридный микс', 'instruction' => 'Balanced mix of people, systems, devices and signal motifs.'],
             ],
-            'preview_image_prompt_template' => 'Create a {{image_style}} editorial hero image for article "{{title}}" in {{lang}}. Theme: CPA backstage, media buying operations, trackers, creatives, sources, affiliate workflows, dark neon city-console mood. No text, no logos, 16:9.',
+            'image_scenarios' => [
+                ['key' => 'traffic_control_room', 'weight' => 1.0, 'label_en' => 'Traffic control room', 'label_ru' => 'Комната управления трафиком', 'instruction' => 'Affiliate operators review traffic, creatives and attribution on multiple screens.'],
+                ['key' => 'creative_war_room', 'weight' => 0.92, 'label_en' => 'Creative war room', 'label_ru' => 'Креативная war room', 'instruction' => 'Walls of hooks, thumbnails, scripts and testing boards in a backstage studio.'],
+                ['key' => 'tracker_signal_grid', 'weight' => 0.9, 'label_en' => 'Tracker signal grid', 'label_ru' => 'Сетка сигналов трекера', 'instruction' => 'Routing nodes, postbacks, event paths and analytics overlays in a dark console style.'],
+                ['key' => 'farm_desk_cluster', 'weight' => 0.82, 'label_en' => 'Farm desk cluster', 'label_ru' => 'Фарм-зона', 'instruction' => 'Rows of controlled devices, profiles, trust dashboards and operator checklists.'],
+                ['key' => 'source_map_console', 'weight' => 0.78, 'label_en' => 'Source map console', 'label_ru' => 'Консоль карты источников', 'instruction' => 'Source routes, cost zones, payout markers and performance overlays.'],
+                ['key' => 'moderation_checkpoint', 'weight' => 0.74, 'label_en' => 'Moderation checkpoint', 'label_ru' => 'Точка модерации', 'instruction' => 'A stylized checkpoint filtering creatives, accounts and landing flows.'],
+                ['key' => 'landing_recovery_scene', 'weight' => 0.7, 'label_en' => 'Landing recovery', 'label_ru' => 'Восстановление лендингов', 'instruction' => 'Rapid rebuild of landing assets, domains and routing in a crisis setup.'],
+                ['key' => 'bundle_card_table', 'weight' => 0.66, 'label_en' => 'Bundle table', 'label_ru' => 'Стол со связками', 'instruction' => 'Cards, metrics, notes and source maps arranged like a tactical operations board.'],
+                ['key' => 'night_shift_team', 'weight' => 0.62, 'label_en' => 'Night shift team', 'label_ru' => 'Ночная смена', 'instruction' => 'A small affiliate team works through the night in a focused control-room environment.'],
+                ['key' => 'postback_debug_lab', 'weight' => 0.76, 'label_en' => 'Postback debug lab', 'label_ru' => 'Лаборатория postback-отладки', 'instruction' => 'Macros, click IDs, logs and broken event chains investigated at close range.'],
+                ['key' => 'bm_recovery_desk', 'weight' => 0.72, 'label_en' => 'BM recovery desk', 'label_ru' => 'Стол восстановления BM', 'instruction' => 'Trust recovery work around business managers, accounts, identity signals and careful sequence planning.'],
+                ['key' => 'anti_detect_workspace', 'weight' => 0.74, 'label_en' => 'Anti-detect workspace', 'label_ru' => 'Anti-detect workspace', 'instruction' => 'Browser profile operations, compartmentalized devices and operator discipline in one workspace.'],
+                ['key' => 'creative_batch_factory', 'weight' => 0.78, 'label_en' => 'Creative batch factory', 'label_ru' => 'Фабрика креативных батчей', 'instruction' => 'A rapid production line of concepts, edits, ratings and batch test preparation.'],
+                ['key' => 'telegram_distribution_hub', 'weight' => 0.68, 'label_en' => 'Telegram distribution hub', 'label_ru' => 'Telegram distribution hub', 'instruction' => 'Channels, mini apps, bots and retention loops visualized as an owned-media nerve center.'],
+                ['key' => 'offer_screening_board', 'weight' => 0.66, 'label_en' => 'Offer screening board', 'label_ru' => 'Доска скрининга офферов', 'instruction' => 'Offers, geos, margins, approval rates and source compatibility compared on a decision board.'],
+                ['key' => 'routing_tunnel_network', 'weight' => 0.7, 'label_en' => 'Routing tunnel network', 'label_ru' => 'Сеть туннелей маршрутизации', 'instruction' => 'Domains, redirects and hosting failover shown as layered delivery tunnels with decision branches.'],
+                ['key' => 'editorial_backroom', 'weight' => 0.6, 'label_en' => 'Editorial backroom', 'label_ru' => 'Редакционный backroom', 'instruction' => 'A magazine desk mixed with operator dashboards, notes and affiliate market maps.'],
+                ['key' => 'neon_city_funnels', 'weight' => 0.64, 'label_en' => 'Neon city funnels', 'label_ru' => 'Неоновый город и воронки', 'instruction' => 'A dark futuristic city where routes, towers and traffic streams behave like live funnels.'],
+            ],
+            'preview_image_prompt_template' => 'Create a high-quality {{image_style}} hero image for article "{{title}}" ({{lang}}). Use context: {{excerpt}}. Additional context: {{context}}. Visual theme: CPA affiliate backstage, media buying operations, tracker dashboards, creative batch testing, farm devices, moderation checkpoints, routing infrastructure, Telegram distribution loops, dark neon console mood, layered perspective, no text, no logos.',
             'campaigns' => seo_gen_default_campaigns(),
         ];
     }
@@ -788,6 +814,56 @@ if (!function_exists('seo_gen_settings_normalize')) {
             }
         }
         $settings['image_scene_families'] = $sceneFamilies;
+
+        $imageScenarios = [];
+        foreach ((array)($settings['image_scenarios'] ?? []) as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $key = strtolower(trim((string)($row['key'] ?? '')));
+            if ($key === '' || !preg_match('/^[a-z0-9_\\-]{2,64}$/', $key)) {
+                continue;
+            }
+            $imageScenarios[] = [
+                'key' => $key,
+                'weight' => max(0.01, min(5.0, (float)($row['weight'] ?? 1.0))),
+                'label_en' => trim((string)($row['label_en'] ?? $key)),
+                'label_ru' => trim((string)($row['label_ru'] ?? $key)),
+                'instruction' => trim((string)($row['instruction'] ?? $key)),
+            ];
+            if (count($imageScenarios) >= 120) {
+                break;
+            }
+        }
+        if (empty($imageScenarios)) {
+            $imageScenarios = (array)($defaults['image_scenarios'] ?? []);
+        } else {
+            $existingScenarioKeys = [];
+            foreach ($imageScenarios as $row) {
+                $existingScenarioKeys[$row['key']] = true;
+            }
+            foreach ((array)($defaults['image_scenarios'] ?? []) as $defRow) {
+                if (!is_array($defRow)) {
+                    continue;
+                }
+                $defKey = strtolower(trim((string)($defRow['key'] ?? '')));
+                if ($defKey === '' || isset($existingScenarioKeys[$defKey])) {
+                    continue;
+                }
+                $imageScenarios[] = [
+                    'key' => $defKey,
+                    'weight' => max(0.01, min(5.0, (float)($defRow['weight'] ?? 1.0))),
+                    'label_en' => trim((string)($defRow['label_en'] ?? $defKey)),
+                    'label_ru' => trim((string)($defRow['label_ru'] ?? $defKey)),
+                    'instruction' => trim((string)($defRow['instruction'] ?? $defKey)),
+                ];
+                $existingScenarioKeys[$defKey] = true;
+                if (count($imageScenarios) >= 120) {
+                    break;
+                }
+            }
+        }
+        $settings['image_scenarios'] = $imageScenarios;
 
         $moods = [];
         foreach ((array)($settings['moods'] ?? []) as $row) {

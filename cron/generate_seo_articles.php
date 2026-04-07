@@ -5577,7 +5577,11 @@ function seo_publish_article(
             $excerptHtml = (string)$expanded['excerpt_html'];
             $words = seo_word_count($contentHtml);
         } catch (Throwable $e) {
-            if ($expandAttempt >= $expandRetries) {
+            if ($e->getMessage() === 'Expand append overlaps existing content') {
+                seo_echo('Expand overlap detected for slug candidate "' . $slug . '", switch to local fallback.');
+                break;
+            }
+            if ($expandAttempt >= $maxExpandAttempts) {
                 throw $e;
             }
         }

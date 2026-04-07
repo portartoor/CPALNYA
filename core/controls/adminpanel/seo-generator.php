@@ -361,6 +361,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         $incoming['image_color_schemes'] = admin_seo_gen_parse_color_schemes(admin_seo_gen_post_string('image_color_schemes'));
         $incoming['image_compositions'] = admin_seo_gen_parse_image_compositions(admin_seo_gen_post_string('image_compositions'));
         $incoming['image_scene_families'] = admin_seo_gen_parse_image_scene_families(admin_seo_gen_post_string('image_scene_families'));
+        $incoming['image_scenarios'] = admin_seo_gen_parse_image_scene_families(admin_seo_gen_post_string('image_scenarios'));
         $incoming['preview_image_prompt_template'] = admin_seo_gen_post_string('preview_image_prompt_template');
 
         $campaignDefaults = function_exists('seo_gen_default_campaigns') ? seo_gen_default_campaigns() : [];

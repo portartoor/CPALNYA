@@ -628,7 +628,9 @@
     "cinematic",
     "editorial",
     "dark_ui",
-    "backstage"
+    "backstage",
+    "surveillance",
+    "ops_console"
   ],
   "image_color_schemes": [
     {
@@ -976,7 +978,72 @@
       "instruction": "Asymmetrical but balanced layout with weighted visual masses."
     }
   ],
-  "preview_image_prompt_template": "Create a high-quality {{image_style}} hero image for article \"{{title}}\" ({{lang}}). Use context: {{excerpt}}. Additional context: {{context}}. Visual theme: CPA backstage, media buying operations, creative testing rooms, tracker dashboards, dark neon city-console mood, layered perspective, no text, no logos.",
+  "image_scene_families": [
+    {
+      "key": "operators",
+      "weight": 1,
+      "label_en": "Operators",
+      "label_ru": "Операторы",
+      "instruction": "Human-centered affiliate operators, buyers, farmers or analysts making concrete decisions."
+    },
+    {
+      "key": "control_rooms",
+      "weight": 0.94,
+      "label_en": "Control rooms",
+      "label_ru": "Операционные комнаты",
+      "instruction": "Rooms of screens, dashboards, tactical maps and coordinated activity."
+    },
+    {
+      "key": "devices_farm",
+      "weight": 0.88,
+      "label_en": "Devices and farm",
+      "label_ru": "Устройства и фарм",
+      "instruction": "Phones, workstations, browser profiles and trust-management setups as the main subject."
+    },
+    {
+      "key": "trackers_dashboards",
+      "weight": 0.9,
+      "label_en": "Trackers and dashboards",
+      "label_ru": "Трекеры и дашборды",
+      "instruction": "Tracker interfaces, attribution signals, path maps and event logic."
+    },
+    {
+      "key": "creative_studio",
+      "weight": 0.86,
+      "label_en": "Creative studio",
+      "label_ru": "Креативная студия",
+      "instruction": "Hooks, concepts, thumbnails, scripts and testing boards in production context."
+    },
+    {
+      "key": "routing_infrastructure",
+      "weight": 0.84,
+      "label_en": "Routing infrastructure",
+      "label_ru": "Инфраструктура маршрутизации",
+      "instruction": "Domains, hosting, redirects, path logic and resilient delivery systems."
+    },
+    {
+      "key": "editorial_backstage",
+      "weight": 0.74,
+      "label_en": "Editorial backstage",
+      "label_ru": "Редакционное закулисье",
+      "instruction": "Magazine-meets-operations environment with notes, metrics and scene-setting atmosphere."
+    },
+    {
+      "key": "abstract_signal",
+      "weight": 0.46,
+      "label_en": "Abstract signal",
+      "label_ru": "Абстрактный сигнал",
+      "instruction": "Signal-driven abstract composition anchored to tracking, moderation or traffic movement."
+    },
+    {
+      "key": "hybrid_mix",
+      "weight": 0.68,
+      "label_en": "Hybrid mix",
+      "label_ru": "Гибридный микс",
+      "instruction": "Balanced mix of people, systems, devices and signal motifs."
+    }
+  ],
+  "preview_image_prompt_template": "Create a high-quality {{image_style}} hero image for article \"{{title}}\" ({{lang}}). Use context: {{excerpt}}. Additional context: {{context}}. Visual theme: CPA affiliate backstage, media buying operations, tracker dashboards, creative batch testing, farm devices, moderation checkpoints, routing infrastructure, Telegram distribution loops, dark neon console mood, layered perspective, no text, no logos.",
   "image_scenarios": [
     {
       "key": "traffic_control_room",
@@ -1061,6 +1128,55 @@
       "label_en": "Signal corridor",
       "label_ru": "Коридор сигналов",
       "instruction": "A perspective corridor of signals, trackers and decision nodes moving into the distance."
+    },
+    {
+      "key": "postback_debug_lab",
+      "weight": 0.76,
+      "label_en": "Postback debug lab",
+      "label_ru": "Лаборатория postback-отладки",
+      "instruction": "Macros, click IDs, logs and broken event chains investigated at close range."
+    },
+    {
+      "key": "bm_recovery_desk",
+      "weight": 0.72,
+      "label_en": "BM recovery desk",
+      "label_ru": "Стол восстановления BM",
+      "instruction": "Trust recovery work around business managers, accounts, identity signals and careful sequence planning."
+    },
+    {
+      "key": "anti_detect_workspace",
+      "weight": 0.74,
+      "label_en": "Anti-detect workspace",
+      "label_ru": "Anti-detect workspace",
+      "instruction": "Browser profile operations, compartmentalized devices and operator discipline in one workspace."
+    },
+    {
+      "key": "creative_batch_factory",
+      "weight": 0.78,
+      "label_en": "Creative batch factory",
+      "label_ru": "Фабрика креативных батчей",
+      "instruction": "A rapid production line of concepts, edits, ratings and batch test preparation."
+    },
+    {
+      "key": "telegram_distribution_hub",
+      "weight": 0.68,
+      "label_en": "Telegram distribution hub",
+      "label_ru": "Telegram distribution hub",
+      "instruction": "Channels, mini apps, bots and retention loops visualized as an owned-media nerve center."
+    },
+    {
+      "key": "offer_screening_board",
+      "weight": 0.66,
+      "label_en": "Offer screening board",
+      "label_ru": "Доска скрининга офферов",
+      "instruction": "Offers, geos, margins, approval rates and source compatibility compared on a decision board."
+    },
+    {
+      "key": "routing_tunnel_network",
+      "weight": 0.7,
+      "label_en": "Routing tunnel network",
+      "label_ru": "Сеть туннелей маршрутизации",
+      "instruction": "Domains, redirects and hosting failover shown as layered delivery tunnels with decision branches."
     }
   ],
   "updated_at": "2026-04-07 00:00:00",

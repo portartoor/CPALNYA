@@ -28,6 +28,14 @@
             . ' | ' . (string)($row['label_ru'] ?? '')
             . ' | ' . (string)($row['instruction'] ?? '');
     }
+    $scenarioLines = [];
+    foreach ((array)($s['image_scenarios'] ?? []) as $row) {
+        $scenarioLines[] = (string)($row['key'] ?? '')
+            . ' | ' . (string)($row['weight'] ?? '1')
+            . ' | ' . (string)($row['label_en'] ?? '')
+            . ' | ' . (string)($row['label_ru'] ?? '')
+            . ' | ' . (string)($row['instruction'] ?? '');
+    }
     $provider = strtolower((string)($s['llm_provider'] ?? 'openai'));
     $pt = strtolower((string)($s['openai_proxy_type'] ?? 'http'));
     $campaigns = function_exists('seo_gen_normalize_campaigns')
@@ -255,6 +263,7 @@
                                         <div class="col-md-4"><label class="form-label">Image Styles</label><textarea class="form-control" rows="2" name="preview_image_style_options"><?= htmlspecialchars(implode("\n", (array)($s['preview_image_style_options'] ?? []))) ?></textarea></div>
                                         <div class="col-md-12"><label class="form-label">Image Color Schemes (key | weight | instruction)</label><textarea class="form-control font-monospace" rows="6" name="image_color_schemes"><?= htmlspecialchars(implode("\n", $colorSchemeLines)) ?></textarea></div>
                                         <div class="col-md-12"><label class="form-label">Image Scene Families (key | weight | label_en | label_ru | instruction)</label><textarea class="form-control font-monospace" rows="7" name="image_scene_families"><?= htmlspecialchars(implode("\n", $sceneFamilyLines)) ?></textarea><div class="wiz-help">Primary semantic family before scenario/composition: characters, infrastructure, nature metaphor, abstract signal, hybrid mix.</div></div>
+                                        <div class="col-md-12"><label class="form-label">Image Scenarios (key | weight | label_en | label_ru | instruction)</label><textarea class="form-control font-monospace" rows="9" name="image_scenarios"><?= htmlspecialchars(implode("\n", $scenarioLines)) ?></textarea><div class="wiz-help">Concrete CPA scenes: farm desks, postback debugging, moderation checkpoints, Telegram distribution hubs, source maps and operator workrooms.</div></div>
                                         <div class="col-md-12"><label class="form-label">Image Compositions (key | weight | label_en | label_ru | instruction)</label><textarea class="form-control font-monospace" rows="8" name="image_compositions"><?= htmlspecialchars(implode("\n", $compositionLines)) ?></textarea><div class="wiz-help">Controls scene layout logic: centered, dynamic diagonal, golden ratio, mosaic, etc.</div></div>
                                         <div class="col-12"><label class="form-label">Image Prompt Template</label><textarea class="form-control" rows="4" name="preview_image_prompt_template"><?= htmlspecialchars((string)($s['preview_image_prompt_template'] ?? '')) ?></textarea></div>
                                         <div class="col-12"><label class="form-label">Image Anchor Prompt Append</label><textarea class="form-control" rows="2" name="preview_image_anchor_append"><?= htmlspecialchars((string)($s['preview_image_anchor_append'] ?? '')) ?></textarea><div class="wiz-help">Optional extra guardrail for anchor-driven image prompts.</div></div>
