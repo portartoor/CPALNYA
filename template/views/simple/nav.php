@@ -49,6 +49,17 @@ $buildClusterPath = static function (string $section, string $code) use ($host, 
     return $sectionBasePaths[$section] ?? '/';
 };
 
+$normalizeTopicTitle = static function (string $value): string {
+    $value = trim((string)preg_replace('/\s+/u', ' ', $value));
+    if ($value === '') {
+        return '';
+    }
+    if (function_exists('mb_strtolower')) {
+        return mb_strtolower($value, 'UTF-8');
+    }
+    return strtolower($value);
+};
+
 $fetchSectionTopics = static function (string $section, int $limit = 2) use ($FRMWRK, $host, $lang, $pickIcon, $buildClusterPath): array {
     $items = [];
     if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters')) {
@@ -69,16 +80,38 @@ $fetchSectionTopics = static function (string $section, int $limit = 2) use ($FR
 
 $importantTopics = [];
 if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters_global')) {
+    $importantTopicCounts = [];
+    $importantTopicRaw = [];
     foreach ((array)examples_popularity_fetch_top_clusters_global($FRMWRK, $host, $lang, 3) as $row) {
         $section = trim((string)($row['section'] ?? 'journal'));
         $code = trim((string)($row['code'] ?? ''));
         if ($code === '' || !isset($sectionBasePaths[$section])) {
             continue;
         }
-        $importantTopics[] = [
-            'title' => (string)($row['label'] ?? $code),
+        $title = trim((string)($row['label'] ?? $code));
+        $normalizedTitle = $normalizeTopicTitle($title);
+        $normalizedParent = $normalizeTopicTitle((string)($sectionTitles[$section] ?? ''));
+        if ($normalizedTitle === '' || $normalizedTitle === $normalizedParent) {
+            continue;
+        }
+        $importantTopicCounts[$normalizedTitle] = (int)($importantTopicCounts[$normalizedTitle] ?? 0) + 1;
+        $importantTopicRaw[] = [
+            'section' => $section,
+            'title' => $title,
+            'normalized_title' => $normalizedTitle,
             'path' => $buildClusterPath($section, $code),
             'icon' => $pickIcon($code),
+        ];
+    }
+    foreach ($importantTopicRaw as $item) {
+        $title = $item['title'];
+        if ((int)($importantTopicCounts[$item['normalized_title']] ?? 0) > 1) {
+            $title .= ' (// ' . (string)($sectionTitles[$item['section']] ?? $item['section']) . ')';
+        }
+        $importantTopics[] = [
+            'title' => $title,
+            'path' => $item['path'],
+            'icon' => $item['icon'],
         ];
     }
 }
