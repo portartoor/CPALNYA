@@ -167,7 +167,7 @@ if ($issueImage === '') {
     $issueImage = trim((string)($issue['hero_image_data'] ?? ''));
 }
 if ($issueImage === '') {
-    $issueImage = '/april2026_new.png';
+    $issueImage = '/april2026_new2.png';
 }
 $buildPageUrl = static function (?string $cluster = '', int $pageNum = 1): string {
     $base = function_exists('examples_cluster_list_path')

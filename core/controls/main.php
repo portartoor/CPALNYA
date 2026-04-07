@@ -62,7 +62,7 @@ if ($issueImage === '') {
     $issueImage = trim((string)($issue['hero_image_data'] ?? ''));
 }
 if ($issueImage === '') {
-    $issueImage = '/april2026_new.png';
+    $issueImage = '/april2026_new2.png';
 }
 
 $ModelPage['home_portal'] = [

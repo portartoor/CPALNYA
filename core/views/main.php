@@ -3,7 +3,7 @@ $home = (array)($ModelPage['home_portal'] ?? []);
 $lang = (string)($home['lang'] ?? 'en');
 $isRu = ($lang === 'ru');
 $issue = (array)($home['issue'] ?? []);
-$issueImage = trim((string)($home['issue_image'] ?? '/april2026_new.png'));
+$issueImage = trim((string)($home['issue_image'] ?? '/april2026_new2.png'));
 $heroFeature = is_array($home['hero_feature'] ?? null) ? $home['hero_feature'] : null;
 $journalItems = array_values((array)($home['journal_items'] ?? []));
 $playbookItems = array_values((array)($home['playbook_items'] ?? []));
@@ -62,10 +62,10 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
 .home-z-cover img{display:block;width:100%;height:auto}
 .home-z-actions{display:flex;gap:10px;flex-wrap:wrap}
 .home-z-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 13px;border:1px solid rgba(122,180,255,.18);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));color:var(--shell-text);text-decoration:none;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
-.home-z-feature{display:grid;grid-template-columns:132px minmax(0,1fr);gap:14px;padding:14px 16px;border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(122,180,255,.05))}
-.home-z-feature-media{width:132px;height:96px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));overflow:hidden}
+.home-z-feature{display:grid;grid-template-columns:180px minmax(0,1fr);gap:14px;padding:14px 16px;border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(122,180,255,.05));align-items:stretch}
+.home-z-feature-media{width:180px;height:100%;min-height:100%;align-self:stretch;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));overflow:hidden}
 .home-z-feature-media img{display:block;width:100%;height:100%;object-fit:cover}
-.home-z-feature-copy{display:grid;gap:10px;min-width:0}
+.home-z-feature-copy{display:grid;gap:10px;min-width:0;align-content:start}
 .home-z-feature-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
 .home-z-feature h3{margin:0;font:700 1.1rem/1.14 "Space Grotesk","Sora",sans-serif}
 .home-z-feature a{color:inherit;text-decoration:none}
@@ -75,10 +75,10 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
 .home-z-block-title{display:grid;gap:10px;align-content:start}
 .home-z-block-link{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-text);text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 .home-z-list{display:grid;gap:14px;padding-left:0}
-.home-z-card{display:grid;grid-template-columns:112px minmax(0,1fr);gap:14px;align-items:start;padding:0;border:0;background:transparent;text-decoration:none;color:inherit}
-.home-z-card-media{width:112px;height:74px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));overflow:hidden}
+.home-z-card{display:grid;grid-template-columns:148px minmax(0,1fr);gap:14px;align-items:stretch;padding:0;border:0;background:transparent;text-decoration:none;color:inherit}
+.home-z-card-media{width:148px;height:100%;min-height:100%;align-self:stretch;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));overflow:hidden}
 .home-z-card-media img{display:block;width:100%;height:100%;object-fit:cover}
-.home-z-card-copy{display:grid;gap:8px;min-width:0}
+.home-z-card-copy{display:grid;gap:8px;min-width:0;align-content:start}
 .home-z-card-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
 .home-z-card h3{margin:0;font:700 1.06rem/1.16 "Space Grotesk","Sora",sans-serif}
 .home-z-stat{display:inline-flex;align-items:center;gap:7px;color:var(--shell-muted);font-size:12px;text-transform:uppercase;letter-spacing:.12em}
@@ -88,9 +88,9 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
     .home-z{padding:18px 14px 52px}
     .home-z-block-head{grid-template-columns:1fr}
     .home-z-feature{grid-template-columns:1fr}
-    .home-z-feature-media{width:100%;height:180px}
+    .home-z-feature-media{width:100%;height:180px;min-height:180px}
     .home-z-card{grid-template-columns:1fr}
-    .home-z-card-media{width:100%;height:180px}
+    .home-z-card-media{width:100%;height:180px;min-height:180px}
 }
 </style>
 
