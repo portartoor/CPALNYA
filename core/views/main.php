@@ -106,18 +106,18 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
     <div class="home-z-shell">
         <header class="home-z-hero">
             <div class="home-z-copy">
-                <span class="home-z-kicker"><?= htmlspecialchars((string)($issue['issue_kicker'] ?? $t('APRIL ISSUE / Р¦РџРђР›Р¬РќРЇ', 'APRIL ISSUE / Р¦РџРђР›Р¬РќРЇ')), ENT_QUOTES, 'UTF-8') ?></span>
-                <h1><?= htmlspecialchars((string)($issue['issue_title'] ?? $t("РђРїСЂРµР»СЊ '26", "April '26")), ENT_QUOTES, 'UTF-8') ?></h1>
+                <span class="home-z-kicker"><?= htmlspecialchars((string)($issue['issue_kicker'] ?? $t('APRIL ISSUE / ЦПАЛЬНЯ', 'APRIL ISSUE / ЦПАЛЬНЯ')), ENT_QUOTES, 'UTF-8') ?></span>
+                <h1><?= htmlspecialchars((string)($issue['issue_title'] ?? $t("Апрель '26", "April '26")), ENT_QUOTES, 'UTF-8') ?></h1>
                 <div class="home-z-hero-lead">
-                    <p><?= htmlspecialchars($t('Р–СѓСЂРЅР°Р» РїСЂРѕ Р°СЂР±РёС‚СЂР°Р¶ С‚СЂР°С„РёРєР° РєР°Рє РїСЂРѕ Р¶РёРІСѓСЋ СЂРµРґР°РєС†РёРѕРЅРЅСѓСЋ СЃСЂРµРґСѓ: Р·РґРµСЃСЊ РІР°Р¶РЅС‹ РЅРµ РІРёС‚СЂРёРЅРЅС‹Рµ РѕР±РµС‰Р°РЅРёСЏ, Р° РІРЅСѓС‚СЂРµРЅРЅРёР№ СЂРёС‚Рј affiliate-РєРѕРјР°РЅРґ, РіРґРµ РёСЃС‚РѕС‡РЅРёРєРё РґСЂРµР№С„СѓСЋС‚, СЃРІСЏР·РєРё РїРµСЂРµСЃРѕР±РёСЂР°СЋС‚СЃСЏ, РєСЂРµР°С‚РёРІС‹ СЃС‚Р°СЂРµСЋС‚ Р±С‹СЃС‚СЂРµРµ РєР°Р»РµРЅРґР°СЂСЏ, Р° СЂРµС€РµРЅРёСЏ РїСЂРёРЅРёРјР°СЋС‚СЃСЏ РїРѕРґ РґР°РІР»РµРЅРёРµРј СЂРµР°Р»СЊРЅРѕРіРѕ СЂС‹РЅРєР°.', 'A journal about traffic arbitrage as a living editorial environment: not showcase promises, but the internal rhythm of affiliate teams, where sources drift, bundles get rebuilt, creatives age faster than the calendar, and decisions are made under real market pressure.'), ENT_QUOTES, 'UTF-8') ?></p>
-                    <p><?= htmlspecialchars($t('Р¦РџРђР›Р¬РќРЇ СЃРѕР±РёСЂР°РµС‚ СЌС‚Рѕ РЅРµ РєР°Рє Р»РµРЅС‚Сѓ, Р° РєР°Рє РЅРѕРјРµСЂ. Р РµРґР°РєС†РёРѕРЅРЅС‹Рµ СЂР°Р·Р±РѕСЂС‹, market notes, backstage-РЅР°Р±Р»СЋРґРµРЅРёСЏ Рё РїСЂР°РєС‚РёС‡РµСЃРєРёРµ РјР°С‚РµСЂРёР°Р»С‹ СЂР°Р±РѕС‚Р°СЋС‚ Р·РґРµСЃСЊ РІРјРµСЃС‚Рµ, С‡С‚РѕР±С‹ РїРѕРєР°Р·С‹РІР°С‚СЊ РјРµС…Р°РЅРёРєСѓ affiliate-РѕРїРµСЂР°С†РёР№ РёР·РЅСѓС‚СЂРё, Р° РЅРµ РїРµСЂРµСЃРєР°Р·С‹РІР°С‚СЊ С€СѓРј РѕС‚СЂР°СЃР»Рё СЃРЅР°СЂСѓР¶Рё.', 'Р¦РџРђР›Р¬РќРЇ assembles this not as a feed, but as an issue. Editorial breakdowns, market notes, backstage observations, and practical materials work together here to show affiliate operations from the inside rather than echoing industry noise from the outside.'), ENT_QUOTES, 'UTF-8') ?></p>
-                    <p><?= htmlspecialchars((string)($issue['issue_subtitle'] ?? $t('Р›РёС†Рѕ РІС‹РїСѓСЃРєР°: С‚СЂРµРєРёРЅРі, РёСЃС‚РѕС‡РЅРёРєРё, СЃСЂРѕРє Р¶РёР·РЅРё РєСЂРµР°С‚РёРІРѕРІ, РґРёСЃС†РёРїР»РёРЅР° РєРѕРјР°РЅРґРЅРѕР№ РѕРїРµСЂР°С†РёРѕРЅРєРё Рё С‚Рµ СЂРµС€РµРЅРёСЏ, Рє РєРѕС‚РѕСЂС‹Рј РІРѕР·РІСЂР°С‰Р°СЋС‚СЃСЏ, РєРѕРіРґР° СЂС‹РЅРѕРє СЃРЅРѕРІР° РЅР°С‡РёРЅР°РµС‚ РєР°С‡Р°С‚СЊ.', 'The face of the issue: tracking, sources, creative shelf life, team operations discipline, and the decisions people return to when the market starts shaking again.')), ENT_QUOTES, 'UTF-8') ?></p>
+                    <p><?= htmlspecialchars($t('Журнал про арбитраж трафика как про живую редакционную среду: здесь важны не витринные обещания, а внутренний ритм affiliate-команд, где источники дрейфуют, связки пересобираются, креативы стареют быстрее календаря, а решения принимаются под давлением реального рынка.', 'A journal about traffic arbitrage as a living editorial environment: not showcase promises, but the internal rhythm of affiliate teams, where sources drift, bundles get rebuilt, creatives age faster than the calendar, and decisions are made under real market pressure.'), ENT_QUOTES, 'UTF-8') ?></p>
+                    <p><?= htmlspecialchars($t('ЦПАЛЬНЯ собирает это не как ленту, а как номер. Редакционные разборы, market notes, backstage-наблюдения и практические материалы работают здесь вместе, чтобы показывать механику affiliate-операций изнутри, а не пересказывать шум отрасли снаружи.', 'ЦПАЛЬНЯ assembles this not as a feed, but as an issue. Editorial breakdowns, market notes, backstage observations, and practical materials work together here to show affiliate operations from the inside rather than echoing industry noise from the outside.'), ENT_QUOTES, 'UTF-8') ?></p>
+                    <p><?= htmlspecialchars((string)($issue['issue_subtitle'] ?? $t('Лицо выпуска: трекинг, источники, срок жизни креативов, дисциплина командной операционки и те решения, к которым возвращаются, когда рынок снова начинает качать.', 'The face of the issue: tracking, sources, creative shelf life, team operations discipline, and the decisions people return to when the market starts shaking again.')), ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
                 <div class="home-z-actions">
-                    <a class="home-z-btn" href="/journal/"><?= htmlspecialchars($t('Р’ Р¶СѓСЂРЅР°Р»', 'Journal'), ENT_QUOTES, 'UTF-8') ?></a>
-                    <a class="home-z-btn" href="/playbooks/"><?= htmlspecialchars($t('РџСЂР°РєС‚РёРєР°', 'Playbooks'), ENT_QUOTES, 'UTF-8') ?></a>
-                    <a class="home-z-btn" href="/signals/"><?= htmlspecialchars($t('РџРѕРІРµСЃС‚РєР°', 'Signals'), ENT_QUOTES, 'UTF-8') ?></a>
-                    <a class="home-z-btn" href="/fun/"><?= htmlspecialchars($t('Р¤Р°РЅ', 'Fun'), ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="home-z-btn" href="/journal/"><?= htmlspecialchars($t('В журнал', 'Journal'), ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="home-z-btn" href="/playbooks/"><?= htmlspecialchars($t('Практика', 'Playbooks'), ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="home-z-btn" href="/signals/"><?= htmlspecialchars($t('Повестка', 'Signals'), ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="home-z-btn" href="/fun/"><?= htmlspecialchars($t('Фан', 'Fun'), ENT_QUOTES, 'UTF-8') ?></a>
                 </div>
                 <?php if (is_array($heroCard)): ?>
                     <?php $heroCardImage = $imageSrc((array)$heroCard); ?>
@@ -129,8 +129,8 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
                         </div>
                         <div class="home-z-feature-copy">
                             <div class="home-z-feature-top">
-                                <span class="home-z-tag"><?= htmlspecialchars($t('РР· Р¶СѓСЂРЅР°Р»Р°', 'From the journal'), ENT_QUOTES, 'UTF-8') ?></span>
-                                <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">в—‰</i><?= (int)($heroCard['view_count'] ?? 0) ?></span>
+                                <span class="home-z-tag"><?= htmlspecialchars($t('Из журнала', 'From the journal'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($heroCard['view_count'] ?? 0) ?></span>
                             </div>
                             <h3><a href="<?= htmlspecialchars($buildArticleUrl((array)$heroCard, 'journal'), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)($heroCard['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></a></h3>
                             <p><?= htmlspecialchars($excerpt((string)($heroCard['excerpt_html'] ?? $heroCard['content_html'] ?? ''), 240), ENT_QUOTES, 'UTF-8') ?></p>
@@ -147,10 +147,10 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
             <section class="home-z-block">
                 <div class="home-z-block-head">
                     <div class="home-z-block-title">
-                        <span class="home-z-tag"><?= htmlspecialchars($t('Р–СѓСЂРЅР°Р»', 'Journal'), ENT_QUOTES, 'UTF-8') ?></span>
-                        <h2><?= htmlspecialchars($t('Р РµРґР°РєС†РёРѕРЅРЅС‹Рµ РјР°С‚РµСЂРёР°Р»С‹ РЅРѕРјРµСЂР°', 'Editorial stories from the issue'), ENT_QUOTES, 'UTF-8') ?></h2>
+                        <span class="home-z-tag"><?= htmlspecialchars($t('Журнал', 'Journal'), ENT_QUOTES, 'UTF-8') ?></span>
+                        <h2><?= htmlspecialchars($t('Редакционные материалы номера', 'Editorial stories from the issue'), ENT_QUOTES, 'UTF-8') ?></h2>
                     </div>
-                    <a class="home-z-block-link" href="/journal/"><?= htmlspecialchars($t('Р’СЃРµ РјР°С‚РµСЂРёР°Р»С‹', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="home-z-block-link" href="/journal/"><?= htmlspecialchars($t('Все материалы', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
                 </div>
                 <div class="home-z-list">
                     <?php foreach (array_slice($journalItems, 0, 5) as $item): ?>
@@ -164,7 +164,7 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
                             <div class="home-z-card-copy">
                                 <div class="home-z-card-head">
                                     <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
-                                    <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">в—‰</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                    <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
                                 </div>
                                 <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
@@ -176,10 +176,10 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
             <section class="home-z-block">
                 <div class="home-z-block-head">
                     <div class="home-z-block-title">
-                        <span class="home-z-tag"><?= htmlspecialchars($t('РџСЂР°РєС‚РёРєР°', 'Playbooks'), ENT_QUOTES, 'UTF-8') ?></span>
-                        <h2><?= htmlspecialchars($t('Р Р°Р±РѕС‡РёРµ РјР°С‚РµСЂРёР°Р»С‹ Рё how-to', 'Working notes and how-to playbooks'), ENT_QUOTES, 'UTF-8') ?></h2>
+                        <span class="home-z-tag"><?= htmlspecialchars($t('Практика', 'Playbooks'), ENT_QUOTES, 'UTF-8') ?></span>
+                        <h2><?= htmlspecialchars($t('Рабочие материалы и how-to', 'Working notes and how-to playbooks'), ENT_QUOTES, 'UTF-8') ?></h2>
                     </div>
-                    <a class="home-z-block-link" href="/playbooks/"><?= htmlspecialchars($t('Р’СЃРµ РјР°С‚РµСЂРёР°Р»С‹', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="home-z-block-link" href="/playbooks/"><?= htmlspecialchars($t('Все материалы', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
                 </div>
                 <div class="home-z-list">
                     <?php foreach (array_slice($playbookItems, 0, 5) as $item): ?>
@@ -193,7 +193,7 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
                             <div class="home-z-card-copy">
                                 <div class="home-z-card-head">
                                     <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
-                                    <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">в—‰</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                    <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
                                 </div>
                                 <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
@@ -205,10 +205,10 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
             <section class="home-z-block">
                 <div class="home-z-block-head">
                     <div class="home-z-block-title">
-                        <span class="home-z-tag"><?= htmlspecialchars($t('РџРѕРІРµСЃС‚РєР°', 'Signals'), ENT_QUOTES, 'UTF-8') ?></span>
-                        <h2><?= htmlspecialchars($t('РџРѕР»РёС‚РёРєР°, РЅРѕРІРѕСЃС‚Рё Рё СЃРёРіРЅР°Р»С‹', 'Policy, news and market signals'), ENT_QUOTES, 'UTF-8') ?></h2>
+                        <span class="home-z-tag"><?= htmlspecialchars($t('Повестка', 'Signals'), ENT_QUOTES, 'UTF-8') ?></span>
+                        <h2><?= htmlspecialchars($t('Политика, новости и сигналы', 'Policy, news and market signals'), ENT_QUOTES, 'UTF-8') ?></h2>
                     </div>
-                    <a class="home-z-block-link" href="/signals/"><?= htmlspecialchars($t('Р’СЃРµ РјР°С‚РµСЂРёР°Р»С‹', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="home-z-block-link" href="/signals/"><?= htmlspecialchars($t('Все материалы', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
                 </div>
                 <div class="home-z-list">
                     <?php foreach (array_slice($signalsItems, 0, 5) as $item): ?>
@@ -222,7 +222,7 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
                             <div class="home-z-card-copy">
                                 <div class="home-z-card-head">
                                     <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
-                                    <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">в—‰</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                    <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
                                 </div>
                                 <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
@@ -234,10 +234,10 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
             <section class="home-z-block">
                 <div class="home-z-block-head">
                     <div class="home-z-block-title">
-                        <span class="home-z-tag"><?= htmlspecialchars($t('Р¤Р°РЅ', 'Fun'), ENT_QUOTES, 'UTF-8') ?></span>
-                        <h2><?= htmlspecialchars($t('РћС‚РґС‹С…, РјРµРјС‹ Рё РЅРёС€РµРІРѕР№ Р°Р±СЃСѓСЂРґ', 'Satire, memes and niche absurdity'), ENT_QUOTES, 'UTF-8') ?></h2>
+                        <span class="home-z-tag"><?= htmlspecialchars($t('Фан', 'Fun'), ENT_QUOTES, 'UTF-8') ?></span>
+                        <h2><?= htmlspecialchars($t('Отдых, мемы и нишевой абсурд', 'Satire, memes and niche absurdity'), ENT_QUOTES, 'UTF-8') ?></h2>
                     </div>
-                    <a class="home-z-block-link" href="/fun/"><?= htmlspecialchars($t('Р’СЃРµ РјР°С‚РµСЂРёР°Р»С‹', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="home-z-block-link" href="/fun/"><?= htmlspecialchars($t('Все материалы', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
                 </div>
                 <div class="home-z-list">
                     <?php foreach (array_slice($funItems, 0, 5) as $item): ?>
@@ -251,7 +251,7 @@ $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover :
                             <div class="home-z-card-copy">
                                 <div class="home-z-card-head">
                                     <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
-                                    <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">в—‰</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                    <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
                                 </div>
                                 <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>

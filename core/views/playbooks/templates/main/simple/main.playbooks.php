@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $playbooks = (array)($ModelPage['playbooks'] ?? []);
 $items = (array)($playbooks['items'] ?? []);
 $selected = is_array($playbooks['selected'] ?? null) ? $playbooks['selected'] : null;
@@ -272,7 +272,7 @@ if ($sectionKey !== 'playbooks') {
 .jrnl-detail-content > ul li,.jrnl-detail-content > ol li{padding:0}
 .jrnl-detail-content p strong{color:#f4f8ff}
 .jrnl-detail-content p a,.jrnl-detail-content li a,.jrnl-detail-content blockquote a,.jrnl-detail-content td a,.jrnl-detail-content th a{color:#d6ebff;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(122,180,255,.28);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(122,180,255,.1));padding:1px 8px;font-weight:600;line-height:1.4;font-size:.95em;transition:color .18s ease,border-color .18s ease,background .18s ease,transform .18s ease;vertical-align:baseline}
-.jrnl-detail-content p a::after,.jrnl-detail-content li a::after,.jrnl-detail-content blockquote a::after,.jrnl-detail-content td a::after,.jrnl-detail-content th a::after{content:"в†—";font-size:11px;opacity:.76;transform:translateY(-1px)}
+.jrnl-detail-content p a::after,.jrnl-detail-content li a::after,.jrnl-detail-content blockquote a::after,.jrnl-detail-content td a::after,.jrnl-detail-content th a::after{content:"\2197";font-size:11px;opacity:.76;transform:translateY(-1px)}
 .jrnl-detail-content p a:hover,.jrnl-detail-content li a:hover,.jrnl-detail-content blockquote a:hover,.jrnl-detail-content td a:hover,.jrnl-detail-content th a:hover{color:#fff;border-color:rgba(122,180,255,.52);background:linear-gradient(180deg,rgba(122,180,255,.18),rgba(39,223,192,.18));transform:translateY(-1px)}
 .jrnl-detail-content .related-links a{text-transform:lowercase}
 .jrnl-detail-content .related-links a::first-letter{text-transform:uppercase}
@@ -282,11 +282,11 @@ if ($sectionKey !== 'playbooks') {
 .jrnl-detail-content h2 + ul{padding-left:28px}
 .jrnl-detail-content ul li,.jrnl-detail-content ol li{margin:0 0 8px;line-height:1.7;color:rgba(221,233,250,.92)}
 .jrnl-detail-content ul li{position:relative;padding-left:22px}
-.jrnl-detail-content ul li::before{content:"вЂў";position:absolute;left:0;top:0;color:#78dfff;font-weight:700}
+.jrnl-detail-content ul li::before{content:"\2022";position:absolute;left:0;top:0;color:#78dfff;font-weight:700}
 .jrnl-detail-content ol{padding-left:74px}
 .jrnl-detail-content img{max-width:100%;height:auto;border-radius:12px;border:1px solid rgba(122,180,255,.18)}
 .jrnl-detail-content blockquote{margin:0 0 14px;padding:12px 14px 12px 16px;border-left:3px solid rgba(122,180,255,.48);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(122,180,255,.05));color:rgba(207,224,247,.92);border-radius:6px;position:relative}
-.jrnl-detail-content blockquote::before{content:"вЂњ";position:absolute;left:8px;top:-4px;font-size:28px;color:rgba(122,180,255,.52);line-height:1}
+.jrnl-detail-content blockquote::before{content:"\201C";position:absolute;left:8px;top:-4px;font-size:28px;color:rgba(122,180,255,.52);line-height:1}
 .jrnl-detail-content table{width:100%;max-width:100%;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;border-collapse:collapse;margin:12px 0 12px 28px;padding:5px;background:rgba(5,10,20,.88);border:1px solid rgba(122,180,255,.18)}
 .jrnl-detail-content thead,.jrnl-detail-content tbody,.jrnl-detail-content tr{display:table;width:100%;table-layout:fixed}
 .jrnl-detail-content th,.jrnl-detail-content td{border:1px solid rgba(122,180,255,.18);padding:8px 10px;vertical-align:top;min-width:140px;word-break:break-word;overflow-wrap:anywhere}
