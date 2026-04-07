@@ -63,9 +63,14 @@ $pickTopicIcon = static function (string $title, string $fallback = '◦') use (
 $importantTopics = [];
 $importantCounts = [];
 $importantRaw = [];
-if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters')) {
+if (isset($FRMWRK) && function_exists('examples_fetch_clusters')) {
     foreach (['journal', 'playbooks', 'signals', 'fun'] as $sectionKey) {
-        foreach ((array)examples_popularity_fetch_top_clusters($FRMWRK, $host, $lang, $sectionKey, 2) as $row) {
+        $sectionClusters = (array)examples_fetch_clusters($FRMWRK, $host, $lang, 40, $sectionKey);
+        $sectionTopicsAdded = 0;
+        foreach ($sectionClusters as $row) {
+            if ($sectionTopicsAdded >= 2) {
+                break;
+            }
             $code = trim((string)($row['code'] ?? ''));
             if ($code === '') {
                 continue;
@@ -84,6 +89,7 @@ if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters'))
                 'href' => function_exists('examples_cluster_list_path') ? examples_cluster_list_path($code, $host, $sectionKey) : ($sectionBasePaths[$sectionKey] ?? '/'),
                 'icon' => $pickTopicIcon($title),
             ];
+            $sectionTopicsAdded++;
         }
     }
 }

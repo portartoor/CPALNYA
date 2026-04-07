@@ -81,10 +81,15 @@ $importantCounts = [];
 $importantRaw = [];
 
 foreach (['journal', 'playbooks', 'signals', 'fun'] as $sectionKey) {
-    if (!isset($FRMWRK) || !function_exists('examples_popularity_fetch_top_clusters')) {
+    if (!isset($FRMWRK) || !function_exists('examples_fetch_clusters')) {
         continue;
     }
-    foreach ((array)examples_popularity_fetch_top_clusters($FRMWRK, $host, $lang, $sectionKey, 2) as $row) {
+    $sectionClusters = (array)examples_fetch_clusters($FRMWRK, $host, $lang, 40, $sectionKey);
+    $sectionTopicsAdded = 0;
+    foreach ($sectionClusters as $row) {
+        if ($sectionTopicsAdded >= 2) {
+            break;
+        }
         $code = trim((string)($row['code'] ?? ''));
         if ($code === '') {
             continue;
@@ -103,6 +108,7 @@ foreach (['journal', 'playbooks', 'signals', 'fun'] as $sectionKey) {
             'path' => $buildClusterPath($sectionKey, $code),
             'icon' => $pickTopicIcon($title),
         ];
+        $sectionTopicsAdded++;
     }
 }
 
