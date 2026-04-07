@@ -79,7 +79,7 @@ if ($selected) {
 .jrnl-hero,.jrnl-detail,.jrnl-card,.jrnl-related,.jrnl-empty{border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(6,12,24,.88),rgba(5,10,20,.76));box-shadow:var(--shell-shadow)}
 .jrnl-hero,.jrnl-detail,.jrnl-related,.jrnl-empty{padding:28px}
 .jrnl-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:16px}
-.jrnl-kicker,.jrnl-tag,.jrnl-meta{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid rgba(122,180,255,.2);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.jrnl-kicker,.jrnl-tag,.jrnl-meta{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;max-height:30px;border:1px solid rgba(122,180,255,.2);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
 .jrnl-copy{display:grid;gap:8px}
 .jrnl-copy h1,.jrnl-copy h2,.jrnl-detail h1,.jrnl-related h2{margin:0;font:700 clamp(1.82rem,3.55vw,3.22rem)/1 "Space Grotesk","Sora",sans-serif;letter-spacing:-.048em}
 .jrnl-copy p,.jrnl-detail p,.jrnl-card p{margin:0;color:var(--shell-muted);line-height:1.62}
@@ -91,52 +91,7 @@ if ($selected) {
 radial-gradient(circle at 50% 22%,rgba(103,200,255,.16),transparent 26%),
 linear-gradient(180deg,rgba(6,11,20,.96),rgba(4,8,16,.92));
 display:block;align-self:start;overflow:hidden;position:relative}
-.jrnl-cover::before,.jrnl-cover::after{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .32s ease}
-.jrnl-cover::before{
-padding:1px;
-background:conic-gradient(from 0deg,
-rgba(100,240,255,0) 0deg,
-rgba(100,240,255,.98) 14deg,
-rgba(100,240,255,.12) 28deg,
-rgba(100,240,255,0) 42deg,
-rgba(255,89,199,0) 82deg,
-rgba(255,89,199,.96) 98deg,
-rgba(255,89,199,.12) 112deg,
-rgba(255,89,199,0) 128deg,
-rgba(116,255,171,0) 172deg,
-rgba(116,255,171,.98) 190deg,
-rgba(116,255,171,.14) 206deg,
-rgba(116,255,171,0) 222deg,
-rgba(255,190,92,0) 262deg,
-rgba(255,190,92,.96) 278deg,
-rgba(255,190,92,.14) 294deg,
-rgba(255,190,92,0) 310deg,
-rgba(100,240,255,0) 360deg);
--webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
--webkit-mask-composite:xor;
-mask-composite:exclude
-}
-.jrnl-cover::after{
-inset:-10px;
-background:conic-gradient(from 0deg,
-rgba(100,240,255,0) 0deg,
-rgba(100,240,255,.82) 18deg,
-rgba(100,240,255,0) 44deg,
-rgba(255,89,199,0) 88deg,
-rgba(255,89,199,.76) 110deg,
-rgba(255,89,199,0) 136deg,
-rgba(116,255,171,0) 182deg,
-rgba(116,255,171,.8) 202deg,
-rgba(116,255,171,0) 228deg,
-rgba(255,190,92,0) 272deg,
-rgba(255,190,92,.82) 292deg,
-rgba(255,190,92,0) 318deg,
-rgba(100,240,255,0) 360deg);
-filter:blur(14px) saturate(1.18)
-}
-.jrnl-cover-button{display:block;padding:0;cursor:pointer;width:100%;text-align:left;appearance:none;line-height:0}
-.jrnl-cover-button:hover::before,.jrnl-cover-button:focus-visible::before,
-.jrnl-cover-button:hover::after,.jrnl-cover-button:focus-visible::after{opacity:1;animation:jrnlBorderFireflies 3.2s linear infinite}
+.jrnl-cover-button{display:block;padding:0;width:100%;text-align:left;appearance:none;line-height:0;cursor:default}
 .jrnl-cover img{position:relative;display:block;width:100%;height:auto;max-width:none;object-fit:contain;object-position:center center;padding:0;transform-origin:50% 0;animation:jrnlCoverIntro 1.15s cubic-bezier(.16,1,.3,1) both}
 .jrnl-cover-note{position:relative;z-index:1;max-width:22ch;margin:18px;padding:14px 16px;background:rgba(4,9,18,.78);border:1px solid rgba(122,180,255,.18);font:700 1rem/1.35 "Space Grotesk","Sora",sans-serif}
 .jrnl-tags{display:flex;flex-wrap:wrap;gap:10px}
@@ -161,66 +116,13 @@ filter:blur(14px) saturate(1.18)
 .jrnl-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border:1px solid rgba(122,180,255,.18);background:linear-gradient(135deg,rgba(115,184,255,.22),rgba(39,223,192,.18));color:var(--shell-text);text-decoration:none;font-weight:700}
 .jrnl-related-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .jrnl-empty{text-align:center}
-.jrnl-lightbox{position:fixed;inset:0;z-index:2147483000;display:none;place-items:center;padding:clamp(16px,4vw,48px);pointer-events:none;opacity:0;visibility:hidden;transition:opacity .52s ease,visibility .52s ease}
-.jrnl-lightbox.is-open,.jrnl-lightbox.is-closing{display:grid}
-.jrnl-lightbox.is-open{opacity:1;visibility:visible;pointer-events:auto}
-.jrnl-lightbox-backdrop{position:absolute;inset:0;background:
-radial-gradient(circle at 50% 45%,rgba(91,210,255,.18),transparent 22%),
-radial-gradient(circle at 50% 50%,rgba(32,255,191,.11),transparent 34%),
-rgba(1,4,10,.965);
-backdrop-filter:blur(20px) saturate(1.24) brightness(.28)}
-.jrnl-lightbox-bloom{position:absolute;inset:0;opacity:0;mix-blend-mode:screen;background:
-conic-gradient(from 90deg at 50% 50%,rgba(107,193,255,.0) 0deg,rgba(107,193,255,.55) 34deg,rgba(68,255,220,.0) 88deg,rgba(68,255,220,.4) 150deg,rgba(107,193,255,.0) 220deg,rgba(107,193,255,.36) 292deg,rgba(68,255,220,.0) 360deg);
-transform:scale(.78) rotate(-18deg);filter:blur(42px)}
-.jrnl-lightbox.is-open .jrnl-lightbox-bloom{opacity:1;animation:jrnlBloomIn .95s cubic-bezier(.16,1,.3,1) forwards}
-.jrnl-lightbox-shell{position:relative;z-index:2;width:min(1320px,94vw);display:grid;gap:18px;justify-items:center}
-.jrnl-lightbox-frame{position:relative;width:min(1240px,92vw);max-height:82vh;padding:18px;border-radius:34px;background:linear-gradient(180deg,rgba(8,16,30,.88),rgba(4,8,18,.76));border:1px solid rgba(143,210,255,.24);box-shadow:0 40px 120px rgba(0,0,0,.58),0 0 0 1px rgba(141,229,255,.08) inset;overflow:hidden;transform:translateY(24px) scale(.9) rotateX(16deg);opacity:0}
-.jrnl-lightbox.is-open .jrnl-lightbox-frame{animation:jrnlFrameIn .88s cubic-bezier(.18,1,.22,1) forwards}
-.jrnl-lightbox-frame::before{content:"";position:absolute;inset:0;background:
-linear-gradient(130deg,rgba(255,255,255,.18),transparent 20%,transparent 72%,rgba(96,210,255,.12)),
-radial-gradient(circle at 50% 0%,rgba(98,219,255,.18),transparent 42%);
-pointer-events:none}
-.jrnl-lightbox-image-wrap{position:relative;overflow:auto;max-height:calc(82vh - 36px);border-radius:22px;background:#050914}
-.jrnl-lightbox-image-wrap img{display:block;width:100%;height:auto;max-height:none;object-fit:contain}
-.jrnl-lightbox-close{position:absolute;right:18px;top:18px;z-index:4;display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(8,14,24,.72);backdrop-filter:blur(14px);color:#f6fbff;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 14px 40px rgba(0,0,0,.34)}
-.jrnl-lightbox-close:hover{transform:scale(1.06);background:rgba(14,23,38,.84)}
-.jrnl-lightbox-caption{position:relative;z-index:3;display:inline-flex;align-items:center;gap:12px;padding:12px 16px;border-radius:999px;background:rgba(5,10,18,.58);border:1px solid rgba(255,255,255,.16);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#dcecff}
-.jrnl-lightbox-caption::before{content:"expanded cover";opacity:.74}
-.jrnl-lightbox.is-closing .jrnl-lightbox-frame{animation:jrnlFrameOut .72s cubic-bezier(.7,0,.84,0) forwards}
-.jrnl-lightbox.is-closing .jrnl-lightbox-bloom{animation:jrnlBloomOut .72s cubic-bezier(.7,0,.84,0) forwards}
-.jrnl-lightbox.is-closing{pointer-events:none}
-@keyframes jrnlBloomIn{
-0%{opacity:0;transform:scale(.58) rotate(-26deg);filter:blur(56px)}
-55%{opacity:1;transform:scale(1.08) rotate(10deg);filter:blur(34px)}
-100%{opacity:.82;transform:scale(1.18) rotate(16deg);filter:blur(46px)}
-}
-@keyframes jrnlBloomOut{
-0%{opacity:.82;transform:scale(1.18) rotate(16deg);filter:blur(46px)}
-100%{opacity:0;transform:scale(.44) rotate(34deg);filter:blur(68px)}
-}
-@keyframes jrnlFrameIn{
-0%{opacity:0;transform:translateY(34px) scale(.82) rotateX(18deg) rotate(-5deg);clip-path:polygon(50% 50%,50% 50%,50% 50%,50% 50%)}
-36%{opacity:1;transform:translateY(0) scale(.94) rotateX(6deg) rotate(1deg);clip-path:polygon(10% 18%,88% 8%,92% 82%,14% 90%)}
-68%{transform:translateY(-8px) scale(1.01) rotateX(0deg) rotate(0deg);clip-path:polygon(0 4%,100% 0,100% 100%,0 96%)}
-100%{opacity:1;transform:translateY(0) scale(1) rotateX(0deg) rotate(0deg);clip-path:inset(0 round 34px)}
-}
-@keyframes jrnlFrameOut{
-0%{opacity:1;transform:translateY(0) scale(1) rotateX(0deg) rotate(0deg);clip-path:inset(0 round 34px)}
-38%{opacity:1;transform:translateY(8px) scale(.98) rotateX(0deg) rotate(-1deg);clip-path:polygon(0 4%,100% 0,100% 100%,0 96%)}
-100%{opacity:0;transform:translateY(42px) scale(.8) rotateX(20deg) rotate(6deg);clip-path:polygon(50% 50%,50% 50%,50% 50%,50% 50%)}
-}
 @keyframes jrnlCoverIntro{
 0%{opacity:0;transform:translateY(28px) scale(.965);filter:blur(14px) saturate(.86)}
 55%{opacity:1;transform:translateY(0) scale(1.006);filter:blur(0) saturate(1)}
 100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0) saturate(1)}
 }
-@keyframes jrnlBorderFireflies{
-0%{transform:rotate(0deg) scale(1);filter:blur(14px) saturate(1.08)}
-50%{transform:rotate(180deg) scale(1.01);filter:blur(15px) saturate(1.22)}
-100%{transform:rotate(360deg) scale(1);filter:blur(14px) saturate(1.08)}
-}
 @media (max-width:1180px){.jrnl-hero,.jrnl-grid,.jrnl-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.jrnl-hero{grid-template-columns:1fr}}
-@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}.jrnl-copy h1,.jrnl-copy h2,.jrnl-detail h1{font-size:clamp(2rem,12vw,3.2rem)}.jrnl-lightbox-frame{padding:12px;border-radius:24px}.jrnl-lightbox-close{right:12px;top:12px;width:48px;height:48px}}
+@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}.jrnl-copy h1,.jrnl-copy h2,.jrnl-detail h1{font-size:clamp(2rem,12vw,3.2rem)}}
 </style>
 
 <section class="jrnl">
@@ -274,7 +176,7 @@ pointer-events:none}
                     <?php if (!empty($issue['issue_title'])): ?><h2><?= htmlspecialchars((string)$issue['issue_title'], ENT_QUOTES, 'UTF-8') ?></h2><?php endif; ?>
                     <?php if (!empty($issue['issue_subtitle'])): ?><?= $renderIssueText((string)$issue['issue_subtitle'], 'jrnl-issue-subtitle') ?><?php endif; ?>
                 </div>
-                <button
+                <div
                     class="jrnl-cover jrnl-cover-button"
                     type="button"
                     data-jrnl-cover-open
@@ -283,7 +185,7 @@ pointer-events:none}
                     aria-label="<?= htmlspecialchars($t('Открыть обложку выпуска', 'Open issue cover'), ENT_QUOTES, 'UTF-8') ?>"
                 >
                     <?php if ($issueImage !== ''): ?><img src="<?= htmlspecialchars($issueImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($issue['issue_title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?>
-                </button>
+                </div>
             </header>
 
             <?php if (!empty($clusters)): ?>
@@ -344,143 +246,3 @@ pointer-events:none}
         <?php endif; ?>
     </div>
 </section>
-
-<div class="jrnl-lightbox" id="jrnlCoverLightbox" aria-hidden="true">
-    <div class="jrnl-lightbox-backdrop" data-jrnl-cover-close></div>
-    <div class="jrnl-lightbox-bloom"></div>
-    <div class="jrnl-lightbox-shell">
-        <div class="jrnl-lightbox-frame" role="dialog" aria-modal="true" aria-label="<?= htmlspecialchars($t('Обложка выпуска', 'Issue cover'), ENT_QUOTES, 'UTF-8') ?>">
-            <button class="jrnl-lightbox-close" type="button" data-jrnl-cover-close aria-label="<?= htmlspecialchars($t('Закрыть', 'Close'), ENT_QUOTES, 'UTF-8') ?>">×</button>
-            <div class="jrnl-lightbox-image-wrap">
-                <img id="jrnlCoverLightboxImage" src="" alt="">
-            </div>
-        </div>
-        <div class="jrnl-lightbox-caption"></div>
-    </div>
-</div>
-
-<script>
-(function () {
-    var lightbox = document.getElementById('jrnlCoverLightbox');
-    var image = document.getElementById('jrnlCoverLightboxImage');
-    if (!lightbox || !image) {
-        return;
-    }
-
-    var lastActive = null;
-    var closingTimer = null;
-    var isOpen = false;
-    var scrollY = 0;
-    var activeTrigger = null;
-
-    if (lightbox.parentNode !== document.body) {
-        document.body.appendChild(lightbox);
-    }
-
-    function lockScroll(lock) {
-        if (lock) {
-            scrollY = window.scrollY || window.pageYOffset || 0;
-            document.documentElement.style.overflow = 'hidden';
-            document.body.style.position = 'fixed';
-            document.body.style.top = '-' + scrollY + 'px';
-            document.body.style.left = '0';
-            document.body.style.right = '0';
-            document.body.style.width = '100%';
-            document.body.style.overflow = 'hidden';
-            return;
-        }
-
-        document.documentElement.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.left = '';
-        document.body.style.right = '';
-        document.body.style.width = '';
-        document.body.style.overflow = '';
-        window.scrollTo(0, scrollY);
-    }
-
-    function openLightbox(trigger, event) {
-        if (event) {
-            event.preventDefault();
-        }
-        if (isOpen || !trigger) {
-            return;
-        }
-        activeTrigger = trigger;
-        lastActive = document.activeElement;
-        image.src = trigger.getAttribute('data-jrnl-cover-src') || '';
-        image.alt = trigger.getAttribute('data-jrnl-cover-alt') || '';
-        clearTimeout(closingTimer);
-        lightbox.classList.remove('is-closing');
-        lightbox.style.display = 'grid';
-        lightbox.setAttribute('aria-hidden', 'false');
-        lockScroll(true);
-        lightbox.classList.add('is-open');
-        isOpen = true;
-        var closeButton = lightbox.querySelector('.jrnl-lightbox-close');
-        if (closeButton) {
-            setTimeout(function () {
-                try {
-                    closeButton.focus({ preventScroll: true });
-                } catch (e) {
-                    closeButton.focus();
-                }
-            }, 120);
-        }
-    }
-
-    function finishClose() {
-        lightbox.classList.remove('is-open', 'is-closing');
-        lightbox.style.display = 'none';
-        lightbox.setAttribute('aria-hidden', 'true');
-        image.src = '';
-        image.alt = '';
-        activeTrigger = null;
-        lockScroll(false);
-        isOpen = false;
-        if (lastActive && typeof lastActive.focus === 'function') {
-            try {
-                lastActive.focus({ preventScroll: true });
-            } catch (e) {
-                lastActive.focus();
-            }
-        }
-    }
-
-    function closeLightbox() {
-        if (!isOpen) {
-            return;
-        }
-        lightbox.classList.add('is-closing');
-        clearTimeout(closingTimer);
-        closingTimer = setTimeout(finishClose, 720);
-    }
-
-    document.addEventListener('click', function (event) {
-        var openTrigger = event.target.closest('[data-jrnl-cover-open]');
-        if (openTrigger) {
-            openLightbox(openTrigger, event);
-            return;
-        }
-
-        if (!isOpen) {
-            return;
-        }
-
-        if (event.target.closest('[data-jrnl-cover-close]')) {
-            event.preventDefault();
-            closeLightbox();
-        }
-    });
-
-    document.addEventListener('keydown', function (event) {
-        if (!isOpen) {
-            return;
-        }
-        if (event.key === 'Escape') {
-            closeLightbox();
-        }
-    });
-})();
-</script>
