@@ -23,6 +23,17 @@ $pickIcon = static function (string $code, string $fallback = '#'): string {
     return strtoupper(substr($code, 0, 1));
 };
 
+$normalizeTopicTitle = static function (string $value): string {
+    $value = trim((string)preg_replace('/\s+/u', ' ', $value));
+    if ($value === '') {
+        return '';
+    }
+    if (function_exists('mb_strtolower')) {
+        return mb_strtolower($value, 'UTF-8');
+    }
+    return strtolower($value);
+};
+
 $sectionTitles = [
     'journal' => $isRu ? 'Журнал' : 'Journal',
     'playbooks' => $isRu ? 'Практика' : 'Playbooks',
@@ -49,77 +60,58 @@ $buildClusterPath = static function (string $section, string $code) use ($host, 
     return $sectionBasePaths[$section] ?? '/';
 };
 
-$normalizeTopicTitle = static function (string $value): string {
-    $value = trim((string)preg_replace('/\s+/u', ' ', $value));
-    if ($value === '') {
-        return '';
-    }
-    if (function_exists('mb_strtolower')) {
-        return mb_strtolower($value, 'UTF-8');
-    }
-    return strtolower($value);
-};
-
-$fetchSectionTopics = static function (string $section, int $limit = 2) use ($FRMWRK, $host, $lang, $pickIcon, $buildClusterPath): array {
-    $items = [];
-    if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters')) {
-        foreach ((array)examples_popularity_fetch_top_clusters($FRMWRK, $host, $lang, $section, $limit) as $row) {
-            $code = trim((string)($row['code'] ?? ''));
-            if ($code === '') {
-                continue;
-            }
-            $items[] = [
-                'title' => (string)($row['label'] ?? $code),
-                'path' => $buildClusterPath($section, $code),
-                'icon' => $pickIcon($code),
-            ];
-        }
-    }
-    return array_slice($items, 0, $limit);
-};
-
 $importantTopics = [];
-if (isset($FRMWRK) && function_exists('examples_popularity_fetch_top_clusters_global')) {
-    $importantTopicCounts = [];
-    $importantTopicRaw = [];
-    foreach ((array)examples_popularity_fetch_top_clusters_global($FRMWRK, $host, $lang, 3) as $row) {
-        $section = trim((string)($row['section'] ?? 'journal'));
+$importantCounts = [];
+$importantRaw = [];
+
+foreach (['journal', 'playbooks', 'signals', 'fun'] as $sectionKey) {
+    if (!isset($FRMWRK) || !function_exists('examples_popularity_fetch_top_clusters')) {
+        continue;
+    }
+    foreach ((array)examples_popularity_fetch_top_clusters($FRMWRK, $host, $lang, $sectionKey, 2) as $row) {
         $code = trim((string)($row['code'] ?? ''));
-        if ($code === '' || !isset($sectionBasePaths[$section])) {
+        if ($code === '') {
             continue;
         }
         $title = trim((string)($row['label'] ?? $code));
         $normalizedTitle = $normalizeTopicTitle($title);
-        $normalizedParent = $normalizeTopicTitle((string)($sectionTitles[$section] ?? ''));
+        $normalizedParent = $normalizeTopicTitle((string)($sectionTitles[$sectionKey] ?? ''));
         if ($normalizedTitle === '' || $normalizedTitle === $normalizedParent) {
             continue;
         }
-        $importantTopicCounts[$normalizedTitle] = (int)($importantTopicCounts[$normalizedTitle] ?? 0) + 1;
-        $importantTopicRaw[] = [
-            'section' => $section,
+        $importantCounts[$normalizedTitle] = (int)($importantCounts[$normalizedTitle] ?? 0) + 1;
+        $importantRaw[] = [
+            'section' => $sectionKey,
             'title' => $title,
             'normalized_title' => $normalizedTitle,
-            'path' => $buildClusterPath($section, $code),
+            'path' => $buildClusterPath($sectionKey, $code),
             'icon' => $pickIcon($code),
         ];
     }
-    foreach ($importantTopicRaw as $item) {
-        $title = $item['title'];
-        if ((int)($importantTopicCounts[$item['normalized_title']] ?? 0) > 1) {
-            $title .= ' (// ' . (string)($sectionTitles[$item['section']] ?? $item['section']) . ')';
-        }
-        $importantTopics[] = [
-            'title' => $title,
-            'path' => $item['path'],
-            'icon' => $item['icon'],
-        ];
-    }
 }
-if (count($importantTopics) < 3) {
+
+foreach ($importantRaw as $item) {
+    $title = $item['title'];
+    if ((int)($importantCounts[$item['normalized_title']] ?? 0) > 1) {
+        $title .= ' (// ' . (string)($sectionTitles[$item['section']] ?? $item['section']) . ')';
+    }
+    $importantTopics[] = [
+        'title' => $title,
+        'path' => $item['path'],
+        'icon' => $item['icon'],
+    ];
+}
+
+if (count($importantTopics) < 8) {
     $importantTopics = [
         ['title' => $isRu ? 'Источники' : 'Sources', 'path' => '/journal/', 'icon' => '>'],
-        ['title' => $isRu ? 'Фарм' : 'Farm', 'path' => '/playbooks/', 'icon' => 'F'],
+        ['title' => $isRu ? 'Фарм' : 'Farm', 'path' => '/journal/', 'icon' => 'F'],
         ['title' => 'AI Creatives', 'path' => '/playbooks/', 'icon' => 'A'],
+        ['title' => $isRu ? 'Операции' : 'Operations', 'path' => '/playbooks/', 'icon' => 'O'],
+        ['title' => $isRu ? 'Policy shifts' : 'Policy shifts', 'path' => '/signals/', 'icon' => 'P'],
+        ['title' => $isRu ? 'Регуляторика СНГ' : 'CIS regulation', 'path' => '/signals/', 'icon' => 'R'],
+        ['title' => $isRu ? 'Мемы команды' : 'Team memes', 'path' => '/fun/', 'icon' => 'M'],
+        ['title' => $isRu ? 'Драма модерации' : 'Moderation drama', 'path' => '/fun/', 'icon' => 'D'],
     ];
 }
 
@@ -138,35 +130,17 @@ $navSections = [
         'label' => $isRu ? 'Важные темы' : 'Important Topics',
         'items' => $importantTopics,
     ],
-];
-
-foreach (['journal', 'playbooks', 'signals', 'fun'] as $sectionKey) {
-    $sectionItems = [[
-        'title' => $sectionTitles[$sectionKey],
-        'path' => $sectionBasePaths[$sectionKey],
-        'icon' => $sectionIcons[$sectionKey],
-    ]];
-    foreach ($fetchSectionTopics($sectionKey, 2) as $topicItem) {
-        $sectionItems[] = $topicItem;
-    }
-    $navSections[] = [
-        'label' => '',
-        'items' => $sectionItems,
-    ];
-}
-
-$navSections[] = [
-    'label' => $isRu ? 'Связь' : 'Reach',
-    'items' => [
-        ['title' => $isRu ? 'Контакты' : 'Contact', 'path' => '/contact/', 'icon' => '@'],
+    [
+        'label' => $isRu ? 'Связь' : 'Reach',
+        'items' => [
+            ['title' => $isRu ? 'Контакты' : 'Contact', 'path' => '/contact/', 'icon' => '@'],
+        ],
     ],
 ];
 
 foreach ($navSections as $sectionBlock):
 ?>
-    <?php if (trim((string)$sectionBlock['label']) !== ''): ?>
-        <span class="nav-section-label"><?= htmlspecialchars((string)$sectionBlock['label'], ENT_QUOTES, 'UTF-8') ?></span>
-    <?php endif; ?>
+    <span class="nav-section-label"><?= htmlspecialchars((string)$sectionBlock['label'], ENT_QUOTES, 'UTF-8') ?></span>
     <?php foreach ($sectionBlock['items'] as $item):
         $path = (string)$item['path'];
         $pathForMatch = parse_url($path, PHP_URL_PATH);
