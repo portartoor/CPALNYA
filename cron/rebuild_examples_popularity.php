@@ -61,14 +61,42 @@ foreach ((array)$articles as $row) {
         ? examples_article_url_path($slug, $cluster, $host, $section)
         : (($section === 'playbooks' ? '/playbooks/' : '/journal/') . rawurlencode($slug) . '/');
 
-    $hostSafe = mysqli_real_escape_string($DB, $host);
-    $pathSafe = mysqli_real_escape_string($DB, $path);
+    $pathVariants = [];
+    $path = trim((string)$path);
+    if ($path !== '') {
+        $pathVariants[] = $path;
+        $trimmed = rtrim($path, '/');
+        if ($trimmed === '') {
+            $trimmed = '/';
+        }
+        $pathVariants[] = $trimmed;
+        if ($trimmed !== '/') {
+            $pathVariants[] = $trimmed . '/';
+        }
+    }
+    $pathVariants = array_values(array_unique(array_filter($pathVariants, static function ($value): bool {
+        return trim((string)$value) !== '';
+    })));
+    if (empty($pathVariants)) {
+        continue;
+    }
+
+    $pathConditions = [];
+    foreach ($pathVariants as $variant) {
+        $pathConditions[] = "path = '" . mysqli_real_escape_string($DB, $variant) . "'";
+    }
+    $pathWhere = implode(' OR ', $pathConditions);
+
+    $hostWhere = $host !== ''
+        ? "AND (host = '" . mysqli_real_escape_string($DB, $host) . "' OR COALESCE(host, '') = '')"
+        : '';
+
     $viewRows = $FRMWRK->DBRecords(
         "SELECT COUNT(*) AS cnt
          FROM analytics_visits
          WHERE COALESCE(is_bot, 0) = 0
-           AND host = '{$hostSafe}'
-           AND path = '{$pathSafe}'"
+           {$hostWhere}
+           AND ({$pathWhere})"
     );
     $views = (int)($viewRows[0]['cnt'] ?? 0);
 

@@ -116,7 +116,7 @@ $footerSections = [
 
 <style>
 .public-layout-footer{max-width:1480px;margin:28px auto 22px;padding:0 18px}
-.public-editorial-footer{padding:24px;border:1px solid rgba(127,164,223,.22);border-radius:24px;background:rgba(8,14,28,.82);backdrop-filter:blur(10px)}
+.public-editorial-footer{padding:24px;border:1px solid rgba(127,164,223,.22);border-radius:0;background:rgba(8,14,28,.82);backdrop-filter:blur(10px)}
 .public-editorial-footer-top{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:28px}
 .public-editorial-kicker{display:inline-flex;align-items:center;padding:8px 12px;border:1px solid rgba(127,164,223,.2);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b8c7dc}
 .public-editorial-intro{display:grid;gap:14px}

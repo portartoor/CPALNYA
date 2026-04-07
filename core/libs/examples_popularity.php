@@ -80,12 +80,13 @@ if (!function_exists('examples_popularity_fetch_top_clusters')) {
         $limit = max(1, min(10, $limit));
 
         $rows = $FRMWRK->DBRecords(
-            "SELECT cluster_code, cluster_label, views_count
+            "SELECT cluster_code, cluster_label, MAX(views_count) AS views_count
              FROM examples_cluster_popularity_cache
-             WHERE domain_host = '{$hostSafe}'
+             WHERE (domain_host = '{$hostSafe}' OR domain_host = '')
                AND lang_code = '{$langSafe}'
                AND material_section = '{$sectionSafe}'
                AND COALESCE(cluster_code, '') <> ''
+             GROUP BY cluster_code, cluster_label
              ORDER BY views_count DESC, cluster_label ASC, cluster_code ASC
              LIMIT {$limit}"
         );
@@ -154,12 +155,13 @@ if (!function_exists('examples_popularity_view_map')) {
         }
 
         $rows = $FRMWRK->DBRecords(
-            "SELECT cluster_code, slug, views_count
+            "SELECT cluster_code, slug, MAX(views_count) AS views_count
              FROM examples_article_popularity_cache
-             WHERE domain_host = '{$hostSafe}'
+             WHERE (domain_host = '{$hostSafe}' OR domain_host = '')
                AND lang_code = '{$langSafe}'
                AND material_section = '{$sectionSafe}'
-               AND ({$wherePairs})"
+               AND ({$wherePairs})
+             GROUP BY cluster_code, slug"
         );
 
         $map = [];

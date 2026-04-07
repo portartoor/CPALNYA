@@ -119,8 +119,8 @@ if ($selected) {
 .jrnl-pager .is-active{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.12)}
 .jrnl-detail{display:grid;gap:18px}
 .jrnl-detail-body{display:grid;gap:18px}
-.jrnl-detail-cover{max-height:540px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
-.jrnl-detail-cover img{width:100%;display:block}
+.jrnl-detail-cover{overflow:visible;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02)}
+.jrnl-detail-cover img{width:100%;height:auto;display:block;object-fit:contain}
 .jrnl-detail-content{font-size:16px;line-height:1.82;color:var(--shell-text)}
 .jrnl-detail-content h2,.jrnl-detail-content h3{font-family:"Space Grotesk","Sora",sans-serif;letter-spacing:-.03em}
 .jrnl-actions{display:flex;gap:12px;flex-wrap:wrap}
