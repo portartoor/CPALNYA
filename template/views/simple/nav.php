@@ -12,17 +12,6 @@ if (strpos($host, ':') !== false) {
 $isRu = (bool)preg_match('/\.ru$/', $host);
 $lang = $isRu ? 'ru' : 'en';
 
-$pickIcon = static function (string $code, string $fallback = '#'): string {
-    $code = trim($code);
-    if ($code === '') {
-        return $fallback;
-    }
-    if (function_exists('mb_substr')) {
-        return mb_strtoupper((string)mb_substr($code, 0, 1, 'UTF-8'), 'UTF-8');
-    }
-    return strtoupper(substr($code, 0, 1));
-};
-
 $normalizeTopicTitle = static function (string $value): string {
     $value = trim((string)preg_replace('/\s+/u', ' ', $value));
     if ($value === '') {
@@ -52,6 +41,33 @@ $sectionIcons = [
     'signals' => '!',
     'fun' => '~',
 ];
+$topicIconMap = [
+    'источники' => '>',
+    'sources' => '>',
+    'фарм' => 'F',
+    'farm' => 'F',
+    'ai creatives' => 'A',
+    'ai-креативы' => 'A',
+    'ai креативы' => 'A',
+    'операции' => 'O',
+    'operations' => 'O',
+    'policy shifts' => 'P',
+    'policy shift' => 'P',
+    'регуляторика снг' => 'R',
+    'cis regulation' => 'R',
+    'мемы команды' => 'M',
+    'team memes' => 'M',
+    'драма модерации' => 'D',
+    'moderation drama' => 'D',
+];
+
+$pickTopicIcon = static function (string $title, string $fallback = '·') use ($normalizeTopicTitle, $topicIconMap): string {
+    $normalized = $normalizeTopicTitle($title);
+    if ($normalized === '') {
+        return $fallback;
+    }
+    return $topicIconMap[$normalized] ?? $fallback;
+};
 
 $buildClusterPath = static function (string $section, string $code) use ($host, $sectionBasePaths): string {
     if (function_exists('examples_cluster_list_path')) {
@@ -85,7 +101,7 @@ foreach (['journal', 'playbooks', 'signals', 'fun'] as $sectionKey) {
             'title' => $title,
             'normalized_title' => $normalizedTitle,
             'path' => $buildClusterPath($sectionKey, $code),
-            'icon' => $pickIcon($code),
+            'icon' => $pickTopicIcon($title),
         ];
     }
 }
@@ -108,7 +124,7 @@ if (count($importantTopics) < 8) {
         ['title' => $isRu ? 'Фарм' : 'Farm', 'path' => '/journal/', 'icon' => 'F'],
         ['title' => 'AI Creatives', 'path' => '/playbooks/', 'icon' => 'A'],
         ['title' => $isRu ? 'Операции' : 'Operations', 'path' => '/playbooks/', 'icon' => 'O'],
-        ['title' => $isRu ? 'Policy shifts' : 'Policy shifts', 'path' => '/signals/', 'icon' => 'P'],
+        ['title' => 'Policy shifts', 'path' => '/signals/', 'icon' => 'P'],
         ['title' => $isRu ? 'Регуляторика СНГ' : 'CIS regulation', 'path' => '/signals/', 'icon' => 'R'],
         ['title' => $isRu ? 'Мемы команды' : 'Team memes', 'path' => '/fun/', 'icon' => 'M'],
         ['title' => $isRu ? 'Драма модерации' : 'Moderation drama', 'path' => '/fun/', 'icon' => 'D'],

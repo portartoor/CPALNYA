@@ -589,12 +589,14 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
     .nav-theme-toggle {
         display: inline-flex;
         align-items: center;
-        gap: 7px;
-        padding: 8px 11px;
+        gap: 5px;
+        padding: 6px 9px;
         background: rgba(255,255,255,.03);
         color: var(--shell-muted);
         text-decoration: none;
         border-bottom: 0;
+        font-size: 12px;
+        line-height: 1.1;
         clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
         transition: color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease;
         flex: 0 0 auto;
@@ -615,17 +617,17 @@ $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? '')
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 14px;
+        width: 12px;
         color: var(--shell-highlight);
-        font-size: 11px;
+        font-size: 10px;
     }
     .nav-section-label {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 0 8px 0 2px;
+        padding: 0 6px 0 2px;
         color: rgba(173, 190, 217, .72);
-        font: 700 10px/1 "Space Grotesk", "Sora", sans-serif;
+        font: 700 9px/1 "Space Grotesk", "Sora", sans-serif;
         letter-spacing: .18em;
         text-transform: uppercase;
         flex: 0 0 auto;
