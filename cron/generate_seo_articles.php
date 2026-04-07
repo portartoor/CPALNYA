@@ -3782,7 +3782,6 @@ function seo_find_existing_exact_duplicate(
 
     $domainSafe = mysqli_real_escape_string($db, $domainHost);
     $langSafe = mysqli_real_escape_string($db, $lang);
-    $sectionSafe = mysqli_real_escape_string($db, $materialSection);
     $titleSafe = mysqli_real_escape_string($db, $title);
 
     $normalizedTargetTitle = seo_normalize_duplicate_probe_text($title);
@@ -3792,11 +3791,22 @@ function seo_find_existing_exact_duplicate(
         return null;
     }
 
+    $hasMaterialSection = seo_table_has_column($db, 'examples_articles', 'material_section');
+    $allowedSections = ['journal', 'playbooks', 'signals', 'fun'];
+    $sectionSql = '';
+    if ($hasMaterialSection) {
+        $sectionParts = [];
+        foreach ($allowedSections as $sectionKey) {
+            $sectionParts[] = "'" . mysqli_real_escape_string($db, $sectionKey) . "'";
+        }
+        $sectionSql = " AND COALESCE(material_section, 'journal') IN (" . implode(', ', $sectionParts) . ")";
+    }
+
     $sql = "SELECT id, title, slug, excerpt_html, content_html
             FROM examples_articles
             WHERE COALESCE(domain_host, '') = '{$domainSafe}'
               AND COALESCE(lang_code, 'en') = '{$langSafe}'
-              AND COALESCE(material_section, 'journal') = '{$sectionSafe}'
+              {$sectionSql}
               AND title = '{$titleSafe}'
             ORDER BY id DESC
             LIMIT 25";
@@ -3897,12 +3907,18 @@ function seo_find_existing_near_duplicate_title(
 
     $domainSafe = mysqli_real_escape_string($db, $domainHost);
     $langSafe = mysqli_real_escape_string($db, $lang);
-    $sectionSafe = mysqli_real_escape_string($db, $materialSection);
     $clusterSafe = mysqli_real_escape_string($db, $clusterCode);
     $hasClusterCode = seo_table_has_column($db, 'examples_articles', 'cluster_code');
-    $clusterSql = $hasClusterCode
-        ? " AND COALESCE(cluster_code, '') = '{$clusterSafe}'"
-        : '';
+    $hasMaterialSection = seo_table_has_column($db, 'examples_articles', 'material_section');
+    $allowedSections = ['journal', 'playbooks', 'signals', 'fun'];
+    $sectionSql = '';
+    if ($hasMaterialSection) {
+        $sectionParts = [];
+        foreach ($allowedSections as $sectionKey) {
+            $sectionParts[] = "'" . mysqli_real_escape_string($db, $sectionKey) . "'";
+        }
+        $sectionSql = " AND COALESCE(material_section, 'journal') IN (" . implode(', ', $sectionParts) . ")";
+    }
 
     $targetTitle = seo_normalize_duplicate_probe_text($title);
     $targetHead = seo_title_head_signature($title);
@@ -3911,14 +3927,13 @@ function seo_find_existing_near_duplicate_title(
         return null;
     }
 
-    $sql = "SELECT id, title, slug" . ($hasClusterCode ? ", cluster_code" : "") . "
+    $sql = "SELECT id, title, slug" . ($hasClusterCode ? ", cluster_code" : "") . ($hasMaterialSection ? ", material_section" : "") . "
             FROM examples_articles
             WHERE COALESCE(domain_host, '') = '{$domainSafe}'
               AND COALESCE(lang_code, 'en') = '{$langSafe}'
-              AND COALESCE(material_section, 'journal') = '{$sectionSafe}'
-              {$clusterSql}
+              {$sectionSql}
             ORDER BY id DESC
-            LIMIT 80";
+            LIMIT 200";
     $res = mysqli_query($db, $sql);
     if (!$res) {
         return null;
@@ -3949,6 +3964,14 @@ function seo_find_existing_near_duplicate_title(
         if ($overlap >= 0.86) {
             mysqli_free_result($res);
             return $row;
+        }
+
+        if ($hasClusterCode && $clusterCode !== '') {
+            $existingCluster = trim((string)($row['cluster_code'] ?? ''));
+            if ($existingCluster !== '' && $existingCluster === $clusterCode && $overlap >= 0.74) {
+                mysqli_free_result($res);
+                return $row;
+            }
         }
     }
 

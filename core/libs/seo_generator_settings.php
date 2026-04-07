@@ -260,9 +260,9 @@ if (!function_exists('seo_gen_settings_default')) {
                 ? (string)$row['material_section']
                 : $key;
             $row['enabled'] = !empty($row['enabled']);
-            $row['daily_min'] = max(1, min(24, (int)($row['daily_min'] ?? $default['daily_min'])));
-            $row['daily_max'] = max($row['daily_min'], min(48, (int)($row['daily_max'] ?? $default['daily_max'])));
-            $row['max_per_run'] = max(1, min(12, (int)($row['max_per_run'] ?? $default['max_per_run'])));
+            $row['daily_min'] = max(1, min(48, (int)($row['daily_min'] ?? $default['daily_min'])));
+            $row['daily_max'] = max($row['daily_min'], min(96, (int)($row['daily_max'] ?? $default['daily_max'])));
+            $row['max_per_run'] = max(1, min(24, (int)($row['max_per_run'] ?? $default['max_per_run'])));
             $row['word_min'] = max(600, min(12000, (int)($row['word_min'] ?? $default['word_min'])));
             $row['word_max'] = max($row['word_min'], min(20000, (int)($row['word_max'] ?? $default['word_max'])));
             $row['seed_salt_suffix'] = trim((string)($row['seed_salt_suffix'] ?? $default['seed_salt_suffix']));
@@ -270,7 +270,7 @@ if (!function_exists('seo_gen_settings_default')) {
                 $row['seed_salt_suffix'] = $default['seed_salt_suffix'];
             }
             foreach (['styles_en', 'styles_ru', 'clusters_en', 'clusters_ru', 'article_structures_en', 'article_structures_ru'] as $listKey) {
-                $row[$listKey] = seo_gen_settings_parse_lines(implode("\n", (array)($row[$listKey] ?? [])), 120);
+                $row[$listKey] = seo_gen_settings_parse_lines(implode("\n", (array)($row[$listKey] ?? [])), 300);
                 if (empty($row[$listKey])) {
                     $row[$listKey] = (array)$default[$listKey];
                 }
@@ -627,16 +627,16 @@ if (!function_exists('seo_gen_settings_normalize')) {
 
         $settings['enabled'] = (bool)$settings['enabled'];
         $settings['topic_analysis_enabled'] = (bool)$settings['topic_analysis_enabled'];
-        $settings['daily_min'] = max(1, min(24, (int)$settings['daily_min']));
-        $settings['daily_max'] = max($settings['daily_min'], min(48, (int)$settings['daily_max']));
-        $settings['max_per_run'] = max(1, min(20, (int)$settings['max_per_run']));
+        $settings['daily_min'] = max(1, min(48, (int)$settings['daily_min']));
+        $settings['daily_max'] = max($settings['daily_min'], min(96, (int)$settings['daily_max']));
+        $settings['max_per_run'] = max(1, min(40, (int)$settings['max_per_run']));
         $settings['word_min'] = max(400, min(12000, (int)$settings['word_min']));
         $settings['word_max'] = max($settings['word_min'], min(20000, (int)$settings['word_max']));
         $settings['today_first_delay_min'] = max(1, min(360, (int)$settings['today_first_delay_min']));
-        $settings['auto_expand_retries'] = max(0, min(8, (int)$settings['auto_expand_retries']));
-        $settings['expand_context_chars'] = max(1000, min(50000, (int)$settings['expand_context_chars']));
+        $settings['auto_expand_retries'] = max(0, min(16, (int)$settings['auto_expand_retries']));
+        $settings['expand_context_chars'] = max(1000, min(120000, (int)$settings['expand_context_chars']));
         $settings['openai_timeout'] = max(20, min(600, (int)$settings['openai_timeout']));
-        $settings['topic_analysis_limit'] = max(20, min(300, (int)$settings['topic_analysis_limit']));
+        $settings['topic_analysis_limit'] = max(20, min(1000, (int)$settings['topic_analysis_limit']));
         $settings['narrative_person'] = strtolower(trim((string)($settings['narrative_person'] ?? 'first_person_singular')));
         if (!in_array($settings['narrative_person'], ['first_person_singular', 'first_person_plural', 'neutral'], true)) {
             $settings['narrative_person'] = 'first_person_singular';
@@ -702,28 +702,28 @@ if (!function_exists('seo_gen_settings_normalize')) {
         ))));
         $settings['langs'] = ['ru'];
 
-        $settings['styles_en'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['styles_en']), 120);
-        $settings['styles_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['styles_ru']), 120);
-        $settings['clusters_en'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['clusters_en']), 120);
-        $settings['clusters_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['clusters_ru']), 120);
-        $settings['intent_verticals_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_verticals_en'] ?? [])), 150);
-        $settings['intent_verticals_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_verticals_ru'] ?? [])), 150);
-        $settings['intent_scenarios_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_scenarios_en'] ?? [])), 150);
-        $settings['intent_scenarios_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_scenarios_ru'] ?? [])), 150);
-        $settings['intent_objectives_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_objectives_en'] ?? [])), 150);
-        $settings['intent_objectives_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_objectives_ru'] ?? [])), 150);
-        $settings['intent_constraints_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_constraints_en'] ?? [])), 150);
-        $settings['intent_constraints_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_constraints_ru'] ?? [])), 150);
-        $settings['intent_artifacts_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_artifacts_en'] ?? [])), 150);
-        $settings['intent_artifacts_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_artifacts_ru'] ?? [])), 150);
-        $settings['intent_outcomes_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_outcomes_en'] ?? [])), 150);
-        $settings['intent_outcomes_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_outcomes_ru'] ?? [])), 150);
-        $settings['service_focus_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['service_focus_en'] ?? [])), 150);
-        $settings['service_focus_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['service_focus_ru'] ?? [])), 150);
-        $settings['forbidden_topics_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['forbidden_topics_en'] ?? [])), 150);
-        $settings['forbidden_topics_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['forbidden_topics_ru'] ?? [])), 150);
-        $settings['article_structures_en'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['article_structures_en']), 120);
-        $settings['article_structures_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['article_structures_ru']), 120);
+        $settings['styles_en'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['styles_en']), 300);
+        $settings['styles_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['styles_ru']), 300);
+        $settings['clusters_en'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['clusters_en']), 300);
+        $settings['clusters_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['clusters_ru']), 300);
+        $settings['intent_verticals_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_verticals_en'] ?? [])), 300);
+        $settings['intent_verticals_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_verticals_ru'] ?? [])), 300);
+        $settings['intent_scenarios_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_scenarios_en'] ?? [])), 300);
+        $settings['intent_scenarios_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_scenarios_ru'] ?? [])), 300);
+        $settings['intent_objectives_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_objectives_en'] ?? [])), 300);
+        $settings['intent_objectives_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_objectives_ru'] ?? [])), 300);
+        $settings['intent_constraints_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_constraints_en'] ?? [])), 300);
+        $settings['intent_constraints_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_constraints_ru'] ?? [])), 300);
+        $settings['intent_artifacts_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_artifacts_en'] ?? [])), 300);
+        $settings['intent_artifacts_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_artifacts_ru'] ?? [])), 300);
+        $settings['intent_outcomes_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_outcomes_en'] ?? [])), 300);
+        $settings['intent_outcomes_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['intent_outcomes_ru'] ?? [])), 300);
+        $settings['service_focus_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['service_focus_en'] ?? [])), 300);
+        $settings['service_focus_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['service_focus_ru'] ?? [])), 300);
+        $settings['forbidden_topics_en'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['forbidden_topics_en'] ?? [])), 300);
+        $settings['forbidden_topics_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)($settings['forbidden_topics_ru'] ?? [])), 300);
+        $settings['article_structures_en'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['article_structures_en']), 300);
+        $settings['article_structures_ru'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['article_structures_ru']), 300);
         $settings['openai_headers'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['openai_headers']), 100);
         $settings['openai_proxy_pool'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['openai_proxy_pool']), 300);
         $settings['preview_image_style_options'] = seo_gen_settings_parse_lines(implode("\n", (array)$settings['preview_image_style_options']), 60);

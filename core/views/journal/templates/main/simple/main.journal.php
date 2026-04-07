@@ -304,7 +304,7 @@ if ($selected) {
             }
             ?>
             <article class="jrnl-detail">
-                <span class="jrnl-kicker"><?= htmlspecialchars((string)($issue['issue_title'] ?? $t('Р–СѓСЂРЅР°Р»', 'Journal')), ENT_QUOTES, 'UTF-8') ?></span>
+                <span class="jrnl-kicker"><?= htmlspecialchars((string)($issue['issue_title'] ?? $t('Журнал', 'Journal')), ENT_QUOTES, 'UTF-8') ?></span>
                 <h1><?= htmlspecialchars((string)($selected['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h1>
                 <div class="jrnl-tags">
                     <?php if (!empty($selected['cluster_code'])): ?>
@@ -312,7 +312,7 @@ if ($selected) {
                     <?php endif; ?>
                     <span class="jrnl-meta"><?= htmlspecialchars((string)($selected['published_at'] ?? $selected['created_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
                     <?php if (!empty($selected['author_name'])): ?><span class="jrnl-meta"><?= htmlspecialchars((string)$selected['author_name'], ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
-                    <span class="jrnl-meta jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">в—‰</i><?= (int)($selected['view_count'] ?? 0) ?></span>
+                    <span class="jrnl-meta jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($selected['view_count'] ?? 0) ?></span>
                 </div>
                 <?php if ($selectedIntroHtml !== ''): ?>
                     <div class="jrnl-detail-intro"><?= $selectedIntroHtml ?></div>
@@ -325,7 +325,7 @@ if ($selected) {
                 <div class="jrnl-detail-body">
                     <div class="jrnl-detail-content"><?= $selectedBodyHtml ?></div>
                     <div class="jrnl-actions">
-                        <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('РќР°Р·Р°Рґ РІ journal', 'Back to journal'), ENT_QUOTES, 'UTF-8') ?></a>
+                        <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Назад в журнал', 'Back to journal'), ENT_QUOTES, 'UTF-8') ?></a>
                     </div>
                     <?php if ($selectedShareUrl !== ''): ?>
                         <div class="jrnl-share">
@@ -341,17 +341,17 @@ if ($selected) {
 
             <?php if (!empty($relatedItems)): ?>
                 <section class="jrnl-related">
-                    <h2><?= htmlspecialchars($t('Р”Р°Р»СЊС€Рµ РїРѕ С‚РµРјРµ', 'Continue reading'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <h2><?= htmlspecialchars($t('Дальше по теме', 'Continue reading'), ENT_QUOTES, 'UTF-8') ?></h2>
                     <div class="jrnl-related-grid">
                         <?php foreach ($relatedItems as $item): ?>
                             <?php $cluster = trim((string)($item['cluster_code'] ?? '')); ?>
                             <a class="jrnl-card" href="<?= htmlspecialchars($buildArticleUrl((string)($item['slug'] ?? ''), $cluster), ENT_QUOTES, 'UTF-8') ?>">
                                 <div class="jrnl-card-media"><?php if (!empty($item['image_src'])): ?><img src="<?= htmlspecialchars((string)$item['image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?></div>
-                                <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('РњР°С‚РµСЂРёР°Р»', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('Материал', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
                                 <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                                 <p><?= htmlspecialchars($strip((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 140), ENT_QUOTES, 'UTF-8') ?></p>
                                 <div class="jrnl-card-foot">
-                                    <span class="jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">в—‰</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                    <span class="jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
                                 </div>
                             </a>
                         <?php endforeach; ?>
@@ -362,7 +362,7 @@ if ($selected) {
             <header class="jrnl-hero">
                 <div class="jrnl-copy">
                     <?php if (!empty($issue['issue_kicker'])): ?><span class="jrnl-kicker"><?= htmlspecialchars((string)$issue['issue_kicker'], ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
-                    <h1><?= htmlspecialchars((string)($issue['hero_title'] ?? $issue['issue_title'] ?? $t('Р–СѓСЂРЅР°Р»', 'Journal')), ENT_QUOTES, 'UTF-8') ?></h1>
+                    <h1><?= htmlspecialchars((string)($issue['hero_title'] ?? $issue['issue_title'] ?? $t('Журнал', 'Journal')), ENT_QUOTES, 'UTF-8') ?></h1>
                     <?php if (!empty($issue['hero_description'])): ?><?= $renderIssueText((string)$issue['hero_description'], 'jrnl-hero-description') ?><?php endif; ?>
                     <?php if (!empty($issue['issue_title'])): ?><h2><?= htmlspecialchars((string)$issue['issue_title'], ENT_QUOTES, 'UTF-8') ?></h2><?php endif; ?>
                     <?php if (!empty($issue['issue_subtitle'])): ?><?= $renderIssueText((string)$issue['issue_subtitle'], 'jrnl-issue-subtitle') ?><?php endif; ?>
@@ -373,14 +373,14 @@ if ($selected) {
             </header>
 
             <?php if (!empty($clusters)): ?>
-                <div class="jrnl-tags" aria-label="<?= htmlspecialchars($t('РўРµРјС‹ РІС‹РїСѓСЃРєР°', 'Issue topics'), ENT_QUOTES, 'UTF-8') ?>">
-                    <a class="jrnl-tag <?= $currentCluster === '' ? 'is-active' : '' ?>" href="<?= htmlspecialchars($buildPageUrl(''), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Р’СЃРµ С‚РµРјС‹', 'All topics'), ENT_QUOTES, 'UTF-8') ?></a>
+                <div class="jrnl-tags" aria-label="<?= htmlspecialchars($t('Темы выпуска', 'Issue topics'), ENT_QUOTES, 'UTF-8') ?>">
+                    <a class="jrnl-tag <?= $currentCluster === '' ? 'is-active' : '' ?>" href="<?= htmlspecialchars($buildPageUrl(''), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Все темы', 'All topics'), ENT_QUOTES, 'UTF-8') ?></a>
                     <?php foreach ($clusters as $cluster): ?>
                         <?php $clusterCode = trim((string)($cluster['code'] ?? '')); ?>
                         <?php if ($clusterCode === '') { continue; } ?>
                         <a class="jrnl-tag <?= $currentCluster === $clusterCode ? 'is-active' : '' ?>" href="<?= htmlspecialchars($buildPageUrl($clusterCode), ENT_QUOTES, 'UTF-8') ?>">
                             <?= htmlspecialchars((string)($cluster['label'] ?? $clusterCode), ENT_QUOTES, 'UTF-8') ?>
-                            <?php if (isset($cluster['count'])): ?> В· <?= (int)$cluster['count'] ?><?php endif; ?>
+                            <?php if (isset($cluster['count'])): ?> · <?= (int)$cluster['count'] ?><?php endif; ?>
                         </a>
                     <?php endforeach; ?>
                 </div>
@@ -392,21 +392,21 @@ if ($selected) {
                         <?php $cluster = trim((string)($item['cluster_code'] ?? '')); ?>
                         <a class="jrnl-card" href="<?= htmlspecialchars($buildArticleUrl((string)($item['slug'] ?? ''), $cluster), ENT_QUOTES, 'UTF-8') ?>">
                             <div class="jrnl-card-media"><?php if (!empty($item['image_src'])): ?><img src="<?= htmlspecialchars((string)$item['image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?></div>
-                            <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('РњР°С‚РµСЂРёР°Р»', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
+                            <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('Материал', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
                             <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                             <p><?= htmlspecialchars($strip((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 160), ENT_QUOTES, 'UTF-8') ?></p>
                             <div class="jrnl-card-foot">
                                 <span><?= htmlspecialchars((string)($item['published_at'] ?? $item['created_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
-                                <span class="jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">в—‰</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                <span class="jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
                             </div>
                         </a>
                     <?php endforeach; ?>
                 </div>
 
                 <?php if ($totalPages > 1): ?>
-                    <nav class="jrnl-pager" aria-label="<?= htmlspecialchars($t('РџР°РіРёРЅР°С†РёСЏ', 'Pagination'), ENT_QUOTES, 'UTF-8') ?>">
+                    <nav class="jrnl-pager" aria-label="<?= htmlspecialchars($t('Пагинация', 'Pagination'), ENT_QUOTES, 'UTF-8') ?>">
                         <?php if ($page > 1): ?>
-                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page - 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('РќР°Р·Р°Рґ', 'Prev'), ENT_QUOTES, 'UTF-8') ?></a>
+                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page - 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Назад', 'Prev'), ENT_QUOTES, 'UTF-8') ?></a>
                         <?php endif; ?>
                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                             <?php if ($i < $page - 2 || $i > $page + 2) { continue; } ?>
@@ -417,14 +417,14 @@ if ($selected) {
                             <?php endif; ?>
                         <?php endfor; ?>
                         <?php if ($page < $totalPages): ?>
-                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page + 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Р’РїРµСЂРµРґ', 'Next'), ENT_QUOTES, 'UTF-8') ?></a>
+                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page + 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Вперед', 'Next'), ENT_QUOTES, 'UTF-8') ?></a>
                         <?php endif; ?>
                     </nav>
                 <?php endif; ?>
             <?php else: ?>
                 <div class="jrnl-empty">
-                    <h2><?= htmlspecialchars($t('РџРѕРєР° РЅРµС‚ РјР°С‚РµСЂРёР°Р»РѕРІ', 'No journal materials yet'), ENT_QUOTES, 'UTF-8') ?></h2>
-                    <p><?= htmlspecialchars($t('РљРѕРіРґР° СЃС‚Р°С‚СЊРё РїРѕСЏРІСЏС‚СЃСЏ, РѕРЅРё Р±СѓРґСѓС‚ РІС‹РІРµРґРµРЅС‹ Р·РґРµСЃСЊ РєР°Рє РІС‹РїСѓСЃРє Р¶СѓСЂРЅР°Р»Р° СЃ С„РёР»СЊС‚СЂР°С†РёРµР№ РїРѕ С‚РµРјР°Рј.', 'Published articles will appear here as a journal issue with topic filters.'), ENT_QUOTES, 'UTF-8') ?></p>
+                    <h2><?= htmlspecialchars($t('Пока нет материалов', 'No journal materials yet'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <p><?= htmlspecialchars($t('Когда статьи появятся, они будут выведены здесь как выпуск журнала с фильтрацией по темам.', 'Published articles will appear here as a journal issue with topic filters.'), ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
             <?php endif; ?>
         <?php endif; ?>
