@@ -419,6 +419,12 @@ class Render {
 		}
 
 		$methodUpper = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
+		if ($methodUpper === 'GET' && function_exists('footer_seo_blocks_handle_dynamic_request')) {
+			$dbForFooterSeo = $FRMWRK->DB();
+			if (footer_seo_blocks_handle_dynamic_request($dbForFooterSeo)) {
+				exit;
+			}
+		}
 		$isStaticAssetPath = (bool)preg_match('/\.[a-z0-9]{1,8}$/i', (string)basename($requestPath));
 		$isFastSkipPath = (
 			$requestPath === '/adminpanel' || strpos($requestPath, '/adminpanel/') === 0

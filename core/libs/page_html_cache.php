@@ -305,6 +305,9 @@ if (!function_exists('page_html_cache_is_cacheable')) {
             if (!empty($queryParams['contact_result'])) {
                 return false;
             }
+            if (!empty($queryParams['header_search_preview']) || !empty($queryParams['footer_seo_block'])) {
+                return false;
+            }
         }
         if (page_html_cache_has_auth_cookie()) {
             return false;

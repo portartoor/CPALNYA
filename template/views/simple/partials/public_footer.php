@@ -6,13 +6,11 @@ $t = static function (string $ru, string $en) use ($isRu): string {
 };
 $year = date('Y');
 $footerSeoBlock = null;
-if (isset($FRMWRK) && is_object($FRMWRK) && method_exists($FRMWRK, 'DB') && function_exists('footer_seo_blocks_fetch_random')) {
-    $db = $FRMWRK->DB();
-    $currentSection = function_exists('footer_seo_blocks_detect_section')
-        ? footer_seo_blocks_detect_section((string)($_SERVER['REQUEST_URI'] ?? '/'))
-        : 'all';
-    $footerSeoBlock = footer_seo_blocks_fetch_random($db, (string)$host, $isRu ? 'ru' : 'en', $currentSection);
+$footerSeoEndpoint = (string)parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+if ($footerSeoEndpoint === '') {
+    $footerSeoEndpoint = '/';
 }
+$footerSeoEndpoint .= (strpos($footerSeoEndpoint, '?') === false ? '?' : '&') . 'footer_seo_block=1';
 $sectionTitles = [
     'journal' => $t('Журнал', 'Journal'),
     'playbooks' => $t('Практика', 'Playbooks'),
@@ -114,18 +112,11 @@ $footerSections = [
 ];
 ?>
 <div class="public-layout-footer public-layout-footer--simple">
-    <?php if (is_array($footerSeoBlock)): ?>
-        <?php $footerSeoStyle = trim((string)($footerSeoBlock['style_variant'] ?? 'editorial-note')); ?>
-        <section class="public-footer-seo-block public-footer-seo-block--<?= htmlspecialchars($footerSeoStyle, ENT_QUOTES, 'UTF-8') ?>">
-            <?php if (trim((string)($footerSeoBlock['block_kicker'] ?? '')) !== ''): ?>
-                <span class="public-footer-seo-kicker"><?= htmlspecialchars((string)$footerSeoBlock['block_kicker'], ENT_QUOTES, 'UTF-8') ?></span>
-            <?php endif; ?>
-            <?php if (trim((string)($footerSeoBlock['block_title'] ?? '')) !== ''): ?>
-                <h3><?= htmlspecialchars((string)$footerSeoBlock['block_title'], ENT_QUOTES, 'UTF-8') ?></h3>
-            <?php endif; ?>
-            <div class="public-footer-seo-body"><?= (string)($footerSeoBlock['body_html'] ?? '') ?></div>
-        </section>
-    <?php endif; ?>
+    <div id="publicFooterSeoMount" data-endpoint="<?= htmlspecialchars($footerSeoEndpoint, ENT_QUOTES, 'UTF-8') ?>">
+        <?php if (is_array($footerSeoBlock) && function_exists('footer_seo_blocks_render_html')): ?>
+            <?= footer_seo_blocks_render_html($footerSeoBlock) ?>
+        <?php endif; ?>
+    </div>
     <footer class="public-editorial-footer site-footer">
         <div class="public-editorial-footer-top">
             <div class="public-editorial-intro">
@@ -217,5 +208,24 @@ $footerSections = [
   window.addEventListener('resize',sync,{passive:true});
   sync();
   btn.addEventListener('click',function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+})();
+(function(){
+  var mount=document.getElementById('publicFooterSeoMount');
+  if(!mount){return;}
+  var endpoint=String(mount.getAttribute('data-endpoint')||'').trim();
+  if(!endpoint || typeof window.fetch!=='function'){return;}
+  window.fetch(endpoint,{
+    method:'GET',
+    credentials:'same-origin',
+    headers:{'X-Requested-With':'XMLHttpRequest','Accept':'text/html'}
+  }).then(function(res){
+    if(!res.ok){return '';}
+    return res.text();
+  }).then(function(html){
+    html=String(html||'').trim();
+    if(html!==''){
+      mount.innerHTML=html;
+    }
+  }).catch(function(){});
 })();
 </script>

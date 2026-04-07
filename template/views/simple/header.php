@@ -603,6 +603,13 @@ if (isset($_GET['header_search_preview'])) {
         border-color: var(--shell-border-strong);
         margin-top: 0;
     }
+    .simple-header.has-search-preview {
+        clip-path: none;
+        overflow: visible;
+    }
+    .simple-header.has-search-preview::before {
+        clip-path: none;
+    }
 
     .simple-brand {
         grid-column: 1;
@@ -743,6 +750,9 @@ if (isset($_GET['header_search_preview'])) {
         transition: opacity .2s ease, max-height .24s ease, transform .24s ease, margin .24s ease;
         max-height: 88px;
     }
+    .simple-header.has-search-preview .simple-header-center {
+        overflow: visible;
+    }
     .simple-header-search {
         display: grid;
         grid-template-columns: 1fr auto;
@@ -755,6 +765,10 @@ if (isset($_GET['header_search_preview'])) {
         clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
         transition: opacity .2s ease, transform .24s ease, border-color .24s ease;
         position: relative;
+    }
+    .simple-header.has-search-preview .simple-header-search {
+        clip-path: none;
+        overflow: visible;
     }
     .simple-header-search input {
         width: 100%;
@@ -907,6 +921,35 @@ if (isset($_GET['header_search_preview'])) {
         flex-wrap: nowrap;
         transition: transform .24s ease;
     }
+    .simple-search-toggle {
+        display: none;
+        width: 44px;
+        height: 44px;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        background: rgba(255,255,255,.04);
+        cursor: pointer;
+    }
+    .simple-search-toggle-icon {
+        position: relative;
+        width: 16px;
+        height: 16px;
+        border: 2px solid currentColor;
+        border-radius: 50%;
+        opacity: .92;
+    }
+    .simple-search-toggle-icon::after {
+        content: "";
+        position: absolute;
+        right: -5px;
+        bottom: -4px;
+        width: 7px;
+        height: 2px;
+        background: currentColor;
+        transform: rotate(45deg);
+        transform-origin: center;
+    }
     .simple-nav {
         grid-column: 1 / -1;
         display: flex;
@@ -976,6 +1019,9 @@ if (isset($_GET['header_search_preview'])) {
         pointer-events: none;
         margin: 0;
     }
+    .simple-header.is-scrolled .simple-search-toggle {
+        display: inline-flex;
+    }
     .simple-header.is-scrolled .simple-header-right {
         grid-row: 1;
         align-self: center;
@@ -995,6 +1041,30 @@ if (isset($_GET['header_search_preview'])) {
     .simple-header.is-scrolled .nav-theme-toggle {
         padding: 5px 8px;
         font-size: 11px;
+    }
+    .simple-header.is-scrolled.is-search-open .simple-header-center {
+        position: absolute;
+        left: clamp(240px, 24vw, 320px);
+        right: 74px;
+        top: 8px;
+        grid-column: auto;
+        grid-row: auto;
+        z-index: 4;
+        opacity: 1;
+        max-height: 120px;
+        transform: none;
+        pointer-events: auto;
+        margin: 0;
+        overflow: visible;
+    }
+    .simple-header.is-scrolled.is-search-open .simple-nav {
+        opacity: .08;
+        pointer-events: none;
+    }
+    .simple-header.is-scrolled.is-search-open .simple-search-toggle {
+        display: inline-flex;
+        background: linear-gradient(135deg, rgba(115,184,255,.18), rgba(39,223,192,.12));
+        border-color: var(--shell-border-strong);
     }
     .nav-item-icon {
         display: inline-flex;
@@ -1242,6 +1312,7 @@ if (isset($_GET['header_search_preview'])) {
         .simple-header { grid-template-columns: minmax(240px, 1fr) auto; }
         .simple-header-note, .simple-header-center { display: none; }
         .simple-nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
+        .simple-search-toggle { display: none !important; }
         .simple-nav-backdrop {
             display: block;
             position: fixed;
@@ -1349,7 +1420,7 @@ if (isset($_GET['header_search_preview'])) {
     </div>
 
     <div class="simple-header-center">
-        <form class="simple-header-search" method="get" action="/journal/">
+        <form class="simple-header-search" id="simple-header-search" method="get" action="/journal/">
             <input type="text" name="q" data-search-input placeholder="<?= htmlspecialchars($isRu ? 'Поиск: Facebook farm, антидетект, tracker setup, nutra funnel' : 'Search: Facebook farm, anti-detect, tracker setup, nutra funnel', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
             <button type="submit"><?= htmlspecialchars($isRu ? 'Найти в выпусках' : 'Search issues', ENT_QUOTES, 'UTF-8') ?></button>
             <div class="simple-search-preview" id="simple-search-preview" aria-hidden="true"></div>
@@ -1357,6 +1428,9 @@ if (isset($_GET['header_search_preview'])) {
     </div>
 
     <div class="simple-header-right">
+        <button class="simple-search-toggle" type="button" aria-expanded="false" aria-controls="simple-header-search">
+            <span class="simple-search-toggle-icon" aria-hidden="true"></span>
+        </button>
         <button class="simple-nav-toggle" type="button" aria-expanded="false" aria-controls="simple-nav-drawer" aria-label="<?= htmlspecialchars($isRu ? 'Открыть меню журнала' : 'Open magazine menu', ENT_QUOTES, 'UTF-8') ?>">
             <span></span><span></span><span></span>
         </button>
@@ -1370,6 +1444,7 @@ if (isset($_GET['header_search_preview'])) {
 <script>
 (function () {
     var btn = document.querySelector('.simple-nav-toggle');
+    var searchToggle = document.querySelector('.simple-search-toggle');
     var nav = document.getElementById('simple-nav-drawer');
     var backdrop = document.querySelector('.simple-nav-backdrop');
     var header = document.getElementById('cp-header');
@@ -1397,10 +1472,37 @@ if (isset($_GET['header_search_preview'])) {
     function closePreview() {
         previewItems = [];
         previewActiveIndex = -1;
+        if (header) {
+            header.classList.remove('has-search-preview');
+        }
         if (searchPreview) {
             searchPreview.classList.remove('is-visible');
             searchPreview.setAttribute('aria-hidden', 'true');
             searchPreview.innerHTML = '';
+        }
+    }
+    function setSearchState(open) {
+        if (!header || !searchToggle) {
+            return;
+        }
+        var next = !!open && header.classList.contains('is-scrolled');
+        header.classList.toggle('is-search-open', next);
+        searchToggle.setAttribute('aria-expanded', next ? 'true' : 'false');
+        if (!next) {
+            header.classList.remove('has-search-preview');
+        }
+        if (next) {
+            if (typeof closeMenu === 'function') {
+                closeMenu();
+            }
+            window.setTimeout(function () {
+                if (searchInput && typeof searchInput.focus === 'function') {
+                    searchInput.focus();
+                    if (typeof searchInput.select === 'function' && String(searchInput.value || '').trim() !== '') {
+                        searchInput.select();
+                    }
+                }
+            }, 20);
         }
     }
     function renderPreview(groups) {
@@ -1410,6 +1512,9 @@ if (isset($_GET['header_search_preview'])) {
         var html = '';
         previewItems = [];
         previewActiveIndex = -1;
+        if (header) {
+            header.classList.add('has-search-preview');
+        }
         var keys = previewSectionOrder.filter(function (key) {
             return Array.isArray(groups[key]) && groups[key].length;
         });
@@ -1486,6 +1591,9 @@ if (isset($_GET['header_search_preview'])) {
                     searchPreview.innerHTML = '<div class="simple-search-preview-empty"><?= htmlspecialchars($isRu ? 'Ничего не найдено' : 'No results found', ENT_QUOTES, 'UTF-8') ?></div>';
                     searchPreview.classList.add('is-visible');
                     searchPreview.setAttribute('aria-hidden', 'false');
+                    if (header) {
+                        header.classList.add('has-search-preview');
+                    }
                     previewItems = [];
                     previewActiveIndex = -1;
                     return;
@@ -1528,6 +1636,12 @@ if (isset($_GET['header_search_preview'])) {
             var isScrolled = window.scrollY > 18;
             header.classList.toggle('is-scrolled', isScrolled);
             document.body.style.paddingTop = String(measuredHeaderOffset) + 'px';
+            if (!isScrolled) {
+                header.classList.remove('is-search-open');
+                if (searchToggle) {
+                    searchToggle.setAttribute('aria-expanded', 'false');
+                }
+            }
         };
         measureExpandedHeaderOffset();
         window.addEventListener('scroll', syncHeader, { passive: true });
@@ -1584,8 +1698,14 @@ if (isset($_GET['header_search_preview'])) {
             if (!searchForm) {
                 return;
             }
+            if (searchToggle && searchToggle.contains(event.target)) {
+                return;
+            }
             if (!searchForm.contains(event.target)) {
                 closePreview();
+                if (header && header.classList.contains('is-search-open') && !header.contains(event.target)) {
+                    setSearchState(false);
+                }
             }
         });
         searchPreview.addEventListener('mouseenter', function (event) {
@@ -1607,8 +1727,15 @@ if (isset($_GET['header_search_preview'])) {
     function closeMenu() {
         setMenuState(false);
     }
+    if (searchToggle) {
+        searchToggle.addEventListener('click', function () {
+            var isOpen = header && header.classList.contains('is-search-open');
+            setSearchState(!isOpen);
+        });
+    }
     btn.addEventListener('click', function () {
         var isOpen = document.body.classList.contains('simple-nav-open');
+        setSearchState(false);
         setMenuState(!isOpen);
     });
     if (backdrop) {
@@ -1616,6 +1743,7 @@ if (isset($_GET['header_search_preview'])) {
     }
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
+            setSearchState(false);
             closeMenu();
         }
     });

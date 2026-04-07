@@ -209,13 +209,17 @@ if (!function_exists('footer_seo_blocks_fetch_random')) {
         $hostSafe = mysqli_real_escape_string($db, $host);
         $langSafe = mysqli_real_escape_string($db, $langCode);
         $sectionSafe = mysqli_real_escape_string($db, $sectionScope);
+        $sectionSql = '';
+        if (!in_array($sectionScope, ['*', 'any'], true)) {
+            $sectionSql = " AND (`section_scope` = 'all' OR `section_scope` = '{$sectionSafe}')";
+        }
         $rows = [];
         $sql = "SELECT *
                 FROM `{$table}`
                 WHERE `is_active` = 1
                   AND `lang_code` = '{$langSafe}'
                   AND (`domain_host` = '' OR `domain_host` = '{$hostSafe}')
-                  AND (`section_scope` = 'all' OR `section_scope` = '{$sectionSafe}')
+                  {$sectionSql}
                 ORDER BY `sort_order` DESC, `id` DESC";
         $res = @mysqli_query($db, $sql);
         if ($res) {
@@ -227,5 +231,81 @@ if (!function_exists('footer_seo_blocks_fetch_random')) {
             return null;
         }
         return $rows[array_rand($rows)];
+    }
+}
+
+if (!function_exists('footer_seo_blocks_render_html')) {
+    function footer_seo_blocks_render_html(?array $block): string
+    {
+        if (!is_array($block)) {
+            return '';
+        }
+        $style = trim((string)($block['style_variant'] ?? 'editorial-note'));
+        $kicker = trim((string)($block['block_kicker'] ?? ''));
+        $title = trim((string)($block['block_title'] ?? ''));
+        $bodyHtml = (string)($block['body_html'] ?? '');
+
+        if ($style === '') {
+            $style = 'editorial-note';
+        }
+
+        ob_start();
+        ?>
+        <section class="public-footer-seo-block public-footer-seo-block--<?= htmlspecialchars($style, ENT_QUOTES, 'UTF-8') ?>">
+            <?php if ($kicker !== ''): ?>
+                <span class="public-footer-seo-kicker"><?= htmlspecialchars($kicker, ENT_QUOTES, 'UTF-8') ?></span>
+            <?php endif; ?>
+            <?php if ($title !== ''): ?>
+                <h3><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h3>
+            <?php endif; ?>
+            <div class="public-footer-seo-body"><?= $bodyHtml ?></div>
+        </section>
+        <?php
+        return (string)ob_get_clean();
+    }
+}
+
+if (!function_exists('footer_seo_blocks_handle_dynamic_request')) {
+    function footer_seo_blocks_handle_dynamic_request(?mysqli $db): bool
+    {
+        if (!isset($_GET['footer_seo_block'])) {
+            return false;
+        }
+        if (!$db instanceof mysqli) {
+            http_response_code(500);
+            header('Content-Type: application/json; charset=UTF-8');
+            echo json_encode(['ok' => false, 'error' => 'db_unavailable'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            return true;
+        }
+
+        $host = strtolower((string)($_SERVER['MIRROR_DOMAIN_HOST'] ?? $_SERVER['HTTP_HOST'] ?? ''));
+        if (strpos($host, ':') !== false) {
+            $host = explode(':', $host, 2)[0];
+        }
+        $langCode = (bool)preg_match('/\.ru$/', $host) ? 'ru' : 'en';
+        $block = footer_seo_blocks_fetch_random($db, $host, $langCode, 'any');
+        $html = footer_seo_blocks_render_html($block);
+
+        if (!headers_sent()) {
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('Pragma: no-cache');
+        }
+
+        $format = strtolower(trim((string)($_GET['format'] ?? 'html')));
+        if ($format === 'json') {
+            header('Content-Type: application/json; charset=UTF-8');
+            echo json_encode([
+                'ok' => $html !== '',
+                'html' => $html,
+                'style' => (string)($block['style_variant'] ?? ''),
+                'title' => (string)($block['block_title'] ?? ''),
+                'kicker' => (string)($block['block_kicker'] ?? ''),
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            return true;
+        }
+
+        header('Content-Type: text/html; charset=UTF-8');
+        echo $html;
+        return true;
     }
 }

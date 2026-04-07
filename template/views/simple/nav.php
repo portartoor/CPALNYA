@@ -78,7 +78,7 @@ $navSections = [
 
 if (!empty($importantTopicItems)) {
     $navSections[] = [
-        'label' => $isRu ? 'Важные разделы' : 'Important Topics',
+        'label' => $isRu ? 'Важное' : 'Important',
         'items' => $importantTopicItems,
     ];
 }
