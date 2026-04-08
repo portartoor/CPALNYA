@@ -646,7 +646,25 @@ if (!function_exists('footer_tarot_crop_card_data_url')) {
         imagesavealpha($dst, true);
         $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
         imagefilledrectangle($dst, 0, 0, $w, $h, $transparent);
-        imagecopy($dst, $src, 0, 0, (int)$card['x'], (int)$card['y'], $w, $h);
+
+        $zoomRatio = 0.90;
+        $cropW = max(1, (int)round($w * $zoomRatio));
+        $cropH = max(1, (int)round($h * $zoomRatio));
+        $cropX = (int)$card['x'] + (int)floor(($w - $cropW) / 2);
+        $cropY = (int)$card['y'] + (int)floor(($h - $cropH) / 2);
+
+        imagecopyresampled(
+            $dst,
+            $src,
+            0,
+            0,
+            $cropX,
+            $cropY,
+            $w,
+            $h,
+            $cropW,
+            $cropH
+        );
 
         ob_start();
         imagepng($dst, null, 7);
@@ -719,23 +737,11 @@ if (!function_exists('footer_tarot_render_html')) {
         if (empty($cards)) {
             return '';
         }
-        $titleVariants = footer_tarot_title_variants($langCode);
-        $introVariants = footer_tarot_intro_variants($langCode);
         $predictionVariants = footer_tarot_prediction_variants($langCode);
-        $title = (footer_tarot_pick_variants($titleVariants, 1)[0] ?? ($langCode === 'ru' ? '4 случайные карты таро' : '4 random tarot cards'));
-        $introParagraphs = footer_tarot_pick_variants($introVariants, 2);
         $prediction = (footer_tarot_pick_variants($predictionVariants, 1)[0] ?? '');
         ob_start();
         ?>
-        <section class="public-footer-tarot" aria-label="<?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?>">
-            <div class="public-footer-tarot-copy">
-                <h3><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h3>
-                <div class="public-footer-tarot-text">
-                    <?php foreach ($introParagraphs as $paragraph): ?>
-                        <p><?= htmlspecialchars($paragraph, ENT_QUOTES, 'UTF-8') ?></p>
-                    <?php endforeach; ?>
-                </div>
-            </div>
+        <section class="public-footer-tarot" aria-label="<?= htmlspecialchars($langCode === 'ru' ? 'Случайный расклад таро' : 'Random tarot spread', ENT_QUOTES, 'UTF-8') ?>">
             <div class="public-footer-tarot-row">
                 <?php foreach ($cards as $card): ?>
                     <figure class="public-footer-tarot-card" data-card-index="<?= (int)($card['index'] ?? 0) ?>">
