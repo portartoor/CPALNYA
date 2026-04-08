@@ -770,7 +770,7 @@ if (!function_exists('footer_tarot_render_html')) {
 if (!function_exists('footer_seo_blocks_render_html')) {
     function footer_seo_blocks_render_html(?array $block, array $tarotCards = [], string $langCode = 'ru'): string
     {
-        if (!is_array($block) && empty($tarotCards)) {
+        if (!is_array($block)) {
             return '';
         }
         $style = trim((string)($block['style_variant'] ?? 'editorial-note'));
@@ -785,18 +785,15 @@ if (!function_exists('footer_seo_blocks_render_html')) {
         ob_start();
         ?>
         <div class="public-footer-seo-stack">
-            <?= footer_tarot_render_html($tarotCards, $langCode) ?>
-            <?php if (is_array($block)): ?>
-                <section class="public-footer-seo-block public-footer-seo-block--<?= htmlspecialchars($style, ENT_QUOTES, 'UTF-8') ?>">
-                    <?php if ($kicker !== ''): ?>
-                        <span class="public-footer-seo-kicker"><?= htmlspecialchars($kicker, ENT_QUOTES, 'UTF-8') ?></span>
-                    <?php endif; ?>
-                    <?php if ($title !== ''): ?>
-                        <h3><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h3>
-                    <?php endif; ?>
-                    <div class="public-footer-seo-body"><?= $bodyHtml ?></div>
-                </section>
-            <?php endif; ?>
+            <section class="public-footer-seo-block public-footer-seo-block--<?= htmlspecialchars($style, ENT_QUOTES, 'UTF-8') ?>">
+                <?php if ($kicker !== ''): ?>
+                    <span class="public-footer-seo-kicker"><?= htmlspecialchars($kicker, ENT_QUOTES, 'UTF-8') ?></span>
+                <?php endif; ?>
+                <?php if ($title !== ''): ?>
+                    <h3><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h3>
+                <?php endif; ?>
+                <div class="public-footer-seo-body"><?= $bodyHtml ?></div>
+            </section>
         </div>
         <?php
         return (string)ob_get_clean();
@@ -822,8 +819,7 @@ if (!function_exists('footer_seo_blocks_handle_dynamic_request')) {
         }
         $langCode = (bool)preg_match('/\.ru$/', $host) ? 'ru' : 'en';
         $block = footer_seo_blocks_fetch_random($db, $host, $langCode, 'any');
-        $tarotCards = footer_tarot_pick_random($langCode, 4);
-        $html = footer_seo_blocks_render_html($block, $tarotCards, $langCode);
+        $html = footer_seo_blocks_render_html($block, [], $langCode);
 
         if (!headers_sent()) {
             header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
@@ -839,15 +835,6 @@ if (!function_exists('footer_seo_blocks_handle_dynamic_request')) {
                 'style' => (string)($block['style_variant'] ?? ''),
                 'title' => (string)($block['block_title'] ?? ''),
                 'kicker' => (string)($block['block_kicker'] ?? ''),
-                'cards' => array_map(static function (array $card): array {
-                    return [
-                        'index' => (int)($card['index'] ?? 0),
-                        'name' => (string)($card['name'] ?? ''),
-                        'row' => (int)($card['row'] ?? 0),
-                        'col' => (int)($card['col'] ?? 0),
-                        'image' => (string)($card['image'] ?? ''),
-                    ];
-                }, $tarotCards),
             ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             return true;
         }
