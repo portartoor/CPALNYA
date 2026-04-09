@@ -625,7 +625,7 @@ if (!function_exists('public_portal_current_user')) {
             return null;
         }
         $db = $FRMWRK->DB();
-        if (!$db || !public_portal_users_ensure_schema($db)) {
+        if (!$db || !public_portal_table_exists($db, 'public_users')) {
             return null;
         }
         $rows = $FRMWRK->DBRecords(
@@ -1178,7 +1178,7 @@ if (!function_exists('public_portal_record_view')) {
     function public_portal_record_view($FRMWRK, string $contentType, int $contentId): int
     {
         $db = $FRMWRK->DB();
-        if (!$db || !public_portal_views_ensure_schema($db)) {
+        if (!$db || !public_portal_table_exists($db, 'public_content_views')) {
             return 0;
         }
         public_portal_session_boot();
@@ -1208,7 +1208,12 @@ if (!function_exists('public_portal_fetch_comments')) {
     function public_portal_fetch_comments($FRMWRK, string $contentType, int $contentId): array
     {
         $db = $FRMWRK->DB();
-        if (!$db || !public_portal_comments_ensure_schema($db) || !public_portal_users_ensure_schema($db) || !public_portal_comment_votes_ensure_schema($db)) {
+        if (
+            !$db
+            || !public_portal_table_exists($db, 'public_comments')
+            || !public_portal_table_exists($db, 'public_users')
+            || !public_portal_table_exists($db, 'public_comment_votes')
+        ) {
             return [];
         }
         $typeSafe = mysqli_real_escape_string($db, public_portal_slugify($contentType, 'article'));
@@ -1262,7 +1267,7 @@ if (!function_exists('public_portal_comment_total_for_content')) {
     function public_portal_comment_total_for_content($FRMWRK, string $contentType, int $contentId): int
     {
         $db = $FRMWRK->DB();
-        if (!$db || !public_portal_comments_ensure_schema($db)) {
+        if (!$db || !public_portal_table_exists($db, 'public_comments') || !public_portal_table_exists($db, 'public_users')) {
             return 0;
         }
         $typeSafe = mysqli_real_escape_string($db, public_portal_slugify($contentType, 'article'));
@@ -1285,7 +1290,7 @@ if (!function_exists('public_portal_admin_fetch_comments')) {
     function public_portal_admin_fetch_comments($FRMWRK, int $articleId = 0, int $userId = 0): array
     {
         $db = $FRMWRK->DB();
-        if (!$db || !public_portal_comments_ensure_schema($db) || !public_portal_users_ensure_schema($db)) {
+        if (!$db || !public_portal_table_exists($db, 'public_comments') || !public_portal_table_exists($db, 'public_users')) {
             return [];
         }
         $articleJoin = public_portal_table_exists($db, 'examples_articles')

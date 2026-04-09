@@ -1,5 +1,6 @@
 <?php
 $commentsRows = is_array($commentsRows ?? null) ? $commentsRows : [];
+$usersRows = is_array($usersRows ?? null) ? $usersRows : [];
 $articleOptions = is_array($articleOptions ?? null) ? $articleOptions : [];
 $filterArticleId = (int)($filterArticleId ?? 0);
 $filterUserId = (int)($filterUserId ?? 0);
@@ -43,6 +44,68 @@ $filterUserId = (int)($filterUserId ?? 0);
         </div>
     </div>
 
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Users</h5>
+                <small class="text-muted">Click a user to open all comments.</small>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Contacts</th>
+                            <th>Stats</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($usersRows as $user): ?>
+                            <tr>
+                                <td>#<?= (int)($user['id'] ?? 0) ?></td>
+                                <td>
+                                    <div><strong><?= htmlspecialchars((string)($user['display_name'] ?? $user['username'] ?? ''), ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                    <div class="text-muted">@<?= htmlspecialchars((string)($user['username'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
+                                    <small class="d-block text-muted"><?= htmlspecialchars((string)($user['email'] ?? ''), ENT_QUOTES, 'UTF-8') ?></small>
+                                </td>
+                                <td>
+                                    <div class="text-muted"><?= htmlspecialchars((string)($user['telegram_handle'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
+                                    <small class="d-block text-muted"><?= htmlspecialchars((string)($user['website_url'] ?? ''), ENT_QUOTES, 'UTF-8') ?></small>
+                                </td>
+                                <td>
+                                    <div>rating: <?= (int)($user['comment_rating'] ?? 0) ?></div>
+                                    <small class="d-block text-muted">comments: <?= (int)($user['comments_count'] ?? 0) ?> / +<?= (int)($user['comment_votes_up'] ?? 0) ?> / -<?= (int)($user['comment_votes_down'] ?? 0) ?></small>
+                                    <small class="d-block text-muted">last login: <?= htmlspecialchars((string)($user['last_login_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></small>
+                                </td>
+                                <td>
+                                    <span class="<?= ((int)($user['is_banned'] ?? 0) === 1) ? 'text-danger' : 'text-success' ?>">
+                                        <?= ((int)($user['is_banned'] ?? 0) === 1) ? 'banned' : 'active' ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-grid gap-2">
+                                        <a class="btn btn-sm btn-outline-primary" href="/adminpanel/comments/?user_id=<?= (int)($user['id'] ?? 0) ?>">All comments</a>
+                                        <form method="post">
+                                            <input type="hidden" name="comments_action" value="toggle_ban_user">
+                                            <input type="hidden" name="user_id" value="<?= (int)($user['id'] ?? 0) ?>">
+                                            <button class="btn btn-sm btn-warning" type="submit"><?= ((int)($user['is_banned'] ?? 0) === 1) ? 'Unban user' : 'Ban user' ?></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        <?php if (empty($usersRows)): ?>
+                            <tr><td colspan="6" class="text-center text-muted py-3">No public users found.</td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
@@ -71,6 +134,9 @@ $filterUserId = (int)($filterUserId ?? 0);
                                     <div class="text-muted">@<?= htmlspecialchars((string)($row['username'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
                                     <small class="d-block text-muted">rating: <?= (int)($row['comment_rating'] ?? 0) ?> / comments: <?= (int)($row['comments_count'] ?? 0) ?></small>
                                     <small class="<?= ((int)($row['is_banned'] ?? 0) === 1) ? 'text-danger' : 'text-success' ?>"><?= ((int)($row['is_banned'] ?? 0) === 1) ? 'banned' : 'active' ?></small>
+                                    <div class="mt-2">
+                                        <a class="btn btn-sm btn-outline-primary" href="/adminpanel/comments/?user_id=<?= (int)($row['user_id'] ?? 0) ?>">All comments by user</a>
+                                    </div>
                                 </td>
                                 <td>
                                     <div><?= htmlspecialchars((string)($row['section_code'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>

@@ -95,9 +95,10 @@ $heroSectionTitles = [
 .home-z-feature-media{width:196px;aspect-ratio:1/1;align-self:start;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));overflow:hidden}
 .home-z-feature-media img{display:block;width:100%;height:100%;object-fit:cover}
 .home-z-feature-copy{display:grid;gap:10px;min-width:0;align-content:start}
-.home-z-feature-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.home-z-feature-top{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
 .home-z-feature h3{margin:0;font:700 1.1rem/1.14 "Space Grotesk","Sora",sans-serif}
 .home-z-feature a{color:inherit;text-decoration:none}
+.home-z-feature-top .home-z-tag,.home-z-feature-top .home-z-meta{margin:0}
 .home-z-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 .home-z-block{padding:22px;display:grid;gap:18px;align-content:start}
 .home-z-block-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:start;min-height:74px;margin-bottom:22px}
@@ -153,12 +154,11 @@ $heroSectionTitles = [
                         <div class="home-z-feature-copy">
                             <div class="home-z-feature-top">
                                 <span class="home-z-tag"><?= htmlspecialchars($t('Редакция рекомендует', 'Editors recommend'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <?php if ($heroCardDate !== ''): ?>
+                                    <span class="home-z-meta"><?= htmlspecialchars($heroCardDate, ENT_QUOTES, 'UTF-8') ?></span>
+                                <?php endif; ?>
                                 <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($heroCard['view_count'] ?? 0) ?></span>
                             </div>
-                            <p class="home-z-meta"><?= htmlspecialchars((string)($heroSectionTitles[$heroSection] ?? $heroSectionTitles['journal']), ENT_QUOTES, 'UTF-8') ?></p>
-                            <?php if ($heroCardDate !== ''): ?>
-                                <p class="home-z-meta"><?= htmlspecialchars($heroCardDate, ENT_QUOTES, 'UTF-8') ?></p>
-                            <?php endif; ?>
                             <h3><a href="<?= htmlspecialchars($buildArticleUrl((array)$heroCard, $heroSection), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)($heroCard['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></a></h3>
                             <p><?= htmlspecialchars($excerpt((string)($heroCard['excerpt_html'] ?? $heroCard['content_html'] ?? ''), 240), ENT_QUOTES, 'UTF-8') ?></p>
                         </div>

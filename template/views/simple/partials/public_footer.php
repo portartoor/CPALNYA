@@ -218,6 +218,7 @@ $footerSections = [
 (function(){
   var mount=document.getElementById('publicFooterSeoMount');
   if(!mount){return;}
+  if(String((mount.innerHTML || '')).trim() !== ''){return;}
   var endpoint=String(mount.getAttribute('data-endpoint')||'').trim();
   if(!endpoint || typeof window.fetch!=='function'){return;}
   window.fetch(endpoint,{

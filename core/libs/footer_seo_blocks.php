@@ -275,9 +275,6 @@ if (!function_exists('footer_seo_blocks_fetch_random')) {
         if (!$db instanceof mysqli) {
             return null;
         }
-        footer_seo_blocks_ensure_schema($db);
-        footer_seo_blocks_seed_defaults($db);
-
         $table = footer_seo_blocks_table_name();
         $host = strtolower(trim($host));
         if (strpos($host, ':') !== false) {
@@ -295,10 +292,11 @@ if (!function_exists('footer_seo_blocks_fetch_random')) {
                   AND (`domain_host` = '' OR `domain_host` = '{$hostSafe}')
                 ORDER BY `sort_order` DESC, `id` DESC";
         $res = @mysqli_query($db, $sql);
-        if ($res) {
-            while ($row = mysqli_fetch_assoc($res)) {
-                $rows[] = $row;
-            }
+        if (!$res) {
+            return null;
+        }
+        while ($row = mysqli_fetch_assoc($res)) {
+            $rows[] = $row;
         }
         if (empty($rows)) {
             return null;

@@ -51,6 +51,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && $db) {
 $filterArticleId = max(0, (int)($_GET['article_id'] ?? 0));
 $filterUserId = max(0, (int)($_GET['user_id'] ?? 0));
 $commentsRows = function_exists('public_portal_admin_fetch_comments') ? public_portal_admin_fetch_comments($FRMWRK, $filterArticleId, $filterUserId) : [];
+$usersRows = [];
+$userLimit = 150;
+if ($db && function_exists('public_portal_table_exists') && public_portal_table_exists($db, 'public_users')) {
+    $usersRows = (array)$FRMWRK->DBRecords(
+        "SELECT id, username, display_name, email, telegram_handle, website_url, comment_rating, comment_votes_up, comment_votes_down, comments_count, is_banned, created_at, last_login_at
+         FROM public_users
+         ORDER BY comments_count DESC, comment_rating DESC, id DESC
+         LIMIT {$userLimit}"
+    );
+}
 $articleOptions = [];
 if ($db && function_exists('examples_table_exists') && examples_table_exists($db)) {
     $articleOptions = (array)$FRMWRK->DBRecords(

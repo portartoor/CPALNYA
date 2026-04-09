@@ -719,11 +719,16 @@ if (!function_exists('examples_fetch_published_by_slug')) {
 if (!function_exists('examples_fetch_clusters')) {
     function examples_fetch_clusters($FRMWRK, string $host, string $lang = 'en', int $limit = 20, string $materialSection = ''): array
     {
+        static $cache = [];
         $db = $FRMWRK->DB();
         if (!$db || !examples_table_exists($db) || !examples_table_has_column($db, 'cluster_code')) {
             return [];
         }
         $limit = max(1, min(50, $limit));
+        $cacheKey = strtolower(trim($host)) . '|' . strtolower(trim($lang)) . '|' . (int)$limit . '|' . strtolower(trim($materialSection));
+        if (isset($cache[$cacheKey])) {
+            return $cache[$cacheKey];
+        }
         $hostSafe = mysqli_real_escape_string($db, strtolower($host));
         $langCond = examples_table_has_lang_column($db)
             ? ($lang === 'ru' ? "AND lang_code = 'ru'" : "AND lang_code = 'en'")
@@ -755,6 +760,7 @@ if (!function_exists('examples_fetch_clusters')) {
                 'count' => (int)($row['cnt'] ?? 0),
             ];
         }
+        $cache[$cacheKey] = $out;
         return $out;
     }
 }
