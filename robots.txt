@@ -1,2 +1,5 @@
 User-agent: *
-Disallow: /
+Allow: /
+
+Sitemap: https://cpalnya.ru/sitemap.xml
+Sitemap: https://cpalnya.ru/sitemap-images.xml
