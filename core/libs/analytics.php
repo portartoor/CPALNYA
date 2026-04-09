@@ -827,16 +827,25 @@ function analytics_geo_lookup_remote(string $ip, string $ua = '', ?string $userI
     return [];
 }
 
+function analytics_geo_remote_enabled(): bool
+{
+    if (PHP_SAPI === 'cli') {
+        return true;
+    }
+
+    $explicit = $GLOBALS['GeoIpSpaceApiFrontendEnabled'] ?? null;
+    if ($explicit !== null) {
+        return (bool)$explicit;
+    }
+
+    return false;
+}
+
 function analytics_geo_lookup(string $ip, string $ua = '', ?string $userId = null): array
 {
     static $cityReader = null;
     if ($ip === '0.0.0.0' || !filter_var($ip, FILTER_VALIDATE_IP)) {
         return [];
-    }
-
-    $remote = analytics_geo_lookup_remote($ip, $ua, $userId);
-    if (!empty($remote)) {
-        return $remote;
     }
 
     try {
@@ -875,9 +884,19 @@ function analytics_geo_lookup(string $ip, string $ua = '', ?string $userId = nul
             'longitude' => isset($city->location->longitude) ? (float)$city->location->longitude : null,
         ];
     } catch (\Throwable $e) {
-        analytics_log_file('Geo lookup failed: ' . $e->getMessage());
+        analytics_log_file('Geo lookup local failed: ' . $e->getMessage());
+    }
+
+    if (!analytics_geo_remote_enabled()) {
         return [];
     }
+
+    $remote = analytics_geo_lookup_remote($ip, $ua, $userId);
+    if (!empty($remote)) {
+        return $remote;
+    }
+
+    return [];
 }
 
 function analytics_visit_payload(array $context = []): array
