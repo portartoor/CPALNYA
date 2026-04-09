@@ -196,23 +196,6 @@ if (!function_exists('public_portal_avatar_svg')) {
         $colors = ['#73b8ff', '#27dfc0', '#ff9a5f', '#f4d56b', '#b38cff', '#ff6d8a'];
         $primary = $colors[hexdec(substr($hash, 0, 2)) % count($colors)];
         $secondary = $colors[hexdec(substr($hash, 2, 2)) % count($colors)];
-        $chars = trim($label);
-        if ($chars === '') {
-            $parts = preg_split('/[\s_\-.]+/u', $seed) ?: [];
-            $letters = '';
-            foreach ($parts as $part) {
-                $part = trim((string)$part);
-                if ($part === '') {
-                    continue;
-                }
-                $letters .= function_exists('mb_substr') ? mb_substr($part, 0, 1, 'UTF-8') : substr($part, 0, 1);
-                if (function_exists('mb_strlen') ? mb_strlen($letters, 'UTF-8') >= 2 : strlen($letters) >= 2) {
-                    break;
-                }
-            }
-            $chars = $letters !== '' ? $letters : 'U';
-        }
-        $chars = function_exists('mb_strtoupper') ? mb_strtoupper($chars, 'UTF-8') : strtoupper($chars);
         $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" fill="none">'
             . '<defs><linearGradient id="g" x1="18" y1="18" x2="142" y2="142" gradientUnits="userSpaceOnUse">'
             . '<stop stop-color="' . htmlspecialchars($primary, ENT_QUOTES, 'UTF-8') . '"/>'
@@ -221,8 +204,9 @@ if (!function_exists('public_portal_avatar_svg')) {
             . '<rect width="160" height="160" rx="22" fill="#081120"/>'
             . '<rect x="10" y="10" width="140" height="140" rx="18" fill="url(#g)" opacity=".95"/>'
             . '<circle cx="120" cy="38" r="18" fill="white" opacity=".12"/>'
-            . '<path d="M28 120c18-20 35-30 52-30 17 0 30 7 52 26" stroke="white" stroke-opacity=".18" stroke-width="10" stroke-linecap="round"/>'
-            . '<text x="80" y="92" text-anchor="middle" font-family="Sora, Arial, sans-serif" font-size="52" font-weight="700" fill="white">' . htmlspecialchars($chars, ENT_QUOTES, 'UTF-8') . '</text>'
+            . '<circle cx="80" cy="66" r="24" fill="white" opacity=".24"/>'
+            . '<path d="M38 124c12-18 26-28 42-31 16-3 30-2 42 4 10 5 18 13 24 27" fill="white" fill-opacity=".18"/>'
+            . '<path d="M42 124c12-16 25-24 40-27 15-3 28-2 39 4 10 5 17 12 21 23" stroke="white" stroke-opacity=".18" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>'
             . '</svg>';
         return 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
@@ -445,7 +429,7 @@ if (!function_exists('public_portal_profile_url')) {
         if ($username === '') {
             return '/account/';
         }
-        return '/account/?user=' . rawurlencode($username);
+        return '/member/' . rawurlencode($username) . '/';
     }
 }
 
@@ -905,6 +889,234 @@ if (!function_exists('public_portal_redirect_back')) {
     }
 }
 
+if (!function_exists('public_portal_return_path')) {
+    function public_portal_return_path(string $fallback = '/'): string
+    {
+        $returnPath = trim((string)($_POST['return_path'] ?? $_SERVER['REQUEST_URI'] ?? $fallback));
+        if ($returnPath === '' || $returnPath[0] !== '/') {
+            $returnPath = $fallback;
+        }
+        return $returnPath;
+    }
+}
+
+if (!function_exists('public_portal_is_ajax_request')) {
+    function public_portal_is_ajax_request(): bool
+    {
+        $xhr = strtolower(trim((string)($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '')));
+        if ($xhr === 'xmlhttprequest') {
+            return true;
+        }
+        $accept = strtolower((string)($_SERVER['HTTP_ACCEPT'] ?? ''));
+        return strpos($accept, 'application/json') !== false;
+    }
+}
+
+if (!function_exists('public_portal_comments_view_data')) {
+    function public_portal_comments_view_data($FRMWRK, string $contentType, int $contentId, array $flash = []): array
+    {
+        return [
+            'portal_user' => public_portal_current_user($FRMWRK),
+            'portal_flash' => $flash,
+            'portal_captcha' => public_portal_captcha_challenge(),
+            'portal_comments' => ($contentId > 0) ? public_portal_fetch_comments($FRMWRK, $contentType, $contentId) : [],
+            'portal_comment_total' => ($contentId > 0) ? public_portal_comment_total_for_content($FRMWRK, $contentType, $contentId) : 0,
+            'portal_content_type' => $contentType,
+            'portal_content_id' => $contentId,
+            'lang' => public_portal_lang(),
+        ];
+    }
+}
+
+if (!function_exists('public_portal_render_comments_block')) {
+    function public_portal_render_comments_block($FRMWRK, string $contentType, int $contentId, array $flash = []): string
+    {
+        $partial = rtrim((string)DIR, '/\\') . '/core/views/partials/article_comments.php';
+        if (!is_file($partial)) {
+            return '';
+        }
+        $ModelPage = public_portal_comments_view_data($FRMWRK, $contentType, $contentId, $flash);
+        $lang = (string)($ModelPage['lang'] ?? public_portal_lang());
+        ob_start();
+        include $partial;
+        return (string)ob_get_clean();
+    }
+}
+
+if (!function_exists('public_portal_respond')) {
+    function public_portal_respond($FRMWRK, array $flash, string $fallback = '/', string $contentType = '', int $contentId = 0, array $extra = []): void
+    {
+        if (public_portal_is_ajax_request()) {
+            $payload = [
+                'ok' => (($flash['type'] ?? 'ok') !== 'error'),
+                'flash' => $flash,
+                'redirect_url' => public_portal_return_path($fallback),
+            ];
+            if ($contentType !== '' && $contentId > 0) {
+                $payload['html'] = public_portal_render_comments_block($FRMWRK, $contentType, $contentId, $flash);
+                $payload['content_type'] = $contentType;
+                $payload['content_id'] = $contentId;
+                $payload['comment_total'] = public_portal_comment_total_for_content($FRMWRK, $contentType, $contentId);
+            }
+            foreach ($extra as $key => $value) {
+                $payload[$key] = $value;
+            }
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+            header('Content-Type: application/json; charset=UTF-8');
+            echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            exit;
+        }
+
+        public_portal_flash_set('portal', $flash);
+        public_portal_redirect_back($fallback);
+    }
+}
+
+if (!function_exists('public_portal_handle_ajax_action')) {
+    function public_portal_handle_ajax_action($FRMWRK, mysqli $db, string $action): void
+    {
+        if (!public_portal_is_ajax_request()) {
+            return;
+        }
+
+        if ($action === 'public_portal_register') {
+            $contentType = public_portal_slugify((string)($_POST['content_type'] ?? 'examples'), 'examples');
+            $contentId = (int)($_POST['content_id'] ?? 0);
+            $emailInput = trim((string)($_POST['email'] ?? ''));
+            $username = public_portal_username_normalize((string)($_POST['username'] ?? $_POST['display_name'] ?? ''));
+            if ($username === '' && $emailInput !== '' && strpos($emailInput, '@') !== false) {
+                $username = public_portal_username_normalize((string)substr($emailInput, 0, strpos($emailInput, '@')));
+            }
+            $displayName = trim((string)($_POST['display_name'] ?? $username));
+            $password = (string)($_POST['password'] ?? '');
+            $captchaAnswer = (string)($_POST['captcha_answer'] ?? '');
+
+            if ($username === '' || (function_exists('mb_strlen') ? mb_strlen($username, 'UTF-8') : strlen($username)) < 3 || (function_exists('mb_strlen') ? mb_strlen($password, 'UTF-8') : strlen($password)) < 8) {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'РЈРєР°Р¶РёС‚Рµ Р»РѕРіРёРЅ РЅРµ РєРѕСЂРѕС‡Рµ 3 СЃРёРјРІРѕР»РѕРІ Рё РїР°СЂРѕР»СЊ РЅРµ РєРѕСЂРѕС‡Рµ 8 СЃРёРјРІРѕР»РѕРІ.'], '/', $contentType, $contentId);
+            }
+            if ($emailInput === '' && !public_portal_captcha_check($captchaAnswer)) {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'РљР°РїС‡Р° РЅРµ СЃРѕРІРїР°Р»Р°. РџРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰Рµ СЂР°Р·.'], '/', $contentType, $contentId);
+            }
+            if ($emailInput !== '' && !filter_var($emailInput, FILTER_VALIDATE_EMAIL)) {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'Email Р·Р°РїРѕР»РЅРµРЅ РЅРµРєРѕСЂСЂРµРєС‚РЅРѕ.'], '/', $contentType, $contentId);
+            }
+
+            $usernameSafe = mysqli_real_escape_string($db, $username);
+            $displayName = $displayName !== '' ? $displayName : $username;
+            $displayNameSafe = mysqli_real_escape_string($db, $displayName);
+            $emailValue = $emailInput !== '' ? strtolower($emailInput) : ($username . '+' . date('YmdHis') . '@portal.local');
+            $emailSafe = mysqli_real_escape_string($db, $emailValue);
+
+            $exists = $FRMWRK->DBRecords("SELECT id FROM public_users WHERE username = '{$usernameSafe}' LIMIT 1");
+            if (!empty($exists)) {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'Р­С‚РѕС‚ Р»РѕРіРёРЅ СѓР¶Рµ Р·Р°РЅСЏС‚.'], '/', $contentType, $contentId);
+            }
+            $emailExists = $FRMWRK->DBRecords("SELECT id FROM public_users WHERE email = '{$emailSafe}' LIMIT 1");
+            if (!empty($emailExists) && $emailInput !== '') {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'Р­С‚РѕС‚ email СѓР¶Рµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ.'], '/', $contentType, $contentId);
+            }
+
+            $passwordSafe = mysqli_real_escape_string($db, password_hash($password, PASSWORD_DEFAULT));
+            $pinCode = public_portal_generate_pin();
+            $pinSafe = mysqli_real_escape_string($db, $pinCode);
+            mysqli_query(
+                $db,
+                "INSERT INTO public_users (username, email, password_hash, display_name, pin_code, avatar_mode, avatar_url, role_code, is_active, is_banned, created_at, updated_at)
+                 VALUES ('{$usernameSafe}', '{$emailSafe}', '{$passwordSafe}', '{$displayNameSafe}', '{$pinSafe}', 'generated', '', 'member', 1, 0, NOW(), NOW())"
+            );
+            $newUserId = (int)mysqli_insert_id($db);
+            public_portal_session_boot();
+            $_SESSION['public_user_id'] = $newUserId;
+            public_portal_respond($FRMWRK, [
+                'type' => 'ok',
+                'message' => 'РђРєРєР°СѓРЅС‚ СЃРѕР·РґР°РЅ. РЎРѕС…СЂР°РЅРёС‚Рµ PIN: ' . $pinCode,
+                'pin_code' => $pinCode,
+            ], '/', $contentType, $contentId, ['pin_code' => $pinCode]);
+        }
+
+        if ($action === 'public_portal_comment') {
+            $user = public_portal_current_user($FRMWRK);
+            $contentType = public_portal_slugify((string)($_POST['content_type'] ?? 'article'), 'article');
+            $contentId = max(1, (int)($_POST['content_id'] ?? 0));
+            if (!$user) {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'Р’РѕР№РґРёС‚Рµ, С‡С‚РѕР±С‹ РєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ.'], '/', $contentType, $contentId);
+            }
+            $parentId = max(0, (int)($_POST['parent_id'] ?? 0));
+            $sectionCode = public_portal_slugify((string)($_POST['section_code'] ?? 'discussion'), 'discussion');
+            $body = trim((string)($_POST['body_markdown'] ?? ''));
+            if ($body === '' || (function_exists('mb_strlen') ? mb_strlen($body, 'UTF-8') : strlen($body)) < 4) {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'РљРѕРјРјРµРЅС‚Р°СЂРёР№ СЃР»РёС€РєРѕРј РєРѕСЂРѕС‚РєРёР№.'], '/', $contentType, $contentId);
+            }
+            $allowedSections = public_portal_comment_sections(public_portal_lang());
+            if (!isset($allowedSections[$sectionCode])) {
+                $sectionCode = 'discussion';
+            }
+            $typeSafe = mysqli_real_escape_string($db, $contentType);
+            $sectionSafe = mysqli_real_escape_string($db, $sectionCode);
+            $bodySafe = mysqli_real_escape_string($db, $body);
+            $htmlSafe = mysqli_real_escape_string($db, public_portal_markdown_to_html($body));
+            mysqli_query(
+                $db,
+                "INSERT INTO public_comments (content_type, content_id, user_id, parent_id, section_code, body_markdown, body_html, is_deleted, is_hidden, created_at, updated_at)
+                 VALUES ('{$typeSafe}', {$contentId}, " . (int)$user['id'] . ", " . ($parentId > 0 ? $parentId : 'NULL') . ", '{$sectionSafe}', '{$bodySafe}', '{$htmlSafe}', 0, 0, NOW(), NOW())"
+            );
+            $newCommentId = (int)mysqli_insert_id($db);
+            if ($newCommentId > 0) {
+                public_portal_recalculate_comment_stats($db, $newCommentId);
+            }
+            public_portal_recalculate_user_rating($db, (int)$user['id']);
+            public_portal_respond($FRMWRK, ['type' => 'ok', 'message' => 'РљРѕРјРјРµРЅС‚Р°СЂРёР№ РѕРїСѓР±Р»РёРєРѕРІР°РЅ.'], '/', $contentType, $contentId, [
+                'comment_id' => $newCommentId,
+                'comment_anchor' => $newCommentId > 0 ? ('#comment-' . $newCommentId) : '',
+            ]);
+        }
+
+        if ($action === 'public_portal_comment_vote') {
+            $user = public_portal_current_user($FRMWRK);
+            if (!$user) {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'Р’РѕР№РґРёС‚Рµ, С‡С‚РѕР±С‹ РіРѕР»РѕСЃРѕРІР°С‚СЊ Р·Р° РєРѕРјРјРµРЅС‚Р°СЂРёРё.'], '/');
+            }
+            $commentId = max(1, (int)($_POST['comment_id'] ?? 0));
+            $voteValue = (int)($_POST['vote_value'] ?? 0);
+            if (!in_array($voteValue, [-1, 1], true)) {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РіРѕР»РѕСЃ.'], '/');
+            }
+            $commentRows = $FRMWRK->DBRecords(
+                "SELECT id, user_id, content_type, content_id
+                 FROM public_comments
+                 WHERE id = {$commentId}
+                   AND is_deleted = 0
+                   AND is_hidden = 0
+                 LIMIT 1"
+            );
+            $commentRow = (!empty($commentRows[0]) && is_array($commentRows[0])) ? $commentRows[0] : null;
+            if (!$commentRow) {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'РљРѕРјРјРµРЅС‚Р°СЂРёР№ РЅРµ РЅР°Р№РґРµРЅ.'], '/');
+            }
+            $authorId = (int)($commentRow['user_id'] ?? 0);
+            if ($authorId === (int)$user['id']) {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'РќРµР»СЊР·СЏ РіРѕР»РѕСЃРѕРІР°С‚СЊ Р·Р° СЃРѕР±СЃС‚РІРµРЅРЅС‹Р№ РєРѕРјРјРµРЅС‚Р°СЂРёР№.'], '/');
+            }
+            mysqli_query(
+                $db,
+                "INSERT INTO public_comment_votes (comment_id, user_id, vote_value, created_at, updated_at)
+                 VALUES ({$commentId}, " . (int)$user['id'] . ", {$voteValue}, NOW(), NOW())
+                 ON DUPLICATE KEY UPDATE
+                    vote_value = IF(vote_value = VALUES(vote_value), 0, VALUES(vote_value)),
+                    updated_at = NOW()"
+            );
+            public_portal_recalculate_comment_stats($db, $commentId);
+            public_portal_recalculate_user_rating($db, $authorId);
+            public_portal_respond($FRMWRK, ['type' => 'ok', 'message' => 'Р РµР№С‚РёРЅРі РєРѕРјРјРµРЅС‚Р°СЂРёСЏ РѕР±РЅРѕРІР»РµРЅ.'], '/', public_portal_slugify((string)($commentRow['content_type'] ?? 'examples'), 'examples'), (int)($commentRow['content_id'] ?? 0), [
+                'comment_id' => $commentId,
+                'comment_anchor' => '#comment-' . $commentId,
+            ]);
+        }
+    }
+}
+
 if (!function_exists('public_portal_handle_request')) {
     function public_portal_handle_request($FRMWRK): void
     {
@@ -916,17 +1128,16 @@ if (!function_exists('public_portal_handle_request')) {
             return;
         }
         if (!public_portal_csrf_check(trim((string)($_POST['portal_csrf'] ?? '')), 'portal')) {
-            public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Security token mismatch.']);
-            public_portal_redirect_back('/');
+            public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'Security token mismatch.'], '/');
         }
         $db = $FRMWRK->DB();
         if (!$db) {
-            public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Database unavailable.']);
-            public_portal_redirect_back('/');
+            public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'Database unavailable.'], '/');
         }
         public_portal_users_ensure_schema($db);
         public_portal_comments_ensure_schema($db);
         public_portal_comment_votes_ensure_schema($db);
+        public_portal_handle_ajax_action($FRMWRK, $db, $action);
         if ($action === 'public_portal_register') {
             $emailInput = trim((string)($_POST['email'] ?? ''));
             $username = public_portal_username_normalize((string)($_POST['username'] ?? $_POST['display_name'] ?? ''));

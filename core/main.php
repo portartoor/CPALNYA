@@ -78,6 +78,17 @@ class Render {
 		}
 
 		$routeFirst = (string)($result['routes'][1] ?? '');
+			if ($routeFirst === 'member') {
+				$routeSecond = (string)($result['routes'][2] ?? '');
+				$result['routes'][1] = 'account';
+				if ($routeSecond !== '') {
+					$_GET['user'] = $routeSecond;
+				}
+				if ($result['routes_count'] === 1) {
+					$result['extension'] = 'account';
+				}
+				$routeFirst = 'account';
+			}
 			if (in_array($routeFirst, ['cases', 'offers'], true)) {
 				$result['routes'][1] = '404';
 				$result['routes_count'] = 1;

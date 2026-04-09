@@ -615,10 +615,15 @@ if (isset($_GET['header_search_preview'])) {
         clip-path: none;
         overflow: visible;
     }
+    .simple-header.has-account-preview {
+        clip-path: none;
+        overflow: visible;
+    }
     .simple-header.has-search-preview {
         clip-path: none;
         overflow: visible;
     }
+    .simple-header.has-account-preview::before,
     .simple-header.has-search-preview::before {
         clip-path: none;
     }
@@ -762,6 +767,7 @@ if (isset($_GET['header_search_preview'])) {
         transition: opacity .2s ease, max-height .24s ease, transform .24s ease, margin .24s ease;
         max-height: 88px;
     }
+    .simple-header.has-account-preview .simple-header-center,
     .simple-header.has-search-preview .simple-header-center {
         overflow: visible;
     }
@@ -926,24 +932,28 @@ if (isset($_GET['header_search_preview'])) {
         align-items: center;
         justify-content: flex-end;
         grid-column: 3;
-        grid-row: 1 / span 2;
+        grid-row: 2;
         justify-self: end;
         gap: 10px;
         min-width: 0;
         flex-wrap: nowrap;
+        align-self: center;
+        overflow: visible;
         transition: transform .24s ease;
     }
     .simple-account {
         position: relative;
         display: inline-flex;
         align-items: center;
+        align-self: center;
+        overflow: visible;
     }
     .simple-account-trigger {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 42px;
-        height: 42px;
+        width: 46px;
+        height: 46px;
         padding: 0;
         border: 1px solid var(--shell-border);
         background: rgba(255,255,255,.04);
@@ -1634,6 +1644,7 @@ if (isset($_GET['header_search_preview'])) {
     var nav = document.getElementById('simple-nav-drawer');
     var backdrop = document.querySelector('.simple-nav-backdrop');
     var header = document.getElementById('cp-header');
+    var account = document.querySelector('.simple-account');
     var searchInput = document.querySelector('[data-search-input]');
     var searchForm = searchInput ? searchInput.closest('form') : null;
     var searchPreview = document.getElementById('simple-search-preview');
@@ -1900,6 +1911,25 @@ if (isset($_GET['header_search_preview'])) {
                 return;
             }
             highlightPreview(Number(item.getAttribute('data-preview-index')));
+        });
+    }
+    if (header && account) {
+        var setAccountPreview = function (open) {
+            header.classList.toggle('has-account-preview', !!open);
+        };
+        account.addEventListener('mouseenter', function () {
+            setAccountPreview(true);
+        });
+        account.addEventListener('mouseleave', function () {
+            setAccountPreview(false);
+        });
+        account.addEventListener('focusin', function () {
+            setAccountPreview(true);
+        });
+        account.addEventListener('focusout', function (event) {
+            if (!account.contains(event.relatedTarget)) {
+                setAccountPreview(false);
+            }
         });
     }
     if (!btn || !nav) {
