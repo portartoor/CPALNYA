@@ -7,6 +7,7 @@ $journalItems = [];
 $playbookItems = [];
 $signalsItems = [];
 $funItems = [];
+$latestComments = [];
 $issue = [];
 $heroFeature = null;
 
@@ -29,6 +30,10 @@ if (function_exists('examples_popularity_attach_views')) {
     $playbookItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'playbooks', (array)$playbookItems);
     $signalsItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'signals', (array)$signalsItems);
     $funItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'fun', (array)$funItems);
+}
+
+if (function_exists('public_portal_fetch_latest_comments')) {
+    $latestComments = (array)public_portal_fetch_latest_comments($FRMWRK, $host, $lang, 4);
 }
 
 $decorateItems = static function (array $items, string $section): array {
@@ -88,6 +93,7 @@ $ModelPage['home_portal'] = [
     'playbook_items' => array_values((array)$playbookItems),
     'signals_items' => array_values((array)$signalsItems),
     'fun_items' => array_values((array)$funItems),
+    'latest_comments' => array_values((array)$latestComments),
 ];
 
 $ModelPage['title'] = $isRu

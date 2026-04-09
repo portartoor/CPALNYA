@@ -161,8 +161,8 @@ $commentTree = function(array $nodes, int $depth = 0) use (&$commentTree): void 
                         <article class="cpb-feature">
                             <span class="cpb-chip"><span class="cpb-icon">⬢</span><?= htmlspecialchars($t('Next route', 'Next route'), ENT_QUOTES, 'UTF-8') ?></span>
                             <h2 class="neo-title"><?= htmlspecialchars($t('Статья не должна обрываться, она должна ', 'The article should not end abruptly, it should ') , ENT_QUOTES, 'UTF-8') ?><strong><?= htmlspecialchars($t('переводить читателя дальше', 'move the reader onward'), ENT_QUOTES, 'UTF-8') ?></strong></h2>
-                            <p><?= htmlspecialchars($t('Логичный следующий шаг здесь: открыть раздел решений, забрать готовый шаблон, сравнить подходы в смежном кластере или продолжить обсуждение на уровне практики.', 'The logical next step here is to open the solutions section, grab a working template, compare approaches in an adjacent cluster or continue the discussion at the level of practice.'), ENT_QUOTES, 'UTF-8') ?></p>
-                            <a class="cpb-link" href="/solutions/"><span>⬢</span><?= htmlspecialchars($t('Открыть раздел решений', 'Open solutions area'), ENT_QUOTES, 'UTF-8') ?></a>
+                            <p><?= htmlspecialchars($t('Логичный следующий шаг здесь: перейти в практику, сравнить подходы в смежной теме или продолжить обсуждение на уровне операционных деталей.', 'The logical next step here is to move into playbooks, compare approaches in a nearby topic or continue the discussion at the operational level.'), ENT_QUOTES, 'UTF-8') ?></p>
+                            <a class="cpb-link" href="/playbooks/"><span>⬢</span><?= htmlspecialchars($t('Открыть раздел Практика', 'Open Playbooks'), ENT_QUOTES, 'UTF-8') ?></a>
                         </article>
                     <?php endif; ?>
 

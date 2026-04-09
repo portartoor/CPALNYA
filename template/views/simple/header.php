@@ -11,9 +11,12 @@ $logoAria = $logoMain . ' portal';
 $requestPath = parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 $requestPath = is_string($requestPath) && $requestPath !== '' ? $requestPath : '/';
 $firstSegment = strtolower((string)(explode('/', trim($requestPath, '/'))[0] ?? ''));
-$section = in_array($firstSegment, ['blog', 'journal', 'playbooks', 'services', 'projects', 'solutions', 'contact', 'audit'], true) ? $firstSegment : 'home';
+$section = in_array($firstSegment, ['blog', 'journal', 'playbooks', 'services', 'projects', 'contact', 'audit', 'account', 'member'], true) ? $firstSegment : 'home';
 if ($section === 'blog') {
     $section = 'journal';
+}
+if ($section === 'account' || $section === 'member') {
+    $section = 'home';
 }
 $scheme = (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ? 'https' : 'http';
 $faviconPrimary = '/favicon4.png';

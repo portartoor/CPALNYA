@@ -220,7 +220,19 @@ if (!function_exists('public_portal_user_avatar')) {
             return $avatarUrl;
         }
         $name = trim((string)($user['display_name'] ?? $user['username'] ?? 'Member'));
-        $seed = trim((string)($user['username'] ?? $user['email'] ?? $name));
+        $seedParts = [
+            trim((string)($user['username'] ?? '')),
+            trim((string)($user['email'] ?? '')),
+            trim((string)($user['pin_code'] ?? '')),
+            trim((string)($user['created_at'] ?? '')),
+            (string)($user['id'] ?? ''),
+        ];
+        $seed = trim(implode('|', array_filter($seedParts, static function ($value): bool {
+            return $value !== '';
+        })));
+        if ($seed === '') {
+            $seed = $name;
+        }
         return public_portal_avatar_svg($seed, $name);
     }
 }
@@ -422,6 +434,29 @@ if (!function_exists('public_portal_comment_votes_ensure_schema')) {
     }
 }
 
+if (!function_exists('public_portal_favorites_ensure_schema')) {
+    function public_portal_favorites_ensure_schema(mysqli $db): bool
+    {
+        $sql = "
+            CREATE TABLE IF NOT EXISTS public_user_favorites (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                user_id BIGINT UNSIGNED NOT NULL,
+                content_type VARCHAR(40) NOT NULL DEFAULT 'examples',
+                content_id BIGINT UNSIGNED NOT NULL,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (id),
+                UNIQUE KEY uniq_public_user_favorites_pair (user_id, content_type, content_id),
+                KEY idx_public_user_favorites_user (user_id, created_at),
+                KEY idx_public_user_favorites_content (content_type, content_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        ";
+        if (!mysqli_query($db, $sql)) {
+            return false;
+        }
+        return public_portal_table_exists($db, 'public_user_favorites');
+    }
+}
+
 if (!function_exists('public_portal_profile_url')) {
     function public_portal_profile_url(array $user): string
     {
@@ -430,6 +465,28 @@ if (!function_exists('public_portal_profile_url')) {
             return '/account/';
         }
         return '/member/' . rawurlencode($username) . '/';
+    }
+}
+
+if (!function_exists('public_portal_is_placeholder_email')) {
+    function public_portal_is_placeholder_email(string $email): bool
+    {
+        $email = strtolower(trim($email));
+        return $email === '' || substr($email, -13) === '@portal.local';
+    }
+}
+
+if (!function_exists('public_portal_public_contact_value')) {
+    function public_portal_public_contact_value(?string $value, string $type = 'text'): string
+    {
+        $value = trim((string)$value);
+        if ($value === '') {
+            return '';
+        }
+        if ($type === 'email' && public_portal_is_placeholder_email($value)) {
+            return '';
+        }
+        return $value;
     }
 }
 
@@ -746,12 +803,167 @@ if (!function_exists('public_portal_fetch_public_profile')) {
         }
         unset($comment);
 
+        $favorites = function_exists('public_portal_fetch_user_favorites')
+            ? public_portal_fetch_user_favorites($FRMWRK, $userId, 8)
+            : [];
+
         $rank = public_portal_rank_meta((int)($user['comment_rating'] ?? 0), $lang);
         $user['avatar_src'] = public_portal_user_avatar($user);
         $user['profile_url'] = public_portal_profile_url($user);
         $user['rank_meta'] = $rank;
         $user['recent_comments'] = $recentComments;
+        $user['email_public'] = public_portal_public_contact_value((string)($user['email'] ?? ''), 'email');
+        $user['telegram_public'] = public_portal_public_contact_value((string)($user['telegram_handle'] ?? ''));
+        $user['website_public'] = public_portal_public_contact_value((string)($user['website_url'] ?? ''));
+        $user['favorites'] = $favorites;
         return $user;
+    }
+}
+
+if (!function_exists('public_portal_fetch_latest_comments')) {
+    function public_portal_fetch_latest_comments($FRMWRK, string $host, string $lang = 'en', int $limit = 4): array
+    {
+        $db = $FRMWRK->DB();
+        if (
+            !$db
+            || $limit <= 0
+            || !public_portal_table_exists($db, 'public_comments')
+            || !public_portal_table_exists($db, 'public_users')
+            || !public_portal_table_exists($db, 'examples_articles')
+        ) {
+            return [];
+        }
+
+        $lang = in_array($lang, ['ru', 'en'], true) ? $lang : 'en';
+        $host = strtolower(trim($host));
+        if (strpos($host, ':') !== false) {
+            $host = explode(':', $host, 2)[0];
+        }
+
+        $hasLang = function_exists('examples_table_has_lang_column') ? examples_table_has_lang_column($db) : false;
+        $hasHost = function_exists('examples_table_has_column') ? examples_table_has_column($db, 'domain_host') : false;
+        $langWhere = $hasLang ? " AND a.lang_code = '" . mysqli_real_escape_string($db, $lang) . "'" : '';
+        $hostWhere = ($hasHost && $host !== '') ? " AND (a.domain_host = '' OR a.domain_host = '" . mysqli_real_escape_string($db, $host) . "')" : '';
+        $limit = max(1, min(12, $limit));
+
+        $rows = $FRMWRK->DBRecords(
+            "SELECT c.id, c.body_html, c.created_at, c.rating_score,
+                    u.username, u.display_name, u.email, u.pin_code, u.created_at AS user_created_at, u.id AS user_id,
+                    a.id AS article_id, a.title AS article_title, a.slug, a.cluster_code, a.material_section
+             FROM public_comments c
+             INNER JOIN public_users u ON u.id = c.user_id
+             INNER JOIN examples_articles a ON a.id = c.content_id
+             WHERE c.content_type = 'examples'
+               AND c.is_deleted = 0
+               AND c.is_hidden = 0
+               AND u.is_active = 1
+               AND u.is_banned = 0
+               {$langWhere}
+               {$hostWhere}
+             ORDER BY c.created_at DESC, c.id DESC
+             LIMIT {$limit}"
+        );
+
+        foreach ($rows as &$row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $row['article_url'] = public_portal_article_url((array)$row) . '#comment-' . (int)($row['id'] ?? 0);
+            $row['profile_url'] = public_portal_profile_url((array)$row);
+            $row['avatar_src'] = public_portal_user_avatar((array)$row);
+        }
+        unset($row);
+
+        return array_values($rows);
+    }
+}
+
+if (!function_exists('public_portal_user_has_favorite')) {
+    function public_portal_user_has_favorite($FRMWRK, int $userId, string $contentType, int $contentId): bool
+    {
+        $db = $FRMWRK->DB();
+        if (!$db || $userId <= 0 || $contentId <= 0 || !public_portal_table_exists($db, 'public_user_favorites')) {
+            return false;
+        }
+        $typeSafe = mysqli_real_escape_string($db, public_portal_slugify($contentType, 'examples'));
+        $rows = $FRMWRK->DBRecords(
+            "SELECT id
+             FROM public_user_favorites
+             WHERE user_id = {$userId}
+               AND content_type = '{$typeSafe}'
+               AND content_id = {$contentId}
+             LIMIT 1"
+        );
+        return !empty($rows[0]);
+    }
+}
+
+if (!function_exists('public_portal_toggle_favorite')) {
+    function public_portal_toggle_favorite($FRMWRK, int $userId, string $contentType, int $contentId): bool
+    {
+        $db = $FRMWRK->DB();
+        if (!$db || $userId <= 0 || $contentId <= 0 || !public_portal_favorites_ensure_schema($db)) {
+            return false;
+        }
+        $typeSafe = mysqli_real_escape_string($db, public_portal_slugify($contentType, 'examples'));
+        $exists = $FRMWRK->DBRecords(
+            "SELECT id
+             FROM public_user_favorites
+             WHERE user_id = {$userId}
+               AND content_type = '{$typeSafe}'
+               AND content_id = {$contentId}
+             LIMIT 1"
+        );
+        if (!empty($exists[0]['id'])) {
+            mysqli_query($db, "DELETE FROM public_user_favorites WHERE id = " . (int)$exists[0]['id'] . " LIMIT 1");
+            return false;
+        }
+        mysqli_query(
+            $db,
+            "INSERT IGNORE INTO public_user_favorites (user_id, content_type, content_id, created_at)
+             VALUES ({$userId}, '{$typeSafe}', {$contentId}, NOW())"
+        );
+        return true;
+    }
+}
+
+if (!function_exists('public_portal_fetch_user_favorites')) {
+    function public_portal_fetch_user_favorites($FRMWRK, int $userId, int $limit = 12): array
+    {
+        $db = $FRMWRK->DB();
+        if (
+            !$db
+            || $userId <= 0
+            || !public_portal_table_exists($db, 'public_user_favorites')
+            || !public_portal_table_exists($db, 'examples_articles')
+        ) {
+            return [];
+        }
+        $limit = max(1, min(50, $limit));
+        $rows = (array)$FRMWRK->DBRecords(
+            "SELECT f.content_id, f.created_at AS saved_at,
+                    a.id, a.title, a.slug, a.cluster_code, a.material_section,
+                    a.preview_image_thumb_url, a.preview_image_url, a.preview_image_data, a.created_at
+             FROM public_user_favorites f
+             INNER JOIN examples_articles a ON a.id = f.content_id
+             WHERE f.user_id = {$userId}
+               AND f.content_type = 'examples'
+               AND COALESCE(a.is_published, 1) = 1
+             ORDER BY f.created_at DESC, f.id DESC
+             LIMIT {$limit}"
+        );
+        foreach ($rows as &$row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $row['article_url'] = public_portal_article_url($row);
+            $thumb = trim((string)($row['preview_image_thumb_url'] ?? ''));
+            $full = trim((string)($row['preview_image_url'] ?? ''));
+            $base = trim((string)($row['preview_image_data'] ?? ''));
+            $row['image_src'] = $thumb !== '' ? $thumb : ($full !== '' ? $full : $base);
+        }
+        unset($row);
+        return $rows;
     }
 }
 
@@ -778,11 +990,15 @@ if (!function_exists('public_portal_store_avatar_upload')) {
         if (!$info) {
             return '';
         }
+        $width = (int)($info[0] ?? 0);
+        $height = (int)($info[1] ?? 0);
+        if ($width <= 0 || $height <= 0 || $width > 512 || $height > 512) {
+            return '';
+        }
         $mime = (string)($info['mime'] ?? '');
         $extMap = [
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
-            'image/webp' => 'webp',
             'image/gif' => 'gif',
         ];
         if (!isset($extMap[$mime])) {
@@ -1120,7 +1336,25 @@ if (!function_exists('public_portal_handle_ajax_action')) {
 if (!function_exists('public_portal_handle_request')) {
     function public_portal_handle_request($FRMWRK): void
     {
-        if (strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET')) !== 'POST') {
+        if (strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET')) === 'GET') {
+            if ((int)($_GET['portal_comments_block'] ?? 0) === 1) {
+                $contentType = public_portal_slugify((string)($_GET['content_type'] ?? 'examples'), 'examples');
+                $contentId = max(1, (int)($_GET['content_id'] ?? 0));
+                $html = ($contentId > 0) ? public_portal_render_comments_block($FRMWRK, $contentType, $contentId) : '';
+                while (ob_get_level() > 0) {
+                    ob_end_clean();
+                }
+                header('Content-Type: application/json; charset=UTF-8');
+                header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+                echo json_encode([
+                    'ok' => ($html !== ''),
+                    'html' => $html,
+                    'logged_in' => (bool)public_portal_current_user($FRMWRK),
+                    'content_type' => $contentType,
+                    'content_id' => $contentId,
+                ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                exit;
+            }
             return;
         }
         $action = trim((string)($_POST['action'] ?? ''));
@@ -1261,7 +1495,8 @@ if (!function_exists('public_portal_handle_request')) {
             $telegramSafe = mysqli_real_escape_string($db, $telegram);
             $websiteSafe = mysqli_real_escape_string($db, $website);
             $avatarSafe = mysqli_real_escape_string($db, $avatarUrl);
-            $emailSafe = mysqli_real_escape_string($db, $email !== '' ? strtolower($email) : (string)($user['email'] ?? ''));
+            $emailFallback = (string)($user['username'] ?? 'member') . '+' . (int)($user['id'] ?? 0) . '@portal.local';
+            $emailSafe = mysqli_real_escape_string($db, $email !== '' ? strtolower($email) : $emailFallback);
             $nicknameSql = ($displayName !== $currentDisplayName) ? ", nickname_changed_at = NOW()" : '';
             mysqli_query(
                 $db,
@@ -1281,15 +1516,59 @@ if (!function_exists('public_portal_handle_request')) {
             public_portal_redirect_back('/account/');
         }
 
+        if ($action === 'public_portal_password_change_v2') {
+            $user = public_portal_current_user($FRMWRK);
+            if (!$user) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Сначала войдите в аккаунт.']);
+                public_portal_redirect_back('/account/');
+            }
+            $currentPassword = (string)($_POST['current_password'] ?? '');
+            $password = (string)($_POST['new_password'] ?? '');
+            $userRow = public_portal_fetch_user_by_id($FRMWRK, (int)($user['id'] ?? 0));
+            if (!$userRow || !password_verify($currentPassword, (string)($userRow['password_hash'] ?? ''))) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Текущий пароль неверный.']);
+                public_portal_redirect_back('/account/');
+            }
+            if ((function_exists('mb_strlen') ? mb_strlen($password, 'UTF-8') : strlen($password)) < 8) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Новый пароль слишком короткий.']);
+                public_portal_redirect_back('/account/');
+            }
+            $passwordSafe = mysqli_real_escape_string($db, password_hash($password, PASSWORD_DEFAULT));
+            mysqli_query($db, "UPDATE public_users SET password_hash = '{$passwordSafe}', updated_at = NOW() WHERE id = " . (int)$user['id'] . " LIMIT 1");
+            public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Пароль обновлен.']);
+            public_portal_redirect_back('/account/');
+        }
+
+        if ($action === 'public_portal_favorite_toggle') {
+            $user = public_portal_current_user($FRMWRK);
+            if (!$user) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Войдите, чтобы сохранять материалы.']);
+                public_portal_redirect_back('/');
+            }
+            $contentType = public_portal_slugify((string)($_POST['content_type'] ?? 'examples'), 'examples');
+            $contentId = max(1, (int)($_POST['content_id'] ?? 0));
+            if ($contentId <= 0) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Не удалось определить материал.']);
+                public_portal_redirect_back('/');
+            }
+            $saved = public_portal_toggle_favorite($FRMWRK, (int)$user['id'], $contentType, $contentId);
+            public_portal_flash_set('portal', [
+                'type' => 'ok',
+                'message' => $saved ? 'Материал добавлен в избранное.' : 'Материал убран из избранного.',
+            ]);
+            public_portal_redirect_back('/');
+        }
+
         if ($action === 'public_portal_password_change') {
             $user = public_portal_current_user($FRMWRK);
             if (!$user) {
                 public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Сначала войдите в аккаунт.']);
                 public_portal_redirect_back('/account/');
             }
-            $pinCode = trim((string)($_POST['pin_code'] ?? ''));
+            $currentPassword = (string)($_POST['current_password'] ?? '');
             $password = (string)($_POST['new_password'] ?? '');
-            if ($pinCode === '' || !hash_equals((string)($user['pin_code'] ?? ''), $pinCode)) {
+            $userRow = public_portal_fetch_user_by_id($FRMWRK, (int)($user['id'] ?? 0));
+            if (!$userRow || !password_verify($currentPassword, (string)($userRow['password_hash'] ?? ''))) {
                 public_portal_flash_set('portal', ['type' => 'error', 'message' => 'PIN-код не совпал.']);
                 public_portal_redirect_back('/account/');
             }

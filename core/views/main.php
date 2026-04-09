@@ -9,6 +9,7 @@ $journalItems = array_values((array)($home['journal_items'] ?? []));
 $playbookItems = array_values((array)($home['playbook_items'] ?? []));
 $signalsItems = array_values((array)($home['signals_items'] ?? []));
 $funItems = array_values((array)($home['fun_items'] ?? []));
+$latestComments = array_values((array)($home['latest_comments'] ?? []));
 $cover = $journalItems[0] ?? null;
 $t = static function (string $ru, string $en) use ($isRu): string { return $isRu ? $ru : $en; };
 $excerpt = static function (string $html, int $limit = 180): string {
@@ -66,6 +67,28 @@ $formatDate = static function (array $item) use ($isRu): string {
         return $raw;
     }
 };
+$formatCommentDate = static function (string $raw) use ($isRu): string {
+    $raw = trim($raw);
+    if ($raw === '') {
+        return '';
+    }
+    try {
+        $date = new DateTimeImmutable($raw);
+        return $date->format($isRu ? 'd.m.Y' : 'M j, Y');
+    } catch (Throwable $e) {
+        return $raw;
+    }
+};
+$commentExcerpt = static function (string $html, int $limit = 220): string {
+    $text = trim((string)preg_replace('/\s+/u', ' ', strip_tags($html)));
+    if ($text === '') {
+        return '';
+    }
+    if (mb_strlen($text, 'UTF-8') <= $limit) {
+        return $text;
+    }
+    return rtrim((string)mb_substr($text, 0, $limit - 1, 'UTF-8')) . '...';
+};
 $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover : null);
 $heroSection = trim((string)($heroCard['source_section'] ?? 'journal'));
 $heroSectionTitles = [
@@ -114,6 +137,23 @@ $heroSectionTitles = [
 .home-z-card h3{margin:0;font:700 1.06rem/1.16 "Space Grotesk","Sora",sans-serif}
 .home-z-stat{display:inline-flex;align-items:center;gap:7px;color:var(--shell-muted);font-size:12px;text-transform:uppercase;letter-spacing:.12em}
 .home-z-stat-eye{font-style:normal;line-height:1}
+.home-z-comments{padding:24px;display:grid;gap:18px}
+.home-z-comments-head{display:grid;gap:10px;max-width:880px}
+.home-z-comments-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.home-z-comment-card{display:grid;gap:14px;padding:18px 18px 20px;border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(122,180,255,.05));text-decoration:none;color:inherit}
+.home-z-comment-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.home-z-comment-author{display:flex;align-items:center;gap:12px;min-width:0}
+.home-z-comment-avatar{width:42px;height:42px;border-radius:50%;overflow:hidden;flex:0 0 42px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.05)}
+.home-z-comment-avatar img{display:block;width:100%;height:100%;object-fit:cover}
+.home-z-comment-person{display:grid;gap:3px;min-width:0}
+.home-z-comment-person strong{font:700 .98rem/1.1 "Space Grotesk","Sora",sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-z-comment-person span{color:var(--shell-muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.home-z-comment-score{display:inline-flex;align-items:center;gap:6px;color:#f4d56b;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.home-z-comment-quote{position:relative;margin:0;padding-left:18px;font:600 1.04rem/1.6 "Space Grotesk","Sora",sans-serif;letter-spacing:-.02em}
+.home-z-comment-quote::before{content:"";position:absolute;left:0;top:2px;bottom:2px;width:3px;background:linear-gradient(180deg,rgba(244,213,107,.9),rgba(115,184,255,.85))}
+.home-z-comment-article{display:grid;gap:5px;padding-top:6px;border-top:1px solid rgba(122,180,255,.12)}
+.home-z-comment-article span{color:var(--shell-muted);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.home-z-comment-article strong{font:700 .96rem/1.35 "Space Grotesk","Sora",sans-serif}
 @media (max-width:1180px){.home-z-hero,.home-z-grid{grid-template-columns:1fr}}
 @media (max-width:720px){
     .home-z{padding:18px 14px 52px}
@@ -123,6 +163,7 @@ $heroSectionTitles = [
     .home-z-card{grid-template-columns:1fr}
     .home-z-card-media-wrap{width:100%}
     .home-z-card-media{width:100%;aspect-ratio:1/1}
+    .home-z-comments-grid{grid-template-columns:1fr}
 }
 </style>
 
@@ -311,5 +352,50 @@ $heroSectionTitles = [
                 </div>
             </section>
         </div>
+
+        <?php if (!empty($latestComments)): ?>
+            <section class="home-z-block home-z-comments">
+                <div class="home-z-comments-head">
+                    <span class="home-z-tag"><?= htmlspecialchars($t('Обсуждение номера', 'From the discussion'), ENT_QUOTES, 'UTF-8') ?></span>
+                    <h2><?= htmlspecialchars($t('Последние реплики под материалами', 'Latest comments across the issue'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <p><?= htmlspecialchars($t('Здесь в фокусе не статья, а то, как ее дочитывают вслух: короткие возражения, уточнения из практики и тихие замечания, которые продолжают материал уже в обсуждении.', 'The focus here is not the article itself, but how readers continue it out loud: short objections, practical clarifications and the quieter notes that carry the piece forward in discussion.'), ENT_QUOTES, 'UTF-8') ?></p>
+                </div>
+                <div class="home-z-comments-grid">
+                    <?php foreach ($latestComments as $comment): ?>
+                        <?php
+                        $commentAuthor = trim((string)($comment['display_name'] ?? ''));
+                        if ($commentAuthor === '') {
+                            $commentAuthor = trim((string)($comment['username'] ?? ''));
+                        }
+                        if ($commentAuthor === '') {
+                            $commentAuthor = $t('Участник', 'Member');
+                        }
+                        $commentDate = $formatCommentDate((string)($comment['created_at'] ?? ''));
+                        $commentBody = $commentExcerpt((string)($comment['body_html'] ?? ''), 210);
+                        $articleTitle = trim((string)($comment['article_title'] ?? $t('Материал', 'Article')));
+                        ?>
+                        <a class="home-z-comment-card" href="<?= htmlspecialchars((string)($comment['article_url'] ?? '/'), ENT_QUOTES, 'UTF-8') ?>">
+                            <div class="home-z-comment-top">
+                                <div class="home-z-comment-author">
+                                    <span class="home-z-comment-avatar">
+                                        <img src="<?= htmlspecialchars((string)($comment['avatar_src'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($commentAuthor, ENT_QUOTES, 'UTF-8') ?>">
+                                    </span>
+                                    <span class="home-z-comment-person">
+                                        <strong><?= htmlspecialchars($commentAuthor, ENT_QUOTES, 'UTF-8') ?></strong>
+                                        <span><?= htmlspecialchars($commentDate, ENT_QUOTES, 'UTF-8') ?></span>
+                                    </span>
+                                </div>
+                                <span class="home-z-comment-score"><?= (int)($comment['rating_score'] ?? 0) ?></span>
+                            </div>
+                            <blockquote class="home-z-comment-quote"><?= htmlspecialchars($commentBody, ENT_QUOTES, 'UTF-8') ?></blockquote>
+                            <div class="home-z-comment-article">
+                                <span><?= htmlspecialchars($t('К материалу', 'In article'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <strong><?= htmlspecialchars($articleTitle, ENT_QUOTES, 'UTF-8') ?></strong>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+        <?php endif; ?>
     </div>
 </section>

@@ -89,7 +89,7 @@ class Render {
 				}
 				$routeFirst = 'account';
 			}
-			if (in_array($routeFirst, ['cases', 'offers'], true)) {
+			if (in_array($routeFirst, ['cases', 'offers', 'solutions'], true)) {
 				$result['routes'][1] = '404';
 				$result['routes_count'] = 1;
 				$result['extension'] = '404';
@@ -835,8 +835,6 @@ class Render {
 			$urls[] = ['loc' => $base.'/playbooks/', 'changefreq' => 'daily', 'priority' => '0.9'];
 			$urls[] = ['loc' => $base.'/signals/', 'changefreq' => 'daily', 'priority' => '0.8'];
 			$urls[] = ['loc' => $base.'/fun/', 'changefreq' => 'daily', 'priority' => '0.7'];
-			$urls[] = ['loc' => $base.'/solutions/downloads/', 'changefreq' => 'weekly', 'priority' => '0.9'];
-			$urls[] = ['loc' => $base.'/solutions/articles/', 'changefreq' => 'weekly', 'priority' => '0.9'];
 			$urls[] = ['loc' => $base.'/services/', 'changefreq' => 'weekly', 'priority' => '0.9'];
 			$urls[] = ['loc' => $base.'/projects/', 'changefreq' => 'weekly', 'priority' => '0.9'];
 			$urls[] = ['loc' => $base.'/contact/', 'changefreq' => 'weekly', 'priority' => '0.8'];
@@ -1252,6 +1250,9 @@ class Render {
 				$routeName = trim((string)($row['route_name'] ?? ''));
 				$pageName = trim((string)($row['page_name'] ?? ''));
 				if ($routeName === '') {
+					continue;
+				}
+				if (in_array($routeName, ['solutions', 'cases', 'offers'], true)) {
 					continue;
 				}
 				$path = '';

@@ -298,6 +298,18 @@ $ModelPage['portal_comments'] = [];
 $ModelPage['portal_comment_total'] = 0;
 $ModelPage['portal_content_type'] = 'examples';
 $ModelPage['portal_content_id'] = (int)($selectedArticle['id'] ?? 0);
+$ModelPage['portal_is_favorite'] = (
+    !empty($ModelPage['portal_user']['id'])
+    && $ModelPage['portal_content_id'] > 0
+    && function_exists('public_portal_user_has_favorite')
+)
+    ? public_portal_user_has_favorite(
+        $FRMWRK,
+        (int)$ModelPage['portal_user']['id'],
+        (string)$ModelPage['portal_content_type'],
+        (int)$ModelPage['portal_content_id']
+    )
+    : false;
 if ($ModelPage['portal_content_id'] > 0) {
     if (function_exists('public_portal_fetch_comments')) {
         $ModelPage['portal_comments'] = (array)public_portal_fetch_comments(

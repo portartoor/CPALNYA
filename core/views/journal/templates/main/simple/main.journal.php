@@ -2,6 +2,9 @@
 $journal = (array)($ModelPage['journal'] ?? []);
 $items = (array)($journal['items'] ?? []);
 $selected = is_array($journal['selected'] ?? null) ? $journal['selected'] : null;
+$portalUser = is_array($ModelPage['portal_user'] ?? null) ? $ModelPage['portal_user'] : null;
+$portalIsFavorite = !empty($ModelPage['portal_is_favorite']);
+$portalCsrf = function_exists('public_portal_csrf_token') ? public_portal_csrf_token('portal') : '';
 $issue = (array)($journal['issue'] ?? []);
 $clusters = (array)($journal['clusters'] ?? []);
 $lang = (string)($journal['lang'] ?? 'en');
@@ -334,6 +337,11 @@ if ($selected) {
 .jrnl-share a:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
 .jrnl-share svg{width:18px;height:18px;display:block;flex:0 0 18px}
 .jrnl-share-label{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.jrnl-favorite-form{display:inline-flex}
+.jrnl-favorite-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-width:46px;height:46px;padding:0 14px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-muted);text-decoration:none;font:inherit;cursor:pointer}
+.jrnl-favorite-btn:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
+.jrnl-favorite-btn.is-active{color:#f4d56b;border-color:rgba(244,213,107,.34);background:rgba(244,213,107,.12)}
+.jrnl-favorite-btn svg{width:18px;height:18px;display:block;flex:0 0 18px}
 .jrnl-related-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .jrnl-empty{text-align:center}
 @keyframes jrnlCoverIntro{
@@ -411,6 +419,19 @@ if ($selected) {
                             <?= $shareIcon('whatsapp') ?>
                             <span class="jrnl-share-label">WhatsApp</span>
                         </a>
+                        <?php if ($portalUser && !empty($selected['id'])): ?>
+                            <form class="jrnl-favorite-form" method="post">
+                                <input type="hidden" name="action" value="public_portal_favorite_toggle">
+                                <input type="hidden" name="portal_csrf" value="<?= htmlspecialchars($portalCsrf, ENT_QUOTES, 'UTF-8') ?>">
+                                <input type="hidden" name="return_path" value="<?= htmlspecialchars((string)($_SERVER['REQUEST_URI'] ?? '/'), ENT_QUOTES, 'UTF-8') ?>">
+                                <input type="hidden" name="content_type" value="examples">
+                                <input type="hidden" name="content_id" value="<?= (int)$selected['id'] ?>">
+                                <button class="jrnl-favorite-btn <?= $portalIsFavorite ? 'is-active' : '' ?>" type="submit" aria-label="<?= htmlspecialchars($t('Добавить в избранное', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.4l2.63 5.34 5.9.86-4.27 4.16 1 5.87L12 16.88 6.74 19.63l1-5.87L3.47 9.6l5.9-.86L12 3.4Z"/></svg>
+                                    <span class="jrnl-share-label"><?= htmlspecialchars($portalIsFavorite ? $t('В избранном', 'Saved') : $t('Добавить в избранное', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?></span>
+                                </button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
                 <div class="jrnl-detail-body">
@@ -420,6 +441,13 @@ if ($selected) {
                     </div>
                 </div>
             </article>
+
+            <?php
+            $commentsPartial = DIR . 'core/views/partials/article_comments.php';
+            if (is_file($commentsPartial)) {
+                include $commentsPartial;
+            }
+            ?>
 
             
 
@@ -443,12 +471,6 @@ if ($selected) {
                 </section>
             <?php endif; ?>
 
-            <?php
-            $commentsPartial = DIR . 'core/views/partials/article_comments.php';
-            if (is_file($commentsPartial)) {
-                include $commentsPartial;
-            }
-            ?>
         <?php else: ?>
             <header class="jrnl-hero">
                 <div class="jrnl-copy">

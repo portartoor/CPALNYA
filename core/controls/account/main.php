@@ -18,6 +18,9 @@ $portalOwnPublicProfile = (!$portalPublicProfile && is_array($portalUser) && !em
 $portalOwnRank = (is_array($portalUser) && function_exists('public_portal_rank_meta'))
     ? public_portal_rank_meta((int)($portalUser['comment_rating'] ?? 0), $portalLang)
     : null;
+$portalOwnFavorites = (is_array($portalUser) && function_exists('public_portal_fetch_user_favorites'))
+    ? (array)public_portal_fetch_user_favorites($FRMWRK, (int)($portalUser['id'] ?? 0), 12)
+    : [];
 
 if (is_array($portalFlash) && !empty($portalFlash['message'])) {
     $flashMessage = trim((string)$portalFlash['message']);
@@ -43,6 +46,7 @@ $ModelPage['account'] = [
     'public_profile' => $portalPublicProfile,
     'own_public_profile' => $portalOwnPublicProfile,
     'own_rank' => $portalOwnRank,
+    'own_favorites' => $portalOwnFavorites,
 ];
 
 $scheme = (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ? 'https' : 'http';
