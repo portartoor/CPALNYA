@@ -483,23 +483,36 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
                     openCompose();
                     return;
                 }
-                if (hasPortalSessionCookie()) {
-                    refreshCommentsBlock(function (loggedIn) {
-                        if (loggedIn) {
-                            var refreshedRoot = document.getElementById('article-comments');
-                            if (refreshedRoot) {
-                                var composeButton = refreshedRoot.querySelector('[data-comment-open]');
-                                if (composeButton) {
-                                    composeButton.click();
-                                    return;
-                                }
+                refreshCommentsBlock(function (loggedIn) {
+                    if (loggedIn) {
+                        var refreshedRoot = document.getElementById('article-comments');
+                        if (refreshedRoot) {
+                            var composeButton = refreshedRoot.querySelector('[data-comment-open]');
+                            if (composeButton) {
+                                composeButton.click();
+                                return;
+                            }
+                            var composeShell = refreshedRoot.querySelector('#pcmt-compose-shell');
+                            var composeText = refreshedRoot.querySelector('#pcmt-text');
+                            if (composeShell) {
+                                composeShell.classList.add('is-open');
+                            }
+                            if (composeText) {
+                                window.setTimeout(function () { composeText.focus(); }, 40);
+                                return;
                             }
                         }
-                        openAuth();
-                    });
-                    return;
-                }
-                openAuth();
+                    }
+                    var refreshedRootForAuth = document.getElementById('article-comments');
+                    if (refreshedRootForAuth) {
+                        var authShell = refreshedRootForAuth.querySelector('#pcmt-auth-shell');
+                        if (authShell) {
+                            authShell.classList.add('is-open');
+                            return;
+                        }
+                    }
+                    openAuth();
+                });
                 return;
             }
 
