@@ -7,8 +7,8 @@ $isRu = (bool)preg_match('/\.ru$/', $host);
 
 $title = $isRu ? 'Связь' : 'Contact';
 $lead = $isRu
-    ? 'Опишите задачу, идею или запрос на сотрудничество. Форма ниже отправит заявку в тот же поток обработки, что и раньше.'
-    : 'Describe your task, idea, or collaboration request. The form below sends it into the same request pipeline as before.';
+    ? 'Пришлите свою идею, отзыв, редакционное наблюдение или предложение о сотрудничестве. Мы обязательно все рассмотрим, вернемся с ответом и свяжемся с вами. Сюда же можно писать по рекламе, партнерствам, идеям для материалов и любым откликам на ЦПАЛЬНЮ.'
+    : 'Send us your idea, feedback, editorial note, or collaboration request. We review every message, get back to you, and you can also reach us here about advertising, partnerships, and material proposals.';
 $contactToken = function_exists('public_contact_form_token') ? public_contact_form_token() : '';
 $contactFlash = function_exists('public_contact_form_flash') ? public_contact_form_flash() : [];
 $contactType = (string)($contactFlash['type'] ?? '');

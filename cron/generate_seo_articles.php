@@ -135,7 +135,9 @@ function seo_apply_db_settings_to_cfg(array $cfg, array $dbSettings): array
         'portfolio_case_weight', 'portfolio_product_weight',
         'domain_host_en', 'domain_host_ru',
         'notify_schedule', 'notify_daily_schedule', 'today_first_delay_min', 'preview_channel_enabled',
-        'preview_channel_chat_id', 'preview_image_enabled', 'preview_image_model', 'preview_image_size',
+        'preview_channel_chat_id', 'preview_public_channel_enabled', 'preview_public_channel_chat_id',
+        'preview_public_channel_bot_token', 'preview_public_channel_api_base',
+        'preview_image_enabled', 'preview_image_model', 'preview_image_size',
         'preview_image_prompt_template', 'preview_image_anchor_enforced', 'preview_image_anchor_append',
         'preview_post_max_words', 'preview_caption_max_words',
         'preview_post_min_words', 'preview_caption_min_words', 'preview_use_llm', 'preview_llm_model',
@@ -1771,12 +1773,17 @@ function seo_notify_telegram_schedule_summary(string $jobDate, array $scheduleBy
     tg_notify_send(implode("\n", $lines));
 }
 
-function seo_tg_settings_with_chat(?string $chatId = null): ?array
+function seo_tg_settings_with_chat(?string $chatId = null, ?array $override = null): ?array
 {
     if (!function_exists('tg_notify_settings')) {
         return null;
     }
     $settings = tg_notify_settings();
+    if (is_array($override) && !empty($override)) {
+        foreach ($override as $key => $value) {
+            $settings[$key] = $value;
+        }
+    }
     if (!is_array($settings) || !(bool)($settings['enabled'] ?? false)) {
         return null;
     }
@@ -1790,9 +1797,9 @@ function seo_tg_settings_with_chat(?string $chatId = null): ?array
     return $settings;
 }
 
-function seo_tg_send_message_to_chat(string $text, string $chatId): bool
+function seo_tg_send_message_to_chat(string $text, string $chatId, ?array $settingsOverride = null): bool
 {
-    $settings = seo_tg_settings_with_chat($chatId);
+    $settings = seo_tg_settings_with_chat($chatId, $settingsOverride);
     if ($settings === null) {
         return false;
     }
@@ -1802,9 +1809,9 @@ function seo_tg_send_message_to_chat(string $text, string $chatId): bool
     return false;
 }
 
-function seo_tg_send_photo_to_chat(string $photoUrl, string $caption, string $chatId): bool
+function seo_tg_send_photo_to_chat(string $photoUrl, string $caption, string $chatId, ?array $settingsOverride = null): bool
 {
-    $settings = seo_tg_settings_with_chat($chatId);
+    $settings = seo_tg_settings_with_chat($chatId, $settingsOverride);
     if ($settings === null) {
         return false;
     }
@@ -1825,9 +1832,9 @@ function seo_tg_send_photo_to_chat(string $photoUrl, string $caption, string $ch
     return false;
 }
 
-function seo_tg_send_photo_data_url_to_chat(string $dataUrl, string $caption, string $chatId): bool
+function seo_tg_send_photo_data_url_to_chat(string $dataUrl, string $caption, string $chatId, ?array $settingsOverride = null): bool
 {
-    $settings = seo_tg_settings_with_chat($chatId);
+    $settings = seo_tg_settings_with_chat($chatId, $settingsOverride);
     if ($settings === null) {
         return false;
     }
@@ -2384,13 +2391,37 @@ function seo_generate_image_asset(
 
 function seo_send_preview_post(array $cfg, string $lang, array $article): array
 {
-    if (!(bool)($cfg['preview_channel_enabled'] ?? false)) {
-        seo_echo('Preview TG: channel preview disabled by config.');
-        return ['status' => 'skipped_disabled'];
+    $recipients = [];
+    if ((bool)($cfg['preview_channel_enabled'] ?? false)) {
+        $primaryChatIds = seo_parse_tg_chat_ids((string)($cfg['preview_channel_chat_id'] ?? ''));
+        foreach ($primaryChatIds as $chatId) {
+            $recipients[] = [
+                'chat_id' => $chatId,
+                'settings' => null,
+                'label' => 'primary',
+            ];
+        }
     }
-    $chatIds = seo_parse_tg_chat_ids((string)($cfg['preview_channel_chat_id'] ?? ''));
-    if (empty($chatIds)) {
-        seo_echo('Preview TG: chat_id is empty, skip.');
+    if ((bool)($cfg['preview_public_channel_enabled'] ?? false)) {
+        $publicChatIds = seo_parse_tg_chat_ids((string)($cfg['preview_public_channel_chat_id'] ?? ''));
+        $publicBotToken = trim((string)($cfg['preview_public_channel_bot_token'] ?? ''));
+        $publicApiBase = rtrim(trim((string)($cfg['preview_public_channel_api_base'] ?? 'https://api.telegram.org')), '/');
+        if ($publicBotToken !== '') {
+            foreach ($publicChatIds as $chatId) {
+                $recipients[] = [
+                    'chat_id' => $chatId,
+                    'settings' => [
+                        'enabled' => true,
+                        'bot_token' => $publicBotToken,
+                        'api_base' => $publicApiBase !== '' ? $publicApiBase : 'https://api.telegram.org',
+                    ],
+                    'label' => 'public',
+                ];
+            }
+        }
+    }
+    if (empty($recipients)) {
+        seo_echo('Preview TG: no preview recipients configured, skip.');
         return ['status' => 'skipped_chat_empty'];
     }
     $slug = (string)($article['slug'] ?? '');
@@ -2479,20 +2510,23 @@ function seo_send_preview_post(array $cfg, string $lang, array $article): array
     }
     $results = [];
     $okCount = 0;
-    foreach ($chatIds as $chatId) {
+    foreach ($recipients as $recipient) {
+        $chatId = (string)($recipient['chat_id'] ?? '');
+        $settingsOverride = is_array($recipient['settings'] ?? null) ? $recipient['settings'] : null;
+        $recipientLabel = (string)($recipient['label'] ?? 'preview');
         $sent = false;
         $status = 'failed';
         if ($imageUrl !== '') {
             $isDataUrl = (stripos($imageUrl, 'data:image/') === 0);
-            seo_echo('Preview TG: sending photo post to chat ' . $chatId . ($isDataUrl ? ' (data-url upload)' : ' (url)'));
+            seo_echo('Preview TG: sending photo post to ' . $recipientLabel . ' chat ' . $chatId . ($isDataUrl ? ' (data-url upload)' : ' (url)'));
             if ($isDataUrl) {
-                if (seo_tg_send_photo_data_url_to_chat($imageUrl, $captionText, $chatId)) {
+                if (seo_tg_send_photo_data_url_to_chat($imageUrl, $captionText, $chatId, $settingsOverride)) {
                     seo_echo('Preview TG: photo post sent successfully (upload).');
                     $sent = true;
                     $status = 'sent_photo_upload';
                 }
             } else {
-                if (seo_tg_send_photo_to_chat($imageUrl, $captionText, $chatId)) {
+                if (seo_tg_send_photo_to_chat($imageUrl, $captionText, $chatId, $settingsOverride)) {
                     seo_echo('Preview TG: photo post sent successfully.');
                     $sent = true;
                     $status = 'sent_photo';
@@ -2503,8 +2537,8 @@ function seo_send_preview_post(array $cfg, string $lang, array $article): array
             }
         }
         if (!$sent) {
-            seo_echo('Preview TG: sending text post to chat ' . $chatId);
-            if (seo_tg_send_message_to_chat($postText, $chatId)) {
+            seo_echo('Preview TG: sending text post to ' . $recipientLabel . ' chat ' . $chatId);
+            if (seo_tg_send_message_to_chat($postText, $chatId, $settingsOverride)) {
                 seo_echo('Preview TG: text post sent.');
                 $sent = true;
                 $status = 'sent_text';
@@ -2515,9 +2549,9 @@ function seo_send_preview_post(array $cfg, string $lang, array $article): array
         if ($sent) {
             $okCount++;
         }
-        $results[] = ['chat_id' => $chatId, 'status' => $status];
+        $results[] = ['chat_id' => $chatId, 'status' => $status, 'label' => $recipientLabel];
     }
-    if ($okCount === count($chatIds)) {
+    if ($okCount === count($recipients)) {
         return ['status' => 'sent_all', 'results' => $results];
     }
     if ($okCount > 0) {
@@ -6526,6 +6560,10 @@ $cfg = [
     'today_first_delay_min' => (int)seo_cfg('SeoArticleCronTodayFirstDelayMinutes', 15),
     'preview_channel_enabled' => (bool)seo_cfg('SeoArticleTelegramPreviewEnabled', false),
     'preview_channel_chat_id' => trim((string)seo_cfg('SeoArticleTelegramPreviewChatId', '-1003704622762')),
+    'preview_public_channel_enabled' => false,
+    'preview_public_channel_chat_id' => '',
+    'preview_public_channel_bot_token' => '',
+    'preview_public_channel_api_base' => 'https://api.telegram.org',
     'preview_image_enabled' => (bool)seo_cfg('SeoArticlePreviewImageEnabled', false),
     'preview_image_model' => trim((string)seo_cfg('SeoArticlePreviewImageModel', '')),
     'preview_image_size' => trim((string)seo_cfg('SeoArticlePreviewImageSize', '768x512')),

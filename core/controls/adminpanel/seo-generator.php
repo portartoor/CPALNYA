@@ -366,6 +366,10 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
         $incoming['preview_channel_enabled'] = admin_seo_gen_post_bool('preview_channel_enabled', false);
         $incoming['preview_channel_chat_id'] = admin_seo_gen_post_string('preview_channel_chat_id');
+        $incoming['preview_public_channel_enabled'] = admin_seo_gen_post_bool('preview_public_channel_enabled', false);
+        $incoming['preview_public_channel_chat_id'] = admin_seo_gen_post_string('preview_public_channel_chat_id');
+        $incoming['preview_public_channel_bot_token'] = admin_seo_gen_post_string('preview_public_channel_bot_token');
+        $incoming['preview_public_channel_api_base'] = admin_seo_gen_post_string('preview_public_channel_api_base', 'https://api.telegram.org');
         $incoming['preview_post_max_words'] = admin_seo_gen_post_int('preview_post_max_words', 220);
         $incoming['preview_caption_max_words'] = admin_seo_gen_post_int('preview_caption_max_words', 80);
         $incoming['preview_post_min_words'] = admin_seo_gen_post_int('preview_post_min_words', 70);

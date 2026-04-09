@@ -255,6 +255,10 @@
                                     <div class="row g-3">
                                         <div class="col-md-3"><label class="form-label">Preview Channel</label><select class="form-select" name="preview_channel_enabled" id="preview_channel_enabled"><option value="1" <?= !empty($s['preview_channel_enabled']) ? 'selected' : '' ?>>Enabled</option><option value="0" <?= empty($s['preview_channel_enabled']) ? 'selected' : '' ?>>Disabled</option></select></div>
                                         <div class="col-md-5"><label class="form-label">Preview Chat ID</label><input class="form-control" name="preview_channel_chat_id" id="preview_channel_chat_id" value="<?= htmlspecialchars((string)($s['preview_channel_chat_id'] ?? '')) ?>"></div>
+                                        <div class="col-md-4"><label class="form-label">CPALNYA Channel</label><select class="form-select" name="preview_public_channel_enabled" id="preview_public_channel_enabled"><option value="1" <?= !empty($s['preview_public_channel_enabled']) ? 'selected' : '' ?>>Enabled</option><option value="0" <?= empty($s['preview_public_channel_enabled']) ? 'selected' : '' ?>>Disabled</option></select></div>
+                                        <div class="col-md-4"><label class="form-label">CPALNYA Chat ID</label><input class="form-control" name="preview_public_channel_chat_id" id="preview_public_channel_chat_id" value="<?= htmlspecialchars((string)($s['preview_public_channel_chat_id'] ?? '')) ?>"></div>
+                                        <div class="col-md-4"><label class="form-label">CPALNYA Bot Token</label><input class="form-control" name="preview_public_channel_bot_token" id="preview_public_channel_bot_token" value="<?= htmlspecialchars((string)($s['preview_public_channel_bot_token'] ?? '')) ?>"></div>
+                                        <div class="col-md-4"><label class="form-label">CPALNYA Telegram API</label><input class="form-control" name="preview_public_channel_api_base" id="preview_public_channel_api_base" value="<?= htmlspecialchars((string)($s['preview_public_channel_api_base'] ?? 'https://api.telegram.org')) ?>"></div>
                                         <div class="col-md-2"><label class="form-label">Preview Use LLM</label><select class="form-select" name="preview_use_llm"><option value="1" <?= !empty($s['preview_use_llm']) ? 'selected' : '' ?>>Yes</option><option value="0" <?= empty($s['preview_use_llm']) ? 'selected' : '' ?>>No</option></select></div>
                                         <div class="col-md-2"><label class="form-label">Preview LLM Model</label><input class="form-control" name="preview_llm_model" value="<?= htmlspecialchars((string)($s['preview_llm_model'] ?? '')) ?>"></div>
                                         <div class="col-md-2"><label class="form-label">Post Min</label><input class="form-control" type="number" name="preview_post_min_words" value="<?= (int)($s['preview_post_min_words'] ?? 70) ?>"></div>
@@ -506,6 +510,11 @@
         }
         const channelEnabled = form.querySelector('[name="preview_channel_enabled"]').value === '1';
         if (channelEnabled && !vNotEmpty('preview_channel_chat_id')) ok = false;
+        const publicChannelEnabled = form.querySelector('[name="preview_public_channel_enabled"]').value === '1';
+        if (publicChannelEnabled) {
+            if (!vNotEmpty('preview_public_channel_chat_id')) ok = false;
+            if (!vNotEmpty('preview_public_channel_bot_token')) ok = false;
+        }
         const colorLines = String(form.querySelector('[name="image_color_schemes"]').value || '').split(/\r\n|\r|\n/).map(v=>v.trim()).filter(Boolean).length;
         if (colorLines < 1) { mark(form.querySelector('[name="image_color_schemes"]'), false); ok = false; }
         const compositionLines = String(form.querySelector('[name="image_compositions"]').value || '').split(/\r\n|\r|\n/).map(v=>v.trim()).filter(Boolean).length;

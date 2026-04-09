@@ -604,6 +604,10 @@ if (!function_exists('seo_gen_settings_default')) {
 
             'preview_channel_enabled' => true,
             'preview_channel_chat_id' => '',
+            'preview_public_channel_enabled' => false,
+            'preview_public_channel_chat_id' => '',
+            'preview_public_channel_bot_token' => '',
+            'preview_public_channel_api_base' => 'https://api.telegram.org',
             'preview_post_max_words' => 220,
             'preview_caption_max_words' => 80,
             'preview_post_min_words' => 70,
