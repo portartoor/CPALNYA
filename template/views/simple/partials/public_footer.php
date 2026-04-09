@@ -44,18 +44,10 @@ $buildClusterLink = static function (array $cluster, string $section, string $fa
         'icon' => $fallbackIcon,
     ];
 };
-$playbookClusters = function_exists('examples_fetch_clusters')
-    ? array_values((array)examples_fetch_clusters($FRMWRK, (string)$host, $isRu ? 'ru' : 'en', 6, 'playbooks'))
-    : [];
-$journalClusters = function_exists('examples_fetch_clusters')
-    ? array_values((array)examples_fetch_clusters($FRMWRK, (string)$host, $isRu ? 'ru' : 'en', 4, 'journal'))
-    : [];
-$signalsClusters = function_exists('examples_fetch_clusters')
-    ? array_values((array)examples_fetch_clusters($FRMWRK, (string)$host, $isRu ? 'ru' : 'en', 3, 'signals'))
-    : [];
-$funClusters = function_exists('examples_fetch_clusters')
-    ? array_values((array)examples_fetch_clusters($FRMWRK, (string)$host, $isRu ? 'ru' : 'en', 3, 'fun'))
-    : [];
+$playbookClusters = [];
+$journalClusters = [];
+$signalsClusters = [];
+$funClusters = [];
 $practiceTopicLinks = [];
 foreach (array_slice($playbookClusters, 0, 3) as $cluster) {
     $link = $buildClusterLink((array)$cluster, 'playbooks', '⚙');
