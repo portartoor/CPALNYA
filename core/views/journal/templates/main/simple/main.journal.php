@@ -199,6 +199,16 @@ $selectedShareUrl = $selectedArticleUrl !== ''
     ? (((!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ? 'https' : 'http') . '://' . (string)($_SERVER['HTTP_HOST'] ?? '') . $selectedArticleUrl)
     : '';
 $selectedShareTitle = trim((string)($selected['title'] ?? ''));
+$shareIcon = static function (string $network): string {
+    $icons = [
+        'telegram' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.94 4.66a1.5 1.5 0 0 0-1.68-.2L3.2 12.84a1 1 0 0 0 .1 1.85l4.34 1.49 1.66 5.06a1 1 0 0 0 1.73.33l2.42-3 4.76 3.48a1.5 1.5 0 0 0 2.36-.92l2.3-14.5a1.5 1.5 0 0 0-.93-1.97ZM9.4 15.47l-.56 3.03-.96-2.91 9.88-7.42-8.36 7.3Z"/></svg>',
+        'x' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.9 2H22l-6.78 7.75L23.2 22h-6.26l-4.9-7.4L5.56 22H2.44l7.25-8.28L2 2h6.42l4.42 6.74L18.9 2Zm-1.1 18h1.74L7.47 3.9H5.6L17.8 20Z"/></svg>',
+        'facebook' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.5 22v-8h2.7l.4-3h-3.1V9.08c0-.87.25-1.46 1.5-1.46h1.72V4.93c-.3-.04-1.32-.13-2.5-.13-2.47 0-4.16 1.5-4.16 4.28V11H7v3h3.04v8h3.46Z"/></svg>',
+        'linkedin' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.94 8.5A1.72 1.72 0 1 1 6.9 5.06a1.72 1.72 0 0 1 .04 3.44ZM5.3 9.82h3.28V22H5.3V9.82Zm5.34 0h3.14v1.66h.05c.44-.83 1.5-1.7 3.09-1.7 3.3 0 3.9 2.17 3.9 5V22h-3.27v-6.4c0-1.52-.03-3.49-2.12-3.49-2.12 0-2.44 1.66-2.44 3.38V22h-3.28V9.82Z"/></svg>',
+        'whatsapp' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12.04 2a9.93 9.93 0 0 0-8.48 15.1L2 22l5.06-1.53A10 10 0 1 0 12.04 2Zm0 18.17a8.16 8.16 0 0 1-4.16-1.14l-.3-.18-3 .9.94-2.93-.2-.3a8.18 8.18 0 1 1 6.72 3.65Zm4.49-6.12c-.24-.12-1.44-.71-1.67-.8-.22-.08-.38-.12-.54.12-.16.23-.62.8-.76.96-.14.15-.28.17-.52.05-.24-.12-1-.37-1.9-1.19-.7-.62-1.17-1.39-1.31-1.62-.14-.24-.01-.36.1-.48.1-.1.24-.28.36-.41.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.4h-.46c-.16 0-.42.06-.64.3-.22.23-.84.82-.84 2 0 1.18.86 2.33.98 2.49.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.51.58.19 1.1.16 1.52.1.46-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28Z"/></svg>',
+    ];
+    return $icons[$network] ?? '';
+};
 $relatedItems = [];
 if ($selected) {
     foreach ($items as $item) {
@@ -281,9 +291,11 @@ if ($selected) {
 .jrnl-detail-content hr{border:0;border-top:1px solid rgba(122,180,255,.16);margin:18px 0}
 .jrnl-actions{display:flex;gap:12px;flex-wrap:wrap}
 .jrnl-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border:1px solid rgba(122,180,255,.18);background:linear-gradient(135deg,rgba(115,184,255,.22),rgba(39,223,192,.18));color:var(--shell-text);text-decoration:none;font-weight:700}
-.jrnl-share{display:flex;flex-wrap:wrap;gap:10px}
-.jrnl-share a{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-muted);text-decoration:none}
+.jrnl-share{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.jrnl-share a{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-width:46px;height:46px;padding:0 14px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-muted);text-decoration:none}
 .jrnl-share a:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
+.jrnl-share svg{width:18px;height:18px;display:block;flex:0 0 18px}
+.jrnl-share-label{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .jrnl-related-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .jrnl-empty{text-align:center}
 @keyframes jrnlCoverIntro{
@@ -327,20 +339,35 @@ if ($selected) {
                         <img src="<?= htmlspecialchars((string)$selected['hero_image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($selected['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                     </div>
                 <?php endif; ?>
+                <?php if ($selectedShareUrl !== ''): ?>
+                    <div class="jrnl-share">
+                        <a href="https://t.me/share/url?url=<?= rawurlencode($selectedShareUrl) ?>&text=<?= rawurlencode($selectedShareTitle) ?>" target="_blank" rel="noopener noreferrer" aria-label="Telegram">
+                            <?= $shareIcon('telegram') ?>
+                            <span class="jrnl-share-label">Telegram</span>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url=<?= rawurlencode($selectedShareUrl) ?>&text=<?= rawurlencode($selectedShareTitle) ?>" target="_blank" rel="noopener noreferrer" aria-label="X">
+                            <?= $shareIcon('x') ?>
+                            <span class="jrnl-share-label">X</span>
+                        </a>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=<?= rawurlencode($selectedShareUrl) ?>" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                            <?= $shareIcon('facebook') ?>
+                            <span class="jrnl-share-label">Facebook</span>
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?= rawurlencode($selectedShareUrl) ?>" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                            <?= $shareIcon('linkedin') ?>
+                            <span class="jrnl-share-label">LinkedIn</span>
+                        </a>
+                        <a href="https://wa.me/?text=<?= rawurlencode($selectedShareTitle . ' ' . $selectedShareUrl) ?>" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+                            <?= $shareIcon('whatsapp') ?>
+                            <span class="jrnl-share-label">WhatsApp</span>
+                        </a>
+                    </div>
+                <?php endif; ?>
                 <div class="jrnl-detail-body">
                     <div class="jrnl-detail-content"><?= $selectedBodyHtml ?></div>
                     <div class="jrnl-actions">
                         <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Назад в журнал', 'Back to journal'), ENT_QUOTES, 'UTF-8') ?></a>
                     </div>
-                    <?php if ($selectedShareUrl !== ''): ?>
-                        <div class="jrnl-share">
-                            <a href="https://t.me/share/url?url=<?= rawurlencode($selectedShareUrl) ?>&text=<?= rawurlencode($selectedShareTitle) ?>" target="_blank" rel="noopener noreferrer">Telegram</a>
-                            <a href="https://twitter.com/intent/tweet?url=<?= rawurlencode($selectedShareUrl) ?>&text=<?= rawurlencode($selectedShareTitle) ?>" target="_blank" rel="noopener noreferrer">X</a>
-                            <a href="https://www.facebook.com/sharer/sharer.php?u=<?= rawurlencode($selectedShareUrl) ?>" target="_blank" rel="noopener noreferrer">Facebook</a>
-                            <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?= rawurlencode($selectedShareUrl) ?>" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-                            <a href="https://wa.me/?text=<?= rawurlencode($selectedShareTitle . ' ' . $selectedShareUrl) ?>" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-                        </div>
-                    <?php endif; ?>
                 </div>
             </article>
 

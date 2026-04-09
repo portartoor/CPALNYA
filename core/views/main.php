@@ -104,8 +104,9 @@ $heroSectionTitles = [
 .home-z-block-title{display:grid;gap:10px;align-content:start}
 .home-z-block-link{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-text);text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 .home-z-list{display:grid;gap:14px;padding-left:0}
-.home-z-card{display:grid;grid-template-columns:148px minmax(0,1fr);gap:14px;align-items:stretch;padding:0;border:0;background:transparent;text-decoration:none;color:inherit}
-.home-z-card-media{width:148px;height:100%;min-height:100%;align-self:stretch;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));overflow:hidden}
+.home-z-card{display:grid;grid-template-columns:160px minmax(0,1fr);gap:14px;align-items:start;padding:0;border:0;background:transparent;text-decoration:none;color:inherit}
+.home-z-card-media-wrap{display:grid;gap:8px;align-content:start}
+.home-z-card-media{width:160px;aspect-ratio:1/1;align-self:start;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));overflow:hidden}
 .home-z-card-media img{display:block;width:100%;height:100%;object-fit:cover}
 .home-z-card-copy{display:grid;gap:8px;min-width:0;align-content:start}
 .home-z-card-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -119,7 +120,8 @@ $heroSectionTitles = [
     .home-z-feature{grid-template-columns:1fr}
     .home-z-feature-media{width:100%;height:180px;min-height:180px}
     .home-z-card{grid-template-columns:1fr}
-    .home-z-card-media{width:100%;height:180px;min-height:180px}
+    .home-z-card-media-wrap{width:100%}
+    .home-z-card-media{width:100%;aspect-ratio:1/1}
 }
 </style>
 
@@ -182,19 +184,21 @@ $heroSectionTitles = [
                         <?php $cardImage = $imageSrc((array)$item); ?>
                         <?php $cardDate = $formatDate((array)$item); ?>
                         <a class="home-z-card" href="<?= htmlspecialchars($buildArticleUrl((array)$item, 'journal'), ENT_QUOTES, 'UTF-8') ?>">
-                            <div class="home-z-card-media">
-                                <?php if ($cardImage !== ''): ?>
-                                    <img src="<?= htmlspecialchars($cardImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                            <div class="home-z-card-media-wrap">
+                                <?php if ($cardDate !== ''): ?>
+                                    <p class="home-z-meta"><?= htmlspecialchars($cardDate, ENT_QUOTES, 'UTF-8') ?></p>
                                 <?php endif; ?>
+                                <div class="home-z-card-media">
+                                    <?php if ($cardImage !== ''): ?>
+                                        <img src="<?= htmlspecialchars($cardImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                                    <?php endif; ?>
+                                </div>
                             </div>
                             <div class="home-z-card-copy">
                                 <div class="home-z-card-head">
                                     <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                                     <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
                                 </div>
-                                <?php if ($cardDate !== ''): ?>
-                                    <p class="home-z-meta"><?= htmlspecialchars($cardDate, ENT_QUOTES, 'UTF-8') ?></p>
-                                <?php endif; ?>
                                 <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
                         </a>
@@ -215,19 +219,21 @@ $heroSectionTitles = [
                         <?php $cardImage = $imageSrc((array)$item); ?>
                         <?php $cardDate = $formatDate((array)$item); ?>
                         <a class="home-z-card" href="<?= htmlspecialchars($buildArticleUrl((array)$item, 'playbooks'), ENT_QUOTES, 'UTF-8') ?>">
-                            <div class="home-z-card-media">
-                                <?php if ($cardImage !== ''): ?>
-                                    <img src="<?= htmlspecialchars($cardImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                            <div class="home-z-card-media-wrap">
+                                <?php if ($cardDate !== ''): ?>
+                                    <p class="home-z-meta"><?= htmlspecialchars($cardDate, ENT_QUOTES, 'UTF-8') ?></p>
                                 <?php endif; ?>
+                                <div class="home-z-card-media">
+                                    <?php if ($cardImage !== ''): ?>
+                                        <img src="<?= htmlspecialchars($cardImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                                    <?php endif; ?>
+                                </div>
                             </div>
                             <div class="home-z-card-copy">
                                 <div class="home-z-card-head">
                                     <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                                     <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
                                 </div>
-                                <?php if ($cardDate !== ''): ?>
-                                    <p class="home-z-meta"><?= htmlspecialchars($cardDate, ENT_QUOTES, 'UTF-8') ?></p>
-                                <?php endif; ?>
                                 <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
                         </a>
@@ -248,19 +254,21 @@ $heroSectionTitles = [
                         <?php $cardImage = $imageSrc((array)$item); ?>
                         <?php $cardDate = $formatDate((array)$item); ?>
                         <a class="home-z-card" href="<?= htmlspecialchars($buildArticleUrl((array)$item, 'signals'), ENT_QUOTES, 'UTF-8') ?>">
-                            <div class="home-z-card-media">
-                                <?php if ($cardImage !== ''): ?>
-                                    <img src="<?= htmlspecialchars($cardImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                            <div class="home-z-card-media-wrap">
+                                <?php if ($cardDate !== ''): ?>
+                                    <p class="home-z-meta"><?= htmlspecialchars($cardDate, ENT_QUOTES, 'UTF-8') ?></p>
                                 <?php endif; ?>
+                                <div class="home-z-card-media">
+                                    <?php if ($cardImage !== ''): ?>
+                                        <img src="<?= htmlspecialchars($cardImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                                    <?php endif; ?>
+                                </div>
                             </div>
                             <div class="home-z-card-copy">
                                 <div class="home-z-card-head">
                                     <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                                     <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
                                 </div>
-                                <?php if ($cardDate !== ''): ?>
-                                    <p class="home-z-meta"><?= htmlspecialchars($cardDate, ENT_QUOTES, 'UTF-8') ?></p>
-                                <?php endif; ?>
                                 <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
                         </a>
@@ -281,19 +289,21 @@ $heroSectionTitles = [
                         <?php $cardImage = $imageSrc((array)$item); ?>
                         <?php $cardDate = $formatDate((array)$item); ?>
                         <a class="home-z-card" href="<?= htmlspecialchars($buildArticleUrl((array)$item, 'fun'), ENT_QUOTES, 'UTF-8') ?>">
-                            <div class="home-z-card-media">
-                                <?php if ($cardImage !== ''): ?>
-                                    <img src="<?= htmlspecialchars($cardImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                            <div class="home-z-card-media-wrap">
+                                <?php if ($cardDate !== ''): ?>
+                                    <p class="home-z-meta"><?= htmlspecialchars($cardDate, ENT_QUOTES, 'UTF-8') ?></p>
                                 <?php endif; ?>
+                                <div class="home-z-card-media">
+                                    <?php if ($cardImage !== ''): ?>
+                                        <img src="<?= htmlspecialchars($cardImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                                    <?php endif; ?>
+                                </div>
                             </div>
                             <div class="home-z-card-copy">
                                 <div class="home-z-card-head">
                                     <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                                     <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
                                 </div>
-                                <?php if ($cardDate !== ''): ?>
-                                    <p class="home-z-meta"><?= htmlspecialchars($cardDate, ENT_QUOTES, 'UTF-8') ?></p>
-                                <?php endif; ?>
                                 <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
                         </a>
