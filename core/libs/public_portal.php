@@ -91,6 +91,62 @@ if (!function_exists('public_portal_table_exists')) {
     }
 }
 
+if (!function_exists('public_portal_column_exists')) {
+    function public_portal_column_exists(mysqli $db, string $table, string $column): bool
+    {
+        $tableSafe = mysqli_real_escape_string($db, $table);
+        $columnSafe = mysqli_real_escape_string($db, $column);
+        $res = mysqli_query(
+            $db,
+            "SELECT 1
+             FROM information_schema.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = '{$tableSafe}'
+               AND COLUMN_NAME = '{$columnSafe}'
+             LIMIT 1"
+        );
+        return $res ? (mysqli_num_rows($res) > 0) : false;
+    }
+}
+
+if (!function_exists('public_portal_index_exists')) {
+    function public_portal_index_exists(mysqli $db, string $table, string $index): bool
+    {
+        $tableSafe = mysqli_real_escape_string($db, $table);
+        $indexSafe = mysqli_real_escape_string($db, $index);
+        $res = mysqli_query(
+            $db,
+            "SELECT 1
+             FROM information_schema.STATISTICS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = '{$tableSafe}'
+               AND INDEX_NAME = '{$indexSafe}'
+             LIMIT 1"
+        );
+        return $res ? (mysqli_num_rows($res) > 0) : false;
+    }
+}
+
+if (!function_exists('public_portal_ensure_column')) {
+    function public_portal_ensure_column(mysqli $db, string $table, string $column, string $definition): bool
+    {
+        if (public_portal_column_exists($db, $table, $column)) {
+            return true;
+        }
+        return (bool)mysqli_query($db, "ALTER TABLE `{$table}` ADD COLUMN {$definition}");
+    }
+}
+
+if (!function_exists('public_portal_ensure_index')) {
+    function public_portal_ensure_index(mysqli $db, string $table, string $indexName, string $definition): bool
+    {
+        if (public_portal_index_exists($db, $table, $indexName)) {
+            return true;
+        }
+        return (bool)mysqli_query($db, "ALTER TABLE `{$table}` ADD {$definition}");
+    }
+}
+
 if (!function_exists('public_portal_slugify')) {
     function public_portal_slugify(string $raw, string $fallbackPrefix = 'item'): string
     {
@@ -112,26 +168,182 @@ if (!function_exists('public_portal_slugify')) {
     }
 }
 
+if (!function_exists('public_portal_username_normalize')) {
+    function public_portal_username_normalize(string $raw): string
+    {
+        $raw = trim($raw);
+        if ($raw === '') {
+            return '';
+        }
+        $raw = preg_replace('/[^A-Za-z0-9_\-.]+/', '-', $raw);
+        $raw = trim((string)$raw, '-._');
+        return substr((string)$raw, 0, 64);
+    }
+}
+
+if (!function_exists('public_portal_generate_pin')) {
+    function public_portal_generate_pin(): string
+    {
+        return str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    }
+}
+
+if (!function_exists('public_portal_avatar_svg')) {
+    function public_portal_avatar_svg(string $seed, string $label = ''): string
+    {
+        $seed = trim($seed) !== '' ? trim($seed) : 'member';
+        $hash = md5($seed);
+        $colors = ['#73b8ff', '#27dfc0', '#ff9a5f', '#f4d56b', '#b38cff', '#ff6d8a'];
+        $primary = $colors[hexdec(substr($hash, 0, 2)) % count($colors)];
+        $secondary = $colors[hexdec(substr($hash, 2, 2)) % count($colors)];
+        $chars = trim($label);
+        if ($chars === '') {
+            $parts = preg_split('/[\s_\-.]+/u', $seed) ?: [];
+            $letters = '';
+            foreach ($parts as $part) {
+                $part = trim((string)$part);
+                if ($part === '') {
+                    continue;
+                }
+                $letters .= function_exists('mb_substr') ? mb_substr($part, 0, 1, 'UTF-8') : substr($part, 0, 1);
+                if (function_exists('mb_strlen') ? mb_strlen($letters, 'UTF-8') >= 2 : strlen($letters) >= 2) {
+                    break;
+                }
+            }
+            $chars = $letters !== '' ? $letters : 'U';
+        }
+        $chars = function_exists('mb_strtoupper') ? mb_strtoupper($chars, 'UTF-8') : strtoupper($chars);
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" fill="none">'
+            . '<defs><linearGradient id="g" x1="18" y1="18" x2="142" y2="142" gradientUnits="userSpaceOnUse">'
+            . '<stop stop-color="' . htmlspecialchars($primary, ENT_QUOTES, 'UTF-8') . '"/>'
+            . '<stop offset="1" stop-color="' . htmlspecialchars($secondary, ENT_QUOTES, 'UTF-8') . '"/>'
+            . '</linearGradient></defs>'
+            . '<rect width="160" height="160" rx="22" fill="#081120"/>'
+            . '<rect x="10" y="10" width="140" height="140" rx="18" fill="url(#g)" opacity=".95"/>'
+            . '<circle cx="120" cy="38" r="18" fill="white" opacity=".12"/>'
+            . '<path d="M28 120c18-20 35-30 52-30 17 0 30 7 52 26" stroke="white" stroke-opacity=".18" stroke-width="10" stroke-linecap="round"/>'
+            . '<text x="80" y="92" text-anchor="middle" font-family="Sora, Arial, sans-serif" font-size="52" font-weight="700" fill="white">' . htmlspecialchars($chars, ENT_QUOTES, 'UTF-8') . '</text>'
+            . '</svg>';
+        return 'data:image/svg+xml;base64,' . base64_encode($svg);
+    }
+}
+
+if (!function_exists('public_portal_user_avatar')) {
+    function public_portal_user_avatar(array $user): string
+    {
+        $avatarUrl = trim((string)($user['avatar_url'] ?? ''));
+        if ($avatarUrl !== '') {
+            return $avatarUrl;
+        }
+        $name = trim((string)($user['display_name'] ?? $user['username'] ?? 'Member'));
+        $seed = trim((string)($user['username'] ?? $user['email'] ?? $name));
+        return public_portal_avatar_svg($seed, $name);
+    }
+}
+
+if (!function_exists('public_portal_captcha_build')) {
+    function public_portal_captcha_build(): array
+    {
+        public_portal_session_boot();
+        $left = random_int(2, 9);
+        $right = random_int(1, 8);
+        $glyphs = ['▲', '●', '■', '◆', '✦', '✳'];
+        $challenge = [
+            'left' => $left,
+            'right' => $right,
+            'glyph_left' => $glyphs[array_rand($glyphs)],
+            'glyph_right' => $glyphs[array_rand($glyphs)],
+            'prompt_ru' => 'Сложите два числа рядом со знаками',
+            'prompt_en' => 'Add the two numbers next to the symbols',
+            'answer' => (string)($left + $right),
+        ];
+        $_SESSION['public_portal_captcha'] = $challenge;
+        return $challenge;
+    }
+}
+
+if (!function_exists('public_portal_captcha_get')) {
+    function public_portal_captcha_get(): array
+    {
+        public_portal_session_boot();
+        $captcha = $_SESSION['public_portal_captcha'] ?? null;
+        if (!is_array($captcha) || empty($captcha['answer'])) {
+            $captcha = public_portal_captcha_build();
+        }
+        return $captcha;
+    }
+}
+
+if (!function_exists('public_portal_captcha_check')) {
+    function public_portal_captcha_check(string $answer): bool
+    {
+        $captcha = public_portal_captcha_get();
+        $expected = trim((string)($captcha['answer'] ?? ''));
+        $given = trim($answer);
+        $ok = ($expected !== '' && hash_equals($expected, $given));
+        public_portal_captcha_build();
+        return $ok;
+    }
+}
+
 if (!function_exists('public_portal_users_ensure_schema')) {
     function public_portal_users_ensure_schema(mysqli $db): bool
     {
         $sql = "
             CREATE TABLE IF NOT EXISTS public_users (
                 id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                username VARCHAR(64) NOT NULL DEFAULT '',
                 email VARCHAR(190) NOT NULL,
                 password_hash VARCHAR(255) NOT NULL,
                 display_name VARCHAR(120) NOT NULL DEFAULT '',
+                pin_code VARCHAR(16) NOT NULL DEFAULT '',
+                avatar_mode VARCHAR(16) NOT NULL DEFAULT 'generated',
+                avatar_url VARCHAR(255) NOT NULL DEFAULT '',
+                telegram_handle VARCHAR(120) NOT NULL DEFAULT '',
+                website_url VARCHAR(255) NOT NULL DEFAULT '',
+                nickname_changed_at DATETIME NULL DEFAULT NULL,
+                comment_rating INT NOT NULL DEFAULT 0,
+                comment_votes_up INT NOT NULL DEFAULT 0,
+                comment_votes_down INT NOT NULL DEFAULT 0,
+                comments_count INT NOT NULL DEFAULT 0,
                 role_code VARCHAR(32) NOT NULL DEFAULT 'member',
                 is_active TINYINT(1) NOT NULL DEFAULT 1,
+                is_banned TINYINT(1) NOT NULL DEFAULT 0,
+                banned_reason VARCHAR(255) NOT NULL DEFAULT '',
+                last_login_at DATETIME NULL DEFAULT NULL,
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME NULL DEFAULT NULL,
                 PRIMARY KEY (id),
+                UNIQUE KEY uniq_public_users_username (username),
                 UNIQUE KEY uniq_public_users_email (email)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
         ";
         if (!mysqli_query($db, $sql)) {
             return false;
         }
+        public_portal_ensure_column($db, 'public_users', 'username', "username VARCHAR(64) NOT NULL DEFAULT '' AFTER id");
+        public_portal_ensure_column($db, 'public_users', 'pin_code', "pin_code VARCHAR(16) NOT NULL DEFAULT '' AFTER display_name");
+        public_portal_ensure_column($db, 'public_users', 'avatar_mode', "avatar_mode VARCHAR(16) NOT NULL DEFAULT 'generated' AFTER pin_code");
+        public_portal_ensure_column($db, 'public_users', 'avatar_url', "avatar_url VARCHAR(255) NOT NULL DEFAULT '' AFTER avatar_mode");
+        public_portal_ensure_column($db, 'public_users', 'telegram_handle', "telegram_handle VARCHAR(120) NOT NULL DEFAULT '' AFTER avatar_url");
+        public_portal_ensure_column($db, 'public_users', 'website_url', "website_url VARCHAR(255) NOT NULL DEFAULT '' AFTER telegram_handle");
+        public_portal_ensure_column($db, 'public_users', 'nickname_changed_at', "nickname_changed_at DATETIME NULL DEFAULT NULL AFTER website_url");
+        public_portal_ensure_column($db, 'public_users', 'comment_rating', "comment_rating INT NOT NULL DEFAULT 0 AFTER nickname_changed_at");
+        public_portal_ensure_column($db, 'public_users', 'comment_votes_up', "comment_votes_up INT NOT NULL DEFAULT 0 AFTER comment_rating");
+        public_portal_ensure_column($db, 'public_users', 'comment_votes_down', "comment_votes_down INT NOT NULL DEFAULT 0 AFTER comment_votes_up");
+        public_portal_ensure_column($db, 'public_users', 'comments_count', "comments_count INT NOT NULL DEFAULT 0 AFTER comment_votes_down");
+        public_portal_ensure_column($db, 'public_users', 'is_banned', "is_banned TINYINT(1) NOT NULL DEFAULT 0 AFTER is_active");
+        public_portal_ensure_column($db, 'public_users', 'banned_reason', "banned_reason VARCHAR(255) NOT NULL DEFAULT '' AFTER is_banned");
+        public_portal_ensure_column($db, 'public_users', 'last_login_at', "last_login_at DATETIME NULL DEFAULT NULL AFTER banned_reason");
+        if (public_portal_column_exists($db, 'public_users', 'username')) {
+            mysqli_query(
+                $db,
+                "UPDATE public_users
+                 SET username = CONCAT('member', id)
+                 WHERE username = '' OR username IS NULL"
+            );
+        }
+        public_portal_ensure_index($db, 'public_users', 'uniq_public_users_username', 'UNIQUE KEY uniq_public_users_username (username)');
         return public_portal_table_exists($db, 'public_users');
     }
 }
@@ -173,7 +385,13 @@ if (!function_exists('public_portal_comments_ensure_schema')) {
                 section_code VARCHAR(32) NOT NULL DEFAULT 'discussion',
                 body_markdown MEDIUMTEXT NOT NULL,
                 body_html MEDIUMTEXT NOT NULL,
+                rating_score INT NOT NULL DEFAULT 0,
+                votes_up INT NOT NULL DEFAULT 0,
+                votes_down INT NOT NULL DEFAULT 0,
                 is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+                is_hidden TINYINT(1) NOT NULL DEFAULT 0,
+                edited_by_admin_id BIGINT UNSIGNED NULL DEFAULT NULL,
+                edited_at DATETIME NULL DEFAULT NULL,
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME NULL DEFAULT NULL,
                 PRIMARY KEY (id),
@@ -185,7 +403,171 @@ if (!function_exists('public_portal_comments_ensure_schema')) {
         if (!mysqli_query($db, $sql)) {
             return false;
         }
+        public_portal_ensure_column($db, 'public_comments', 'rating_score', "rating_score INT NOT NULL DEFAULT 0 AFTER body_html");
+        public_portal_ensure_column($db, 'public_comments', 'votes_up', "votes_up INT NOT NULL DEFAULT 0 AFTER rating_score");
+        public_portal_ensure_column($db, 'public_comments', 'votes_down', "votes_down INT NOT NULL DEFAULT 0 AFTER votes_up");
+        public_portal_ensure_column($db, 'public_comments', 'is_hidden', "is_hidden TINYINT(1) NOT NULL DEFAULT 0 AFTER is_deleted");
+        public_portal_ensure_column($db, 'public_comments', 'edited_by_admin_id', "edited_by_admin_id BIGINT UNSIGNED NULL DEFAULT NULL AFTER is_hidden");
+        public_portal_ensure_column($db, 'public_comments', 'edited_at', "edited_at DATETIME NULL DEFAULT NULL AFTER edited_by_admin_id");
+        public_portal_ensure_index($db, 'public_comments', 'idx_public_comments_visible', 'KEY idx_public_comments_visible (content_type, content_id, is_deleted, is_hidden, created_at)');
         return public_portal_table_exists($db, 'public_comments');
+    }
+}
+
+if (!function_exists('public_portal_comment_votes_ensure_schema')) {
+    function public_portal_comment_votes_ensure_schema(mysqli $db): bool
+    {
+        $sql = "
+            CREATE TABLE IF NOT EXISTS public_comment_votes (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                comment_id BIGINT UNSIGNED NOT NULL,
+                user_id BIGINT UNSIGNED NOT NULL,
+                vote_value SMALLINT NOT NULL DEFAULT 0,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME NULL DEFAULT NULL,
+                PRIMARY KEY (id),
+                UNIQUE KEY uniq_public_comment_votes_pair (comment_id, user_id),
+                KEY idx_public_comment_votes_user (user_id),
+                KEY idx_public_comment_votes_comment (comment_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        ";
+        if (!mysqli_query($db, $sql)) {
+            return false;
+        }
+        return public_portal_table_exists($db, 'public_comment_votes');
+    }
+}
+
+if (!function_exists('public_portal_profile_url')) {
+    function public_portal_profile_url(array $user): string
+    {
+        $username = trim((string)($user['username'] ?? ''));
+        if ($username === '') {
+            return '/account/';
+        }
+        return '/account/?user=' . rawurlencode($username);
+    }
+}
+
+if (!function_exists('public_portal_article_url')) {
+    function public_portal_article_url(array $article): string
+    {
+        $section = trim((string)($article['material_section'] ?? 'journal'));
+        if (!in_array($section, ['journal', 'playbooks', 'signals', 'fun'], true)) {
+            $section = 'journal';
+        }
+        $slug = trim((string)($article['slug'] ?? ''));
+        $cluster = trim((string)($article['cluster_code'] ?? ''));
+        if ($slug === '') {
+            return '/' . $section . '/';
+        }
+        if ($cluster !== '') {
+            return '/' . $section . '/' . rawurlencode($cluster) . '/' . rawurlencode($slug) . '/';
+        }
+        return '/' . $section . '/' . rawurlencode($slug) . '/';
+    }
+}
+
+if (!function_exists('public_portal_rank_meta')) {
+    function public_portal_rank_meta(int $rating, string $lang = 'en'): array
+    {
+        $levels = ($lang === 'ru')
+            ? [
+                ['min' => 1000, 'code' => 'legend', 'label' => 'Легенда редакции'],
+                ['min' => 500, 'code' => 'master', 'label' => 'Магистр разбора'],
+                ['min' => 200, 'code' => 'archivist', 'label' => 'Архивариус практики'],
+                ['min' => 100, 'code' => 'practitioner', 'label' => 'Практик сигнала'],
+                ['min' => 50, 'code' => 'navigator', 'label' => 'Навигатор темы'],
+                ['min' => 10, 'code' => 'scout', 'label' => 'Разведчик комментариев'],
+                ['min' => 0, 'code' => 'member', 'label' => 'Участник обсуждения'],
+            ]
+            : [
+                ['min' => 1000, 'code' => 'legend', 'label' => 'Editorial legend'],
+                ['min' => 500, 'code' => 'master', 'label' => 'Breakdown master'],
+                ['min' => 200, 'code' => 'archivist', 'label' => 'Practice archivist'],
+                ['min' => 100, 'code' => 'practitioner', 'label' => 'Signal practitioner'],
+                ['min' => 50, 'code' => 'navigator', 'label' => 'Topic navigator'],
+                ['min' => 10, 'code' => 'scout', 'label' => 'Comment scout'],
+                ['min' => 0, 'code' => 'member', 'label' => 'Discussion member'],
+            ];
+        $current = $levels[count($levels) - 1];
+        $next = null;
+        foreach ($levels as $index => $level) {
+            if ($rating >= (int)$level['min']) {
+                $current = $level;
+                if ($index > 0) {
+                    $next = $levels[$index - 1];
+                }
+                break;
+            }
+        }
+        return [
+            'rating' => $rating,
+            'code' => (string)$current['code'],
+            'label' => (string)$current['label'],
+            'next' => $next,
+            'to_next' => $next ? max(0, (int)$next['min'] - $rating) : 0,
+        ];
+    }
+}
+
+if (!function_exists('public_portal_recalculate_comment_stats')) {
+    function public_portal_recalculate_comment_stats(mysqli $db, int $commentId): void
+    {
+        if ($commentId <= 0 || !public_portal_comments_ensure_schema($db) || !public_portal_comment_votes_ensure_schema($db)) {
+            return;
+        }
+        mysqli_query(
+            $db,
+            "UPDATE public_comments c
+             LEFT JOIN (
+                 SELECT comment_id,
+                        COALESCE(SUM(vote_value), 0) AS rating_score,
+                        SUM(CASE WHEN vote_value > 0 THEN 1 ELSE 0 END) AS votes_up,
+                        SUM(CASE WHEN vote_value < 0 THEN 1 ELSE 0 END) AS votes_down
+                 FROM public_comment_votes
+                 WHERE comment_id = {$commentId}
+                 GROUP BY comment_id
+             ) v ON v.comment_id = c.id
+             SET c.rating_score = COALESCE(v.rating_score, 0),
+                 c.votes_up = COALESCE(v.votes_up, 0),
+                 c.votes_down = COALESCE(v.votes_down, 0),
+                 c.updated_at = NOW()
+             WHERE c.id = {$commentId}
+             LIMIT 1"
+        );
+    }
+}
+
+if (!function_exists('public_portal_recalculate_user_rating')) {
+    function public_portal_recalculate_user_rating(mysqli $db, int $userId): void
+    {
+        if ($userId <= 0 || !public_portal_users_ensure_schema($db) || !public_portal_comments_ensure_schema($db)) {
+            return;
+        }
+        mysqli_query(
+            $db,
+            "UPDATE public_users u
+             LEFT JOIN (
+                 SELECT c.user_id,
+                        COUNT(*) AS comments_count,
+                        COALESCE(SUM(c.rating_score), 0) AS comment_rating,
+                        COALESCE(SUM(c.votes_up), 0) AS votes_up,
+                        COALESCE(SUM(c.votes_down), 0) AS votes_down
+                 FROM public_comments c
+                 WHERE c.user_id = {$userId}
+                   AND c.is_deleted = 0
+                   AND c.is_hidden = 0
+                 GROUP BY c.user_id
+             ) s ON s.user_id = u.id
+             SET u.comments_count = COALESCE(s.comments_count, 0),
+                 u.comment_rating = COALESCE(s.comment_rating, 0),
+                 u.comment_votes_up = COALESCE(s.votes_up, 0),
+                 u.comment_votes_down = COALESCE(s.votes_down, 0),
+                 u.updated_at = NOW()
+             WHERE u.id = {$userId}
+             LIMIT 1"
+        );
     }
 }
 
@@ -247,18 +629,195 @@ if (!function_exists('public_portal_current_user')) {
             return null;
         }
         $rows = $FRMWRK->DBRecords(
-            "SELECT id, email, display_name, role_code, is_active, created_at
+            "SELECT id, username, email, display_name, pin_code, avatar_mode, avatar_url,
+                    telegram_handle, website_url, nickname_changed_at, comment_rating, comment_votes_up,
+                    comment_votes_down, comments_count, role_code, is_active,
+                    is_banned, banned_reason, last_login_at, created_at
              FROM public_users
              WHERE id = {$userId}
                AND is_active = 1
+               AND is_banned = 0
              LIMIT 1"
         );
         if (!empty($rows[0]) && is_array($rows[0])) {
             $user = $rows[0];
+            public_portal_recalculate_user_rating($db, (int)$user['id']);
+            $refresh = $FRMWRK->DBRecords(
+                "SELECT id, username, email, display_name, pin_code, avatar_mode, avatar_url,
+                        telegram_handle, website_url, nickname_changed_at, comment_rating, comment_votes_up,
+                        comment_votes_down, comments_count, role_code, is_active,
+                        is_banned, banned_reason, last_login_at, created_at
+                 FROM public_users
+                 WHERE id = {$userId}
+                   AND is_active = 1
+                   AND is_banned = 0
+                 LIMIT 1"
+            );
+            if (!empty($refresh[0]) && is_array($refresh[0])) {
+                $user = $refresh[0];
+            }
             return $user;
         }
         unset($_SESSION['public_user_id']);
         return null;
+    }
+}
+
+if (!function_exists('public_portal_find_user_by_login')) {
+    function public_portal_find_user_by_login($FRMWRK, string $login): ?array
+    {
+        $db = $FRMWRK->DB();
+        if (!$db || !public_portal_users_ensure_schema($db)) {
+            return null;
+        }
+        $login = trim($login);
+        if ($login === '') {
+            return null;
+        }
+        $loginSafe = mysqli_real_escape_string($db, strtolower($login));
+        $rows = $FRMWRK->DBRecords(
+            "SELECT *
+             FROM public_users
+             WHERE LOWER(username) = '{$loginSafe}'
+                OR LOWER(email) = '{$loginSafe}'
+             LIMIT 1"
+        );
+        return (!empty($rows[0]) && is_array($rows[0])) ? $rows[0] : null;
+    }
+}
+
+if (!function_exists('public_portal_fetch_user_by_id')) {
+    function public_portal_fetch_user_by_id($FRMWRK, int $userId): ?array
+    {
+        $db = $FRMWRK->DB();
+        if (!$db || !public_portal_users_ensure_schema($db) || $userId <= 0) {
+            return null;
+        }
+        $rows = $FRMWRK->DBRecords("SELECT * FROM public_users WHERE id = {$userId} LIMIT 1");
+        return (!empty($rows[0]) && is_array($rows[0])) ? $rows[0] : null;
+    }
+}
+
+if (!function_exists('public_portal_fetch_user_by_username')) {
+    function public_portal_fetch_user_by_username($FRMWRK, string $username): ?array
+    {
+        $db = $FRMWRK->DB();
+        if (!$db || !public_portal_users_ensure_schema($db)) {
+            return null;
+        }
+        $username = public_portal_username_normalize($username);
+        if ($username === '') {
+            return null;
+        }
+        $usernameSafe = mysqli_real_escape_string($db, strtolower($username));
+        $rows = $FRMWRK->DBRecords(
+            "SELECT *
+             FROM public_users
+             WHERE LOWER(username) = '{$usernameSafe}'
+               AND is_active = 1
+               AND is_banned = 0
+             LIMIT 1"
+        );
+        return (!empty($rows[0]) && is_array($rows[0])) ? $rows[0] : null;
+    }
+}
+
+if (!function_exists('public_portal_fetch_public_profile')) {
+    function public_portal_fetch_public_profile($FRMWRK, string $username, string $lang = 'en'): ?array
+    {
+        $user = public_portal_fetch_user_by_username($FRMWRK, $username);
+        if (!$user) {
+            return null;
+        }
+        $db = $FRMWRK->DB();
+        if (!$db || !public_portal_comments_ensure_schema($db)) {
+            return null;
+        }
+        $userId = (int)($user['id'] ?? 0);
+        if ($userId <= 0) {
+            return null;
+        }
+        public_portal_recalculate_user_rating($db, $userId);
+        $user = public_portal_fetch_user_by_id($FRMWRK, $userId) ?: $user;
+        $recentComments = [];
+        if (public_portal_table_exists($db, 'examples_articles')) {
+            $recentComments = (array)$FRMWRK->DBRecords(
+                "SELECT c.id, c.body_html, c.rating_score, c.votes_up, c.votes_down, c.created_at,
+                        a.title AS article_title, a.slug AS article_slug, a.material_section, a.cluster_code
+                 FROM public_comments c
+                 LEFT JOIN examples_articles a ON a.id = c.content_id
+                 WHERE c.user_id = {$userId}
+                   AND c.content_type = 'examples'
+                   AND c.is_deleted = 0
+                   AND c.is_hidden = 0
+                 ORDER BY c.created_at DESC, c.id DESC
+                 LIMIT 12"
+            );
+        }
+        foreach ($recentComments as &$comment) {
+            if (!is_array($comment)) {
+                continue;
+            }
+            $comment['article_url'] = public_portal_article_url((array)$comment);
+        }
+        unset($comment);
+
+        $rank = public_portal_rank_meta((int)($user['comment_rating'] ?? 0), $lang);
+        $user['avatar_src'] = public_portal_user_avatar($user);
+        $user['profile_url'] = public_portal_profile_url($user);
+        $user['rank_meta'] = $rank;
+        $user['recent_comments'] = $recentComments;
+        return $user;
+    }
+}
+
+if (!function_exists('public_portal_avatar_upload_dir')) {
+    function public_portal_avatar_upload_dir(): array
+    {
+        $dir = rtrim((string)DIR, '/\\') . '/cache/public_avatars/';
+        $public = '/cache/public_avatars/';
+        return ['dir' => $dir, 'public' => $public];
+    }
+}
+
+if (!function_exists('public_portal_store_avatar_upload')) {
+    function public_portal_store_avatar_upload(array $file, string $seed = 'avatar'): string
+    {
+        if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+            return '';
+        }
+        $tmp = (string)($file['tmp_name'] ?? '');
+        if ($tmp === '' || !is_file($tmp)) {
+            return '';
+        }
+        $info = @getimagesize($tmp);
+        if (!$info) {
+            return '';
+        }
+        $mime = (string)($info['mime'] ?? '');
+        $extMap = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+            'image/gif' => 'gif',
+        ];
+        if (!isset($extMap[$mime])) {
+            return '';
+        }
+        $paths = public_portal_avatar_upload_dir();
+        if (!is_dir($paths['dir']) && !@mkdir($paths['dir'], 0775, true) && !is_dir($paths['dir'])) {
+            return '';
+        }
+        $name = public_portal_slugify($seed, 'avatar') . '-' . date('YmdHis') . '-' . random_int(1000, 9999) . '.' . $extMap[$mime];
+        $target = $paths['dir'] . $name;
+        $moved = @move_uploaded_file($tmp, $target);
+        if (!$moved) {
+            $moved = @copy($tmp, $target);
+        }
+        if (!$moved) {
+            return '';
+        }
+        return $paths['public'] . $name;
     }
 }
 
@@ -269,6 +828,7 @@ if (!function_exists('public_portal_format_inline')) {
         $patterns = [
             '/\*\*(.+?)\*\*/su' => '<strong>$1</strong>',
             '/\*(.+?)\*/su' => '<em>$1</em>',
+            '/~~(.+?)~~/su' => '<s>$1</s>',
             '/`(.+?)`/su' => '<code>$1</code>',
             '/\[(.+?)\]\((https?:\/\/[^\s)]+)\)/su' => '<a href="$2" target="_blank" rel="nofollow noopener">$1</a>',
         ];
@@ -366,65 +926,176 @@ if (!function_exists('public_portal_handle_request')) {
         }
         public_portal_users_ensure_schema($db);
         public_portal_comments_ensure_schema($db);
-
+        public_portal_comment_votes_ensure_schema($db);
         if ($action === 'public_portal_register') {
-            $email = trim((string)($_POST['email'] ?? ''));
-            $name = trim((string)($_POST['display_name'] ?? ''));
+            $emailInput = trim((string)($_POST['email'] ?? ''));
+            $username = public_portal_username_normalize((string)($_POST['username'] ?? $_POST['display_name'] ?? ''));
+            if ($username === '' && $emailInput !== '' && strpos($emailInput, '@') !== false) {
+                $username = public_portal_username_normalize((string)substr($emailInput, 0, strpos($emailInput, '@')));
+            }
+            $displayName = trim((string)($_POST['display_name'] ?? $username));
             $password = (string)($_POST['password'] ?? '');
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($password, 'UTF-8') < 8 || $name === '') {
-                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Fill all fields correctly.']);
+            $captchaAnswer = (string)($_POST['captcha_answer'] ?? '');
+            if ($username === '' || (function_exists('mb_strlen') ? mb_strlen($username, 'UTF-8') : strlen($username)) < 3 || (function_exists('mb_strlen') ? mb_strlen($password, 'UTF-8') : strlen($password)) < 8) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Укажите логин не короче 3 символов и пароль не короче 8 символов.']);
                 public_portal_redirect_back('/');
             }
-            $emailSafe = mysqli_real_escape_string($db, strtolower($email));
-            $nameSafe = mysqli_real_escape_string($db, $name);
+            $requiresCaptcha = ($emailInput === '');
+            if ($requiresCaptcha && !public_portal_captcha_check($captchaAnswer)) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Капча не совпала. Попробуйте еще раз.']);
+                public_portal_redirect_back('/');
+            }
+            $usernameSafe = mysqli_real_escape_string($db, $username);
+            $displayName = $displayName !== '' ? $displayName : $username;
+            $displayNameSafe = mysqli_real_escape_string($db, $displayName);
             $passwordSafe = mysqli_real_escape_string($db, password_hash($password, PASSWORD_DEFAULT));
-            $exists = $FRMWRK->DBRecords("SELECT id FROM public_users WHERE email = '{$emailSafe}' LIMIT 1");
+            $pinCode = public_portal_generate_pin();
+            $pinSafe = mysqli_real_escape_string($db, $pinCode);
+            if ($emailInput !== '' && !filter_var($emailInput, FILTER_VALIDATE_EMAIL)) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Email заполнен некорректно.']);
+                public_portal_redirect_back('/');
+            }
+            $emailValue = $emailInput !== '' ? strtolower($emailInput) : ($username . '+' . date('YmdHis') . '@portal.local');
+            $emailSafe = mysqli_real_escape_string($db, $emailValue);
+            $exists = $FRMWRK->DBRecords("SELECT id FROM public_users WHERE username = '{$usernameSafe}' LIMIT 1");
             if (!empty($exists)) {
-                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Email already registered.']);
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Этот логин уже занят.']);
+                public_portal_redirect_back('/');
+            }
+            $emailExists = $FRMWRK->DBRecords("SELECT id FROM public_users WHERE email = '{$emailSafe}' LIMIT 1");
+            if (!empty($emailExists) && $emailInput !== '') {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Этот email уже используется.']);
                 public_portal_redirect_back('/');
             }
             mysqli_query(
                 $db,
-                "INSERT INTO public_users (email, password_hash, display_name, role_code, is_active, created_at, updated_at)
-                 VALUES ('{$emailSafe}', '{$passwordSafe}', '{$nameSafe}', 'member', 1, NOW(), NOW())"
+                "INSERT INTO public_users (username, email, password_hash, display_name, pin_code, avatar_mode, avatar_url, role_code, is_active, is_banned, created_at, updated_at)
+                 VALUES ('{$usernameSafe}', '{$emailSafe}', '{$passwordSafe}', '{$displayNameSafe}', '{$pinSafe}', 'generated', '', 'member', 1, 0, NOW(), NOW())"
             );
+            $newUserId = (int)mysqli_insert_id($db);
             public_portal_session_boot();
-            $_SESSION['public_user_id'] = (int)mysqli_insert_id($db);
-            public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Account created.']);
+            $_SESSION['public_user_id'] = $newUserId;
+            public_portal_flash_set('portal', [
+                'type' => 'ok',
+                'message' => 'Аккаунт создан. Сохраните PIN: ' . $pinCode,
+                'pin_code' => $pinCode,
+            ]);
             public_portal_redirect_back('/');
         }
 
         if ($action === 'public_portal_login') {
-            $emailSafe = mysqli_real_escape_string($db, strtolower(trim((string)($_POST['email'] ?? ''))));
+            $login = trim((string)($_POST['login'] ?? $_POST['email'] ?? ''));
             $password = (string)($_POST['password'] ?? '');
-            $rows = $FRMWRK->DBRecords(
-                "SELECT id, password_hash, is_active
-                 FROM public_users
-                 WHERE email = '{$emailSafe}'
-                 LIMIT 1"
-            );
-            $row = (!empty($rows[0]) && is_array($rows[0])) ? $rows[0] : null;
-            if (!$row || (int)($row['is_active'] ?? 0) !== 1 || !password_verify($password, (string)($row['password_hash'] ?? ''))) {
-                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Invalid credentials.']);
+            $row = public_portal_find_user_by_login($FRMWRK, $login);
+            if (!$row || (int)($row['is_active'] ?? 0) !== 1 || (int)($row['is_banned'] ?? 0) === 1 || !password_verify($password, (string)($row['password_hash'] ?? ''))) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Неверный логин или пароль.']);
                 public_portal_redirect_back('/');
             }
+            mysqli_query($db, "UPDATE public_users SET last_login_at = NOW(), updated_at = NOW() WHERE id = " . (int)$row['id'] . " LIMIT 1");
             public_portal_session_boot();
             $_SESSION['public_user_id'] = (int)$row['id'];
-            public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Signed in.']);
+            public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Вы вошли в аккаунт.']);
             public_portal_redirect_back('/');
         }
 
         if ($action === 'public_portal_logout') {
             public_portal_session_boot();
             unset($_SESSION['public_user_id']);
-            public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Signed out.']);
+            public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Вы вышли из аккаунта.']);
             public_portal_redirect_back('/');
+        }
+
+        if ($action === 'public_portal_profile_update') {
+            $user = public_portal_current_user($FRMWRK);
+            if (!$user) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Сначала войдите в аккаунт.']);
+                public_portal_redirect_back('/account/');
+            }
+            $displayName = trim((string)($_POST['display_name'] ?? ''));
+            $telegram = trim((string)($_POST['telegram_handle'] ?? ''));
+            $website = trim((string)($_POST['website_url'] ?? ''));
+            $email = trim((string)($_POST['email'] ?? ''));
+            $currentDisplayName = trim((string)($user['display_name'] ?? ''));
+            $nicknameChangedAt = trim((string)($user['nickname_changed_at'] ?? ''));
+            if ($displayName === '') {
+                $displayName = $currentDisplayName !== '' ? $currentDisplayName : (string)($user['username'] ?? 'Member');
+            }
+            if ($displayName !== $currentDisplayName && $nicknameChangedAt !== '') {
+                $changedTs = strtotime($nicknameChangedAt);
+                if ($changedTs !== false && $changedTs > strtotime('-30 days')) {
+                    public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Никнейм можно менять не чаще одного раза в 30 дней.']);
+                    public_portal_redirect_back('/account/');
+                }
+            }
+            if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Email заполнен некорректно.']);
+                public_portal_redirect_back('/account/');
+            }
+            if ($email !== '') {
+                $emailCheckSafe = mysqli_real_escape_string($db, strtolower($email));
+                $emailCheck = $FRMWRK->DBRecords("SELECT id FROM public_users WHERE email = '{$emailCheckSafe}' AND id <> " . (int)$user['id'] . " LIMIT 1");
+                if (!empty($emailCheck)) {
+                    public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Этот email уже привязан к другому аккаунту.']);
+                    public_portal_redirect_back('/account/');
+                }
+            }
+            $avatarUrl = trim((string)($user['avatar_url'] ?? ''));
+            if (!empty($_FILES['avatar']['name'])) {
+                $uploaded = public_portal_store_avatar_upload((array)$_FILES['avatar'], (string)($user['username'] ?? 'avatar'));
+                if ($uploaded !== '') {
+                    $avatarUrl = $uploaded;
+                }
+            }
+            $displayNameSafe = mysqli_real_escape_string($db, $displayName);
+            $telegramSafe = mysqli_real_escape_string($db, $telegram);
+            $websiteSafe = mysqli_real_escape_string($db, $website);
+            $avatarSafe = mysqli_real_escape_string($db, $avatarUrl);
+            $emailSafe = mysqli_real_escape_string($db, $email !== '' ? strtolower($email) : (string)($user['email'] ?? ''));
+            $nicknameSql = ($displayName !== $currentDisplayName) ? ", nickname_changed_at = NOW()" : '';
+            mysqli_query(
+                $db,
+                "UPDATE public_users
+                 SET display_name = '{$displayNameSafe}',
+                     telegram_handle = '{$telegramSafe}',
+                     website_url = '{$websiteSafe}',
+                     email = '{$emailSafe}',
+                     avatar_mode = '" . ($avatarUrl !== '' ? 'upload' : 'generated') . "',
+                     avatar_url = '{$avatarSafe}',
+                     updated_at = NOW()
+                     {$nicknameSql}
+                 WHERE id = " . (int)$user['id'] . "
+                 LIMIT 1"
+            );
+            public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Профиль обновлен.']);
+            public_portal_redirect_back('/account/');
+        }
+
+        if ($action === 'public_portal_password_change') {
+            $user = public_portal_current_user($FRMWRK);
+            if (!$user) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Сначала войдите в аккаунт.']);
+                public_portal_redirect_back('/account/');
+            }
+            $pinCode = trim((string)($_POST['pin_code'] ?? ''));
+            $password = (string)($_POST['new_password'] ?? '');
+            if ($pinCode === '' || !hash_equals((string)($user['pin_code'] ?? ''), $pinCode)) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'PIN-код не совпал.']);
+                public_portal_redirect_back('/account/');
+            }
+            if ((function_exists('mb_strlen') ? mb_strlen($password, 'UTF-8') : strlen($password)) < 8) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Новый пароль слишком короткий.']);
+                public_portal_redirect_back('/account/');
+            }
+            $passwordSafe = mysqli_real_escape_string($db, password_hash($password, PASSWORD_DEFAULT));
+            mysqli_query($db, "UPDATE public_users SET password_hash = '{$passwordSafe}', updated_at = NOW() WHERE id = " . (int)$user['id'] . " LIMIT 1");
+            public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Пароль обновлен.']);
+            public_portal_redirect_back('/account/');
         }
 
         if ($action === 'public_portal_comment') {
             $user = public_portal_current_user($FRMWRK);
             if (!$user) {
-                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Sign in to post comments.']);
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Войдите, чтобы комментировать.']);
                 public_portal_redirect_back('/');
             }
             $contentType = public_portal_slugify((string)($_POST['content_type'] ?? 'article'), 'article');
@@ -432,8 +1103,8 @@ if (!function_exists('public_portal_handle_request')) {
             $parentId = max(0, (int)($_POST['parent_id'] ?? 0));
             $sectionCode = public_portal_slugify((string)($_POST['section_code'] ?? 'discussion'), 'discussion');
             $body = trim((string)($_POST['body_markdown'] ?? ''));
-            if ($body === '' || mb_strlen($body, 'UTF-8') < 4) {
-                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Comment is too short.']);
+            if ($body === '' || (function_exists('mb_strlen') ? mb_strlen($body, 'UTF-8') : strlen($body)) < 4) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Комментарий слишком короткий.']);
                 public_portal_redirect_back('/');
             }
             $allowedSections = public_portal_comment_sections(public_portal_lang());
@@ -446,10 +1117,58 @@ if (!function_exists('public_portal_handle_request')) {
             $htmlSafe = mysqli_real_escape_string($db, public_portal_markdown_to_html($body));
             mysqli_query(
                 $db,
-                "INSERT INTO public_comments (content_type, content_id, user_id, parent_id, section_code, body_markdown, body_html, is_deleted, created_at, updated_at)
-                 VALUES ('{$typeSafe}', {$contentId}, " . (int)$user['id'] . ", " . ($parentId > 0 ? $parentId : 'NULL') . ", '{$sectionSafe}', '{$bodySafe}', '{$htmlSafe}', 0, NOW(), NOW())"
+                "INSERT INTO public_comments (content_type, content_id, user_id, parent_id, section_code, body_markdown, body_html, is_deleted, is_hidden, created_at, updated_at)
+                 VALUES ('{$typeSafe}', {$contentId}, " . (int)$user['id'] . ", " . ($parentId > 0 ? $parentId : 'NULL') . ", '{$sectionSafe}', '{$bodySafe}', '{$htmlSafe}', 0, 0, NOW(), NOW())"
             );
-            public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Comment published.']);
+            $newCommentId = (int)mysqli_insert_id($db);
+            if ($newCommentId > 0) {
+                public_portal_recalculate_comment_stats($db, $newCommentId);
+            }
+            public_portal_recalculate_user_rating($db, (int)$user['id']);
+            public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Комментарий опубликован.']);
+            public_portal_redirect_back('/');
+        }
+        if ($action === 'public_portal_comment_vote') {
+            $user = public_portal_current_user($FRMWRK);
+            if (!$user) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Войдите, чтобы голосовать за комментарии.']);
+                public_portal_redirect_back('/');
+            }
+            $commentId = max(1, (int)($_POST['comment_id'] ?? 0));
+            $voteValue = (int)($_POST['vote_value'] ?? 0);
+            if (!in_array($voteValue, [-1, 1], true)) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Некорректный голос.']);
+                public_portal_redirect_back('/');
+            }
+            $commentRows = $FRMWRK->DBRecords(
+                "SELECT id, user_id
+                 FROM public_comments
+                 WHERE id = {$commentId}
+                   AND is_deleted = 0
+                   AND is_hidden = 0
+                 LIMIT 1"
+            );
+            $commentRow = (!empty($commentRows[0]) && is_array($commentRows[0])) ? $commentRows[0] : null;
+            if (!$commentRow) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Комментарий не найден.']);
+                public_portal_redirect_back('/');
+            }
+            $authorId = (int)($commentRow['user_id'] ?? 0);
+            if ($authorId === (int)$user['id']) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Нельзя голосовать за собственный комментарий.']);
+                public_portal_redirect_back('/');
+            }
+            mysqli_query(
+                $db,
+                "INSERT INTO public_comment_votes (comment_id, user_id, vote_value, created_at, updated_at)
+                 VALUES ({$commentId}, " . (int)$user['id'] . ", {$voteValue}, NOW(), NOW())
+                 ON DUPLICATE KEY UPDATE
+                    vote_value = IF(vote_value = VALUES(vote_value), 0, VALUES(vote_value)),
+                    updated_at = NOW()"
+            );
+            public_portal_recalculate_comment_stats($db, $commentId);
+            public_portal_recalculate_user_rating($db, $authorId);
+            public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Рейтинг комментария обновлен.']);
             public_portal_redirect_back('/');
         }
     }
@@ -489,18 +1208,30 @@ if (!function_exists('public_portal_fetch_comments')) {
     function public_portal_fetch_comments($FRMWRK, string $contentType, int $contentId): array
     {
         $db = $FRMWRK->DB();
-        if (!$db || !public_portal_comments_ensure_schema($db)) {
+        if (!$db || !public_portal_comments_ensure_schema($db) || !public_portal_users_ensure_schema($db) || !public_portal_comment_votes_ensure_schema($db)) {
             return [];
         }
         $typeSafe = mysqli_real_escape_string($db, public_portal_slugify($contentType, 'article'));
+        $currentUser = public_portal_current_user($FRMWRK);
+        $currentUserId = (int)($currentUser['id'] ?? 0);
+        $voteJoin = $currentUserId > 0
+            ? "LEFT JOIN public_comment_votes cv ON cv.comment_id = c.id AND cv.user_id = {$currentUserId}"
+            : "LEFT JOIN (SELECT 0 AS comment_id, 0 AS vote_value) cv ON cv.comment_id = c.id";
         $rows = $FRMWRK->DBRecords(
-            "SELECT c.id, c.parent_id, c.section_code, c.body_markdown, c.body_html, c.created_at,
-                    u.display_name, u.email
+            "SELECT c.id, c.parent_id, c.section_code, c.body_markdown, c.body_html, c.created_at, c.updated_at,
+                    c.rating_score, c.votes_up, c.votes_down,
+                    u.id AS user_id, u.username, u.display_name, u.email, u.avatar_url, u.avatar_mode,
+                    u.comment_rating, u.comment_votes_up, u.comment_votes_down, u.comments_count,
+                    cv.vote_value AS current_user_vote
              FROM public_comments c
              INNER JOIN public_users u ON u.id = c.user_id
+             {$voteJoin}
              WHERE c.content_type = '{$typeSafe}'
                AND c.content_id = {$contentId}
                AND c.is_deleted = 0
+               AND c.is_hidden = 0
+               AND u.is_active = 1
+               AND u.is_banned = 0
              ORDER BY c.created_at ASC, c.id ASC"
         );
         $items = [];
@@ -508,6 +1239,9 @@ if (!function_exists('public_portal_fetch_comments')) {
             if (!is_array($row)) {
                 continue;
             }
+            $row['avatar_src'] = public_portal_user_avatar($row);
+            $row['profile_url'] = public_portal_profile_url($row);
+            $row['rank_meta'] = public_portal_rank_meta((int)($row['comment_rating'] ?? 0), public_portal_lang());
             $row['children'] = [];
             $items[(int)$row['id']] = $row;
         }
@@ -521,6 +1255,60 @@ if (!function_exists('public_portal_fetch_comments')) {
             }
         }
         return array_values($tree);
+    }
+}
+
+if (!function_exists('public_portal_comment_total_for_content')) {
+    function public_portal_comment_total_for_content($FRMWRK, string $contentType, int $contentId): int
+    {
+        $db = $FRMWRK->DB();
+        if (!$db || !public_portal_comments_ensure_schema($db)) {
+            return 0;
+        }
+        $typeSafe = mysqli_real_escape_string($db, public_portal_slugify($contentType, 'article'));
+        $rows = $FRMWRK->DBRecords(
+            "SELECT COUNT(*) AS total
+             FROM public_comments c
+             INNER JOIN public_users u ON u.id = c.user_id
+             WHERE c.content_type = '{$typeSafe}'
+               AND c.content_id = {$contentId}
+               AND c.is_deleted = 0
+               AND c.is_hidden = 0
+               AND u.is_active = 1
+               AND u.is_banned = 0"
+        );
+        return (int)($rows[0]['total'] ?? 0);
+    }
+}
+
+if (!function_exists('public_portal_admin_fetch_comments')) {
+    function public_portal_admin_fetch_comments($FRMWRK, int $articleId = 0, int $userId = 0): array
+    {
+        $db = $FRMWRK->DB();
+        if (!$db || !public_portal_comments_ensure_schema($db) || !public_portal_users_ensure_schema($db)) {
+            return [];
+        }
+        $articleJoin = public_portal_table_exists($db, 'examples_articles')
+            ? 'LEFT JOIN examples_articles a ON a.id = c.content_id'
+            : "LEFT JOIN (SELECT 0 AS id, '' AS title, '' AS slug, '' AS material_section, '' AS cluster_code) a ON a.id = c.content_id";
+        $where = ["c.content_type = 'examples'"];
+        if ($articleId > 0) {
+            $where[] = 'c.content_id = ' . $articleId;
+        }
+        if ($userId > 0) {
+            $where[] = 'c.user_id = ' . $userId;
+        }
+        $whereSql = implode(' AND ', $where);
+        return (array)$FRMWRK->DBRecords(
+            "SELECT c.*, u.username, u.display_name, u.avatar_url, u.is_banned, u.banned_reason,
+                    u.comment_rating, u.comment_votes_up, u.comment_votes_down, u.comments_count,
+                    a.title AS article_title, a.slug AS article_slug, a.material_section, a.cluster_code
+             FROM public_comments c
+             INNER JOIN public_users u ON u.id = c.user_id
+             {$articleJoin}
+             WHERE {$whereSql}
+             ORDER BY c.created_at DESC, c.id DESC"
+        );
     }
 }
 

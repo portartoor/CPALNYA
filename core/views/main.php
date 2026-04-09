@@ -91,8 +91,8 @@ $heroSectionTitles = [
 .home-z-actions{display:flex;gap:10px;flex-wrap:wrap}
 .home-z-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:9px 18px;border:1px solid rgba(122,180,255,.18);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));color:var(--shell-text);text-decoration:none;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
 .home-z-btn-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;min-width:14px;color:#f4d56b;font-size:12px;line-height:1}
-.home-z-feature{display:grid;grid-template-columns:180px minmax(0,1fr);gap:14px;padding:14px 16px;border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(122,180,255,.05));align-items:stretch}
-.home-z-feature-media{width:180px;height:100%;min-height:100%;align-self:stretch;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));overflow:hidden}
+.home-z-feature{display:grid;grid-template-columns:196px minmax(0,1fr);gap:14px;padding:14px 16px;border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(122,180,255,.05));align-items:start}
+.home-z-feature-media{width:196px;aspect-ratio:1/1;align-self:start;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));overflow:hidden}
 .home-z-feature-media img{display:block;width:100%;height:100%;object-fit:cover}
 .home-z-feature-copy{display:grid;gap:10px;min-width:0;align-content:start}
 .home-z-feature-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -118,7 +118,7 @@ $heroSectionTitles = [
     .home-z{padding:18px 14px 52px}
     .home-z-block-head{grid-template-columns:1fr}
     .home-z-feature{grid-template-columns:1fr}
-    .home-z-feature-media{width:100%;height:180px;min-height:180px}
+    .home-z-feature-media{width:100%;aspect-ratio:16/10}
     .home-z-card{grid-template-columns:1fr}
     .home-z-card-media-wrap{width:100%}
     .home-z-card-media{width:100%;aspect-ratio:1/1}
@@ -152,7 +152,7 @@ $heroSectionTitles = [
                         </div>
                         <div class="home-z-feature-copy">
                             <div class="home-z-feature-top">
-                                <span class="home-z-tag"><?= htmlspecialchars($t('Случайный материал', 'Random feature'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <span class="home-z-tag"><?= htmlspecialchars($t('Редакция рекомендует', 'Editors recommend'), ENT_QUOTES, 'UTF-8') ?></span>
                                 <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($heroCard['view_count'] ?? 0) ?></span>
                             </div>
                             <p class="home-z-meta"><?= htmlspecialchars((string)($heroSectionTitles[$heroSection] ?? $heroSectionTitles['journal']), ENT_QUOTES, 'UTF-8') ?></p>

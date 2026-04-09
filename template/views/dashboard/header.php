@@ -988,6 +988,12 @@ if ($isAdminPanel) {
 	</a>
 </li>
 <li class="side-nav-item">
+	<a href="/adminpanel/comments/" class="side-nav-link">
+		<span class="menu-icon"><i class="ti ti-message-circle-2"></i></span>
+		<span class="menu-text"><?= $isRuUi ? 'Комментарии' : 'Comments' ?></span>
+	</a>
+</li>
+<li class="side-nav-item">
 	<a href="/adminpanel/site-checks/" class="side-nav-link">
 		<span class="menu-icon"><i class="ti ti-world-search"></i></span>
 		<span class="menu-text"><?= $isRuUi ? '�������� ������' : 'Site Checks' ?></span>

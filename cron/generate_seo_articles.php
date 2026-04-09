@@ -998,11 +998,15 @@ function seo_article_public_url(string $lang, string $slug, string $clusterCode 
         return '';
     }
     $clusterCode = examples_normalize_cluster((string)$clusterCode, $lang);
-    $base = ($materialSection === 'playbooks') ? '/playbooks/' : '/journal/';
-    if ($clusterCode === '') {
-        return 'https://' . $host . $base . rawurlencode($slug);
+    $materialSection = strtolower(trim((string)$materialSection));
+    if (!in_array($materialSection, ['journal', 'playbooks', 'signals', 'fun'], true)) {
+        $materialSection = 'journal';
     }
-    return 'https://' . $host . $base . rawurlencode($clusterCode) . '/' . rawurlencode($slug);
+    $base = '/' . $materialSection . '/';
+    if ($clusterCode === '') {
+        return 'https://' . $host . $base . rawurlencode($slug) . '/';
+    }
+    return 'https://' . $host . $base . rawurlencode($clusterCode) . '/' . rawurlencode($slug) . '/';
 }
 
 function seo_public_image_url_for_lang(string $lang, string $rawUrl): string
@@ -5604,22 +5608,7 @@ function seo_generate_article_payload(
         $isRu ? ['сравнение брендов и конкурентов'] : ['competitor brand comparisons'],
         150
     );
-    $clusterCode = seo_detect_cluster_code_v2($cluster, $lang, $cfg);
-    $taxonomy = seo_cluster_taxonomy_v2($lang, $cfg);
-    $taxonomyWeights = [];
-    foreach ($taxonomy as $taxRow) {
-        $taxKey = trim((string)($taxRow['key'] ?? ''));
-        if ($taxKey === '') {
-            continue;
-        }
-        $taxonomyWeights[$taxKey] = max(0.01, (float)($taxRow['weight'] ?? 1.0));
-    }
-    if (!empty($taxonomyWeights)) {
-        $pickedCluster = (string)seo_weighted_pick($taxonomyWeights);
-        if ($pickedCluster !== '') {
-            $clusterCode = examples_normalize_cluster($pickedCluster, $lang);
-        }
-    }
+    $clusterCode = examples_normalize_cluster($cluster, $lang);
     $structureDefaultsEn = [
         'Introduction -> FAQ grid -> Cases -> Code examples -> Conclusion',
         'Problem framing -> Constraints -> Solution architecture -> Implementation steps -> Checklist',
@@ -6199,8 +6188,18 @@ function seo_publish_article(
         $slug = 'article-' . gmdate('YmdHis') . '-' . random_int(100, 999);
     }
     $slug = seo_unique_slug($db, $slug, $domainForLang, $lang);
-    $clusterCode = examples_normalize_cluster((string)($clusterResolved['cluster_code'] ?? ($payload['cluster_code'] ?? 'b2b')), $lang);
-    $clusterSource = (string)($clusterResolved['cluster_source'] ?? 'heuristic');
+    $clusterCode = examples_normalize_cluster(
+        (string)($payload['cluster_code'] ?? $clusterResolved['cluster_code'] ?? $clusterCode ?? ''),
+        $lang
+    );
+    if ($clusterCode === '' || in_array($clusterCode, ['b2b', 'research', 'dev', 'theory'], true)) {
+        $clusterCode = examples_normalize_cluster((string)($payload['cluster'] ?? $payload['topic'] ?? $title), $lang);
+    }
+    $clusterSource = (string)(
+        !empty($payload['cluster_code'])
+            ? 'payload-cluster'
+            : ($clusterResolved['cluster_source'] ?? 'heuristic')
+    );
 
     if ($excerptHtml === '') {
         $excerptHtml = '<p>' . htmlspecialchars(examples_build_excerpt($contentHtml, 260), ENT_QUOTES, 'UTF-8') . '</p>';

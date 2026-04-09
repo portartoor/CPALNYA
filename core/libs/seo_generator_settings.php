@@ -54,9 +54,47 @@ if (!function_exists('seo_gen_settings_parse_lines')) {
 }
 
 if (!function_exists('seo_gen_settings_default')) {
-    function seo_gen_default_campaigns(): array
+    function seo_gen_campaign_variance_library(): array
     {
         return [
+            'journal' => [
+                'styles_en' => ['issue opener', 'editorial notebook', 'market map', 'backstage report', 'operator column', 'field memo', 'signal essay', 'niche dispatch'],
+                'styles_ru' => ['открывающая статья номера', 'редакционный блокнот', 'карта рынка', 'закулисный отчет', 'операторская колонка', 'полевой memo', 'сигнальное эссе', 'нишевой dispatch'],
+                'clusters_en' => ['creative shelf life and refresh economics', 'source volatility and buyer adaptation patterns', 'offer selection under shrinking margins', 'team handoff discipline in affiliate operations', 'operator hiring and backstage team structure', 'whitehat shells and compliance buffers', 'moderation pressure and account trust decay', 'telegram distribution as owned media infrastructure', 'farm economics and account lifespan strategy', 'market maps for geos offers and source mix', 'decision quality after attribution degradation', 'operating rhythm inside high-pressure media teams'],
+                'clusters_ru' => ['срок жизни креативов и экономика постоянной пересборки', 'волатильность источников и адаптация баеров', 'выбор офферов в условиях сжатия маржи', 'дисциплина handoff внутри affiliate-операционки', 'найм операторов и backstage-структура команды', 'whitehat-оболочки и compliance-буферы', 'давление модерации и деградация account trust', 'Telegram как owned media-инфраструктура для команды', 'экономика фарма и стратегия срока жизни аккаунтов', 'карта гео офферов и source mix для команды', 'качество решений после деградации атрибуции', 'рабочий ритм внутри медиабаинг-команд под давлением'],
+                'article_structures_en' => ['Issue opener -> market tension -> backstage realities -> takeaways -> close', 'Observation -> symptoms -> interpretation -> operator response -> summary', 'Market map -> segments -> hidden shifts -> tactical response -> close'],
+                'article_structures_ru' => ['Открывающая статья номера -> напряжение рынка -> backstage-реальность -> выводы -> итог', 'Наблюдение -> симптомы -> интерпретация -> реакция оператора -> итог', 'Карта рынка -> сегменты -> скрытые сдвиги -> тактический ответ -> closing note'],
+            ],
+            'playbooks' => [
+                'styles_en' => ['setup memo', 'launch checklist', 'rollback memo', 'implementation guide', 'runbook', 'SOP blueprint', 'debug diary', 'recovery guide'],
+                'styles_ru' => ['setup memo', 'launch checklist', 'rollback memo', 'implementation guide', 'runbook', 'SOP blueprint', 'дневник отладки', 'гайд по восстановлению'],
+                'clusters_en' => ['launch QA and preflight checks', 'bm trust recovery after bans', 'handoff templates for buyers and assistants', 'routing failover and reserve infrastructure', 'creative review loop and fatigue control', 'offer screening workflow for operators', 'day-one setup for junior buyers', 'checkout continuity after payment failures', 'tracking hygiene and macro validation', 'rollback planning after failed releases', 'bundle migration between teams', 'operator dashboard and alert routine'],
+                'clusters_ru' => ['launch QA и preflight-проверки перед запуском', 'восстановление trust у BM после банов', 'handoff-шаблоны для баеров и ассистентов', 'failover-маршрутизация и резервная инфраструктура', 'creative review loop и контроль выгорания', 'workflow скрининга офферов для операторов', 'day-one setup для junior media buyer', 'непрерывность checkout после сбоев платежей', 'hygiene трекинга и валидация макросов', 'rollback-план после неудачных релизов', 'миграция связки между командами', 'операторский дашборд и рутина алертов'],
+                'article_structures_en' => ['Checklist -> stack -> actions -> QA -> scale notes -> summary', 'Failure -> diagnosis -> fix path -> verification -> safeguard', 'Start point -> implementation -> edge cases -> handoff -> final SOP'],
+                'article_structures_ru' => ['Чеклист -> стек -> действия -> QA -> заметки по масштабу -> итог', 'Сбой -> диагностика -> путь фикса -> верификация -> safeguard', 'Стартовая точка -> implementation -> edge cases -> handoff -> финальный SOP'],
+            ],
+            'signals' => [
+                'styles_en' => ['market alert', 'government watch', 'exchange watch', 'crypto signal memo', 'legislation tracker'],
+                'styles_ru' => ['market alert', 'government watch', 'биржевой watch', 'crypto signal memo', 'законодательный трекер'],
+                'clusters_en' => ['fresh politics and government decisions affecting traffic markets', 'business analysis around public companies sectors and market stress', 'exchange analytics and market structure shifts', 'major cryptocurrency moves and asset-specific implications', 'russian business news with operational market consequences', 'new russian laws bills and enforcement practice with digital impact', 'sanctions payments and settlement risks for operators', 'central bank signals and financial regulation shifts', 'ad market budget reallocations after macro events', 'messenger platform rules and distribution economics', 'election cycles politics and platform behavior changes', 'operator exposure after geopolitical shocks'],
+                'clusters_ru' => ['свежие политические новости и решения власти с влиянием на рынок трафика', 'бизнес-аналитика по компаниям секторам и рыночному стрессу', 'аналитика бирж структуры рынка и движения ликвидности', 'отдельные криптовалюты и их новостной фон как рыночный сигнал', 'свежие бизнес-новости России с последствиями для digital-рынка', 'новости законодательства России законопроекты и практика применения', 'санкции платежи и риски расчетов для операторов', 'сигналы центробанков и повороты финансового регулирования', 'перераспределение рекламных бюджетов после макро-событий', 'правила мессенджеров и экономика дистрибуции', 'политические циклы и смена поведения платформ', 'уязвимость операторов после геополитических шоков'],
+                'article_structures_en' => ['Market shock -> operator exposure -> control points -> next steps'],
+                'article_structures_ru' => ['Рыночный шок -> уязвимость оператора -> точки контроля -> следующие шаги'],
+            ],
+            'fun' => [
+                'styles_en' => ['dark comedy note', 'absurd dispatch', 'team mythology sketch', 'mock memo', 'tragicomedy review', 'ritual notebook'],
+                'styles_ru' => ['темная комедия', 'абсурдный dispatch', 'набросок командной мифологии', 'mock memo', 'трагикомический обзор', 'ритуальный блокнот'],
+                'clusters_en' => ['late-night dashboard delirium', 'assistant and buyer miscommunication folklore', 'launch day rituals and panic management', 'creative review as office theatre', 'bm recovery as heroic quest', 'telegram chats as tribal memory', 'operator burnout turned into niche comedy', 'spreadsheet cults and metric superstition', 'anti-detect discipline as workplace mythology', 'offer screening as satirical character study', 'team voice messages and crisis folklore', 'meeting after banwave as tragic farce'],
+                'clusters_ru' => ['ночной делирий у дашбордов', 'фольклор недопонимания между ассистентом и баером', 'ритуалы launch-day и управление паникой', 'creative review как офисный театр', 'восстановление BM как героический квест', 'Telegram-чаты как племенная память команды', 'выгорание операторов как нишевая комедия', 'культ таблиц и суеверия вокруг метрик', 'anti-detect-дисциплина как рабочая мифология', 'скрининг офферов как сатирический портрет команды', 'голосовые команды и фольклор кризисов', 'митинг после banwave как трагическая буффонада'],
+                'article_structures_en' => ['Scene -> ritual -> collapse -> niche moral', 'Backstage anecdote -> escalation -> reveal -> takeaways'],
+                'article_structures_ru' => ['Сцена -> ритуал -> обрушение -> нишевая мораль', 'Закулисный анекдот -> эскалация -> разворот -> выводы'],
+            ],
+        ];
+    }
+
+    function seo_gen_default_campaigns(): array
+    {
+        $campaigns = [
             'journal' => [
                 'key' => 'journal',
                 'title' => 'Journal',
@@ -308,6 +346,22 @@ if (!function_exists('seo_gen_settings_default')) {
                 'article_user_prompt_append_ru' => 'Держи тон живым, ироничным и нишевым. Юмор должен рождаться из реальной affiliate-операционки, ролевого поведения команды, handoff-сбоев, модерационного абсурда и хаоса трекеров, а не из общих шуток.',
             ],
         ];
+
+        $variance = seo_gen_campaign_variance_library();
+        foreach ($campaigns as $key => $row) {
+            if (empty($variance[$key]) || !is_array($variance[$key])) {
+                continue;
+            }
+            foreach (['styles_en', 'styles_ru', 'clusters_en', 'clusters_ru', 'article_structures_en', 'article_structures_ru'] as $listKey) {
+                $base = array_values(array_filter(array_map('trim', (array)($row[$listKey] ?? []))));
+                $extra = array_values(array_filter(array_map('trim', (array)($variance[$key][$listKey] ?? []))));
+                if (!empty($extra)) {
+                    $campaigns[$key][$listKey] = array_values(array_unique(array_merge($base, $extra)));
+                }
+            }
+        }
+
+        return $campaigns;
     }
 
     function seo_gen_normalize_campaigns($raw): array

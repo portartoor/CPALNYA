@@ -209,6 +209,10 @@ if ($titleHost !== '' && stripos($title, $titleHost) === false) {
 }
 $googleTagCode = trim((string)($_SERVER['MIRROR_GOOGLE_TAG_CODE'] ?? ''));
 $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? ''));
+$publicPortalUser = function_exists('public_portal_current_user') ? public_portal_current_user($FRMWRK ?? null) : null;
+$publicPortalAvatar = (is_array($publicPortalUser) && function_exists('public_portal_user_avatar'))
+    ? public_portal_user_avatar($publicPortalUser)
+    : '';
 
 if (!function_exists('header_search_preview_results')) {
     function header_search_preview_tokens(string $query): array
@@ -925,6 +929,116 @@ if (isset($_GET['header_search_preview'])) {
         flex-wrap: nowrap;
         transition: transform .24s ease;
     }
+    .simple-account {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+    }
+    .simple-account-trigger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        border: 1px solid var(--shell-border);
+        background: rgba(255,255,255,.04);
+        color: var(--shell-text);
+        text-decoration: none;
+        transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .simple-account-trigger:hover {
+        transform: translateY(-1px);
+        border-color: var(--shell-border-strong);
+        background: rgba(255,255,255,.08);
+    }
+    .simple-account-trigger img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .simple-account-icon {
+        width: 18px;
+        height: 18px;
+        position: relative;
+        display: inline-block;
+    }
+    .simple-account-icon::before,
+    .simple-account-icon::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 999px;
+        border: 1.5px solid currentColor;
+    }
+    .simple-account-icon::before {
+        top: 0;
+        width: 10px;
+        height: 10px;
+    }
+    .simple-account-icon::after {
+        bottom: 0;
+        width: 16px;
+        height: 9px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+    }
+    .simple-account-popover {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 10px);
+        min-width: 250px;
+        padding: 14px;
+        border: 1px solid var(--shell-border);
+        background: var(--shell-panel-strong);
+        box-shadow: 0 18px 44px rgba(0, 4, 14, .22);
+        display: grid;
+        gap: 10px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-6px);
+        transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+        z-index: 10030;
+    }
+    .simple-account:hover .simple-account-popover,
+    .simple-account:focus-within .simple-account-popover {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    .simple-account-popover strong {
+        font-size: 12px;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: var(--shell-accent);
+    }
+    .simple-account-popover p {
+        margin: 0;
+        color: var(--shell-muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+    .simple-account-actions {
+        display: grid;
+        gap: 8px;
+    }
+    .simple-account-actions a,
+    .simple-account-actions button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        padding: 0 14px;
+        border: 1px solid var(--shell-border);
+        background: rgba(255,255,255,.04);
+        color: var(--shell-text);
+        text-decoration: none;
+        cursor: pointer;
+    }
     .simple-search-toggle {
         display: none;
         width: 36px;
@@ -1472,6 +1586,30 @@ if (isset($_GET['header_search_preview'])) {
     </div>
 
     <div class="simple-header-right">
+        <div class="simple-account">
+            <a class="simple-account-trigger" href="/account/" aria-label="<?= htmlspecialchars($isRu ? 'Личный кабинет' : 'Account', ENT_QUOTES, 'UTF-8') ?>">
+                <?php if ($publicPortalAvatar !== ''): ?>
+                    <img src="<?= htmlspecialchars($publicPortalAvatar, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($publicPortalUser['display_name'] ?? $publicPortalUser['username'] ?? 'Account'), ENT_QUOTES, 'UTF-8') ?>">
+                <?php else: ?>
+                    <span class="simple-account-icon" aria-hidden="true"></span>
+                <?php endif; ?>
+            </a>
+            <div class="simple-account-popover">
+                <?php if (is_array($publicPortalUser)): ?>
+                    <strong><?= htmlspecialchars((string)($publicPortalUser['display_name'] ?? $publicPortalUser['username'] ?? 'Member'), ENT_QUOTES, 'UTF-8') ?></strong>
+                    <p><?= htmlspecialchars($isRu ? 'Профиль активен. Здесь можно открыть кабинет, обновить аватарку, контакты и продолжить разговор под статьями.' : 'Profile is active. Open your account, update avatar and continue the discussion under articles.', ENT_QUOTES, 'UTF-8') ?></p>
+                    <div class="simple-account-actions">
+                        <a href="/account/"><?= htmlspecialchars($isRu ? 'Открыть кабинет' : 'Open account', ENT_QUOTES, 'UTF-8') ?></a>
+                    </div>
+                <?php else: ?>
+                    <strong><?= htmlspecialchars($isRu ? 'Личный кабинет' : 'Community account', ENT_QUOTES, 'UTF-8') ?></strong>
+                    <p><?= htmlspecialchars($isRu ? 'Войдите или зарегистрируйтесь, чтобы комментировать статьи, получить PIN-код и управлять профилем.' : 'Sign in or register to comment on articles, receive a PIN code and manage your profile.', ENT_QUOTES, 'UTF-8') ?></p>
+                    <div class="simple-account-actions">
+                        <a href="/account/"><?= htmlspecialchars($isRu ? 'Вход / регистрация' : 'Sign in / register', ENT_QUOTES, 'UTF-8') ?></a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
         <button class="simple-search-toggle" type="button" aria-expanded="false" aria-controls="simple-header-search">
             <span class="simple-search-toggle-icon" aria-hidden="true"></span>
         </button>

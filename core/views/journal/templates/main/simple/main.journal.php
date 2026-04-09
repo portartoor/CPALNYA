@@ -199,6 +199,39 @@ $selectedShareUrl = $selectedArticleUrl !== ''
     ? (((!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ? 'https' : 'http') . '://' . (string)($_SERVER['HTTP_HOST'] ?? '') . $selectedArticleUrl)
     : '';
 $selectedShareTitle = trim((string)($selected['title'] ?? ''));
+$clusterLabelByCode = static function (string $clusterCode) use ($clusters): string {
+    $clusterCode = trim($clusterCode);
+    if ($clusterCode === '') {
+        return '';
+    }
+    foreach ($clusters as $cluster) {
+        $candidate = trim((string)($cluster['code'] ?? ''));
+        if ($candidate !== '' && $candidate === $clusterCode) {
+            return trim((string)($cluster['label'] ?? $candidate));
+        }
+    }
+    $fallback = str_replace(['-', '_'], ' ', $clusterCode);
+    return trim(mb_convert_case($fallback, MB_CASE_TITLE, 'UTF-8'));
+};
+$selectedClusterCode = trim((string)($selected['cluster_code'] ?? ''));
+$selectedClusterLabel = $clusterLabelByCode($selectedClusterCode);
+$detailBreadcrumbs = [];
+if ($selected) {
+    $detailBreadcrumbs[] = [
+        'label' => $t('Журнал', 'Journal'),
+        'url' => $buildPageUrl(),
+    ];
+    if ($selectedClusterLabel !== '') {
+        $detailBreadcrumbs[] = [
+            'label' => $selectedClusterLabel,
+            'url' => $buildPageUrl($selectedClusterCode),
+        ];
+    }
+    $detailBreadcrumbs[] = [
+        'label' => $selectedShareTitle !== '' ? $selectedShareTitle : $t('Материал', 'Article'),
+        'url' => '',
+    ];
+}
 $shareIcon = static function (string $network): string {
     $icons = [
         'telegram' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.94 4.66a1.5 1.5 0 0 0-1.68-.2L3.2 12.84a1 1 0 0 0 .1 1.85l4.34 1.49 1.66 5.06a1 1 0 0 0 1.73.33l2.42-3 4.76 3.48a1.5 1.5 0 0 0 2.36-.92l2.3-14.5a1.5 1.5 0 0 0-.93-1.97ZM9.4 15.47l-.56 3.03-.96-2.91 9.88-7.42-8.36 7.3Z"/></svg>',
@@ -254,6 +287,11 @@ if ($selected) {
 .jrnl-pager a,.jrnl-pager span{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:10px 14px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-muted);text-decoration:none}
 .jrnl-pager .is-active{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.12)}
 .jrnl-detail{display:grid;gap:18px}
+.jrnl-breadcrumbs{display:flex;flex-wrap:wrap;gap:10px;align-items:center;color:rgba(214,235,255,.78);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.jrnl-breadcrumbs a{color:rgba(214,235,255,.72);text-decoration:none}
+.jrnl-breadcrumbs a:hover{color:var(--shell-text)}
+.jrnl-breadcrumb-sep{opacity:.42}
+.jrnl-breadcrumb-current{color:var(--shell-text)}
 .jrnl-detail-body{display:grid;gap:18px}
 .jrnl-detail-cover{overflow:visible;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02)}
 .jrnl-detail-cover img{width:100%;height:auto;display:block;object-fit:contain}
@@ -321,11 +359,23 @@ if ($selected) {
             }
             ?>
             <article class="jrnl-detail">
+                <?php if (!empty($detailBreadcrumbs)): ?>
+                    <nav class="jrnl-breadcrumbs" aria-label="<?= htmlspecialchars($t('Хлебные крошки', 'Breadcrumbs'), ENT_QUOTES, 'UTF-8') ?>">
+                        <?php foreach ($detailBreadcrumbs as $index => $crumb): ?>
+                            <?php if ($index > 0): ?><span class="jrnl-breadcrumb-sep">/</span><?php endif; ?>
+                            <?php if (!empty($crumb['url'])): ?>
+                                <a href="<?= htmlspecialchars((string)$crumb['url'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)$crumb['label'], ENT_QUOTES, 'UTF-8') ?></a>
+                            <?php else: ?>
+                                <span class="jrnl-breadcrumb-current"><?= htmlspecialchars((string)$crumb['label'], ENT_QUOTES, 'UTF-8') ?></span>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </nav>
+                <?php endif; ?>
                 <span class="jrnl-kicker"><?= htmlspecialchars((string)($issue['issue_title'] ?? $t('Журнал', 'Journal')), ENT_QUOTES, 'UTF-8') ?></span>
                 <h1><?= htmlspecialchars((string)($selected['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h1>
                 <div class="jrnl-tags">
-                    <?php if (!empty($selected['cluster_code'])): ?>
-                        <a class="jrnl-tag" href="<?= htmlspecialchars($buildPageUrl((string)$selected['cluster_code']), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)$selected['cluster_code'], ENT_QUOTES, 'UTF-8') ?></a>
+                    <?php if ($selectedClusterCode !== '' && $selectedClusterLabel !== ''): ?>
+                        <a class="jrnl-tag" href="<?= htmlspecialchars($buildPageUrl($selectedClusterCode), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($selectedClusterLabel, ENT_QUOTES, 'UTF-8') ?></a>
                     <?php endif; ?>
                     <span class="jrnl-meta"><?= htmlspecialchars((string)($selected['published_at'] ?? $selected['created_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
                     <?php if (!empty($selected['author_name'])): ?><span class="jrnl-meta"><?= htmlspecialchars((string)$selected['author_name'], ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
@@ -370,6 +420,13 @@ if ($selected) {
                     </div>
                 </div>
             </article>
+
+            <?php
+            $portalCommentsPartial = DIR . 'core/views/partials/article_comments.php';
+            if (is_file($portalCommentsPartial)) {
+                include $portalCommentsPartial;
+            }
+            ?>
 
             <?php if (!empty($relatedItems)): ?>
                 <section class="jrnl-related">

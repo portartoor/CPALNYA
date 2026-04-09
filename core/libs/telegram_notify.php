@@ -88,21 +88,33 @@ function tg_notify_utf8_clean(string $value): string
 {
     $value = str_replace("\xEF\xBB\xBF", '', $value);
     $value = str_replace(["\r\n", "\r"], "\n", $value);
+    $value = preg_replace('/[^\P{C}\n\t]/u', '', $value) ?? $value;
     if ($value === '') {
         return '';
     }
     if (function_exists('mb_check_encoding') && mb_check_encoding($value, 'UTF-8')) {
         return $value;
     }
+    if (function_exists('iconv')) {
+        $stripped = @iconv('UTF-8', 'UTF-8//IGNORE', $value);
+        if (is_string($stripped) && $stripped !== '') {
+            $stripped = preg_replace('/[^\P{C}\n\t]/u', '', $stripped) ?? $stripped;
+            if (!function_exists('mb_check_encoding') || mb_check_encoding($stripped, 'UTF-8')) {
+                return $stripped;
+            }
+        }
+    }
     if (function_exists('mb_convert_encoding')) {
-        $converted = @mb_convert_encoding($value, 'UTF-8', 'UTF-8, Windows-1251, CP1251, ISO-8859-1');
+        $converted = @mb_convert_encoding($value, 'UTF-8', 'Windows-1251, CP1251');
         if (is_string($converted) && $converted !== '') {
+            $converted = preg_replace('/[^\P{C}\n\t]/u', '', $converted) ?? $converted;
             return $converted;
         }
     }
     if (function_exists('iconv')) {
         $converted = @iconv('Windows-1251', 'UTF-8//IGNORE', $value);
         if (is_string($converted) && $converted !== '') {
+            $converted = preg_replace('/[^\P{C}\n\t]/u', '', $converted) ?? $converted;
             return $converted;
         }
     }
