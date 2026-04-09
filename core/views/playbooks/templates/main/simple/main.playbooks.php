@@ -472,6 +472,13 @@ if ($sectionKey !== 'playbooks') {
                     </div>
                 </section>
             <?php endif; ?>
+
+            <?php
+            $commentsPartial = DIR . 'core/views/partials/article_comments.php';
+            if (is_file($commentsPartial)) {
+                include $commentsPartial;
+            }
+            ?>
         <?php else: ?>
             <header class="jrnl-hero">
                 <div class="jrnl-copy">

@@ -211,6 +211,12 @@ $googleTagCode = trim((string)($_SERVER['MIRROR_GOOGLE_TAG_CODE'] ?? ''));
 $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? ''));
 $publicPortalUser = null;
 $publicPortalAvatar = '';
+if (function_exists('public_portal_current_user')) {
+    $publicPortalUser = public_portal_current_user($FRMWRK);
+    if (is_array($publicPortalUser) && function_exists('public_portal_user_avatar')) {
+        $publicPortalAvatar = (string)public_portal_user_avatar($publicPortalUser);
+    }
+}
 
 if (!function_exists('header_search_preview_results')) {
     function header_search_preview_tokens(string $query): array

@@ -261,12 +261,34 @@ if ($selectedArticle) {
     $ModelPage['og_type'] = $ModelPage['og_type'] ?? 'website';
 }
 
-$ModelPage['portal_user'] = null;
-$ModelPage['portal_flash'] = [];
-$ModelPage['portal_captcha'] = [];
+$ModelPage['portal_user'] = function_exists('public_portal_current_user')
+    ? public_portal_current_user($FRMWRK)
+    : null;
+$ModelPage['portal_flash'] = function_exists('public_portal_pull_flash')
+    ? (array)public_portal_pull_flash()
+    : [];
+$ModelPage['portal_captcha'] = function_exists('public_portal_captcha_challenge')
+    ? (array)public_portal_captcha_challenge()
+    : [];
 $ModelPage['portal_comments'] = [];
 $ModelPage['portal_comment_total'] = 0;
 $ModelPage['portal_content_type'] = 'examples';
 $ModelPage['portal_content_id'] = (int)($selectedArticle['id'] ?? 0);
+if ($ModelPage['portal_content_id'] > 0) {
+    if (function_exists('public_portal_fetch_comments')) {
+        $ModelPage['portal_comments'] = (array)public_portal_fetch_comments(
+            $FRMWRK,
+            (string)$ModelPage['portal_content_type'],
+            (int)$ModelPage['portal_content_id']
+        );
+    }
+    if (function_exists('public_portal_comment_total_for_content')) {
+        $ModelPage['portal_comment_total'] = (int)public_portal_comment_total_for_content(
+            $FRMWRK,
+            (string)$ModelPage['portal_content_type'],
+            (int)$ModelPage['portal_content_id']
+        );
+    }
+}
 
 $ModelPage['journal'] = $journalData;
