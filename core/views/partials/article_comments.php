@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $portalUser = is_array($ModelPage['portal_user'] ?? null) ? $ModelPage['portal_user'] : null;
 $portalFlash = (array)($ModelPage['portal_flash'] ?? []);
 $portalCaptcha = (array)($ModelPage['portal_captcha'] ?? []);
@@ -11,7 +11,7 @@ $portalIsRu = ($portalLang === 'ru');
 $portalIsLoggedIn = is_array($portalUser) && (int)($portalUser['id'] ?? 0) > 0;
 $portalCsrf = function_exists('public_portal_csrf_token') ? public_portal_csrf_token('portal') : '';
 $portalSections = $portalIsRu
-    ? ['discussion' => 'РћР±СЃСѓР¶РґРµРЅРёРµ', 'question' => 'Р’РѕРїСЂРѕСЃ', 'idea' => 'РРґРµСЏ', 'feedback' => 'РћС‚Р·С‹РІ', 'case' => 'РџСЂР°РєС‚РёРєР°']
+    ? ['discussion' => 'Обсуждение', 'question' => 'Вопрос', 'idea' => 'Идея', 'feedback' => 'Отзыв', 'case' => 'Практика']
     : ['discussion' => 'Discussion', 'question' => 'Question', 'idea' => 'Idea', 'feedback' => 'Feedback', 'case' => 'Practice'];
 $portalCurrentUrl = (string)($_SERVER['REQUEST_URI'] ?? '/');
 $t = static function (string $ru, string $en) use ($portalIsRu): string {
@@ -29,56 +29,56 @@ $portalCollectScore = static function (array $nodes) use (&$portalCollectScore, 
 $portalCollectScore($portalComments);
 $portalEmptyCtas = $portalIsRu
     ? [
-        'РџРµСЂРІСѓСЋ СЂРµРїР»РёРєСѓ Р·РґРµСЃСЊ РѕР±С‹С‡РЅРѕ РѕСЃС‚Р°РІР»СЏРµС‚ С‚РѕС‚, РєС‚Рѕ РїСЂРѕС‡РёС‚Р°Р» РјРµР¶РґСѓ СЃС‚СЂРѕРє.',
-        'Р•СЃР»Рё РјР°С‚РµСЂРёР°Р» С…РѕС‡РµС‚СЃСЏ РЅРµ РїСЂРѕСЃС‚Рѕ РґРѕС‡РёС‚Р°С‚СЊ, Р° СЃРґРІРёРЅСѓС‚СЊ СЃ РјРµСЃС‚Р°, РєРѕРјРјРµРЅС‚Р°СЂРёР№ РїРѕРґС…РѕРґРёС‚ Р»СѓС‡С€Рµ РІСЃРµРіРѕ.',
-        'РџРѕРґ СЃС‚Р°С‚СЊРµР№ РїРѕРєР° С‚РёС€РёРЅР°. РЎР°РјРѕРµ РІСЂРµРјСЏ РёСЃРїРѕСЂС‚РёС‚СЊ РµРµ С‚РѕС‡РЅС‹Рј РЅР°Р±Р»СЋРґРµРЅРёРµРј.',
-        'РРЅРѕРіРґР° РѕРґРёРЅ РєРѕРјРјРµРЅС‚Р°СЂРёР№ РїРѕР»РµР·РЅРµРµ Р»РёС€РЅРµРіРѕ Р°Р±Р·Р°С†Р° РІ С‚РµРєСЃС‚Рµ.',
-        'Р РµРґР°РєС†РёСЏ СѓР¶Рµ СЃРєР°Р·Р°Р»Р° СЃРІРѕРµ. РўРµРїРµСЂСЊ РёРЅС‚РµСЂРµСЃРЅРµРµ СѓСЃР»С‹С€Р°С‚СЊ С‡РµР»РѕРІРµРєР° РёР· РїСЂРѕС†РµСЃСЃР°.',
-        'Р•СЃР»Рё РІ РјР°С‚РµСЂРёР°Р»Рµ С‡РµРіРѕ-С‚Рѕ РЅРµ С…РІР°С‚Р°РµС‚, РЅРµРґРѕСЃС‚Р°СЋС‰Р°СЏ СЃС‚СЂРѕРєР° РІРїРѕР»РЅРµ РјРѕР¶РµС‚ РїРѕСЏРІРёС‚СЊСЃСЏ РЅРёР¶Рµ.',
-        'Р—РґРµСЃСЊ РїРѕРєР° РЅРёРєС‚Рѕ РЅРµ РІРѕР·СЂР°Р·РёР» СЃС‚Р°С‚СЊРµ. РџРѕРґРѕР·СЂРёС‚РµР»СЊРЅРѕ СѓРґРѕР±РЅР°СЏ СЃРёС‚СѓР°С†РёСЏ, С‡С‚РѕР±С‹ РЅР°С‡Р°С‚СЊ РїРµСЂРІС‹Рј.',
-        'Р‘С‹РІР°РµС‚, С‡С‚Рѕ Р»СѓС‡С€РёР№ С„СЂР°РіРјРµРЅС‚ РЅРѕРјРµСЂР° РїРѕСЏРІР»СЏРµС‚СЃСЏ РёРјРµРЅРЅРѕ РІ РєРѕРјРјРµРЅС‚Р°СЂРёСЏС….',
-        'Р•СЃР»Рё Сѓ РІР°СЃ РµСЃС‚СЊ СЂР°Р±РѕС‡РµРµ РІРѕР·СЂР°Р¶РµРЅРёРµ, РЅР°Р±Р»СЋРґРµРЅРёРµ РёР»Рё С‚РёС…РёР№ РёРЅСЃР°Р№Рґ, РµРјСѓ РєР°Рє СЂР°Р· СЃСЋРґР°.',
-        'РљРѕРјРјРµРЅС‚Р°СЂРёР№ Р·РґРµСЃСЊ РјРѕР¶РµС‚ Р±С‹С‚СЊ РєРѕСЂРѕС‡Рµ СЃС‚Р°С‚СЊРё, РЅРѕ С‚РѕС‡РЅРµРµ РµРµ РїРѕРІРѕСЂРѕС‚Р°.',
-        'РРЅРѕРіРґР° РѕР±СЃСѓР¶РґРµРЅРёРµ РЅР°С‡РёРЅР°РµС‚СЃСЏ РЅРµ СЃ РіСЂРѕРјРєРѕРіРѕ С‚РµР·РёСЃР°, Р° СЃ Р°РєРєСѓСЂР°С‚РЅРѕРіРѕ вЂњРІРѕРѕР±С‰Рµ-С‚РѕвЂќ.',
-        'Р•СЃР»Рё СЌС‚РѕС‚ С‚РµРєСЃС‚ Р·Р°РґРµР» РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅСѓСЋ РїСЂРёРІС‹С‡РєСѓ, СЃС‚РѕРёС‚ РѕСЃС‚Р°РІРёС‚СЊ СЃР»РµРґ РїРѕРґ РЅРёРј.',
-        'РџРѕРґ С‚Р°РєРёРј РјР°С‚РµСЂРёР°Р»РѕРј С†РµРЅСЏС‚СЃСЏ РЅРµ Р°РїР»РѕРґРёСЃРјРµРЅС‚С‹, Р° С‚РѕС‡РЅС‹Рµ РґРѕРїРѕР»РЅРµРЅРёСЏ.',
-        'РҐРѕСЂРѕС€РёР№ РєРѕРјРјРµРЅС‚Р°СЂРёР№ Р·РґРµСЃСЊ СЂР°Р±РѕС‚Р°РµС‚ РєР°Рє СЂРµРґР°РєС‚РѕСЂСЃРєР°СЏ РїРѕРјРµС‚РєР° РЅР° РїРѕР»СЏС….',
-        'РњРѕР¶РЅРѕ РѕСЃС‚Р°РІРёС‚СЊ РІРѕРїСЂРѕСЃ, РєРѕС‚РѕСЂС‹Р№ РЅРµСѓРґРѕР±РЅРѕ Р·Р°РґР°С‚СЊ РІСЃР»СѓС…. РћР±С‹С‡РЅРѕ РёРјРµРЅРЅРѕ С‚Р°РєРёРµ Рё РґРІРёРіР°СЋС‚ СЂР°Р·РіРѕРІРѕСЂ.',
-        'Р•СЃР»Рё РІС‹ РґРѕС‡РёС‚Р°Р»Рё РґРѕ РєРѕРЅС†Р° Рё РЅРµ СЃРѕРіР»Р°СЃРёР»РёСЃСЊ С…РѕС‚СЏ Р±С‹ СЃ РѕРґРЅРёРј РїРѕРІРѕСЂРѕС‚РѕРј, РїРѕСЂР° РѕС‚РєСЂС‹С‚СЊ РѕР±СЃСѓР¶РґРµРЅРёРµ.',
-        'РўРёС€РёРЅР° РїРѕРґ СЃС‚Р°С‚СЊРµР№ РІС‹РіР»СЏРґРёС‚ РєСЂР°СЃРёРІРѕ, РЅРѕ РїРѕР»РµР·РЅРѕР№ РѕРЅР° Р±С‹РІР°РµС‚ СЂРµРґРєРѕ.',
-        'РџРѕРґ СЌС‚РёРј С‚РµРєСЃС‚РѕРј РµС‰Рµ РЅРµС‚ СЂРµРїР»РёРєРё, РєРѕС‚РѕСЂР°СЏ РїРµСЂРµРІРµР»Р° Р±С‹ С‚РµРѕСЂРёСЋ РІ РїСЂР°РєС‚РёРєСѓ.',
-        'РЎР°РјС‹Рµ Р¶РёРІС‹Рµ РјР°С‚РµСЂРёР°Р»С‹ СЂРµРґРєРѕ Р·Р°РєР°РЅС‡РёРІР°СЋС‚СЃСЏ С‚РѕС‡РєРѕР№. Р§Р°С‰Рµ РѕРЅРё РїСЂРѕРґРѕР»Р¶Р°СЋС‚СЃСЏ РІ РєРѕРјРјРµРЅС‚Р°СЂРёСЏС….',
-        'Р•СЃР»Рё СЃС‚Р°С‚СЊСЏ РІС‹Р·РІР°Р»Р° РІРЅСѓС‚СЂРµРЅРЅРµРµ вЂњРґР°, РЅРѕвЂ¦вЂќ, СЌС‚Рѕ РѕС‚Р»РёС‡РЅС‹Р№ СЃС‚Р°СЂС‚ РґР»СЏ РїРµСЂРІРѕР№ СЂРµРїР»РёРєРё.',
-        'РљРѕРјРјРµРЅС‚Р°СЂРёРё Р·РґРµСЃСЊ РЅСѓР¶РЅС‹ РЅРµ РґР»СЏ РІРµР¶Р»РёРІРѕСЃС‚Рё, Р° РґР»СЏ РїСЂРѕРґРѕР»Р¶РµРЅРёСЏ РјС‹СЃР»Рё.',
-        'Р’РѕРїСЂРѕСЃ РїРѕРґ С‚Р°РєРёРј РјР°С‚РµСЂРёР°Р»РѕРј РёРЅРѕРіРґР° С†РµРЅРЅРµРµ СѓРІРµСЂРµРЅРЅРѕРіРѕ РІС‹РІРѕРґР°.',
-        'Р•СЃР»Рё С…РѕС‡РµС‚СЃСЏ РґРѕР±Р°РІРёС‚СЊ РєРѕРЅС‚РµРєСЃС‚, РїСЂРёРјРµСЂ РёР»Рё РјСЏРіРєРѕРµ РЅРµСЃРѕРіР»Р°СЃРёРµ, РјРµСЃС‚Рѕ СѓР¶Рµ РіРѕС‚РѕРІРѕ.',
-        'Р‘С‹РІР°РµС‚, С‡С‚Рѕ РїРѕРґ СЃС‚Р°С‚СЊРµР№ СЂРѕР¶РґР°РµС‚СЃСЏ РµРµ Р±РѕР»РµРµ С‡РµСЃС‚РЅР°СЏ РІРµСЂСЃРёСЏ.',
-        'РћСЃС‚Р°РІСЊС‚Рµ СЂРµРїР»РёРєСѓ С‚Р°Рє, Р±СѓРґС‚Рѕ РїСЂРѕРґРѕР»Р¶Р°РµС‚Рµ РєРѕР»РѕРЅРєСѓ, Р° РЅРµ РїСЂРѕСЃС‚Рѕ РѕС‚РІРµС‡Р°РµС‚Рµ РІРЅРёР·Сѓ СЃС‚СЂР°РЅРёС†С‹.',
-        'РџРѕРґ СЃС‚Р°С‚СЊРµР№ РїРѕРєР° РїСѓСЃС‚Рѕ. Р СЌС‚Рѕ СЂРµРґРєРѕРµ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРѕ РґР»СЏ РїРµСЂРІРѕР№ СѓРјРЅРѕР№ СЂРµРїР»РёРєРё.',
-        'Р•СЃР»Рё С‚РµРєСЃС‚ РїРѕРїР°Р» РІ РЅРµСЂРІ, РєРѕРјРјРµРЅС‚Р°СЂРёР№ РјРѕР¶РµС‚ РїРѕРїР°СЃС‚СЊ РїСЂСЏРјРѕ РІ СЃСѓС‚СЊ.',
-        'РРЅРѕРіРґР° РѕР±СЃСѓР¶РґРµРЅРёРµ РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ С„СЂР°Р·С‹, РєРѕС‚РѕСЂСѓСЋ Р°РІС‚РѕСЂСѓ СЃР°РјРѕРјСѓ С…РѕС‚РµР»РѕСЃСЊ Р±С‹ РїСЂРѕС‡РёС‚Р°С‚СЊ.',
-        'РџРµСЂРІС‹Р№ РєРѕРјРјРµРЅС‚Р°СЂРёР№ Р·РґРµСЃСЊ РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅРµ РіСЂРѕРјРєРёРј, Р° РїСЂРѕСЃС‚Рѕ С‚РѕС‡РЅС‹Рј.',
-        'РџРѕРґ РјР°С‚РµСЂРёР°Р»РѕРј РµС‰Рµ РЅРµС‚ РЅРё РѕРґРЅРѕРіРѕ РІРѕРїСЂРѕСЃР°. Р—РЅР°С‡РёС‚, РјРѕР¶РЅРѕ Р·Р°РґР°С‚СЊ С‚РѕС‚ СЃР°РјС‹Р№.',
-        'Р•СЃР»Рё СЃС‚Р°С‚СЊСЏ РїРѕРєР°Р·Р°Р»Р°СЃСЊ СЃР»РёС€РєРѕРј СѓРІРµСЂРµРЅРЅРѕР№, РєРѕРјРјРµРЅС‚Р°СЂРёР№ вЂ” С…РѕСЂРѕС€РµРµ РјРµСЃС‚Рѕ РґР»СЏ РєРѕРЅС‚СЂР°СЂРіСѓРјРµРЅС‚Р°.',
-        'Р›СѓС‡С€РёРµ СЂР°Р·РіРѕРІРѕСЂС‹ РїРѕРґ СЃС‚Р°С‚СЊСЏРјРё РЅР°С‡РёРЅР°СЋС‚СЃСЏ Р±РµР· СЂР°Р·СЂРµС€РµРЅРёСЏ. РџСЂРѕСЃС‚Рѕ СЃ РїРµСЂРІРѕР№ С„СЂР°Р·С‹.',
-        'РўСѓС‚ РїРѕРєР° РЅРµС‚ РЅРё РІРѕР·СЂР°Р¶РµРЅРёР№, РЅРё РёРЅСЃР°Р№РґРѕРІ, РЅРё СЂРµРґР°РєС‚РѕСЂСЃРєРѕРіРѕ С€РµРїРѕС‚Р° СЃРЅРёР·Сѓ. РњРѕР¶РЅРѕ РёСЃРїСЂР°РІРёС‚СЊ.',
-        'РљРѕРјРјРµРЅС‚Р°СЂРёР№ вЂ” СЌС‚Рѕ Р±С‹СЃС‚СЂС‹Р№ СЃРїРѕСЃРѕР± РїРѕРєР°Р·Р°С‚СЊ, С‡С‚Рѕ СЃС‚Р°С‚СЊСЏ РїРѕРїР°Р»Р° РЅРµ РІ РїСѓСЃС‚РѕС‚Сѓ.',
-        'Р•СЃР»Рё Сѓ РјР°С‚РµСЂРёР°Р»Р° РµСЃС‚СЊ РІС‚РѕСЂРѕРµ РґРЅРѕ, РµРіРѕ РѕР±С‹С‡РЅРѕ РІСЃРєСЂС‹РІР°СЋС‚ РЅРµ РІ С‚РµРєСЃС‚Рµ, Р° РІ РѕР±СЃСѓР¶РґРµРЅРёРё.',
-        'РџРѕРґРµР»РёС‚РµСЃСЊ С‚РµРј, С‡С‚Рѕ РІ СЂР°Р±РѕС‡РёС… С‡Р°С‚Р°С… СЃРєР°Р·Р°Р»Рё Р±С‹ РїРѕР»СѓС€РµРїРѕС‚РѕРј.',
-        'Р•СЃР»Рё С‚РµРєСЃС‚ С…РѕС‡РµС‚СЃСЏ РїСЂРѕРґРѕР»Р¶РёС‚СЊ РїСЂРёРјРµСЂРѕРј РёР· Р¶РёР·РЅРё, СЌС‚Рѕ Р»СѓС‡С€РµРµ РјРµСЃС‚Рѕ.',
-        'РРЅРѕРіРґР° РѕРґРЅРѕ С‚РѕС‡РЅРѕРµ вЂњСѓ РЅР°СЃ Р±С‹Р»Рѕ РёРЅР°С‡РµвЂќ СЃРѕР±РёСЂР°РµС‚ РѕР±СЃСѓР¶РґРµРЅРёРµ Р»СѓС‡С€Рµ Р»СЋР±РѕРіРѕ Р»РѕРЅРіСЂРёРґР°.',
-        'РџРѕРґ РјР°С‚РµСЂРёР°Р»РѕРј РїРѕРєР° РёРґРµР°Р»СЊРЅР°СЏ РїСѓСЃС‚РѕС‚Р° РґР»СЏ РїРµСЂРІРѕР№ СѓРјРЅРѕР№ РїСЂРѕРІРѕРєР°С†РёРё.',
-        'Р•СЃР»Рё СЃС‚Р°С‚СЊСЏ РїРѕРЅСЂР°РІРёР»Р°СЃСЊ, РјРѕР¶РЅРѕ РїРѕРґРґРµСЂР¶Р°С‚СЊ РµРµ Р°СЂРіСѓРјРµРЅС‚РѕРј. Р•СЃР»Рё РЅРµС‚ вЂ” С‚РµРј Р±РѕР»РµРµ.',
-        'РљРѕРјРјРµРЅС‚Р°СЂРёРё Р·РґРµСЃСЊ РѕСЃРѕР±РµРЅРЅРѕ С…РѕСЂРѕС€Рё, РєРѕРіРґР° РІ РЅРёС… РјРµРЅСЊС€Рµ С€СѓРјР° Рё Р±РѕР»СЊС€Рµ СЂРµРјРµСЃР»Р°.',
-        'РџРѕРґ СЌС‚РѕР№ СЃС‚Р°С‚СЊРµР№ РїРѕРєР° РЅРµС‚ РЅРё РѕРґРЅРѕР№ СЂРµРїР»РёРєРё, РєРѕС‚РѕСЂР°СЏ Р±С‹ РёР·РјРµРЅРёР»Р° РµРµ СѓРіРѕР».',
-        'Р•СЃР»Рё Сѓ РІР°СЃ РµСЃС‚СЊ СЃРІРѕР№ backstage Рє СЌС‚РѕР№ С‚РµРјРµ, РѕРЅ РІРїРѕР»РЅРµ РґРѕСЃС‚РѕРёРЅ РІС‹Р№С‚Рё РёР· С‚РµРЅРё.',
-        'РќРёР¶Рµ РµС‰Рµ РЅРµ РїСЂРѕР·РІСѓС‡Р°Р»Р° С„СЂР°Р·Р°, РїРѕСЃР»Рµ РєРѕС‚РѕСЂРѕР№ СЃС‚Р°С‚СЊСЏ С‡РёС‚Р°РµС‚СЃСЏ РїРѕ-РґСЂСѓРіРѕРјСѓ.',
-        'РРЅРѕРіРґР° Р»СѓС‡С€РёР№ РєРѕРјРїР»РёРјРµРЅС‚ С‚РµРєСЃС‚Сѓ вЂ” СѓРјРЅС‹Р№ РєРѕРјРјРµРЅС‚Р°СЂРёР№ РїРѕРґ РЅРёРј.',
-        'РўСЂРµРґ РїРѕРєР° РїСѓСЃС‚, Р° Р·РЅР°С‡РёС‚, Сѓ РїРµСЂРІРѕР№ СЂРµРїР»РёРєРё РµСЃС‚СЊ СЂРѕСЃРєРѕС€СЊ Р·Р°РґР°С‚СЊ С‚РѕРЅ.',
-        'Р•СЃР»Рё РІС‹ Р·РЅР°РµС‚Рµ РґРµС‚Р°Р»СЊ, РєРѕС‚РѕСЂСѓСЋ СЃС‚Р°С‚СЊСЏ С‚РѕР»СЊРєРѕ РЅР°С‰СѓРїР°Р»Р°, РµР№ РїРѕСЂР° РїРѕСЏРІРёС‚СЊСЃСЏ Р·РґРµСЃСЊ.',
-        'РџРѕРґ РјР°С‚РµСЂРёР°Р»РѕРј РїРѕРєР° РЅРµ С…РІР°С‚Р°РµС‚ Р¶РёРІРѕРіРѕ С‡РµР»РѕРІРµС‡РµСЃРєРѕРіРѕ СЃР»РµРґР°. РњРѕР¶РЅРѕ РѕСЃС‚Р°РІРёС‚СЊ РµРіРѕ РїРµСЂРІС‹Рј.',
-        'РўРёС€РёРЅР° Р·РґРµСЃСЊ СЃР»РёС€РєРѕРј Р°РєРєСѓСЂР°С‚РЅР°СЏ. Р”Р°РІР°Р№С‚Рµ РґРѕР±Р°РІРёРј РІ РЅРµРµ СЃРјС‹СЃР».',
-        'Р РµРґР°РєС†РёСЏ Р»СЋР±РёС‚, РєРѕРіРґР° РѕР±СЃСѓР¶РґРµРЅРёРµ РЅР°С‡РёРЅР°РµС‚СЃСЏ РєСЂР°СЃРёРІРѕ: СЃ РјС‹СЃР»Рё, Р° РЅРµ СЃ С€СѓРјР°.',
+        'Первую реплику здесь обычно оставляет тот, кто прочитал между строк.',
+        'Если материал хочется не просто дочитать, а сдвинуть с места, комментарий подходит лучше всего.',
+        'Под статьей пока тишина. Самое время испортить ее точным наблюдением.',
+        'Иногда один комментарий полезнее лишнего абзаца в тексте.',
+        'Редакция уже сказала свое. Теперь интереснее услышать человека из процесса.',
+        'Если в материале чего-то не хватает, недостающая строка вполне может появиться ниже.',
+        'Здесь пока никто не возразил статье. Подозрительно удобная ситуация, чтобы начать первым.',
+        'Бывает, что лучший фрагмент номера появляется именно в комментариях.',
+        'Если у вас есть рабочее возражение, наблюдение или тихий инсайд, ему как раз сюда.',
+        'Комментарий здесь может быть короче статьи, но точнее ее поворота.',
+        'Иногда обсуждение начинается не с громкого тезиса, а с аккуратного “вообще-то”.',
+        'Если этот текст задел профессиональную привычку, стоит оставить след под ним.',
+        'Под таким материалом ценятся не аплодисменты, а точные дополнения.',
+        'Хороший комментарий здесь работает как редакторская пометка на полях.',
+        'Можно оставить вопрос, который неудобно задать вслух. Обычно именно такие и двигают разговор.',
+        'Если вы дочитали до конца и не согласились хотя бы с одним поворотом, пора открыть обсуждение.',
+        'Тишина под статьей выглядит красиво, но полезной она бывает редко.',
+        'Под этим текстом еще нет реплики, которая перевела бы теорию в практику.',
+        'Самые живые материалы редко заканчиваются точкой. Чаще они продолжаются в комментариях.',
+        'Если статья вызвала внутреннее “да, но…”, это отличный старт для первой реплики.',
+        'Комментарии здесь нужны не для вежливости, а для продолжения мысли.',
+        'Вопрос под таким материалом иногда ценнее уверенного вывода.',
+        'Если хочется добавить контекст, пример или мягкое несогласие, место уже готово.',
+        'Бывает, что под статьей рождается ее более честная версия.',
+        'Оставьте реплику так, будто продолжаете колонку, а не просто отвечаете внизу страницы.',
+        'Под статьей пока пусто. И это редкое пространство для первой умной реплики.',
+        'Если текст попал в нерв, комментарий может попасть прямо в суть.',
+        'Иногда обсуждение начинается с фразы, которую автору самому хотелось бы прочитать.',
+        'Первый комментарий здесь может быть не громким, а просто точным.',
+        'Под материалом еще нет ни одного вопроса. Значит, можно задать тот самый.',
+        'Если статья показалась слишком уверенной, комментарий — хорошее место для контраргумента.',
+        'Лучшие разговоры под статьями начинаются без разрешения. Просто с первой фразы.',
+        'Тут пока нет ни возражений, ни инсайдов, ни редакторского шепота снизу. Можно исправить.',
+        'Комментарий — это быстрый способ показать, что статья попала не в пустоту.',
+        'Если у материала есть второе дно, его обычно вскрывают не в тексте, а в обсуждении.',
+        'Поделитесь тем, что в рабочих чатах сказали бы полушепотом.',
+        'Если текст хочется продолжить примером из жизни, это лучшее место.',
+        'Иногда одно точное “у нас было иначе” собирает обсуждение лучше любого лонгрида.',
+        'Под материалом пока идеальная пустота для первой умной провокации.',
+        'Если статья понравилась, можно поддержать ее аргументом. Если нет — тем более.',
+        'Комментарии здесь особенно хороши, когда в них меньше шума и больше ремесла.',
+        'Под этой статьей пока нет ни одной реплики, которая бы изменила ее угол.',
+        'Если у вас есть свой backstage к этой теме, он вполне достоин выйти из тени.',
+        'Ниже еще не прозвучала фраза, после которой статья читается по-другому.',
+        'Иногда лучший комплимент тексту — умный комментарий под ним.',
+        'Тред пока пуст, а значит, у первой реплики есть роскошь задать тон.',
+        'Если вы знаете деталь, которую статья только нащупала, ей пора появиться здесь.',
+        'Под материалом пока не хватает живого человеческого следа. Можно оставить его первым.',
+        'Тишина здесь слишком аккуратная. Давайте добавим в нее смысл.',
+        'Редакция любит, когда обсуждение начинается красиво: с мысли, а не с шума.',
     ]
     : [
         'The first note here usually comes from the person who read between the lines.',
@@ -91,16 +91,16 @@ $portalEmptyCtas = $portalIsRu
         'Some of the best parts of an issue appear in the comments, not the draft.',
         'If you have a practical objection, an extra angle or a quiet insight, this is where it lands.',
         'A comment can be shorter than the article and still move it further.',
-        'A good thread often starts with a careful вЂњyes, butвЂќ.',
+        'A good thread often starts with a careful “yes, but”.',
         'If the piece touched a professional nerve, leave a trace under it.',
         'What matters here is not applause, but a sharper addition.',
-        'A strong comment works like an editorвЂ™s pencil in the margin.',
+        'A strong comment works like an editor’s pencil in the margin.',
         'You can leave the question that is awkward to say out loud. Those are often the useful ones.',
         'If you reached the end and disagreed with at least one turn, this is your opening line.',
         'Silence under a piece looks elegant, but it is rarely useful.',
         'The thread is still missing the comment that turns theory into practice.',
         'The liveliest articles rarely end with a period. They continue below.',
-        'If the piece triggered an internal вЂњyes, butвЂ¦вЂќ, that is already a strong first comment.',
+        'If the piece triggered an internal “yes, but…”, that is already a strong first comment.',
         'Comments are not here for politeness. They are here to continue the thought.',
         'A sharp question under a piece can matter more than a confident conclusion.',
         'If you want to add context, an example or a calm disagreement, the space is ready.',
@@ -118,7 +118,7 @@ $portalEmptyCtas = $portalIsRu
         'If the article has a second layer, it is often opened in the thread, not in the copy.',
         'Share the thought you would usually say half-quietly in a work chat.',
         'If the text wants a real-life example, this is where it should arrive.',
-        'A precise вЂњwe saw it differentlyвЂќ can build a better thread than a long essay.',
+        'A precise “we saw it differently” can build a better thread than a long essay.',
         'The empty thread is a rare luxury: your first note gets to set the tone.',
         'If you liked the piece, support it with an argument. If not, even better.',
         'Comments work best here when they carry less noise and more craft.',
@@ -127,7 +127,7 @@ $portalEmptyCtas = $portalIsRu
         'The first reply has the rare privilege of defining the mood of the thread.',
         'If you know the detail the piece only brushed against, this is the place for it.',
         'The article is still missing a human trace under it. You can leave the first one.',
-        'This silence is a little too tidy. LetвЂ™s add something useful to it.',
+        'This silence is a little too tidy. Let’s add something useful to it.',
         'The editors prefer discussions that begin with a thought, not a performance.',
         'If your backstage version of this topic is stronger than the polished one, bring it in.',
         'A stylish thread often starts with a single exact sentence.',
@@ -147,7 +147,7 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
         $commentDown = (int)($node['votes_down'] ?? 0);
         $currentVote = (int)($node['current_user_vote'] ?? 0);
         $userScore = (int)($node['comment_rating'] ?? 0);
-        $rankLabel = (string)($node['rank_meta']['label'] ?? $t('РЈС‡Р°СЃС‚РЅРёРє РѕР±СЃСѓР¶РґРµРЅРёСЏ', 'Discussion member'));
+        $rankLabel = (string)($node['rank_meta']['label'] ?? $t('Участник обсуждения', 'Discussion member'));
         ?>
         <article class="pcmt-node" id="comment-<?= $commentId ?>" style="--pcmt-depth:<?= (int)$depth ?>">
             <div class="pcmt-node-line" aria-hidden="true"></div>
@@ -182,7 +182,7 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
                             <?php endif; ?>
                         </div>
                         <?php if ($portalUser): ?>
-                            <button class="pcmt-reply" type="button" data-comment-reply="<?= $commentId ?>" data-comment-author="<?= htmlspecialchars($author, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('РћС‚РІРµС‚РёС‚СЊ', 'Reply'), ENT_QUOTES, 'UTF-8') ?></button>
+                            <button class="pcmt-reply" type="button" data-comment-reply="<?= $commentId ?>" data-comment-author="<?= htmlspecialchars($author, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Ответить', 'Reply'), ENT_QUOTES, 'UTF-8') ?></button>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -271,10 +271,10 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
 <section class="pcmt" id="article-comments" data-portal-auth="<?= $portalIsLoggedIn ? '1' : '0' ?>" data-content-type="<?= htmlspecialchars($portalContentType, ENT_QUOTES, 'UTF-8') ?>" data-content-id="<?= $portalContentId ?>">
     <div class="pcmt-head">
         <div class="pcmt-copy">
-            <span class="pcmt-kicker"><?= htmlspecialchars($t('Р РµРґР°РєС†РёРѕРЅРЅРѕРµ РѕР±СЃСѓР¶РґРµРЅРёРµ', 'Editorial discussion'), ENT_QUOTES, 'UTF-8') ?></span>
-            <h2><?= htmlspecialchars($t('РџРѕРґ С‚РµРєСЃС‚РѕРј РЅР°С‡РёРЅР°РµС‚СЃСЏ Р¶РёРІР°СЏ С‡Р°СЃС‚СЊ СЂР°Р·РіРѕРІРѕСЂР°', 'The live part of the conversation starts below'), ENT_QUOTES, 'UTF-8') ?></h2>
-            <p><?= htmlspecialchars($t('Р—РґРµСЃСЊ РѕР±С‹С‡РЅРѕ РїРѕСЏРІР»СЏСЋС‚СЃСЏ РЅР°Р±Р»СЋРґРµРЅРёСЏ, РІСЃС‚СЂРµС‡РЅС‹Рµ РёСЃС‚РѕСЂРёРё, РЅРµСЃРѕРіР»Р°СЃРёСЏ, С‚РёС…РёРµ СѓС‚РѕС‡РЅРµРЅРёСЏ Рё С‚Рµ РґРµС‚Р°Р»Рё, СЂР°РґРё РєРѕС‚РѕСЂС‹С… РјР°С‚РµСЂРёР°Р» С…РѕС‡РµС‚СЃСЏ РїРµСЂРµС‡РёС‚Р°С‚СЊ СѓР¶Рµ РІРјРµСЃС‚Рµ СЃ РґСЂСѓРіРёРјРё. Р•СЃР»Рё РµСЃС‚СЊ СЃРІРѕР№ РѕРїС‹С‚, РІРѕРїСЂРѕСЃ РёР»Рё Р°РєРєСѓСЂР°С‚РЅРѕРµ РІРѕР·СЂР°Р¶РµРЅРёРµ вЂ” СЌС‚Рѕ РєР°Рє СЂР°Р· С‚Рѕ РјРµСЃС‚Рѕ.', 'This is where lived detail, disagreements, useful follow-ups and the human part of the story usually show up. If you have experience, a question or a thoughtful counterpoint, this is the right place for it.'), ENT_QUOTES, 'UTF-8') ?></p>
-            <div class="pcmt-summary" aria-label="<?= htmlspecialchars($t('РЎРІРѕРґРєР° РѕР±СЃСѓР¶РґРµРЅРёСЏ', 'Discussion summary'), ENT_QUOTES, 'UTF-8') ?>">
+            <span class="pcmt-kicker"><?= htmlspecialchars($t('Редакционное обсуждение', 'Editorial discussion'), ENT_QUOTES, 'UTF-8') ?></span>
+            <h2><?= htmlspecialchars($t('Под текстом начинается живая часть разговора', 'The live part of the conversation starts below'), ENT_QUOTES, 'UTF-8') ?></h2>
+            <p><?= htmlspecialchars($t('Здесь обычно появляются наблюдения, встречные истории, несогласия, тихие уточнения и те детали, ради которых материал хочется перечитать уже вместе с другими. Если есть свой опыт, вопрос или аккуратное возражение — это как раз то место.', 'This is where lived detail, disagreements, useful follow-ups and the human part of the story usually show up. If you have experience, a question or a thoughtful counterpoint, this is the right place for it.'), ENT_QUOTES, 'UTF-8') ?></p>
+            <div class="pcmt-summary" aria-label="<?= htmlspecialchars($t('Сводка обсуждения', 'Discussion summary'), ENT_QUOTES, 'UTF-8') ?>">
                 <span class="pcmt-summary-item"><span class="pcmt-summary-glyph" aria-hidden="true">◉</span><strong><?= (int)$portalCommentTotal ?></strong></span>
                 <span class="pcmt-summary-item"><span class="pcmt-summary-glyph" aria-hidden="true">↕</span><strong><?= (int)$portalCommentScoreTotal ?></strong></span>
             </div>
@@ -289,9 +289,9 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
         <div class="pcmt-summary-shell">
             <div class="pcmt-auth-shell" id="pcmt-auth-shell">
                 <div class="pcmt-auth-tease">
-                    <p><?= htmlspecialchars($portalCommentTotal > 0 ? $t('Р’РѕР№РґРёС‚Рµ, С‡С‚РѕР±С‹ РѕС‚РІРµС‚РёС‚СЊ, РїРѕРґРґРµСЂР¶Р°С‚СЊ С‡СѓР¶СѓСЋ РјС‹СЃР»СЊ РёР»Рё РїСЂРёРЅРµСЃС‚Рё РІ СЂР°Р·РіРѕРІРѕСЂ СЃРІРѕР№ РѕРїС‹С‚.', 'Sign in to reply, support a point or bring your own experience into the thread.') : $t('Р’РѕР№РґРёС‚Рµ, С‡С‚РѕР±С‹ РѕСЃС‚Р°РІРёС‚СЊ РїРµСЂРІСѓСЋ СЂРµРїР»РёРєСѓ Рё РѕС‚РєСЂС‹С‚СЊ СЌС‚Рѕ РѕР±СЃСѓР¶РґРµРЅРёРµ.', 'Sign in to leave the first note and open this discussion.'), ENT_QUOTES, 'UTF-8') ?></p>
+                    <p><?= htmlspecialchars($portalCommentTotal > 0 ? $t('Войдите, чтобы ответить, поддержать чужую мысль или принести в разговор свой опыт.', 'Sign in to reply, support a point or bring your own experience into the thread.') : $t('Войдите, чтобы оставить первую реплику и открыть это обсуждение.', 'Sign in to leave the first note and open this discussion.'), ENT_QUOTES, 'UTF-8') ?></p>
                     <div class="pcmt-guest-cta">
-                        <button class="pcmt-btn" type="button" data-comment-auth-open><?= htmlspecialchars($portalCommentTotal > 0 ? $t('Р’РѕР№С‚Рё Рё РѕР±СЃСѓРґРёС‚СЊ', 'Join the discussion') : $t('РћСЃС‚Р°РІРёС‚СЊ РїРµСЂРІС‹Р№ РєРѕРјРјРµРЅС‚Р°СЂРёР№', 'Leave the first comment'), ENT_QUOTES, 'UTF-8') ?></button>
+                        <button class="pcmt-btn" type="button" data-comment-auth-open><?= htmlspecialchars($portalCommentTotal > 0 ? $t('Войти и обсудить', 'Join the discussion') : $t('Оставить первый комментарий', 'Leave the first comment'), ENT_QUOTES, 'UTF-8') ?></button>
                     </div>
                 </div>
                 <form class="pcmt-auth-form" method="post">
@@ -300,20 +300,20 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
                     <input type="hidden" name="return_path" value="<?= htmlspecialchars($portalCurrentUrl, ENT_QUOTES, 'UTF-8') ?>">
                     <input type="hidden" name="content_type" value="<?= htmlspecialchars($portalContentType, ENT_QUOTES, 'UTF-8') ?>">
                     <input type="hidden" name="content_id" value="<?= $portalContentId ?>">
-                    <div><span class="pcmt-auth-kicker"><?= htmlspecialchars($t('Р‘С‹СЃС‚СЂС‹Р№ РІС…РѕРґ РІ РѕР±СЃСѓР¶РґРµРЅРёРµ', 'Quick access to discussion'), ENT_QUOTES, 'UTF-8') ?></span></div>
-                    <div><input type="text" name="username" placeholder="<?= htmlspecialchars($t('Р›РѕРіРёРЅ', 'Login'), ENT_QUOTES, 'UTF-8') ?>" required></div>
-                    <div class="pcmt-field-full"><input type="password" name="password" placeholder="<?= htmlspecialchars($t('РџР°СЂРѕР»СЊ РѕС‚ 8 СЃРёРјРІРѕР»РѕРІ', 'Password, min 8 chars'), ENT_QUOTES, 'UTF-8') ?>" required></div>
+                    <div><span class="pcmt-auth-kicker"><?= htmlspecialchars($t('Быстрый вход в обсуждение', 'Quick access to discussion'), ENT_QUOTES, 'UTF-8') ?></span></div>
+                    <div><input type="text" name="username" placeholder="<?= htmlspecialchars($t('Логин', 'Login'), ENT_QUOTES, 'UTF-8') ?>" required></div>
+                    <div class="pcmt-field-full"><input type="password" name="password" placeholder="<?= htmlspecialchars($t('Пароль от 8 символов', 'Password, min 8 chars'), ENT_QUOTES, 'UTF-8') ?>" required></div>
                     <div class="pcmt-field-full pcmt-captcha">
-                        <div><strong><?= htmlspecialchars((string)($portalCaptcha[$portalIsRu ? 'prompt_ru' : 'prompt_en'] ?? $t('РЎР»РѕР¶РёС‚Рµ РґРІР° С‡РёСЃР»Р° СЂСЏРґРѕРј СЃРѕ Р·РЅР°РєР°РјРё', 'Add the two numbers next to the symbols')), ENT_QUOTES, 'UTF-8') ?></strong></div>
+                        <div><strong><?= htmlspecialchars((string)($portalCaptcha[$portalIsRu ? 'prompt_ru' : 'prompt_en'] ?? $t('Сложите два числа рядом со знаками', 'Add the two numbers next to the symbols')), ENT_QUOTES, 'UTF-8') ?></strong></div>
                         <div class="pcmt-captcha-code">
-                            <span><?= htmlspecialchars((string)($portalCaptcha['glyph_left'] ?? 'в—§'), ENT_QUOTES, 'UTF-8') ?><?= (int)($portalCaptcha['left'] ?? 0) ?></span>
+                            <span><?= htmlspecialchars((string)($portalCaptcha['glyph_left'] ?? '◧'), ENT_QUOTES, 'UTF-8') ?><?= (int)($portalCaptcha['left'] ?? 0) ?></span>
                             <span>+</span>
-                            <span><?= htmlspecialchars((string)($portalCaptcha['glyph_right'] ?? 'в—©'), ENT_QUOTES, 'UTF-8') ?><?= (int)($portalCaptcha['right'] ?? 0) ?></span>
+                            <span><?= htmlspecialchars((string)($portalCaptcha['glyph_right'] ?? '◩'), ENT_QUOTES, 'UTF-8') ?><?= (int)($portalCaptcha['right'] ?? 0) ?></span>
                         </div>
-                        <input type="text" name="captcha_answer" placeholder="<?= htmlspecialchars($t('РћС‚РІРµС‚', 'Answer'), ENT_QUOTES, 'UTF-8') ?>" required>
+                        <input type="text" name="captcha_answer" placeholder="<?= htmlspecialchars($t('Ответ', 'Answer'), ENT_QUOTES, 'UTF-8') ?>" required>
                     </div>
                     <div class="pcmt-field-full pcmt-guest-cta">
-                        <button class="pcmt-btn" type="submit"><?= htmlspecialchars($t('РЎРѕР·РґР°С‚СЊ Р°РєРєР°СѓРЅС‚ Рё РїСЂРѕРґРѕР»Р¶РёС‚СЊ', 'Create account and continue'), ENT_QUOTES, 'UTF-8') ?></button>
+                        <button class="pcmt-btn" type="submit"><?= htmlspecialchars($t('Создать аккаунт и продолжить', 'Create account and continue'), ENT_QUOTES, 'UTF-8') ?></button>
                     </div>
                 </form>
             </div>
@@ -321,8 +321,8 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
     <?php else: ?>
         <div class="pcmt-compose">
             <div class="pcmt-compose-tease">
-                <p><?= htmlspecialchars($t('Р•СЃР»Рё С…РѕС‡РµС‚СЃСЏ РїСЂРѕРґРѕР»Р¶РёС‚СЊ РјС‹СЃР»СЊ, Р·Р°РґР°С‚СЊ РІСЃС‚СЂРµС‡РЅС‹Р№ РІРѕРїСЂРѕСЃ РёР»Рё РѕСЃС‚Р°РІРёС‚СЊ СЃРІРѕСЋ РїСЂР°РєС‚РёС‡РµСЃРєСѓСЋ РїРѕРјРµС‚РєСѓ, РѕС‚РєСЂРѕР№С‚Рµ С„РѕСЂРјСѓ Рё РґРѕР±Р°РІСЊС‚Рµ СЂРµРїР»РёРєСѓ.', 'If you want to continue the point, ask a follow-up question or leave a practical note, open the form and add your reply.'), ENT_QUOTES, 'UTF-8') ?></p>
-                <button class="pcmt-btn" type="button" data-comment-open><?= htmlspecialchars($t('РћСЃС‚Р°РІРёС‚СЊ РєРѕРјРјРµРЅС‚Р°СЂРёР№', 'Leave a comment'), ENT_QUOTES, 'UTF-8') ?></button>
+                <p><?= htmlspecialchars($t('Если хочется продолжить мысль, задать встречный вопрос или оставить свою практическую пометку, откройте форму и добавьте реплику.', 'If you want to continue the point, ask a follow-up question or leave a practical note, open the form and add your reply.'), ENT_QUOTES, 'UTF-8') ?></p>
+                <button class="pcmt-btn" type="button" data-comment-open><?= htmlspecialchars($t('Оставить комментарий', 'Leave a comment'), ENT_QUOTES, 'UTF-8') ?></button>
             </div>
             <div class="pcmt-compose-shell" id="pcmt-compose-shell">
                 <form class="pcmt-form" method="post" id="pcmt-comment-form">
@@ -341,21 +341,21 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
                         <button type="button" data-wrap="**" data-target="pcmt-text">B</button>
                         <button type="button" data-wrap="*" data-target="pcmt-text">I</button>
                         <button type="button" data-wrap="~~" data-target="pcmt-text">S</button>
-                        <button type="button" data-link-target="pcmt-text"><?= htmlspecialchars($t('РЎСЃС‹Р»РєР°', 'Link'), ENT_QUOTES, 'UTF-8') ?></button>
-                        <button type="button" data-prefix="рџ™‚ " data-target="pcmt-text">рџ™‚</button>
-                        <button type="button" data-prefix="рџ”Ґ " data-target="pcmt-text">рџ”Ґ</button>
-                        <button type="button" data-prefix="рџ§  " data-target="pcmt-text">рџ§ </button>
-                        <button type="button" data-prefix="вљ™пёЏ " data-target="pcmt-text">вљ™пёЏ</button>
+                        <button type="button" data-link-target="pcmt-text"><?= htmlspecialchars($t('Ссылка', 'Link'), ENT_QUOTES, 'UTF-8') ?></button>
+                        <button type="button" data-prefix="🙂 " data-target="pcmt-text">🙂</button>
+                        <button type="button" data-prefix="🔥 " data-target="pcmt-text">🔥</button>
+                        <button type="button" data-prefix="🧠 " data-target="pcmt-text">🧠</button>
+                        <button type="button" data-prefix="⚙️ " data-target="pcmt-text">⚙️</button>
                     </div>
                     <div class="pcmt-reply-state" id="pcmt-reply-state">
                         <span id="pcmt-reply-text"></span>
-                        <button class="pcmt-btn-ghost" type="button" data-comment-reply-clear><?= htmlspecialchars($t('РЎРЅСЏС‚СЊ РѕС‚РІРµС‚', 'Clear reply'), ENT_QUOTES, 'UTF-8') ?></button>
+                        <button class="pcmt-btn-ghost" type="button" data-comment-reply-clear><?= htmlspecialchars($t('Снять ответ', 'Clear reply'), ENT_QUOTES, 'UTF-8') ?></button>
                     </div>
-                    <textarea id="pcmt-text" name="body_markdown" placeholder="<?= htmlspecialchars($t('РџРѕРґРµР»РёС‚РµСЃСЊ СЃРІРѕРёРј РЅР°Р±Р»СЋРґРµРЅРёРµРј, РІРѕРїСЂРѕСЃРѕРј, РЅРµСЃРѕРіР»Р°СЃРёРµРј РёР»Рё РїСЂР°РєС‚РёС‡РµСЃРєРѕР№ РёСЃС‚РѕСЂРёРµР№ РїРѕ С‚РµРјРµ РјР°С‚РµСЂРёР°Р»Р°', 'Share an observation, question, disagreement or practical story related to the article'), ENT_QUOTES, 'UTF-8') ?>" required></textarea>
+                    <textarea id="pcmt-text" name="body_markdown" placeholder="<?= htmlspecialchars($t('Поделитесь своим наблюдением, вопросом, несогласием или практической историей по теме материала', 'Share an observation, question, disagreement or practical story related to the article'), ENT_QUOTES, 'UTF-8') ?>" required></textarea>
                     <div class="pcmt-form-foot">
-                        <span class="pcmt-node-meta"><span><?= htmlspecialchars($t('Р Р°Р·СЂРµС€РµРЅС‹: Р¶РёСЂРЅС‹Р№, РєСѓСЂСЃРёРІ, РїРµСЂРµС‡РµСЂРєРЅСѓС‚С‹Р№, СЃСЃС‹Р»РєР°, СЌРјРѕРґР·Рё', 'Supports bold, italic, strike, links and emoji'), ENT_QUOTES, 'UTF-8') ?></span></span>
+                        <span class="pcmt-node-meta"><span><?= htmlspecialchars($t('Разрешены: жирный, курсив, перечеркнутый, ссылка, эмодзи', 'Supports bold, italic, strike, links and emoji'), ENT_QUOTES, 'UTF-8') ?></span></span>
                         <div class="pcmt-guest-cta">
-                            <button class="pcmt-btn" type="submit"><?= htmlspecialchars($t('РћРїСѓР±Р»РёРєРѕРІР°С‚СЊ РєРѕРјРјРµРЅС‚Р°СЂРёР№', 'Publish comment'), ENT_QUOTES, 'UTF-8') ?></button>
+                            <button class="pcmt-btn" type="submit"><?= htmlspecialchars($t('Опубликовать комментарий', 'Publish comment'), ENT_QUOTES, 'UTF-8') ?></button>
                         </div>
                     </div>
                 </form>
@@ -366,7 +366,7 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
     <?php if (!empty($portalComments)): ?>
         <div class="pcmt-list"><?php $portalCommentTree($portalComments); ?></div>
     <?php else: ?>
-        <div class="pcmt-empty"><?= htmlspecialchars($t('РџРѕРґ СЌС‚РёРј РјР°С‚РµСЂРёР°Р»РѕРј РїРѕРєР° С‚РёС…Рѕ. РњРѕР¶РЅРѕ РѕСЃС‚Р°РІРёС‚СЊ РїРµСЂРІСѓСЋ СЂРµРїР»РёРєСѓ Рё РѕС‚РєСЂС‹С‚СЊ РѕР±СЃСѓР¶РґРµРЅРёРµ.', 'It is still quiet under this article. You can leave the first note and open the thread.'), ENT_QUOTES, 'UTF-8') ?></div>
+        <div class="pcmt-empty"><?= htmlspecialchars($t('Под этим материалом пока тихо. Можно оставить первую реплику и открыть обсуждение.', 'It is still quiet under this article. You can leave the first note and open the thread.'), ENT_QUOTES, 'UTF-8') ?></div>
     <?php endif; ?>
 </section>
 <script>
@@ -546,7 +546,7 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
                 if (!linkTarget) { return; }
                 var url = window.prompt('https://');
                 if (!url) { return; }
-                var text = window.prompt('РўРµРєСЃС‚ СЃСЃС‹Р»РєРё') || url;
+                var text = window.prompt('Текст ссылки') || url;
                 var linkInsert = '[' + text + '](' + url + ')';
                 var linkStart = linkTarget.selectionStart || 0;
                 var linkEnd = linkTarget.selectionEnd || 0;
@@ -564,7 +564,7 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
                 if (parentInput && replyState && replyText) {
                     openCompose();
                     parentInput.value = replyButton.getAttribute('data-comment-reply') || '0';
-                    replyText.textContent = 'в†і ' + (replyButton.getAttribute('data-comment-author') || '');
+                    replyText.textContent = '↳ ' + (replyButton.getAttribute('data-comment-author') || '');
                     replyState.classList.add('is-visible');
                 }
                 return;
