@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 if (!function_exists('seo_gen_settings_table_name')) {
     function seo_gen_settings_table_name(): string

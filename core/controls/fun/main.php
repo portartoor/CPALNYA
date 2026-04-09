@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 if (!isset($ModelPage) || !is_array($ModelPage)) {
     $ModelPage = [];
 }

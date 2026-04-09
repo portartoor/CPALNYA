@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $hostAuditView = strtolower((string)($_SERVER['MIRROR_DOMAIN_HOST'] ?? $_SERVER['HTTP_HOST'] ?? ''));
 if (strpos($hostAuditView, ':') !== false) {
     $hostAuditView = explode(':', $hostAuditView, 2)[0];

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 if (!function_exists('public_services_slugify')) {
     function public_services_slugify(string $raw): string

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 ini_set('display_errors', '0');
 
 define('DIR', dirname(__DIR__) . '/');

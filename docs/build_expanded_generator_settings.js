@@ -1,4 +1,4 @@
-﻿const fs = require('fs');
+const fs = require('fs');
 const path = require('path');
 const root = 'c:/Projects/myrepo/CPALNYA';
 const base = JSON.parse(fs.readFileSync(path.join(root,'docs','cpalnya_generator_settings.json'),'utf8'));

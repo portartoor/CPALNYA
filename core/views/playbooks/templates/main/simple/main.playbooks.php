@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $playbooks = (array)($ModelPage['playbooks'] ?? []);
 $items = (array)($playbooks['items'] ?? []);
 $selected = is_array($playbooks['selected'] ?? null) ? $playbooks['selected'] : null;
