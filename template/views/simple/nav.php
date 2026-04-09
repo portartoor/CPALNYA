@@ -37,7 +37,8 @@ if (function_exists('examples_fetch_clusters')) {
     $topicSections = ['journal', 'playbooks', 'signals', 'fun'];
     $seenTopicLabels = [];
     foreach ($topicSections as $topicSection) {
-        $clusters = array_values((array)examples_fetch_clusters($FRMWRK, (string)$host, $isRu ? 'ru' : 'en', 8, $topicSection));
+        $clusters = array_values((array)examples_fetch_clusters($FRMWRK, (string)$host, $isRu ? 'ru' : 'en', 2, $topicSection));
+        $sectionAdded = 0;
         foreach ($clusters as $cluster) {
             $cluster = (array)$cluster;
             $code = trim((string)($cluster['code'] ?? ''));
@@ -59,6 +60,10 @@ if (function_exists('examples_fetch_clusters')) {
                     : ('/' . trim($topicSection, '/') . '/' . $code . '/'),
                 'icon' => $sectionIcons[$topicSection] ?? '•',
             ];
+            $sectionAdded++;
+            if ($sectionAdded >= 2) {
+                break;
+            }
         }
     }
 }
