@@ -240,10 +240,22 @@ if (!function_exists('page_html_cache_has_auth_cookie')) {
         if (empty($_COOKIE) || !is_array($_COOKIE)) {
             return false;
         }
+        $sessionCookieNames = [];
+        $defaultSessionName = trim((string)session_name());
+        if ($defaultSessionName !== '') {
+            $sessionCookieNames[] = strtolower($defaultSessionName);
+        }
+        $sessionCookieNames[] = 'phpsessid';
+        $sessionCookieNames = array_values(array_unique(array_filter($sessionCookieNames, static function (string $name): bool {
+            return $name !== '';
+        })));
         foreach ($_COOKIE as $name => $_v) {
             $name = strtolower((string)$name);
             if ($name === '') {
                 continue;
+            }
+            if (in_array($name, $sessionCookieNames, true)) {
+                return true;
             }
             if (
                 $name === 'admin_token'
