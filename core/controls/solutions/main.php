@@ -3,6 +3,7 @@ if (!isset($ModelPage) || !is_array($ModelPage)) {
     $ModelPage = [];
 }
 
+$db = isset($FRMWRK) && is_object($FRMWRK) && method_exists($FRMWRK, 'DB') ? $FRMWRK->DB() : null;
 $host = public_portal_host();
 $lang = public_portal_lang($host);
 $path = parse_url((string)($_SERVER['REQUEST_URI'] ?? '/solutions/'), PHP_URL_PATH);
@@ -39,7 +40,11 @@ if ($selectedCode !== '' && function_exists('public_portal_fetch_solution_by_cod
         if ($selectedId > 0 && function_exists('public_portal_record_view')) {
             $solutionsData['selected']['view_count'] = public_portal_record_view($FRMWRK, 'solutions', $selectedId);
         }
-        if ($selectedId > 0 && function_exists('public_portal_fetch_comments')) {
+        $canUseComments = $db instanceof mysqli
+            && function_exists('public_portal_table_exists')
+            && public_portal_table_exists($db, 'public_comments')
+            && public_portal_table_exists($db, 'public_users');
+        if ($selectedId > 0 && $canUseComments && function_exists('public_portal_fetch_comments')) {
             $solutionsData['comments'] = public_portal_fetch_comments($FRMWRK, 'solutions', $selectedId);
             $solutionsData['comment_count'] = function_exists('public_portal_comment_count')
                 ? public_portal_comment_count((array)$solutionsData['comments'])

@@ -214,7 +214,9 @@ $clusterLabelByCode = static function (string $clusterCode) use ($clusters): str
     $fallback = str_replace(['-', '_'], ' ', $clusterCode);
     return trim(mb_convert_case($fallback, MB_CASE_TITLE, 'UTF-8'));
 };
-$sectionCrumbLabel = $issueTitle;
+$sectionCrumbLabel = isset($issueTitle) && trim((string)$issueTitle) !== ''
+    ? trim((string)$issueTitle)
+    : $t('Журнал', 'Journal');
 if ($sectionKey === 'playbooks') {
     $sectionCrumbLabel = $t('Практика', 'Playbooks');
 } elseif ($sectionKey === 'signals') {
