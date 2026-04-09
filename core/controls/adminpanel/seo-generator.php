@@ -226,6 +226,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             $queueId = (int)($_POST['queue_id'] ?? 0);
             $rowDate = trim((string)($_POST['job_date'] ?? ''));
             $time = trim((string)($_POST['planned_time'] ?? ''));
+            $campaignKey = trim((string)($_POST['campaign_key'] ?? ''));
+            $langCode = examples_normalize_lang((string)($_POST['lang_code'] ?? 'ru'));
+            $slotIndex = (int)($_POST['slot_index'] ?? 0);
             if ($queueId <= 0 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $rowDate) || !preg_match('/^\d{2}:\d{2}$/', $time)) {
                 $message = 'Invalid schedule update payload.';
                 $messageType = 'danger';
@@ -238,6 +241,20 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                         WHERE id = {$queueId} AND job_date = '{$jobDateSafe}'
                         LIMIT 1";
                 if (mysqli_query($DB, $sql)) {
+                    if ($hasCronRunsTable && $slotIndex > 0 && in_array($campaignKey, ['journal', 'playbooks', 'signals', 'fun'], true)) {
+                        $campaignSafe = mysqli_real_escape_string($DB, $campaignKey);
+                        $langSafe = mysqli_real_escape_string($DB, $langCode);
+                        mysqli_query(
+                            $DB,
+                            "UPDATE seo_article_cron_runs
+                             SET planned_at = '{$plannedAtSafe}', updated_at = NOW()
+                             WHERE job_date = '{$jobDateSafe}'
+                               AND lang_code = '{$langSafe}'
+                               AND campaign_key = '{$campaignSafe}'
+                               AND slot_index = {$slotIndex}
+                             LIMIT 1"
+                        );
+                    }
                     $message = 'Schedule time updated.';
                     $messageType = 'success';
                 } else {
@@ -420,12 +437,14 @@ if ($hasCronRunsTable) {
     $joinArticle = $hasExamplesTable
         ? "LEFT JOIN examples_articles ea ON ea.id = r.article_id"
         : "";
-    $sql = "SELECT r.id, r.job_date, r.lang_code, r.slot_index, r.planned_at, r.status, r.attempts, r.article_id, r.message,
+    $sql = "SELECT r.id, r.job_date, r.lang_code, r.campaign_key, r.slot_index, r.planned_at, r.status, r.attempts, r.article_id, r.message,
                    {$selectArticle}
             FROM seo_article_cron_runs r
             {$joinArticle}
             WHERE r.job_date = '{$dateSafe}'
-            ORDER BY r.lang_code ASC, r.slot_index ASC, r.id ASC";
+            ORDER BY
+                CASE r.campaign_key WHEN 'journal' THEN 1 WHEN 'playbooks' THEN 2 WHEN 'signals' THEN 3 WHEN 'fun' THEN 4 ELSE 9 END,
+                r.lang_code ASC, r.slot_index ASC, r.id ASC";
     $res = mysqli_query($DB, $sql);
     if ($res) {
         while ($row = mysqli_fetch_assoc($res)) {
@@ -437,13 +456,14 @@ if ($hasCronRunsTable) {
 
 if ($hasQueueTable) {
     $dateSafe = mysqli_real_escape_string($DB, $scheduleDate);
-    $sql = "SELECT id, job_date, lang_code, campaign_key, force_mode, dry_run, max_per_run, status, attempts,
+    $sql = "SELECT id, job_date, lang_code, campaign_key, force_mode, dry_run, max_per_run, slot_index, status, attempts,
                    planned_at, started_at, finished_at, last_exit_code, last_output, last_error, created_at, updated_at
             FROM seo_article_generation_queue
             WHERE job_date = '{$dateSafe}'
             ORDER BY
                 CASE campaign_key WHEN 'journal' THEN 1 WHEN 'playbooks' THEN 2 WHEN 'signals' THEN 3 WHEN 'fun' THEN 4 ELSE 9 END,
                 planned_at ASC,
+                slot_index ASC,
                 id ASC";
     $res = mysqli_query($DB, $sql);
     if ($res) {

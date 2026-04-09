@@ -132,6 +132,7 @@ function queue_table_ensure(mysqli $db): bool
         force_mode TINYINT(1) NOT NULL DEFAULT 0,
         dry_run TINYINT(1) NOT NULL DEFAULT 0,
         max_per_run INT NOT NULL DEFAULT 1,
+        slot_index INT NOT NULL DEFAULT 0,
         status ENUM('queued','processing','success','failed') NOT NULL DEFAULT 'queued',
         attempts INT NOT NULL DEFAULT 0,
         planned_at DATETIME DEFAULT NULL,
@@ -144,7 +145,7 @@ function queue_table_ensure(mysqli $db): bool
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         KEY idx_status_planned (status, planned_at),
-        KEY idx_job_lang (job_date, lang_code, campaign_key)
+        KEY idx_job_lang (job_date, lang_code, campaign_key, slot_index)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
     $ok = mysqli_query($db, $sql) !== false;
     if ($ok) {
@@ -156,8 +157,182 @@ function queue_table_ensure(mysqli $db): bool
         if (!$hasCampaignKey) {
             $ok = mysqli_query($db, "ALTER TABLE seo_article_generation_queue ADD COLUMN campaign_key VARCHAR(32) NOT NULL DEFAULT '' AFTER lang_code") !== false;
         }
+        $check = mysqli_query($db, "SHOW COLUMNS FROM seo_article_generation_queue LIKE 'slot_index'");
+        $hasSlotIndex = $check && mysqli_num_rows($check) > 0;
+        if ($check) {
+            mysqli_free_result($check);
+        }
+        if (!$hasSlotIndex) {
+            $ok = mysqli_query($db, "ALTER TABLE seo_article_generation_queue ADD COLUMN slot_index INT NOT NULL DEFAULT 0 AFTER max_per_run") !== false;
+        }
     }
     return $ok;
+}
+
+function queue_round_up_15_minute(int $minute): int
+{
+    $minute = max(0, $minute);
+    $mod = $minute % 15;
+    return $mod === 0 ? $minute : ($minute + (15 - $mod));
+}
+
+function queue_seed_unit(string $seed, string $key): float
+{
+    $hash = hash('sha256', $seed . '|' . $key);
+    $chunk = substr($hash, 0, 13);
+    $int = hexdec($chunk);
+    return max(0.0, min(0.999999, $int / 0x1FFFFFFFFFFFFF));
+}
+
+function queue_generate_irregular_slot_minutes(
+    string $jobDate,
+    string $lang,
+    string $salt,
+    int $startMinute,
+    int $endMinute,
+    int $target,
+    string $scope = 'full-day'
+): array {
+    $target = max(1, min(96, $target));
+    $startQuarter = max(0, (int)floor($startMinute / 15));
+    $endQuarter = min(95, (int)floor($endMinute / 15));
+    if ($endQuarter <= $startQuarter) {
+        return [queue_round_up_15_minute($startMinute)];
+    }
+
+    $available = $endQuarter - $startQuarter + 1;
+    if ($target >= $available) {
+        $minutes = [];
+        for ($quarter = $startQuarter; $quarter <= $endQuarter; $quarter++) {
+            $minutes[] = $quarter * 15;
+        }
+        return $minutes;
+    }
+
+    $seed = $jobDate . '|' . $lang . '|' . $salt . '|' . $scope;
+    $slots = [];
+    $first = $startQuarter + (int)floor(queue_seed_unit($seed, 'first') * min(4, max(1, $available - $target + 1)));
+    $slots[] = $first;
+
+    while (count($slots) < $target) {
+        $prev = $slots[count($slots) - 1];
+        $remainingSlots = $target - count($slots) - 1;
+        $minQuarter = min($endQuarter, $prev + 1);
+        $maxQuarter = $endQuarter - $remainingSlots;
+        if ($maxQuarter < $minQuarter) {
+            $maxQuarter = $minQuarter;
+        }
+        $window = $maxQuarter - $minQuarter + 1;
+        $pick = $minQuarter;
+        if ($window > 1) {
+            $pick += (int)floor(queue_seed_unit($seed, 'slot-' . count($slots)) * $window);
+        }
+        if ($pick <= $prev) {
+            $pick = $prev + 1;
+        }
+        if ($pick > $endQuarter) {
+            $pick = $endQuarter;
+        }
+        $slots[] = $pick;
+    }
+
+    $minutes = array_map(static function (int $slot): int {
+        return $slot * 15;
+    }, $slots);
+    sort($minutes, SORT_NUMERIC);
+    return array_values(array_unique($minutes));
+}
+
+function queue_daily_slots_ranged(
+    string $jobDate,
+    string $lang,
+    int $minCount,
+    int $maxCount,
+    string $salt,
+    int $startMinute
+): array {
+    $minCount = max(1, min(96, $minCount));
+    $maxCount = max($minCount, min(96, $maxCount));
+    $seed = $jobDate . '|' . $lang . '|' . $salt . '|count-ranged';
+    $spread = $maxCount - $minCount;
+    $target = $minCount + ($spread > 0 ? (int)floor(queue_seed_unit($seed, 'count') * ($spread + 1)) : 0);
+    $minutes = queue_generate_irregular_slot_minutes($jobDate, $lang, $salt, $startMinute, 23 * 60 + 45, $target, 'ranged');
+    $slots = [];
+    $slotIndex = 1;
+    foreach ($minutes as $minuteTotal) {
+        $hour = (int)floor($minuteTotal / 60);
+        $minute = $minuteTotal % 60;
+        $slots[$slotIndex] = sprintf('%s %02d:%02d:00', $jobDate, $hour, $minute);
+        $slotIndex++;
+    }
+    return $slots;
+}
+
+function queue_seed_salt_for_campaign(array $settings, string $campaignKey): string
+{
+    $base = trim((string)($settings['seed_salt'] ?? 'seo-article'));
+    $campaigns = (array)($settings['campaigns'] ?? []);
+    $campaign = (array)($campaigns[$campaignKey] ?? []);
+    $suffix = trim((string)($campaign['seed_salt_suffix'] ?? $campaignKey));
+    return $suffix !== '' ? ($base . '|' . $suffix) : $base;
+}
+
+function queue_upsert_cron_slot(mysqli $db, string $jobDate, string $lang, string $campaignKey, int $slotIndex, string $plannedAt): bool
+{
+    $jobDateSafe = mysqli_real_escape_string($db, $jobDate);
+    $langSafe = mysqli_real_escape_string($db, $lang);
+    $campaignSafe = mysqli_real_escape_string($db, $campaignKey);
+    $plannedSafe = mysqli_real_escape_string($db, $plannedAt);
+    $slotIndex = max(1, $slotIndex);
+    $sql = "INSERT INTO seo_article_cron_runs (job_date, lang_code, campaign_key, slot_index, planned_at, status, attempts, created_at, updated_at)
+            VALUES ('{$jobDateSafe}', '{$langSafe}', '{$campaignSafe}', {$slotIndex}, '{$plannedSafe}', 'pending', 0, NOW(), NOW())
+            ON DUPLICATE KEY UPDATE planned_at = VALUES(planned_at), updated_at = NOW()";
+    return mysqli_query($db, $sql) !== false;
+}
+
+function queue_fetch_cron_slots(mysqli $db, string $jobDate, string $lang, string $campaignKey): array
+{
+    $rows = [];
+    $jobDateSafe = mysqli_real_escape_string($db, $jobDate);
+    $langSafe = mysqli_real_escape_string($db, $lang);
+    $campaignSafe = mysqli_real_escape_string($db, $campaignKey);
+    $sql = "SELECT slot_index, planned_at
+            FROM seo_article_cron_runs
+            WHERE job_date = '{$jobDateSafe}'
+              AND lang_code = '{$langSafe}'
+              AND campaign_key = '{$campaignSafe}'
+            ORDER BY slot_index ASC";
+    $res = mysqli_query($db, $sql);
+    if ($res) {
+        while ($row = mysqli_fetch_assoc($res)) {
+            $rows[(int)($row['slot_index'] ?? 0)] = (string)($row['planned_at'] ?? '');
+        }
+        mysqli_free_result($res);
+    }
+    return $rows;
+}
+
+function queue_compute_slots(array $settings, string $jobDate, string $lang, string $campaignKey): array
+{
+    $campaigns = (array)($settings['campaigns'] ?? []);
+    $campaign = (array)($campaigns[$campaignKey] ?? []);
+    if (empty($campaign) || empty($campaign['enabled'])) {
+        return [];
+    }
+
+    $dailyMin = max(1, (int)($campaign['daily_min'] ?? 1));
+    $dailyMax = max($dailyMin, (int)($campaign['daily_max'] ?? $dailyMin));
+    $salt = queue_seed_salt_for_campaign($settings, $campaignKey);
+    $isTodayJob = ($jobDate === date('Y-m-d'));
+
+    if ($isTodayJob) {
+        $delayMin = max(1, min(360, (int)($settings['today_first_delay_min'] ?? 15)));
+        $minuteNow = ((int)date('G') * 60) + (int)date('i');
+        $startMinute = queue_round_up_15_minute($minuteNow + $delayMin);
+        return queue_daily_slots_ranged($jobDate, $lang, $dailyMin, $dailyMax, $salt, $startMinute);
+    }
+
+    return queue_daily_slots_ranged($jobDate, $lang, $dailyMin, $dailyMax, $salt, 0);
 }
 
 function queue_add_task(
@@ -168,18 +343,20 @@ function queue_add_task(
     bool $force,
     bool $dryRun,
     int $maxPerRun,
-    ?string $plannedAt = null
+    ?string $plannedAt = null,
+    int $slotIndex = 0
 ): bool {
     $jobDateSafe = mysqli_real_escape_string($db, $jobDate);
     $langSafe = mysqli_real_escape_string($db, examples_normalize_lang($lang));
     $campaignSafe = mysqli_real_escape_string($db, in_array($campaignKey, ['journal', 'playbooks', 'signals', 'fun'], true) ? $campaignKey : '');
+    $slotIndex = max(0, $slotIndex);
     $plannedSql = $plannedAt !== null && $plannedAt !== ''
         ? "'" . mysqli_real_escape_string($db, $plannedAt) . "'"
         : 'NOW()';
     $sql = "INSERT INTO seo_article_generation_queue
-            (job_date, lang_code, campaign_key, force_mode, dry_run, max_per_run, status, attempts, planned_at, created_at, updated_at)
+            (job_date, lang_code, campaign_key, force_mode, dry_run, max_per_run, slot_index, status, attempts, planned_at, created_at, updated_at)
             VALUES
-            ('{$jobDateSafe}', '{$langSafe}', '{$campaignSafe}', " . ($force ? 1 : 0) . ", " . ($dryRun ? 1 : 0) . ", " . (int)$maxPerRun . ", 'queued', 0, {$plannedSql}, NOW(), NOW())";
+            ('{$jobDateSafe}', '{$langSafe}', '{$campaignSafe}', " . ($force ? 1 : 0) . ", " . ($dryRun ? 1 : 0) . ", " . (int)$maxPerRun . ", {$slotIndex}, 'queued', 0, {$plannedSql}, NOW(), NOW())";
     return mysqli_query($db, $sql) !== false;
 }
 
@@ -187,7 +364,11 @@ function queue_add_daily_if_missing(mysqli $db, array $langs, string $jobDate): 
 {
     $added = 0;
     $jobDateSafe = mysqli_real_escape_string($db, $jobDate);
-    $campaigns = function_exists('seo_gen_default_campaigns') ? seo_gen_default_campaigns() : [];
+    $settings = function_exists('seo_gen_settings_get') ? seo_gen_settings_get($db) : [];
+    $campaigns = (array)($settings['campaigns'] ?? (function_exists('seo_gen_default_campaigns') ? seo_gen_default_campaigns() : []));
+    if (function_exists('seo_gen_cron_runs_table_ensure')) {
+        seo_gen_cron_runs_table_ensure($db);
+    }
     foreach ($langs as $langRaw) {
         $lang = examples_normalize_lang((string)$langRaw);
         $langSafe = mysqli_real_escape_string($db, $lang);
@@ -196,24 +377,39 @@ function queue_add_daily_if_missing(mysqli $db, array $langs, string $jobDate): 
                 continue;
             }
             $campaignSafe = mysqli_real_escape_string($db, $campaignKey);
-            $sql = "SELECT id
-                    FROM seo_article_generation_queue
-                    WHERE job_date = '{$jobDateSafe}'
-                      AND lang_code = '{$langSafe}'
-                      AND campaign_key = '{$campaignSafe}'
-                      AND status IN ('queued','processing','success')
-                    ORDER BY id DESC
-                    LIMIT 1";
-            $res = mysqli_query($db, $sql);
-            $exists = $res && mysqli_num_rows($res) > 0;
-            if ($res) {
-                mysqli_free_result($res);
+            $slots = queue_fetch_cron_slots($db, $jobDate, $lang, $campaignKey);
+            if (empty($slots)) {
+                $slots = queue_compute_slots($settings, $jobDate, $lang, $campaignKey);
+                foreach ($slots as $slotIndex => $plannedAt) {
+                    queue_upsert_cron_slot($db, $jobDate, $lang, $campaignKey, (int)$slotIndex, $plannedAt);
+                }
+                $slots = queue_fetch_cron_slots($db, $jobDate, $lang, $campaignKey);
             }
-            if ($exists) {
-                continue;
-            }
-            if (queue_add_task($db, $jobDate, $lang, $campaignKey, true, false, max(1, (int)($campaign['daily_max'] ?? 4)), null)) {
-                $added++;
+            foreach ($slots as $slotIndex => $plannedAt) {
+                $slotIndex = (int)$slotIndex;
+                if ($slotIndex <= 0 || trim((string)$plannedAt) === '') {
+                    continue;
+                }
+                $sql = "SELECT id
+                        FROM seo_article_generation_queue
+                        WHERE job_date = '{$jobDateSafe}'
+                          AND lang_code = '{$langSafe}'
+                          AND campaign_key = '{$campaignSafe}'
+                          AND slot_index = {$slotIndex}
+                          AND status IN ('queued','processing','success')
+                        ORDER BY id DESC
+                        LIMIT 1";
+                $res = mysqli_query($db, $sql);
+                $exists = $res && mysqli_num_rows($res) > 0;
+                if ($res) {
+                    mysqli_free_result($res);
+                }
+                if ($exists) {
+                    continue;
+                }
+                if (queue_add_task($db, $jobDate, $lang, $campaignKey, true, false, 1, (string)$plannedAt, $slotIndex)) {
+                    $added++;
+                }
             }
         }
     }
@@ -231,6 +427,9 @@ function queue_run_generation(array $task): array
         . ' --max-per-run=' . (int)$task['max_per_run'];
     if (!empty($task['campaign_key'])) {
         $cmd .= ' --campaign=' . escapeshellarg((string)$task['campaign_key']);
+    }
+    if ((int)($task['slot_index'] ?? 0) > 0) {
+        $cmd .= ' --slot-index=' . (int)$task['slot_index'];
     }
     if ((int)$task['force_mode'] === 1) {
         $cmd .= ' --force';
@@ -300,9 +499,10 @@ function queue_fetch_tasks(mysqli $db, int $limit): array
 {
     $limit = max(1, min(50, $limit));
     $rows = [];
-    $sql = "SELECT id, job_date, lang_code, campaign_key, force_mode, dry_run, max_per_run
+    $sql = "SELECT id, job_date, lang_code, campaign_key, force_mode, dry_run, max_per_run, slot_index
             FROM seo_article_generation_queue
             WHERE status = 'queued'
+              AND slot_index > 0
               AND (planned_at IS NULL OR planned_at <= NOW())
             ORDER BY planned_at ASC, id ASC
             LIMIT {$limit}";
@@ -371,8 +571,8 @@ if ($opts['mode'] === 'ensure') {
 
 if ($opts['mode'] === 'enqueue_test') {
     $campaign = $opts['campaign'] !== '' ? $opts['campaign'] : 'journal';
-    $okRu = queue_add_task($DB, $opts['job_date'], 'ru', $campaign, true, false, 1, $opts['planned_at'] !== '' ? $opts['planned_at'] : null);
-    $okEn = queue_add_task($DB, $opts['job_date'], 'en', $campaign, true, false, 1, $opts['planned_at'] !== '' ? $opts['planned_at'] : null);
+    $okRu = queue_add_task($DB, $opts['job_date'], 'ru', $campaign, true, false, 1, $opts['planned_at'] !== '' ? $opts['planned_at'] : null, 1);
+    $okEn = queue_add_task($DB, $opts['job_date'], 'en', $campaign, true, false, 1, $opts['planned_at'] !== '' ? $opts['planned_at'] : null, 1);
     queue_echo('Enqueued test jobs: RU=' . ($okRu ? 'ok' : 'fail') . ', EN=' . ($okEn ? 'ok' : 'fail'));
     exit(($okRu && $okEn) ? 0 : 1);
 }
@@ -395,7 +595,8 @@ if ($opts['mode'] === 'enqueue') {
             $opts['force'],
             $opts['dry_run'],
             $opts['max_per_run'],
-            $opts['planned_at'] !== '' ? $opts['planned_at'] : null
+            $opts['planned_at'] !== '' ? $opts['planned_at'] : null,
+            1
         )) {
             $added++;
         }

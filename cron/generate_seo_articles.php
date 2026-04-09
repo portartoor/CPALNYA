@@ -38,6 +38,7 @@ function seo_runtime_options(): array
         'job_date' => '',
         'langs' => [],
         'max_per_run' => null,
+        'slot_index' => null,
         'image_limit' => null,
         'campaign' => '',
     ];
@@ -91,6 +92,13 @@ function seo_runtime_options(): array
             $value = (int)trim(substr($arg, 14));
             if ($value > 0) {
                 $opts['max_per_run'] = $value;
+            }
+            continue;
+        }
+        if (strpos($arg, '--slot-index=') === 0) {
+            $value = (int)trim(substr($arg, 13));
+            if ($value > 0) {
+                $opts['slot_index'] = $value;
             }
             continue;
         }
@@ -6837,6 +6845,9 @@ if (!empty($cfg['campaign_key'])) {
     seo_echo('Campaign: ' . $cfg['campaign_key'] . ' -> section=' . (string)($cfg['campaign_material_section'] ?? 'journal'));
 }
 $slotCampaignKey = (string)($cfg['campaign_key'] ?? '');
+if ($runtime['slot_index'] !== null) {
+    seo_echo('Target slot: ' . (int)$runtime['slot_index']);
+}
 seo_echo('LLM provider: ' . $cfg['llm_provider'] . ', model: ' . $cfg['openai_model']);
 if ($cfg['llm_provider'] === 'openrouter' && !empty($cfg['openrouter_fallback_model'])) {
     seo_echo('OpenRouter fallback model: ' . (string)$cfg['openrouter_fallback_model']);
@@ -6874,6 +6885,16 @@ foreach ($cfg['langs'] as $lang) {
             }
             $slots = seo_fetch_slots($DB, $jobDate, $lang, $slotCampaignKey);
         }
+    }
+
+    if ($runtime['slot_index'] !== null) {
+        $targetSlotIndex = (int)$runtime['slot_index'];
+        $targetPlannedAt = $slots[$targetSlotIndex] ?? null;
+        if ($targetPlannedAt === null) {
+            seo_echo("Lang {$lang}: target slot {$targetSlotIndex} not found in schedule.");
+            continue;
+        }
+        $slots = [$targetSlotIndex => $targetPlannedAt];
     }
 
     $scheduleForSummary[$lang] = array_values($slots);

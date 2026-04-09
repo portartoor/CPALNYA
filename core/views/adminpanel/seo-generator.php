@@ -307,7 +307,7 @@
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
                 <h6 class="mb-1">Generation Queue</h6>
-                <div class="text-muted small">Daily queue for `journal`, `playbooks`, `signals` and `fun`, with status, attempts, logs and planned time.</div>
+                <div class="text-muted small">Queue rows are now created per article slot, with random planned time for each publication.</div>
             </div>
             <form method="GET" class="d-flex align-items-center gap-2">
                 <label class="small text-muted mb-0">Date</label>
@@ -326,7 +326,7 @@
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Campaign / Lang</th>
+                            <th>Campaign / Lang / Slot</th>
                             <th>Planned At</th>
                             <th>Status</th>
                             <th>Attempts</th>
@@ -361,7 +361,12 @@
                                 <td><?= (int)($row['id'] ?? 0) ?></td>
                                 <td>
                                     <div><b><?= htmlspecialchars($campaignKey !== '' ? $campaignKey : 'default') ?></b></div>
-                                    <div class="text-muted small"><?= htmlspecialchars((string)($row['lang_code'] ?? '')) ?></div>
+                                    <div class="text-muted small">
+                                        <?= htmlspecialchars((string)($row['lang_code'] ?? '')) ?>
+                                        <?php if ((int)($row['slot_index'] ?? 0) > 0): ?>
+                                            / slot <?= (int)($row['slot_index'] ?? 0) ?>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                                 <td><code><?= htmlspecialchars($plannedAtRaw) ?></code></td>
                                 <td><span class="badge text-bg-<?= $badge ?>"><?= htmlspecialchars($status) ?></span></td>
@@ -378,6 +383,9 @@
                                         <input type="hidden" name="action" value="update_queue_time">
                                         <input type="hidden" name="queue_id" value="<?= (int)($row['id'] ?? 0) ?>">
                                         <input type="hidden" name="job_date" value="<?= htmlspecialchars((string)($row['job_date'] ?? '')) ?>">
+                                        <input type="hidden" name="campaign_key" value="<?= htmlspecialchars((string)($row['campaign_key'] ?? '')) ?>">
+                                        <input type="hidden" name="lang_code" value="<?= htmlspecialchars((string)($row['lang_code'] ?? '')) ?>">
+                                        <input type="hidden" name="slot_index" value="<?= (int)($row['slot_index'] ?? 0) ?>">
                                         <input type="time" name="planned_time" class="form-control form-control-sm" value="<?= htmlspecialchars($plannedTime) ?>" required>
                                         <button class="btn btn-sm btn-outline-primary" type="submit">Save</button>
                                     </form>
@@ -394,8 +402,8 @@
     <?php if (!empty($hasCronRunsTable)): ?>
         <div class="card mt-4">
             <div class="card-header">
-                <h6 class="mb-1">Legacy Slot Table</h6>
-                <div class="text-muted small">Old `seo_article_cron_runs` rows are kept here for debugging while the new queue is primary.</div>
+                <h6 class="mb-1">Slot Schedule Mirror</h6>
+                <div class="text-muted small">`seo_article_cron_runs` keeps the actual per-slot publication schedule used by the generator.</div>
             </div>
             <div class="card-body">
                 <?php if (empty($scheduleRows)): ?>
@@ -406,7 +414,7 @@
                             <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Lang / Slot</th>
+                                <th>Campaign / Lang / Slot</th>
                                 <th>Planned At</th>
                                 <th>Status</th>
                                 <th>Attempts</th>
@@ -429,7 +437,10 @@
                                 ?>
                                 <tr>
                                     <td><?= (int)($row['id'] ?? 0) ?></td>
-                                    <td><b><?= htmlspecialchars((string)($row['lang_code'] ?? '')) ?></b> / slot <?= (int)($row['slot_index'] ?? 0) ?></td>
+                                    <td>
+                                        <b><?= htmlspecialchars((string)($row['campaign_key'] ?? '')) ?></b>
+                                        <div class="text-muted small"><?= htmlspecialchars((string)($row['lang_code'] ?? '')) ?> / slot <?= (int)($row['slot_index'] ?? 0) ?></div>
+                                    </td>
                                     <td><code><?= htmlspecialchars((string)($row['planned_at'] ?? '')) ?></code></td>
                                     <td><span class="badge text-bg-<?= $badge ?>"><?= htmlspecialchars($status) ?></span></td>
                                     <td><?= (int)($row['attempts'] ?? 0) ?></td>
