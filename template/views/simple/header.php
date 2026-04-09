@@ -1438,7 +1438,13 @@ if (isset($_GET['header_search_preview'])) {
         }
     }
     </style>
+    <?php if ($googleTagCode !== ''): ?>
+    <?= $googleTagCode . PHP_EOL ?>
+    <?php endif; ?>
 </head>
+<?php if ($yandexCounterCode !== ''): ?>
+<?= $yandexCounterCode . PHP_EOL ?>
+<?php endif; ?>
 <canvas id="terrainFieldGlobal" aria-hidden="true"></canvas>
 <header class="simple-header" id="cp-header">
     <a class="simple-brand" href="/" aria-label="<?= htmlspecialchars($logoAria, ENT_QUOTES, 'UTF-8') ?>">
