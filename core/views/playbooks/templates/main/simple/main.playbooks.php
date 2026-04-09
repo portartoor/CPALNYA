@@ -174,9 +174,14 @@ if ($issueImage === '') {
     $issueImage = '/april2026_new2.png';
 }
 $buildPageUrl = static function (?string $cluster = '', int $pageNum = 1) use ($sectionKey): string {
-    $base = function_exists('examples_cluster_list_path')
-        ? examples_cluster_list_path((string)$cluster, null, $sectionKey)
-        : '/playbooks/';
+    $cluster = trim((string)$cluster);
+    if ($cluster === '') {
+        $base = '/' . trim($sectionKey, '/') . '/';
+    } else {
+        $base = function_exists('examples_cluster_list_path')
+            ? examples_cluster_list_path($cluster, null, $sectionKey)
+            : '/playbooks/';
+    }
     if ($pageNum > 1) {
         $base .= '?' . http_build_query(['page' => $pageNum]);
     }

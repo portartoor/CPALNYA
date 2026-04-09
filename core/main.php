@@ -78,6 +78,12 @@ class Render {
 		}
 
 		$routeFirst = (string)($result['routes'][1] ?? '');
+			if (in_array($routeFirst, ['cases', 'offers'], true)) {
+				$result['routes'][1] = '404';
+				$result['routes_count'] = 1;
+				$result['extension'] = '404';
+				$routeFirst = '404';
+			}
 			if ($routeFirst === 'use' && $this->IsApiGeoOnlineHost()) {
 				$result['routes'][1] = 'tools';
 				if ($result['routes_count'] === 1) {
@@ -728,8 +734,6 @@ class Render {
 			$urls[] = ['loc' => $base.'/solutions/articles/', 'changefreq' => 'weekly', 'priority' => '0.9'];
 			$urls[] = ['loc' => $base.'/services/', 'changefreq' => 'weekly', 'priority' => '0.9'];
 			$urls[] = ['loc' => $base.'/projects/', 'changefreq' => 'weekly', 'priority' => '0.9'];
-			$urls[] = ['loc' => $base.'/cases/', 'changefreq' => 'weekly', 'priority' => '0.9'];
-			$urls[] = ['loc' => $base.'/offers/', 'changefreq' => 'weekly', 'priority' => '0.9'];
 			$urls[] = ['loc' => $base.'/contact/', 'changefreq' => 'weekly', 'priority' => '0.8'];
 			$urls[] = ['loc' => $base.'/audit/', 'changefreq' => 'weekly', 'priority' => '0.7'];
 			$urls[] = ['loc' => $base.'/terms/', 'changefreq' => 'monthly', 'priority' => '0.3'];
@@ -740,8 +744,6 @@ class Render {
 			$urls = array_merge($urls, $this->FetchSitemapBlogUrls($base));
 			$urls = array_merge($urls, $this->FetchSitemapServiceUrls($base));
 			$urls = array_merge($urls, $this->FetchSitemapProjectUrls($base));
-			$urls = array_merge($urls, $this->FetchSitemapCaseUrls($base));
-			$urls = array_merge($urls, $this->FetchSitemapOfferUrls($base));
 			$urls = array_merge($urls, $this->FetchSitemapMirrorRouteUrls($base));
 		}
 

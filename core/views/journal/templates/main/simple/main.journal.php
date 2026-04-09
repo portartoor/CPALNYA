@@ -173,9 +173,14 @@ if ($issueImage === '') {
     $issueImage = '/april2026_new2.png';
 }
 $buildPageUrl = static function (?string $cluster = '', int $pageNum = 1): string {
-    $base = function_exists('examples_cluster_list_path')
-        ? examples_cluster_list_path((string)$cluster, null)
-        : '/journal/';
+    $cluster = trim((string)$cluster);
+    if ($cluster === '') {
+        $base = '/journal/';
+    } else {
+        $base = function_exists('examples_cluster_list_path')
+            ? examples_cluster_list_path($cluster, null)
+            : '/journal/';
+    }
     if ($pageNum > 1) {
         $base .= '?' . http_build_query(['page' => $pageNum]);
     }

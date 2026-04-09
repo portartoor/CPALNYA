@@ -17,54 +17,10 @@ if (is_file($mirrorRoutesLib) && is_file($frmwrkLib)) {
     }
 }
 
-$hasCasesNav = false;
-foreach ($items as $navItem) {
+$items = array_values(array_filter($items, static function (array $navItem): bool {
     $navPath = (string)($navItem['path'] ?? '');
-    if ($navPath === '/cases/' || $navPath === '/cases') {
-        $hasCasesNav = true;
-        break;
-    }
-}
-if (!$hasCasesNav) {
-    $productsIndex = null;
-    foreach ($items as $idx => $navItem) {
-        $navPath = (string)($navItem['path'] ?? '');
-        if ($navPath === '/projects/' || $navPath === '/projects') {
-            $productsIndex = $idx;
-            break;
-        }
-    }
-    $casesItem = ['title' => 'Cases', 'path' => '/cases/'];
-    if ($productsIndex === null) {
-        $items[] = $casesItem;
-    } else {
-        array_splice($items, $productsIndex + 1, 0, [$casesItem]);
-    }
-}
-
-$hasOffersNav = false;
-foreach ($items as $navItem) {
-    $navPath = (string)($navItem['path'] ?? '');
-    if ($navPath === '/offers/' || $navPath === '/offers') {
-        $hasOffersNav = true;
-        break;
-    }
-}
-if (!$hasOffersNav) {
-    $insertIndex = null;
-    foreach ($items as $idx => $navItem) {
-        $navPath = (string)($navItem['path'] ?? '');
-        if ($navPath === '/cases/' || $navPath === '/cases' || $navPath === '/projects/' || $navPath === '/projects') {
-            $insertIndex = $idx;
-        }
-    }
-    $offersItem = ['title' => 'Offers', 'path' => '/offers/'];
-    if ($insertIndex === null) {
-        $items[] = $offersItem;
-    } else {
-        array_splice($items, $insertIndex + 1, 0, [$offersItem]);
-    }
-}
+    return !in_array($navPath, ['/cases/', '/cases', '/offers/', '/offers'], true);
+}));
 
 $host = strtolower((string)($_SERVER['MIRROR_DOMAIN_HOST'] ?? $_SERVER['HTTP_HOST'] ?? ''));
 if (strpos($host, ':') !== false) {
@@ -76,7 +32,6 @@ $titleByPathRu = [
     '/blog/' => 'Блог',
     '/services/' => 'Услуги',
     '/projects/' => 'Продукты',
-    '/cases/' => 'Кейсы',
     '/contact/' => 'Контакты',
     '/audit/' => 'Аудит',
 ];
@@ -85,7 +40,6 @@ $titleByPathEn = [
     '/blog/' => 'Blog',
     '/services/' => 'Services',
     '/projects/' => 'Products',
-    '/cases/' => 'Cases',
     '/contact/' => 'Contact',
     '/audit/' => 'Audit',
 ];
@@ -106,9 +60,6 @@ foreach ($items as $item):
         $title = $titleByPathRu[$path] ?? $title;
     } else {
         $title = $titleByPathEn[$path] ?? $title;
-    }
-    if ($path === '/offers/') {
-        $title = $isRu ? 'Офферы' : 'Offers';
     }
 ?>
     <a class="<?= $isActive ? 'is-active' : '' ?>" href="<?= htmlspecialchars($path, ENT_QUOTES, 'UTF-8') ?>">

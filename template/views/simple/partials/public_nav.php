@@ -15,7 +15,6 @@ $publicExamplesQuery = ($publicNavLang !== '') ? ['lang' => $publicNavLang] : []
 $publicHomeHref = function_exists('public_site_href') ? public_site_href('/') : '/';
 $publicDocsHref = function_exists('public_site_href') ? public_site_href('/docs/') : '/docs/';
 $publicExamplesHref = function_exists('public_site_href') ? public_site_href('/examples/', $publicExamplesQuery) : '/examples/';
-$publicCasesHref = function_exists('public_site_href') ? public_site_href('/cases/', $publicExamplesQuery) : '/cases/';
 $publicToolsHref = function_exists('public_site_href') ? public_site_href('/tools/', $publicExamplesQuery) : '/tools/';
 $publicDashboardHref = function_exists('public_site_href') ? public_site_href('/dashboard/') : '/dashboard/';
 ?>
@@ -43,9 +42,6 @@ $publicDashboardHref = function_exists('public_site_href') ? public_site_href('/
     <?php endif; ?>
     <?php if ($publicNavPage !== 'examples'): ?>
         <a class="<?= htmlspecialchars($publicGeoBtnClass) ?>" href="<?= htmlspecialchars($publicExamplesHref) ?>"><?= htmlspecialchars($t('Примеры', 'Examples')) ?></a>
-    <?php endif; ?>
-    <?php if ($publicNavPage !== 'cases'): ?>
-        <a class="<?= htmlspecialchars($publicGeoBtnClass) ?>" href="<?= htmlspecialchars($publicCasesHref) ?>"><?= htmlspecialchars($t('Кейсы', 'Case Studies')) ?></a>
     <?php endif; ?>
     <?php if ($publicNavPage !== 'tools'): ?>
         <a class="<?= htmlspecialchars($publicGeoBtnClass) ?>" href="<?= htmlspecialchars($publicToolsHref) ?>"><?= htmlspecialchars($t('Инструменты', 'Tools')) ?></a>

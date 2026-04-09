@@ -11,7 +11,7 @@ $logoAria = ($isRu ? $logoRu : 'PORT') . ' core';
 $requestPath = parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 $requestPath = is_string($requestPath) && $requestPath !== '' ? $requestPath : '/';
 $firstSegment = strtolower((string)(explode('/', trim($requestPath, '/'))[0] ?? ''));
-$section = in_array($firstSegment, ['blog', 'services', 'projects', 'cases', 'offers', 'contact', 'audit'], true) ? $firstSegment : 'home';
+$section = in_array($firstSegment, ['blog', 'services', 'projects', 'contact', 'audit'], true) ? $firstSegment : 'home';
 $scheme = (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ? 'https' : 'http';
 $faviconPrimary = '/favicon4.png';
 $favicon32 = $faviconPrimary;
@@ -140,7 +140,7 @@ $canonical = $scheme . '://' . $canonicalHost . $canonicalPath;
 $ruHost = 'portcore.ru';
 $enHost = 'portcore.online';
 $selfLang = $isRu ? 'ru' : 'en';
-$isEquivalentPath = in_array($canonicalPath, ['/', '/blog/', '/services/', '/projects/', '/cases/', '/offers/', '/contact/', '/audit/', '/privacy/', '/terms/'], true);
+$isEquivalentPath = in_array($canonicalPath, ['/', '/blog/', '/services/', '/projects/', '/contact/', '/audit/', '/privacy/', '/terms/'], true);
 $hreflangLinks = [];
 $hreflangLinks[] = ['lang' => $selfLang, 'href' => $canonical];
 if ($isEquivalentPath) {
