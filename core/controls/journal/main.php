@@ -261,24 +261,12 @@ if ($selectedArticle) {
     $ModelPage['og_type'] = $ModelPage['og_type'] ?? 'website';
 }
 
-$ModelPage['portal_user'] = function_exists('public_portal_current_user')
-    ? public_portal_current_user($FRMWRK)
-    : null;
-$ModelPage['portal_flash'] = function_exists('public_portal_flash_get')
-    ? public_portal_flash_get('portal')
-    : [];
-$ModelPage['portal_captcha'] = function_exists('public_portal_captcha_get')
-    ? public_portal_captcha_get()
-    : [];
+$ModelPage['portal_user'] = null;
+$ModelPage['portal_flash'] = [];
+$ModelPage['portal_captcha'] = [];
 $ModelPage['portal_comments'] = [];
 $ModelPage['portal_comment_total'] = 0;
 $ModelPage['portal_content_type'] = 'examples';
 $ModelPage['portal_content_id'] = (int)($selectedArticle['id'] ?? 0);
-if ($selectedArticle && function_exists('public_portal_fetch_comments')) {
-    $ModelPage['portal_comments'] = public_portal_fetch_comments($FRMWRK, 'examples', (int)$selectedArticle['id']);
-    $ModelPage['portal_comment_total'] = function_exists('public_portal_comment_total_for_content')
-        ? public_portal_comment_total_for_content($FRMWRK, 'examples', (int)$selectedArticle['id'])
-        : (function_exists('public_portal_comment_count') ? public_portal_comment_count((array)$ModelPage['portal_comments']) : 0);
-}
 
 $ModelPage['journal'] = $journalData;

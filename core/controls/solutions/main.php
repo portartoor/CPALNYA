@@ -35,22 +35,6 @@ $solutionsData = [
 
 if ($selectedCode !== '' && function_exists('public_portal_fetch_solution_by_code')) {
     $solutionsData['selected'] = public_portal_fetch_solution_by_code($FRMWRK, $host, $lang, $selectedCode);
-    if (is_array($solutionsData['selected'])) {
-        $selectedId = (int)($solutionsData['selected']['id'] ?? 0);
-        if ($selectedId > 0 && function_exists('public_portal_record_view')) {
-            $solutionsData['selected']['view_count'] = public_portal_record_view($FRMWRK, 'solutions', $selectedId);
-        }
-        $canUseComments = $db instanceof mysqli
-            && function_exists('public_portal_table_exists')
-            && public_portal_table_exists($db, 'public_comments')
-            && public_portal_table_exists($db, 'public_users');
-        if ($selectedId > 0 && $canUseComments && function_exists('public_portal_fetch_comments')) {
-            $solutionsData['comments'] = public_portal_fetch_comments($FRMWRK, 'solutions', $selectedId);
-            $solutionsData['comment_count'] = function_exists('public_portal_comment_count')
-                ? public_portal_comment_count((array)$solutionsData['comments'])
-                : count((array)$solutionsData['comments']);
-        }
-    }
 }
 
 $isRu = ($lang === 'ru');
@@ -68,6 +52,6 @@ $ModelPage['description'] = $isRu
     : 'ЦПАЛЬНЯ ready-made base: downloads, templates, analytics frameworks and practical articles for affiliate teams.';
 $ModelPage['canonical'] = $canonical;
 $ModelPage['solutions'] = $solutionsData;
-$ModelPage['portal_user'] = function_exists('public_portal_current_user') ? public_portal_current_user($FRMWRK) : null;
+$ModelPage['portal_user'] = null;
 $ModelPage['portal_flash'] = function_exists('public_portal_flash_get') ? public_portal_flash_get('portal') : [];
 $ModelPage['portal_comments'] = (array)($solutionsData['comments'] ?? []);

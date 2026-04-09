@@ -209,10 +209,8 @@ if ($titleHost !== '' && stripos($title, $titleHost) === false) {
 }
 $googleTagCode = trim((string)($_SERVER['MIRROR_GOOGLE_TAG_CODE'] ?? ''));
 $yandexCounterCode = trim((string)($_SERVER['MIRROR_YANDEX_COUNTER_CODE'] ?? ''));
-$publicPortalUser = function_exists('public_portal_current_user') ? public_portal_current_user($FRMWRK ?? null) : null;
-$publicPortalAvatar = (is_array($publicPortalUser) && function_exists('public_portal_user_avatar'))
-    ? public_portal_user_avatar($publicPortalUser)
-    : '';
+$publicPortalUser = null;
+$publicPortalAvatar = '';
 
 if (!function_exists('header_search_preview_results')) {
     function header_search_preview_tokens(string $query): array

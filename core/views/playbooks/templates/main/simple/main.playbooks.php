@@ -451,12 +451,7 @@ if ($sectionKey !== 'playbooks') {
                 </div>
             </article>
 
-            <?php
-            $portalCommentsPartial = DIR . 'core/views/partials/article_comments.php';
-            if (is_file($portalCommentsPartial)) {
-                include $portalCommentsPartial;
-            }
-            ?>
+            
 
             <?php if (!empty($relatedItems)): ?>
                 <section class="jrnl-related">
