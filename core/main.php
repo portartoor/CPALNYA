@@ -161,6 +161,19 @@ class Render {
 	private function DrawPage($FilePath) {
 		$routes = $this->GetRoutes();
 		include ('config.php');
+		$perfEnabled = $this->PerfProfilerEnabled();
+		$perfStartedAt = microtime(true);
+		$perfMarks = [];
+		$perfMark = function (string $label) use (&$perfMarks, $perfStartedAt, $perfEnabled): void {
+			if (!$perfEnabled) {
+				return;
+			}
+			$perfMarks[] = [
+				'label' => $label,
+				'time' => microtime(true) - $perfStartedAt,
+			];
+		};
+		$perfMark('drawpage:start');
 
 		$File = $FilePath;
 
@@ -219,7 +232,9 @@ class Render {
 		if (file_exists($footerSeoBlocksLib)) {
 			include_once($footerSeoBlocksLib);
 		}
+		$perfMark('libs:included');
 		$FRMWRK = new FRMWRK();
+		$perfMark('frmwrk:constructed');
 		$GLOBAL['main_lib']=$LibName;
 		$GLOBAL['lib_version']=$LibVersion;
 		$_SERVER['MIRROR_TEMPLATE_KEY'] = 'simple';
@@ -256,6 +271,7 @@ class Render {
 				exit;
 			}
 		}
+		$perfMark('mirror:resolved');
 
 		$previewTemplateKey = null;
 		if (function_exists('mirror_template_preview_key')) {
@@ -281,6 +297,7 @@ class Render {
 		if (function_exists('public_portal_handle_request')) {
 			public_portal_handle_request($FRMWRK);
 		}
+		$perfMark('request_handlers:handled');
 
 		$requestPath = parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 		$requestPath = is_string($requestPath) && $requestPath !== '' ? $requestPath : '/';
@@ -454,6 +471,7 @@ class Render {
 				}
 			}
 		}
+		$perfMark('page_cache:checked');
 
 		$resolvedMirrorRoute = null;
 		if (function_exists('mirror_routes_resolve')) {
@@ -483,6 +501,7 @@ class Render {
 				]);
 			}
 		}
+		$perfMark('analytics:logged');
 		
 		//include modules
 		$GLOBAL['modules']=$FRMWRK->GetModules();
@@ -490,6 +509,7 @@ class Render {
 			include ($LibsPath.'modules/'.$module.'/module.php');
 			$$module = new Module();
 		}
+		$perfMark('modules:loaded');
 		
 		//drawing the page by routes rules
 		if (is_array($resolvedMirrorRoute) && isset($resolvedMirrorRoute['paths']) && is_array($resolvedMirrorRoute['paths'])) {
@@ -564,10 +584,12 @@ class Render {
 				include($globalModel404);
 			}
 		}
+		$perfMark('model:included');
 		
 		if (file_exists($ControlsPath.$controlFile)) {
 			include($ControlsPath.$controlFile);
 		}
+		$perfMark('control:included');
 		
 		
 		if (isset($routes['routes'][1]) && in_array($routes['routes'][1], $NoUImode, true)) {
@@ -605,6 +627,7 @@ class Render {
 			}
 
 			include($templateHeaderFile);
+			$perfMark('template_header:included');
 
 			if ($mirrorDebugEnabled) {
 				$debugPayload = [
@@ -658,19 +681,90 @@ class Render {
 			else {
 				include($FilesPath.'404.php');
 			}
+			$perfMark('view:rendered');
 
 			include($templateFooterFile);
+			$perfMark('template_footer:included');
 
 			if ($renderBuffering) {
 				$fullPageOutput = (string)ob_get_clean();
 				echo $fullPageOutput;
 				page_html_cache_store($pageHtmlCacheSettings, $pageHtmlCacheContext, $fullPageOutput);
+				$perfMark('page_cache:stored');
 			}
 			
 			if (!file_exists($ViewsPath.$File)) {
 				die();
 			}
 		}
+		$perfMark('drawpage:end');
+		$this->PerfProfilerFlush($perfEnabled, $perfStartedAt, $perfMarks, [
+			'uri' => (string)($_SERVER['REQUEST_URI'] ?? '/'),
+			'path' => (string)$requestPath,
+			'host' => (string)($_SERVER['HTTP_HOST'] ?? ''),
+			'template' => (string)($_SERVER['MIRROR_TEMPLATE_SHELL'] ?? ''),
+			'file' => (string)$File,
+			'route_first' => (string)($routes['routes'][1] ?? ''),
+			'method' => (string)$methodUpper,
+		]);
+	}
+
+	private function PerfProfilerEnabled(): bool
+	{
+		$method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
+		if ($method !== 'GET') {
+			return false;
+		}
+		$requestPath = parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+		$requestPath = is_string($requestPath) && $requestPath !== '' ? $requestPath : '/';
+		if (
+			$requestPath === '/robots.txt'
+			|| $requestPath === '/sitemap.xml'
+			|| $requestPath === '/sitemap-images.xml'
+			|| strpos($requestPath, '/adminpanel') === 0
+			|| strpos($requestPath, '/dashboard') === 0
+			|| strpos($requestPath, '/api/') === 0
+		) {
+			return false;
+		}
+		return true;
+	}
+
+	private function PerfProfilerFlush(bool $enabled, float $startedAt, array $marks, array $context = []): void
+	{
+		if (!$enabled) {
+			return;
+		}
+
+		$totalMs = (microtime(true) - $startedAt) * 1000;
+		$force = isset($_GET['perf_debug']) && (string)$_GET['perf_debug'] === '1';
+		if (!$force && $totalMs < 400) {
+			return;
+		}
+
+		$parts = [];
+		$prev = 0.0;
+		foreach ($marks as $mark) {
+			$current = (float)($mark['time'] ?? 0.0);
+			$deltaMs = max(0.0, ($current - $prev) * 1000);
+			$parts[] = (string)($mark['label'] ?? 'step') . '=' . number_format($deltaMs, 1, '.', '') . 'ms';
+			$prev = $current;
+		}
+
+		$contextParts = [];
+		foreach ($context as $key => $value) {
+			$value = trim((string)$value);
+			if ($value === '') {
+				continue;
+			}
+			$contextParts[] = $key . '=' . $value;
+		}
+
+		error_log(
+			'FRONT PERF total=' . number_format($totalMs, 1, '.', '') . 'ms'
+			. (empty($contextParts) ? '' : ' ' . implode(' ', $contextParts))
+			. ' :: ' . implode(' | ', $parts)
+		);
 	}
 
 	private function ViewStartsWithHtmlShell(string $output): bool
