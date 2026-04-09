@@ -746,6 +746,15 @@ if (!function_exists('seo_gen_settings_normalize')) {
             $settings['portfolio_case_weight'] = 10;
             $settings['portfolio_product_weight'] = 10;
         }
+        $settings['preview_channel_enabled'] = (bool)($settings['preview_channel_enabled'] ?? true);
+        $settings['preview_channel_chat_id'] = trim((string)($settings['preview_channel_chat_id'] ?? ''));
+        $settings['preview_public_channel_enabled'] = (bool)($settings['preview_public_channel_enabled'] ?? false);
+        $settings['preview_public_channel_chat_id'] = trim((string)($settings['preview_public_channel_chat_id'] ?? ''));
+        $settings['preview_public_channel_bot_token'] = trim((string)($settings['preview_public_channel_bot_token'] ?? ''));
+        $settings['preview_public_channel_api_base'] = trim((string)($settings['preview_public_channel_api_base'] ?? 'https://api.telegram.org'));
+        if ($settings['preview_public_channel_api_base'] === '') {
+            $settings['preview_public_channel_api_base'] = 'https://api.telegram.org';
+        }
         $settings['preview_image_anchor_enforced'] = (bool)($settings['preview_image_anchor_enforced'] ?? true);
         $settings['preview_image_anchor_append'] = trim((string)($settings['preview_image_anchor_append'] ?? ''));
         $settings['indexnow_enabled'] = (bool)($settings['indexnow_enabled'] ?? false);

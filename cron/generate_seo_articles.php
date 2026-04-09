@@ -2394,6 +2394,9 @@ function seo_send_preview_post(array $cfg, string $lang, array $article): array
     $recipients = [];
     if ((bool)($cfg['preview_channel_enabled'] ?? false)) {
         $primaryChatIds = seo_parse_tg_chat_ids((string)($cfg['preview_channel_chat_id'] ?? ''));
+        if (empty($primaryChatIds)) {
+            seo_echo('Preview TG: primary channel enabled, but chat_id list is empty.');
+        }
         foreach ($primaryChatIds as $chatId) {
             $recipients[] = [
                 'chat_id' => $chatId,
@@ -2406,6 +2409,12 @@ function seo_send_preview_post(array $cfg, string $lang, array $article): array
         $publicChatIds = seo_parse_tg_chat_ids((string)($cfg['preview_public_channel_chat_id'] ?? ''));
         $publicBotToken = trim((string)($cfg['preview_public_channel_bot_token'] ?? ''));
         $publicApiBase = rtrim(trim((string)($cfg['preview_public_channel_api_base'] ?? 'https://api.telegram.org')), '/');
+        if (empty($publicChatIds)) {
+            seo_echo('Preview TG: public channel enabled, but chat_id list is empty.');
+        }
+        if ($publicBotToken === '') {
+            seo_echo('Preview TG: public channel enabled, but bot token is empty.');
+        }
         if ($publicBotToken !== '') {
             foreach ($publicChatIds as $chatId) {
                 $recipients[] = [
@@ -2424,6 +2433,7 @@ function seo_send_preview_post(array $cfg, string $lang, array $article): array
         seo_echo('Preview TG: no preview recipients configured, skip.');
         return ['status' => 'skipped_chat_empty'];
     }
+    seo_echo('Preview TG: recipients prepared = ' . count($recipients));
     $slug = (string)($article['slug'] ?? '');
     $url = $slug !== '' ? seo_article_public_url($lang, $slug, (string)($article['cluster_code'] ?? ''), (string)($article['material_section'] ?? 'journal')) : '';
     $postText = seo_build_tg_preview_text(
