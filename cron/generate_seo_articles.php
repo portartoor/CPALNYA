@@ -6845,13 +6845,13 @@ $startupProxyCandidates = seo_proxy_candidates($cfg);
 seo_echo('Proxy mode: ' . seo_proxy_mode_label($cfg, $startupProxyCandidates));
 seo_echo('Proxy candidates: ' . implode(', ', array_map('seo_proxy_entry_label', $startupProxyCandidates)));
 $isTodayJob = ($jobDate === date('Y-m-d'));
-$scheduleExistedAtStart = $runtime['dry_run'] ? true : seo_schedule_exists($DB, $jobDate);
+$scheduleExistedAtStart = $runtime['dry_run'] ? true : seo_schedule_exists($DB, $jobDate, $slotCampaignKey);
 $planningRun = (!$runtime['dry_run'] && !$scheduleExistedAtStart);
 $scheduleForSummary = [];
 $newScheduledSlots = 0;
 
 foreach ($cfg['langs'] as $lang) {
-    $slots = !$runtime['dry_run'] ? seo_fetch_slots($DB, $jobDate, $lang) : [];
+    $slots = !$runtime['dry_run'] ? seo_fetch_slots($DB, $jobDate, $lang, $slotCampaignKey) : [];
     if (empty($slots)) {
         if ($isTodayJob) {
             $delayMin = max(1, min(360, (int)$cfg['today_first_delay_min']));
@@ -6872,7 +6872,7 @@ foreach ($cfg['langs'] as $lang) {
                     }
                 }
             }
-            $slots = seo_fetch_slots($DB, $jobDate, $lang);
+            $slots = seo_fetch_slots($DB, $jobDate, $lang, $slotCampaignKey);
         }
     }
 
@@ -7136,7 +7136,12 @@ foreach ($cfg['langs'] as $lang) {
     }
 }
 
-if (!empty($cfg['notify_daily_schedule']) && $newScheduledSlots > 0 && !empty($scheduleForSummary)) {
+if (
+    empty($cfg['campaign_key'])
+    && !empty($cfg['notify_daily_schedule'])
+    && $newScheduledSlots > 0
+    && !empty($scheduleForSummary)
+) {
     seo_notify_telegram_schedule_summary($jobDate, $scheduleForSummary);
 }
 
