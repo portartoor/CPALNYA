@@ -407,7 +407,7 @@ function queue_add_daily_if_missing(mysqli $db, array $langs, string $jobDate): 
                 if ($exists) {
                     continue;
                 }
-                if (queue_add_task($db, $jobDate, $lang, $campaignKey, true, false, 1, (string)$plannedAt, $slotIndex)) {
+                if (queue_add_task($db, $jobDate, $lang, $campaignKey, false, false, 1, (string)$plannedAt, $slotIndex)) {
                     $added++;
                 }
             }
