@@ -33,7 +33,7 @@ $sectionIcons = [
 ];
 
 $importantTopicItems = [];
-if (function_exists('examples_fetch_clusters')) {
+if (false && function_exists('examples_fetch_clusters')) {
     $topicSections = ['journal', 'playbooks', 'signals', 'fun'];
     $seenTopicLabels = [];
     foreach ($topicSections as $topicSection) {
