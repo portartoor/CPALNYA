@@ -16,7 +16,7 @@ if ($section === 'blog') {
     $section = 'journal';
 }
 $scheme = (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ? 'https' : 'http';
-$faviconPrimary = $isRu ? '/favicon1.png' : '/favicon2.png';
+$faviconPrimary = '/favicon4.png';
 $favicon32 = $faviconPrimary;
 $favicon16 = $faviconPrimary;
 $faviconIco = '/favicon.ico';

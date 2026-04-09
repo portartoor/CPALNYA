@@ -13,7 +13,7 @@ $requestPath = is_string($requestPath) && $requestPath !== '' ? $requestPath : '
 $firstSegment = strtolower((string)(explode('/', trim($requestPath, '/'))[0] ?? ''));
 $section = in_array($firstSegment, ['blog', 'services', 'projects', 'cases', 'offers', 'contact', 'audit'], true) ? $firstSegment : 'home';
 $scheme = (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ? 'https' : 'http';
-$faviconPrimary = $isRu ? '/favicon1.png' : '/favicon2.png';
+$faviconPrimary = '/favicon4.png';
 $favicon32 = $faviconPrimary;
 $favicon16 = $faviconPrimary;
 $faviconIco = '/favicon.ico';
