@@ -348,10 +348,11 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
 .pcmt-reply-state{display:none;align-items:center;gap:10px;padding:10px 12px;border:1px solid rgba(122,180,255,.12);background:rgba(255,255,255,.03)}
 .pcmt-reply-state.is-visible{display:flex}
 .pcmt-list{display:grid;gap:14px}
-.pcmt-node{position:relative;padding-left:10px;scroll-margin-top:120px}
-.pcmt-node-line{position:absolute;left:0;top:0;bottom:-10px;width:1px;background:rgba(122,180,255,.26)}
-.pcmt-node:last-child > .pcmt-node-line{background:linear-gradient(180deg,rgba(122,180,255,.26) 0%,rgba(122,180,255,.26) 56%,rgba(122,180,255,0) 100%)}
-.pcmt-node::before{content:"";position:absolute;left:0;top:20px;width:10px;height:1px;background:rgba(122,180,255,.28)}
+.pcmt-node{position:relative;padding-left:18px;scroll-margin-top:120px}
+.pcmt-node-line{display:none}
+.pcmt-node::before{content:"";position:absolute;left:0;top:20px;width:18px;height:1px;background:rgba(122,180,255,.28)}
+.pcmt-node::after{content:"";position:absolute;left:0;top:-7px;bottom:7px;width:1px;background:rgba(122,180,255,.26)}
+.pcmt-node:last-child::after{background:linear-gradient(180deg,rgba(122,180,255,.26) 0%,rgba(122,180,255,.26) 58%,rgba(122,180,255,0) 100%)}
 .pcmt-node-card{display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:8px 12px;align-items:start;padding:9px 11px;border:1px solid rgba(122,180,255,.12);background:rgba(255,255,255,.025)}
 .pcmt-node-head{grid-column:1;grid-row:1;display:block;min-width:0}
 .pcmt-node-author{display:flex;align-items:center;gap:10px;min-width:0}
@@ -367,7 +368,9 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
 .pcmt-node-body p:last-child{margin-bottom:0}
 .pcmt-node-body ul{margin:12px 0 0;padding-left:18px}
 .pcmt-node-body a{color:var(--shell-accent)}
-.pcmt-children{display:grid;gap:10px;margin-top:10px;margin-left:18px}
+.pcmt-children{position:relative;display:grid;gap:10px;margin-top:12px;margin-left:24px}
+.pcmt-children::before{content:"";position:absolute;left:-24px;top:-12px;width:24px;height:12px;border-left:1px solid rgba(122,180,255,.26);border-bottom:1px solid rgba(122,180,255,.24)}
+.pcmt-children::after{content:"";position:absolute;left:0;top:-2px;width:1px;height:10px;background:rgba(122,180,255,.26)}
 .pcmt-node-actions{grid-column:2;grid-row:1 / 3;display:grid;justify-items:stretch;gap:7px;align-content:start}
 .pcmt-anchor{color:var(--shell-muted);text-decoration:none}
 .pcmt-rating{display:grid;gap:6px;justify-items:center}
