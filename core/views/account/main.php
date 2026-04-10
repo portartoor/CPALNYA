@@ -207,7 +207,7 @@ if ($user) {
                                 <input type="email" name="email" value="<?= htmlspecialchars($ownEmailValue, ENT_QUOTES, 'UTF-8') ?>" placeholder="<?= htmlspecialchars($t('Email', 'Email'), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="text" name="telegram_handle" value="<?= htmlspecialchars((string)($user['telegram_handle'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="Telegram">
                                 <input type="url" name="website_url" value="<?= htmlspecialchars((string)($user['website_url'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" placeholder="<?= htmlspecialchars($t('Сайт', 'Website'), ENT_QUOTES, 'UTF-8') ?>">
-                                <input class="pacc-field-full" type="file" name="avatar" accept="image/png,image/jpeg,image/gif">
+                                <input class="pacc-field-full" type="file" name="avatar" accept="image/png,image/jpeg,image/gif,image/webp">
                             </div>
                             <div class="pacc-actions">
                                 <button class="pacc-btn" type="submit"><?= htmlspecialchars($t('Сохранить открытую карточку', 'Save public card'), ENT_QUOTES, 'UTF-8') ?></button>

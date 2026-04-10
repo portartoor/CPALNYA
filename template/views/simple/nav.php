@@ -32,12 +32,19 @@ $sectionIcons = [
     'contact' => '✉',
 ];
 
+if (!function_exists('examples_fetch_clusters') && defined('DIR')) {
+    $examplesCommon = rtrim((string)DIR, '/\\') . '/core/controls/examples/_common.php';
+    if (is_file($examplesCommon)) {
+        require_once $examplesCommon;
+    }
+}
+
 $importantTopicItems = [];
 if (function_exists('examples_fetch_clusters')) {
     $topicSections = ['journal', 'playbooks', 'signals', 'fun'];
     $seenTopicLabels = [];
     foreach ($topicSections as $topicSection) {
-        $clusters = array_values((array)examples_fetch_clusters($FRMWRK, (string)$host, $isRu ? 'ru' : 'en', 2, $topicSection));
+        $clusters = array_values((array)examples_fetch_clusters($FRMWRK, (string)$host, $isRu ? 'ru' : 'en', 1, $topicSection));
         $sectionAdded = 0;
         foreach ($clusters as $cluster) {
             $cluster = (array)$cluster;
@@ -61,7 +68,7 @@ if (function_exists('examples_fetch_clusters')) {
                 'icon' => $sectionIcons[$topicSection] ?? '•',
             ];
             $sectionAdded++;
-            if ($sectionAdded >= 2) {
+            if ($sectionAdded >= 1) {
                 break;
             }
         }

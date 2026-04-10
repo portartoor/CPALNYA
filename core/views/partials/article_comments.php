@@ -316,6 +316,19 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
                         <button class="pcmt-btn" type="submit"><?= htmlspecialchars($t('Создать аккаунт и продолжить', 'Create account and continue'), ENT_QUOTES, 'UTF-8') ?></button>
                     </div>
                 </form>
+                <form class="pcmt-auth-form" method="post">
+                    <input type="hidden" name="action" value="public_portal_login">
+                    <input type="hidden" name="portal_csrf" value="<?= htmlspecialchars($portalCsrf, ENT_QUOTES, 'UTF-8') ?>">
+                    <input type="hidden" name="return_path" value="<?= htmlspecialchars($portalCurrentUrl, ENT_QUOTES, 'UTF-8') ?>">
+                    <input type="hidden" name="content_type" value="<?= htmlspecialchars($portalContentType, ENT_QUOTES, 'UTF-8') ?>">
+                    <input type="hidden" name="content_id" value="<?= $portalContentId ?>">
+                    <div><span class="pcmt-auth-kicker"><?= htmlspecialchars($t('Уже есть аккаунт', 'Already have an account'), ENT_QUOTES, 'UTF-8') ?></span></div>
+                    <div><input type="text" name="login" placeholder="<?= htmlspecialchars($t('Логин или email', 'Login or email'), ENT_QUOTES, 'UTF-8') ?>" required></div>
+                    <div><input type="password" name="password" placeholder="<?= htmlspecialchars($t('Пароль', 'Password'), ENT_QUOTES, 'UTF-8') ?>" required></div>
+                    <div class="pcmt-field-full pcmt-guest-cta">
+                        <button class="pcmt-btn-ghost" type="submit"><?= htmlspecialchars($t('Войти и продолжить', 'Sign in and continue'), ENT_QUOTES, 'UTF-8') ?></button>
+                    </div>
+                </form>
             </div>
         </div>
     <?php else: ?>
@@ -596,7 +609,7 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
             }
             var actionInput = form.querySelector('input[name="action"]');
             var action = actionInput ? actionInput.value : '';
-            if (['public_portal_register', 'public_portal_comment', 'public_portal_comment_vote'].indexOf(action) === -1) {
+            if (['public_portal_register', 'public_portal_login', 'public_portal_comment', 'public_portal_comment_vote'].indexOf(action) === -1) {
                 return;
             }
 

@@ -196,6 +196,14 @@ if (function_exists('examples_fetch_published_count') && function_exists('exampl
             (array)$playbooksData['items']
         );
     }
+    if (function_exists('public_portal_comment_total_for_content')) {
+        foreach ($playbooksData['items'] as $index => $row) {
+            $contentId = (int)($row['id'] ?? 0);
+            $playbooksData['items'][$index]['comment_count'] = $contentId > 0
+                ? public_portal_comment_total_for_content($FRMWRK, 'examples', $contentId)
+                : 0;
+        }
+    }
 }
 
 $scheme = (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ? 'https' : 'http';
@@ -324,6 +332,9 @@ if ($ModelPage['portal_content_id'] > 0) {
             (string)$ModelPage['portal_content_type'],
             (int)$ModelPage['portal_content_id']
         );
+        if (is_array($playbooksData['selected'] ?? null)) {
+            $playbooksData['selected']['comment_count'] = (int)$ModelPage['portal_comment_total'];
+        }
     }
 }
 

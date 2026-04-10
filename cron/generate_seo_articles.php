@@ -2393,8 +2393,39 @@ function seo_generate_image_asset(
     ];
 }
 
+function seo_pick_tg_preview_image_payload(array $cfg, string $lang, array $article): string
+{
+    $dataUrl = trim((string)($article['preview_image_data'] ?? ''));
+    if ($dataUrl !== '' && stripos($dataUrl, 'data:image/') === 0) {
+        return $dataUrl;
+    }
+
+    $candidates = [];
+    foreach (['preview_image_url', 'preview_image_thumb_url'] as $key) {
+        $raw = trim((string)($article[$key] ?? ''));
+        if ($raw === '') {
+            continue;
+        }
+        $url = seo_public_image_url_for_lang($lang, $raw);
+        if ($url !== '' && !in_array($url, $candidates, true)) {
+            $candidates[] = $url;
+        }
+    }
+
+    foreach ($candidates as $url) {
+        $fetched = seo_fetch_image_data_url_with_fallback($url, $cfg);
+        if ($fetched !== '') {
+            return $fetched;
+        }
+    }
+
+    return $candidates[0] ?? '';
+}
+
 function seo_send_preview_post(array $cfg, string $lang, array $article): array
 {
+    global $DB;
+
     $recipients = [];
     if ((bool)($cfg['preview_channel_enabled'] ?? false)) {
         $primaryChatIds = seo_parse_tg_chat_ids((string)($cfg['preview_channel_chat_id'] ?? ''));
@@ -2505,10 +2536,7 @@ function seo_send_preview_post(array $cfg, string $lang, array $article): array
     $captionChars = function_exists('mb_strlen') ? mb_strlen($captionText, 'UTF-8') : strlen($captionText);
     seo_echo('Preview TG: prepared text lengths, post_chars=' . $postChars . ', caption_chars=' . $captionChars);
 
-    $imageUrl = trim((string)($article['preview_image_data'] ?? ''));
-    if ($imageUrl === '') {
-        $imageUrl = seo_public_image_url_for_lang($lang, (string)($article['preview_image_url'] ?? ''));
-    }
+    $imageUrl = seo_pick_tg_preview_image_payload($cfg, $lang, $article);
     if ($imageUrl === '') {
         $imgAsset = seo_generate_image_asset($cfg, $lang, $article, (string)($article['preview_image_style'] ?? ''));
         $imageUrl = trim((string)($imgAsset['data_url'] ?? ''));
@@ -2521,6 +2549,22 @@ function seo_send_preview_post(array $cfg, string $lang, array $article): array
                 }
             }
         }
+        $articleId = (int)($article['article_id'] ?? $article['id'] ?? 0);
+        if ($articleId > 0 && $imageUrl !== '' && isset($DB) && $DB instanceof mysqli) {
+            $generatedUrl = (stripos($imageUrl, 'data:image/') === 0) ? '' : $imageUrl;
+            $generatedData = (stripos($imageUrl, 'data:image/') === 0) ? $imageUrl : '';
+            $storedPreview = seo_store_preview_assets_on_disk($cfg, $articleId, (string)($article['slug'] ?? ''), $generatedUrl, $generatedData);
+            if (!empty($storedPreview['stored'])) {
+                $storedUrl = (string)($storedPreview['image_url'] ?? $generatedUrl);
+                $storedThumb = (string)($storedPreview['thumb_url'] ?? '');
+                $storedData = (string)($storedPreview['image_data'] ?? '');
+                seo_update_article_preview_image($DB, $articleId, $storedUrl, $storedData, (string)($article['preview_image_style'] ?? ''), $storedThumb);
+                $article['preview_image_url'] = $storedUrl;
+                $article['preview_image_thumb_url'] = $storedThumb;
+                $article['preview_image_data'] = $storedData;
+                $imageUrl = seo_pick_tg_preview_image_payload($cfg, $lang, $article);
+            }
+        }
     }
     $results = [];
     $okCount = 0;
@@ -2528,6 +2572,7 @@ function seo_send_preview_post(array $cfg, string $lang, array $article): array
         $chatId = (string)($recipient['chat_id'] ?? '');
         $settingsOverride = is_array($recipient['settings'] ?? null) ? $recipient['settings'] : null;
         $recipientLabel = (string)($recipient['label'] ?? 'preview');
+        $requiresPhoto = ($recipientLabel === 'public');
         $sent = false;
         $status = 'failed';
         if ($imageUrl !== '') {
@@ -2547,10 +2592,15 @@ function seo_send_preview_post(array $cfg, string $lang, array $article): array
                 }
             }
             if (!$sent) {
-                seo_echo('Preview TG: photo send failed, fallback to text post.');
+                seo_echo($requiresPhoto
+                    ? 'Preview TG: photo send failed, public text fallback is disabled.'
+                    : 'Preview TG: photo send failed, fallback to text post.');
             }
+        } elseif ($requiresPhoto) {
+            seo_echo('Preview TG: public channel requires image, skip text-only post for chat ' . $chatId);
+            $status = 'skipped_public_image_empty';
         }
-        if (!$sent) {
+        if (!$sent && !$requiresPhoto) {
             seo_echo('Preview TG: sending text post to ' . $recipientLabel . ' chat ' . $chatId);
             if (seo_tg_send_message_to_chat($postText, $chatId, $settingsOverride)) {
                 seo_echo('Preview TG: text post sent.');
@@ -2559,6 +2609,9 @@ function seo_send_preview_post(array $cfg, string $lang, array $article): array
             } else {
                 seo_echo('Preview TG: text post failed.');
             }
+        } elseif (!$sent && $requiresPhoto && $imageUrl !== '') {
+            seo_echo('Preview TG: public channel requires image, skip text fallback for chat ' . $chatId);
+            $status = 'failed_public_photo';
         }
         if ($sent) {
             $okCount++;
@@ -2656,12 +2709,12 @@ function seo_tags_from_article(array $article, string $lang, int $limit = 4): ar
     );
 
     $candidates = [
-        '#SystemArchitecture' => ['architecture', 'Р°СЂС…Рё', 'system design', 'microservice', 'distributed'],
-        '#Engineering' => ['engineering', 'СЂР°Р·СЂР°Р±РѕС‚', 'implementation', 'production', 'backend'],
-        '#B2B' => ['b2b', 'enterprise', 'business', 'roi', 'РѕРїРµСЂР°С†'],
-        '#Security' => ['security', 'РєРёР±РµСЂ', 'threat', 'risk', 'hardening'],
+        '#SystemArchitecture' => ['architecture', 'архит', 'system design', 'microservice', 'distributed'],
+        '#Engineering' => ['engineering', 'разработ', 'implementation', 'production', 'backend'],
+        '#B2B' => ['b2b', 'enterprise', 'business', 'roi', 'операц'],
+        '#Security' => ['security', 'кибер', 'threat', 'risk', 'hardening'],
         '#DevOps' => ['devops', 'ci/cd', 'deployment', 'monitoring', 'observability'],
-        '#Analytics' => ['analytics', 'РјРµС‚СЂРёРє', 'dashboard', 'data', 'reporting'],
+        '#Analytics' => ['analytics', 'метрик', 'dashboard', 'data', 'reporting'],
         '#Product' => ['product', 'roadmap', 'feature', 'adoption', 'retention'],
         '#API' => ['api', 'endpoint', 'integration', 'sdk', 'token'],
     ];
@@ -2730,23 +2783,25 @@ function seo_tg_preview_generate_with_llm(
     $contentTail = mb_substr($content, 0, $contextChars);
     $isRu = ($lang === 'ru');
     $styleVariants = $isRu
-        ? ['РґРµР»РѕРІРѕР№ Рё РїСЂР°РєС‚РёС‡РЅС‹Р№', 'Р°РЅР°Р»РёС‚РёС‡РЅС‹Р№ Рё СЃРїРѕРєРѕР№РЅС‹Р№', 'РґСЂР°Р№РІРѕРІС‹Р№ Рё РїСЂРѕРґР°СЋС‰РёР№']
-        : ['practical and business-like', 'analytical and concise', 'dynamic and conversion-focused'];
+        ? ['деловой и практичный', 'аналитичный и спокойный', 'драйвовый и продающий', 'живой CPA-разбор с короткими блоками']
+        : ['practical and business-like', 'analytical and concise', 'dynamic and conversion-focused', 'affiliate Telegram style with short blocks'];
     $styleHint = $styleVariants[random_int(0, count($styleVariants) - 1)];
 
     $systemPrompt = $isRu
-        ? 'РўС‹ СЂРµРґР°РєС‚РѕСЂ Telegram-РєР°РЅР°Р»Р° Р»РёС‡РЅРѕРіРѕ СЃР°Р№С‚Р° Р°СЂС…РёС‚РµРєС‚РѕСЂР° СЃРёСЃС‚РµРј. РџРёС€Рё С‡РёС‚Р°Р±РµР»СЊРЅРѕ, СЂР°Р·РЅРѕРѕР±СЂР°Р·РЅРѕ, Р±РµР· С€Р°Р±Р»РѕРЅРЅРѕСЃС‚Рё.'
-        : 'You are a Telegram editor for a personal systems architect website. Write varied, clear, non-generic copy.';
+        ? 'Ты редактор Telegram-канала для CPA/affiliate-аудитории. Пиши живо, с короткими блоками, emoji-маркерами и HTML-разметкой, но без спама, кликбейта и кринжа.'
+        : 'You are a Telegram editor for a CPA/affiliate audience. Write lively short-block posts with emoji markers and HTML formatting, but avoid spam, clickbait, and cringe.';
 
     $userPrompt = ($isRu
-        ? "РЎРіРµРЅРµСЂРёСЂСѓР№ РўРћР›Р¬РљРћ JSON Р±РµР· markdown РґР»СЏ Р°РЅРѕРЅСЃР° СЃС‚Р°С‚СЊРё РІ Telegram.\n"
-          . "РЎС‚РёР»СЊ: {$styleHint}.\n"
-          . "РћРіСЂР°РЅРёС‡РµРЅРёСЏ: post_text {$postMinWords}-{$postMaxWords} СЃР»РѕРІ, caption_text {$captionMinWords}-{$captionMaxWords} СЃР»РѕРІ.\n"
-          . "РСЃРїРѕР»СЊР·СѓР№ Telegram HTML (<b>, <i>, <a href=\"...\">), 2-4 С‚РµРјР°С‚РёС‡РµСЃРєРёРµ РёРєРѕРЅРєРё, РЅРµ РґРµР»Р°Р№ РѕРґРЅРѕС‚РёРїРЅРѕ.\n"
-          . "Р’ РѕР±РѕРёС… С‚РµРєСЃС‚Р°С… РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ СЃСЃС‹Р»РєР° РЅР° СЃС‚Р°С‚СЊСЋ.\n"
-          . "Р¤РѕСЂРјР°С‚ РѕС‚РІРµС‚Р°:\n"
+        ? "Сгенерируй ТОЛЬКО JSON без markdown для анонса статьи в Telegram.\n"
+          . "Стиль: {$styleHint}.\n"
+          . "Ограничения: post_text {$postMinWords}-{$postMaxWords} слов, caption_text {$captionMinWords}-{$captionMaxWords} слов.\n"
+          . "Подача как в живых CPA/affiliate Telegram-каналах: хук в первой строке, короткие абзацы, жирные маркеры, 5-9 релевантных emoji в post_text и 3-6 emoji в caption_text.\n"
+          . "Используй Telegram HTML (<b>, <i>, <a href=\"...\">), маркеры вроде ⚡️, 🎯, 🧠, 📌, 🧩, 🚀, 🔥, 💸, 🛠, ✅, но не перегружай и не ставь emoji в каждую строку.\n"
+          . "Можно использовать CPA-лексикон без токсичности: связка, фарм, трекер, конверт, тест, продакшен, трафик, команда, если это подходит статье.\n"
+          . "В обоих текстах обязательна ссылка на статью.\n"
+          . "Формат ответа:\n"
           . "{\n  \"post_text\": \"...\",\n  \"caption_text\": \"...\",\n  \"tags\": [\"#Tag1\", \"#Tag2\"]\n}\n\n"
-          . "РўРµРіРё РїРѕРґР±РёСЂР°Р№ РїРѕ СЃРјС‹СЃР»Сѓ СЃС‚Р°С‚СЊРё, РЅРµ С€Р°Р±Р»РѕРЅРЅРѕ.\n"
+          . "Теги подбирай по смыслу статьи, не шаблонно.\n"
           . "TITLE: {$title}\n"
           . "URL: {$url}\n"
           . "EXCERPT: {$excerpt}\n"
@@ -2754,7 +2809,9 @@ function seo_tg_preview_generate_with_llm(
         : "Return JSON only (no markdown) for Telegram promotion of an article.\n"
           . "Style: {$styleHint}.\n"
           . "Limits: post_text {$postMinWords}-{$postMaxWords} words, caption_text {$captionMinWords}-{$captionMaxWords} words.\n"
-          . "Use Telegram HTML (<b>, <i>, <a href=\"...\">), 2-4 relevant emojis, avoid repetitive template style.\n"
+          . "Write like a sharp CPA/affiliate Telegram channel: strong hook in the first line, short paragraphs, bold markers, 5-9 relevant emojis in post_text and 3-6 emojis in caption_text.\n"
+          . "Use Telegram HTML (<b>, <i>, <a href=\"...\">), markers like ⚡️, 🎯, 🧠, 📌, 🧩, 🚀, 🔥, 💸, 🛠, ✅, but do not overload every line.\n"
+          . "Use affiliate vocabulary when relevant: funnel, tracker, conversion, traffic, ops, test, production, team.\n"
           . "Both texts must include the article link.\n"
           . "Response format:\n"
           . "{\n  \"post_text\": \"...\",\n  \"caption_text\": \"...\",\n  \"tags\": [\"#Tag1\", \"#Tag2\"]\n}\n\n"
@@ -2796,6 +2853,13 @@ function seo_build_tg_preview_text(string $lang, array $article, string $url, in
     $isRu = ($lang === 'ru');
     $titleRaw = trim((string)($article['title'] ?? ''));
     $title = htmlspecialchars($titleRaw, ENT_QUOTES, 'UTF-8');
+    $emojiSets = [
+        ['🔥', '🎯', '🧠', '📌'],
+        ['⚡️', '🧩', '🚀', '✅'],
+        ['💸', '🛠', '📍', '👀'],
+    ];
+    $emojiSet = $emojiSets[random_int(0, count($emojiSets) - 1)];
+    [$leadEmoji, $insideEmoji, $noteEmoji, $linkEmoji] = $emojiSet;
 
     $excerpt = seo_strip_html_to_text((string)($article['excerpt_html'] ?? ''));
     if ($excerpt === '') {
@@ -2810,7 +2874,7 @@ function seo_build_tg_preview_text(string $lang, array $article, string $url, in
         $wordsCount = is_array($parts) ? count($parts) : 0;
     }
     if ($wordsCount < $minWords) {
-        $fillerRu = 'Р Р°Р·Р±РѕСЂ РѕС…РІР°С‚С‹РІР°РµС‚ РїСЂР°РєС‚РёС‡РµСЃРєРёРµ С€Р°РіРё РІРЅРµРґСЂРµРЅРёСЏ, С‚РёРїРѕРІС‹Рµ РѕС€РёР±РєРё Рё СЂРµРєРѕРјРµРЅРґР°С†РёРё РїРѕ РЅР°РґРµР¶РЅРѕР№ Р°СЂС…РёС‚РµРєС‚СѓСЂРµ Рё СЌРєСЃРїР»СѓР°С‚Р°С†РёРё РІ РїСЂРѕРґР°РєС€РµРЅРµ.';
+        $fillerRu = 'Разбор охватывает практические шаги внедрения, типовые ошибки и рекомендации по надежной архитектуре и эксплуатации в продакшене.';
         $fillerEn = 'This overview adds practical implementation steps, common pitfalls, and recommendations for reliable production architecture and operations.';
         $base = trim($excerpt);
         $filler = $isRu ? $fillerRu : $fillerEn;
@@ -2822,23 +2886,27 @@ function seo_build_tg_preview_text(string $lang, array $article, string $url, in
 
     if ($isRu) {
         $lines = [
-            '<b>' . $title . '</b>',
+            $leadEmoji . ' <b>' . $title . '</b>',
             '',
-            $excerptEscaped,
+            $insideEmoji . ' <b>Что внутри:</b> ' . $excerptEscaped,
+            '',
+            $noteEmoji . ' <i>Для тех, кто смотрит на связки, трафик и продакшен без розовых очков.</i>',
         ];
         if ($url !== '') {
             $lines[] = '';
-            $lines[] = '<a href="' . $urlEscaped . '">Читать полностью</a>';
+            $lines[] = $linkEmoji . ' <a href="' . $urlEscaped . '">Читать полностью</a>';
         }
     } else {
         $lines = [
-            '<b>' . $title . '</b>',
+            $leadEmoji . ' <b>' . $title . '</b>',
             '',
-            $excerptEscaped,
+            $insideEmoji . ' <b>Inside:</b> ' . $excerptEscaped,
+            '',
+            $noteEmoji . ' <i>For teams that care about traffic, funnels, and production reality.</i>',
         ];
         if ($url !== '') {
             $lines[] = '';
-            $lines[] = '<a href="' . $urlEscaped . '">Read full article</a>';
+            $lines[] = $linkEmoji . ' <a href="' . $urlEscaped . '">Read full article</a>';
         }
     }
     return implode("\n", $lines);

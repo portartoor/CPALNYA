@@ -950,6 +950,7 @@ if (isset($_GET['header_search_preview'])) {
         align-items: center;
         align-self: center;
         overflow: visible;
+        order: 1;
     }
     .simple-account-trigger {
         display: inline-flex;
@@ -1069,7 +1070,9 @@ if (isset($_GET['header_search_preview'])) {
         cursor: pointer;
         color: rgba(235,243,252,.9);
         transition: color .2s ease, transform .2s ease, opacity .2s ease;
+        order: 2;
     }
+    .simple-nav-toggle { order: 3; }
     .simple-search-toggle-icon {
         position: relative;
         width: 15px;
@@ -1952,6 +1955,54 @@ if (isset($_GET['header_search_preview'])) {
             setSearchState(!isOpen);
         });
     }
+    document.addEventListener('submit', function (event) {
+        var form = event.target;
+        if (!(form instanceof HTMLFormElement) || !form.classList.contains('jrnl-favorite-form')) {
+            return;
+        }
+        event.preventDefault();
+        var button = form.querySelector('.jrnl-favorite-btn');
+        var label = form.querySelector('.jrnl-share-label');
+        var activeText = form.getAttribute('data-favorite-active-label') || 'Saved';
+        var idleText = form.getAttribute('data-favorite-idle-label') || 'Save to favorites';
+        if (button) {
+            button.disabled = true;
+        }
+        fetch(window.location.href, {
+            method: 'POST',
+            body: new FormData(form),
+            credentials: 'same-origin',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        }).then(function (response) {
+            return response.json();
+        }).then(function (payload) {
+            if (!payload || typeof payload !== 'object') {
+                window.location.reload();
+                return;
+            }
+            if (payload.ok === false) {
+                window.location.href = payload.redirect_url || '/account/';
+                return;
+            }
+            var saved = !!payload.saved;
+            if (button) {
+                button.classList.toggle('is-active', saved);
+                button.setAttribute('aria-pressed', saved ? 'true' : 'false');
+            }
+            if (label) {
+                label.textContent = saved ? activeText : idleText;
+            }
+        }).catch(function () {
+            window.location.reload();
+        }).finally(function () {
+            if (button) {
+                button.disabled = false;
+            }
+        });
+    });
     btn.addEventListener('click', function () {
         var isOpen = document.body.classList.contains('simple-nav-open');
         setSearchState(false);

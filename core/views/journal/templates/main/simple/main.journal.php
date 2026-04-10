@@ -4,6 +4,7 @@ $items = (array)($journal['items'] ?? []);
 $selected = is_array($journal['selected'] ?? null) ? $journal['selected'] : null;
 $portalUser = is_array($ModelPage['portal_user'] ?? null) ? $ModelPage['portal_user'] : null;
 $portalIsFavorite = !empty($ModelPage['portal_is_favorite']);
+$portalCommentTotal = (int)($ModelPage['portal_comment_total'] ?? 0);
 $portalCsrf = function_exists('public_portal_csrf_token') ? public_portal_csrf_token('portal') : '';
 $issue = (array)($journal['issue'] ?? []);
 $clusters = (array)($journal['clusters'] ?? []);
@@ -245,6 +246,13 @@ $shareIcon = static function (string $network): string {
     ];
     return $icons[$network] ?? '';
 };
+$statIcon = static function (string $type): string {
+    $icons = [
+        'eye' => '<svg class="jrnl-stat-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 5.2c5.2 0 8.7 4.4 9.7 5.8.4.6.4 1.4 0 2-1 1.4-4.5 5.8-9.7 5.8S3.3 14.4 2.3 13a1.8 1.8 0 0 1 0-2c1-1.4 4.5-5.8 9.7-5.8Zm0 2C7.9 7.2 5 10.6 4 12c1 1.4 3.9 4.8 8 4.8s7-3.4 8-4.8c-1-1.4-3.9-4.8-8-4.8Zm0 1.7a3.1 3.1 0 1 1 0 6.2 3.1 3.1 0 0 1 0-6.2Zm0 2a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2Z"/></svg>',
+        'comments' => '<svg class="jrnl-stat-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 4h14a3 3 0 0 1 3 3v7.2a3 3 0 0 1-3 3h-7.1l-5.2 3.9a1 1 0 0 1-1.6-.8v-3.1H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Zm14 2H5a1 1 0 0 0-1 1v7.2a1 1 0 0 0 1 1h1.1a1 1 0 0 1 1 1v2.1l3.9-2.9a1 1 0 0 1 .6-.2H19a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1Z"/></svg>',
+    ];
+    return $icons[$type] ?? '';
+};
 $relatedItems = [];
 if ($selected) {
     foreach ($items as $item) {
@@ -283,13 +291,18 @@ if ($selected) {
 .jrnl-card-media{aspect-ratio:16/10;background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));border:1px solid rgba(255,255,255,.08);overflow:hidden}
 .jrnl-card-media img{width:100%;height:100%;object-fit:cover;display:block}
 .jrnl-card h3{margin:0;font:700 1.28rem/1.15 "Space Grotesk","Sora",sans-serif;letter-spacing:-.03em}
-.jrnl-card-foot{display:flex;justify-content:space-between;gap:10px;color:var(--shell-muted);font-size:12px;text-transform:uppercase;letter-spacing:.12em}
+.jrnl-card-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--shell-muted);font-size:12px;text-transform:uppercase;letter-spacing:.12em}
+.jrnl-card-stats{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 .jrnl-stat{display:inline-flex;align-items:center;gap:7px}
-.jrnl-stat-eye{display:inline-block;font-style:normal;font-size:13px;line-height:1;opacity:.82}
+.jrnl-stat-icon{width:15px;height:15px;display:block;flex:0 0 15px;opacity:.86}
 .jrnl-pager{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
 .jrnl-pager a,.jrnl-pager span{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:10px 14px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-muted);text-decoration:none}
 .jrnl-pager .is-active{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.12)}
 .jrnl-detail{display:grid;gap:18px}
+.jrnl-detail-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.jrnl-detail-stats{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-left:auto}
+.jrnl-stat-link{color:var(--shell-muted);text-decoration:none}
+.jrnl-stat-link:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
 .jrnl-breadcrumbs{display:flex;flex-wrap:wrap;gap:10px;align-items:center;color:rgba(214,235,255,.78);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
 .jrnl-breadcrumbs a{color:rgba(214,235,255,.72);text-decoration:none}
 .jrnl-breadcrumbs a:hover{color:var(--shell-text)}
@@ -367,18 +380,24 @@ if ($selected) {
             }
             ?>
             <article class="jrnl-detail">
-                <?php if (!empty($detailBreadcrumbs)): ?>
-                    <nav class="jrnl-breadcrumbs" aria-label="<?= htmlspecialchars($t('Хлебные крошки', 'Breadcrumbs'), ENT_QUOTES, 'UTF-8') ?>">
-                        <?php foreach ($detailBreadcrumbs as $index => $crumb): ?>
-                            <?php if ($index > 0): ?><span class="jrnl-breadcrumb-sep">/</span><?php endif; ?>
-                            <?php if (!empty($crumb['url'])): ?>
-                                <a href="<?= htmlspecialchars((string)$crumb['url'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)$crumb['label'], ENT_QUOTES, 'UTF-8') ?></a>
-                            <?php else: ?>
-                                <span class="jrnl-breadcrumb-current"><?= htmlspecialchars((string)$crumb['label'], ENT_QUOTES, 'UTF-8') ?></span>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    </nav>
-                <?php endif; ?>
+                <div class="jrnl-detail-top">
+                    <?php if (!empty($detailBreadcrumbs)): ?>
+                        <nav class="jrnl-breadcrumbs" aria-label="<?= htmlspecialchars($t('Хлебные крошки', 'Breadcrumbs'), ENT_QUOTES, 'UTF-8') ?>">
+                            <?php foreach ($detailBreadcrumbs as $index => $crumb): ?>
+                                <?php if ($index > 0): ?><span class="jrnl-breadcrumb-sep">/</span><?php endif; ?>
+                                <?php if (!empty($crumb['url'])): ?>
+                                    <a href="<?= htmlspecialchars((string)$crumb['url'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)$crumb['label'], ENT_QUOTES, 'UTF-8') ?></a>
+                                <?php else: ?>
+                                    <span class="jrnl-breadcrumb-current"><?= htmlspecialchars((string)$crumb['label'], ENT_QUOTES, 'UTF-8') ?></span>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </nav>
+                    <?php endif; ?>
+                    <div class="jrnl-detail-stats">
+                        <span class="jrnl-meta jrnl-stat"><?= $statIcon('eye') ?><?= (int)($selected['view_count'] ?? 0) ?></span>
+                        <a class="jrnl-meta jrnl-stat jrnl-stat-link" href="#article-comments"><?= $statIcon('comments') ?><?= (int)$portalCommentTotal ?></a>
+                    </div>
+                </div>
                 <span class="jrnl-kicker"><?= htmlspecialchars((string)($issue['issue_title'] ?? $t('Журнал', 'Journal')), ENT_QUOTES, 'UTF-8') ?></span>
                 <h1><?= htmlspecialchars((string)($selected['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h1>
                 <div class="jrnl-tags">
@@ -387,7 +406,6 @@ if ($selected) {
                     <?php endif; ?>
                     <span class="jrnl-meta"><?= htmlspecialchars((string)($selected['published_at'] ?? $selected['created_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
                     <?php if (!empty($selected['author_name'])): ?><span class="jrnl-meta"><?= htmlspecialchars((string)$selected['author_name'], ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
-                    <span class="jrnl-meta jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($selected['view_count'] ?? 0) ?></span>
                 </div>
                 <?php if ($selectedIntroHtml !== ''): ?>
                     <div class="jrnl-detail-intro"><?= $selectedIntroHtml ?></div>
@@ -420,7 +438,7 @@ if ($selected) {
                             <span class="jrnl-share-label">WhatsApp</span>
                         </a>
                         <?php if ($portalUser && !empty($selected['id'])): ?>
-                            <form class="jrnl-favorite-form" method="post">
+                            <form class="jrnl-favorite-form" method="post" data-favorite-active-label="<?= htmlspecialchars($t('В избранном', 'Saved'), ENT_QUOTES, 'UTF-8') ?>" data-favorite-idle-label="<?= htmlspecialchars($t('Добавить в избранное', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="action" value="public_portal_favorite_toggle">
                                 <input type="hidden" name="portal_csrf" value="<?= htmlspecialchars($portalCsrf, ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="return_path" value="<?= htmlspecialchars((string)($_SERVER['REQUEST_URI'] ?? '/'), ENT_QUOTES, 'UTF-8') ?>">
@@ -463,7 +481,10 @@ if ($selected) {
                                 <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                                 <p><?= htmlspecialchars($strip((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 140), ENT_QUOTES, 'UTF-8') ?></p>
                                 <div class="jrnl-card-foot">
-                                    <span class="jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                    <span class="jrnl-card-stats">
+                                        <span class="jrnl-stat"><?= $statIcon('eye') ?><?= (int)($item['view_count'] ?? 0) ?></span>
+                                        <span class="jrnl-stat"><?= $statIcon('comments') ?><?= (int)($item['comment_count'] ?? 0) ?></span>
+                                    </span>
                                 </div>
                             </a>
                         <?php endforeach; ?>
@@ -510,7 +531,10 @@ if ($selected) {
                             <p><?= htmlspecialchars($strip((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 160), ENT_QUOTES, 'UTF-8') ?></p>
                             <div class="jrnl-card-foot">
                                 <span><?= htmlspecialchars((string)($item['published_at'] ?? $item['created_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
-                                <span class="jrnl-stat"><i class="jrnl-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                <span class="jrnl-card-stats">
+                                    <span class="jrnl-stat"><?= $statIcon('eye') ?><?= (int)($item['view_count'] ?? 0) ?></span>
+                                    <span class="jrnl-stat"><?= $statIcon('comments') ?><?= (int)($item['comment_count'] ?? 0) ?></span>
+                                </span>
                             </div>
                         </a>
                     <?php endforeach; ?>

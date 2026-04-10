@@ -22,11 +22,35 @@ if (!function_exists('public_portal_lang')) {
 if (!function_exists('public_portal_session_boot')) {
     function public_portal_session_boot(): void
     {
+        $lifetime = 7 * 24 * 60 * 60;
         if (session_status() !== PHP_SESSION_ACTIVE) {
             if (function_exists('session_cache_limiter')) {
                 @session_cache_limiter('');
             }
+            if (!headers_sent()) {
+                @ini_set('session.gc_maxlifetime', (string)$lifetime);
+                $params = session_get_cookie_params();
+                session_set_cookie_params([
+                    'lifetime' => $lifetime,
+                    'path' => (string)($params['path'] ?? '/'),
+                    'domain' => (string)($params['domain'] ?? ''),
+                    'secure' => (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off'),
+                    'httponly' => true,
+                    'samesite' => 'Lax',
+                ]);
+            }
             session_start();
+        }
+        if (!headers_sent() && session_id() !== '') {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), session_id(), [
+                'expires' => time() + $lifetime,
+                'path' => (string)($params['path'] ?? '/'),
+                'domain' => (string)($params['domain'] ?? ''),
+                'secure' => (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off'),
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
         }
     }
 }
@@ -654,19 +678,19 @@ if (!function_exists('public_portal_solutions_ensure_schema')) {
 if (!function_exists('public_portal_current_user')) {
     function public_portal_current_user($FRMWRK): ?array
     {
-        static $resolved = false;
-        static $user = null;
-        if ($resolved) {
-            return $user;
+        $cacheKey = 'public_portal_current_user_cache';
+        if (array_key_exists($cacheKey, $GLOBALS)) {
+            return is_array($GLOBALS[$cacheKey]) ? $GLOBALS[$cacheKey] : null;
         }
-        $resolved = true;
         public_portal_session_boot();
         $userId = (int)($_SESSION['public_user_id'] ?? 0);
         if ($userId <= 0) {
+            $GLOBALS[$cacheKey] = null;
             return null;
         }
         $db = $FRMWRK->DB();
         if (!$db || !public_portal_table_exists($db, 'public_users')) {
+            $GLOBALS[$cacheKey] = null;
             return null;
         }
         $rows = $FRMWRK->DBRecords(
@@ -697,10 +721,24 @@ if (!function_exists('public_portal_current_user')) {
             if (!empty($refresh[0]) && is_array($refresh[0])) {
                 $user = $refresh[0];
             }
+            $GLOBALS[$cacheKey] = $user;
             return $user;
         }
         unset($_SESSION['public_user_id']);
+        $GLOBALS[$cacheKey] = null;
         return null;
+    }
+}
+
+if (!function_exists('public_portal_set_current_user')) {
+    function public_portal_set_current_user(int $userId): void
+    {
+        public_portal_session_boot();
+        if ($userId > 0 && function_exists('session_regenerate_id')) {
+            @session_regenerate_id(true);
+        }
+        $_SESSION['public_user_id'] = $userId;
+        unset($GLOBALS['public_portal_current_user_cache']);
     }
 }
 
@@ -977,22 +1015,32 @@ if (!function_exists('public_portal_avatar_upload_dir')) {
 }
 
 if (!function_exists('public_portal_store_avatar_upload')) {
-    function public_portal_store_avatar_upload(array $file, string $seed = 'avatar'): string
+    function public_portal_store_avatar_upload(array $file, string $seed = 'avatar', ?string &$error = null): string
     {
+        $error = null;
         if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+            $error = 'Не удалось получить файл аватарки.';
+            return '';
+        }
+        $size = (int)($file['size'] ?? 0);
+        if ($size <= 0 || $size > 5 * 1024 * 1024) {
+            $error = 'Аватарка должна быть изображением до 5 МБ.';
             return '';
         }
         $tmp = (string)($file['tmp_name'] ?? '');
         if ($tmp === '' || !is_file($tmp)) {
+            $error = 'Временный файл аватарки не найден.';
             return '';
         }
         $info = @getimagesize($tmp);
         if (!$info) {
+            $error = 'Аватарка должна быть изображением JPG, PNG, GIF или WebP.';
             return '';
         }
         $width = (int)($info[0] ?? 0);
         $height = (int)($info[1] ?? 0);
-        if ($width <= 0 || $height <= 0 || $width > 512 || $height > 512) {
+        if ($width <= 0 || $height <= 0 || $width > 4096 || $height > 4096) {
+            $error = 'Аватарка слишком большая. Максимум 4096px по стороне.';
             return '';
         }
         $mime = (string)($info['mime'] ?? '');
@@ -1000,12 +1048,15 @@ if (!function_exists('public_portal_store_avatar_upload')) {
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
             'image/gif' => 'gif',
+            'image/webp' => 'webp',
         ];
         if (!isset($extMap[$mime])) {
+            $error = 'Аватарка должна быть изображением JPG, PNG, GIF или WebP.';
             return '';
         }
         $paths = public_portal_avatar_upload_dir();
         if (!is_dir($paths['dir']) && !@mkdir($paths['dir'], 0775, true) && !is_dir($paths['dir'])) {
+            $error = 'Не удалось создать папку для аватарок.';
             return '';
         }
         $name = public_portal_slugify($seed, 'avatar') . '-' . date('YmdHis') . '-' . random_int(1000, 9999) . '.' . $extMap[$mime];
@@ -1015,6 +1066,7 @@ if (!function_exists('public_portal_store_avatar_upload')) {
             $moved = @copy($tmp, $target);
         }
         if (!$moved) {
+            $error = 'Не удалось сохранить файл аватарки.';
             return '';
         }
         return $paths['public'] . $name;
@@ -1197,6 +1249,15 @@ if (!function_exists('public_portal_handle_ajax_action')) {
             return;
         }
 
+        if ($action === 'public_portal_register' || $action === 'public_portal_login') {
+            $existingUser = public_portal_current_user($FRMWRK);
+            if ($existingUser) {
+                $contentType = public_portal_slugify((string)($_POST['content_type'] ?? 'examples'), 'examples');
+                $contentId = (int)($_POST['content_id'] ?? 0);
+                public_portal_respond($FRMWRK, ['type' => 'ok', 'message' => 'Вы уже вошли в аккаунт.'], '/', $contentType, $contentId);
+            }
+        }
+
         if ($action === 'public_portal_register') {
             $contentType = public_portal_slugify((string)($_POST['content_type'] ?? 'examples'), 'examples');
             $contentId = (int)($_POST['content_id'] ?? 0);
@@ -1243,13 +1304,44 @@ if (!function_exists('public_portal_handle_ajax_action')) {
                  VALUES ('{$usernameSafe}', '{$emailSafe}', '{$passwordSafe}', '{$displayNameSafe}', '{$pinSafe}', 'generated', '', 'member', 1, 0, NOW(), NOW())"
             );
             $newUserId = (int)mysqli_insert_id($db);
-            public_portal_session_boot();
-            $_SESSION['public_user_id'] = $newUserId;
+            public_portal_set_current_user($newUserId);
             public_portal_respond($FRMWRK, [
                 'type' => 'ok',
                 'message' => 'РђРєРєР°СѓРЅС‚ СЃРѕР·РґР°РЅ. РЎРѕС…СЂР°РЅРёС‚Рµ PIN: ' . $pinCode,
                 'pin_code' => $pinCode,
             ], '/', $contentType, $contentId, ['pin_code' => $pinCode]);
+        }
+
+        if ($action === 'public_portal_login') {
+            $contentType = public_portal_slugify((string)($_POST['content_type'] ?? 'examples'), 'examples');
+            $contentId = (int)($_POST['content_id'] ?? 0);
+            $login = trim((string)($_POST['login'] ?? $_POST['email'] ?? $_POST['username'] ?? ''));
+            $password = (string)($_POST['password'] ?? '');
+            $row = public_portal_find_user_by_login($FRMWRK, $login);
+            if (!$row || (int)($row['is_active'] ?? 0) !== 1 || (int)($row['is_banned'] ?? 0) === 1 || !password_verify($password, (string)($row['password_hash'] ?? ''))) {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'РќРµРІРµСЂРЅС‹Р№ Р»РѕРіРёРЅ РёР»Рё РїР°СЂРѕР»СЊ.'], '/', $contentType, $contentId);
+            }
+            mysqli_query($db, "UPDATE public_users SET last_login_at = NOW(), updated_at = NOW() WHERE id = " . (int)$row['id'] . " LIMIT 1");
+            public_portal_set_current_user((int)$row['id']);
+            public_portal_respond($FRMWRK, ['type' => 'ok', 'message' => 'Р’С‹ РІРѕС€Р»Рё РІ Р°РєРєР°СѓРЅС‚.'], '/', $contentType, $contentId);
+        }
+
+        if ($action === 'public_portal_favorite_toggle') {
+            $user = public_portal_current_user($FRMWRK);
+            $contentType = public_portal_slugify((string)($_POST['content_type'] ?? 'examples'), 'examples');
+            $contentId = max(1, (int)($_POST['content_id'] ?? 0));
+            if (!$user) {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'Р’РѕР№РґРёС‚Рµ, С‡С‚РѕР±С‹ СЃРѕС…СЂР°РЅСЏС‚СЊ РјР°С‚РµСЂРёР°Р»С‹.'], '/', $contentType, $contentId);
+            }
+            $saved = public_portal_toggle_favorite($FRMWRK, (int)$user['id'], $contentType, $contentId);
+            public_portal_respond($FRMWRK, [
+                'type' => 'ok',
+                'message' => $saved ? 'РњР°С‚РµСЂРёР°Р» РґРѕР±Р°РІР»РµРЅ РІ РёР·Р±СЂР°РЅРЅРѕРµ.' : 'РњР°С‚РµСЂРёР°Р» СѓР±СЂР°РЅ РёР· РёР·Р±СЂР°РЅРЅРѕРіРѕ.',
+            ], '/', '', 0, [
+                'saved' => $saved,
+                'content_type' => $contentType,
+                'content_id' => $contentId,
+            ]);
         }
 
         if ($action === 'public_portal_comment') {
@@ -1418,8 +1510,7 @@ if (!function_exists('public_portal_handle_request')) {
                  VALUES ('{$usernameSafe}', '{$emailSafe}', '{$passwordSafe}', '{$displayNameSafe}', '{$pinSafe}', 'generated', '', 'member', 1, 0, NOW(), NOW())"
             );
             $newUserId = (int)mysqli_insert_id($db);
-            public_portal_session_boot();
-            $_SESSION['public_user_id'] = $newUserId;
+            public_portal_set_current_user($newUserId);
             public_portal_flash_set('portal', [
                 'type' => 'ok',
                 'message' => 'Аккаунт создан. Сохраните PIN: ' . $pinCode,
@@ -1437,8 +1528,7 @@ if (!function_exists('public_portal_handle_request')) {
                 public_portal_redirect_back('/');
             }
             mysqli_query($db, "UPDATE public_users SET last_login_at = NOW(), updated_at = NOW() WHERE id = " . (int)$row['id'] . " LIMIT 1");
-            public_portal_session_boot();
-            $_SESSION['public_user_id'] = (int)$row['id'];
+            public_portal_set_current_user((int)$row['id']);
             public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Вы вошли в аккаунт.']);
             public_portal_redirect_back('/');
         }
@@ -1446,6 +1536,7 @@ if (!function_exists('public_portal_handle_request')) {
         if ($action === 'public_portal_logout') {
             public_portal_session_boot();
             unset($_SESSION['public_user_id']);
+            unset($GLOBALS['public_portal_current_user_cache']);
             public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Вы вышли из аккаунта.']);
             public_portal_redirect_back('/');
         }
@@ -1485,10 +1576,16 @@ if (!function_exists('public_portal_handle_request')) {
                 }
             }
             $avatarUrl = trim((string)($user['avatar_url'] ?? ''));
+            $avatarChanged = false;
             if (!empty($_FILES['avatar']['name'])) {
-                $uploaded = public_portal_store_avatar_upload((array)$_FILES['avatar'], (string)($user['username'] ?? 'avatar'));
+                $avatarError = null;
+                $uploaded = public_portal_store_avatar_upload((array)$_FILES['avatar'], (string)($user['username'] ?? 'avatar'), $avatarError);
                 if ($uploaded !== '') {
                     $avatarUrl = $uploaded;
+                    $avatarChanged = true;
+                } else {
+                    public_portal_flash_set('portal', ['type' => 'error', 'message' => $avatarError ?: 'Не удалось сохранить аватарку.']);
+                    public_portal_redirect_back('/account/');
                 }
             }
             $displayNameSafe = mysqli_real_escape_string($db, $displayName);
@@ -1512,6 +1609,9 @@ if (!function_exists('public_portal_handle_request')) {
                  WHERE id = " . (int)$user['id'] . "
                  LIMIT 1"
             );
+            if ($avatarChanged && function_exists('page_html_cache_purge_all')) {
+                page_html_cache_purge_all();
+            }
             public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Профиль обновлен.']);
             public_portal_redirect_back('/account/');
         }
