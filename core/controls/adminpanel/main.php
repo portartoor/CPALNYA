@@ -383,7 +383,7 @@ $rows = $FRMWRK->DBRecords("
     WHERE visited_at >= {$trendFromDateSql}
       AND visited_at < {$trendToDateSql}
       AND is_bot = 0
-      AND COALESCE(NULLIF(host,''), 'unknown') <> 'chlenix.ru'
+      AND (is_suspect IS NULL OR is_suspect = 0)
     GROUP BY DATE(visited_at)
 ");
 
@@ -400,6 +400,7 @@ $botRows = $FRMWRK->DBRecords("
     WHERE visited_at >= {$trendFromDateSql}
       AND visited_at < {$trendToDateSql}
       AND is_bot = 1
+      AND (is_suspect IS NULL OR is_suspect = 0)
     GROUP BY DATE(visited_at)
 ");
 foreach ($botRows as $r) {
@@ -417,7 +418,7 @@ $uniqRows = $FRMWRK->DBRecords("
     WHERE visited_at >= {$trendFromDateSql}
       AND visited_at < {$trendToDateSql}
       AND is_bot = 0
-      AND COALESCE(NULLIF(host,''), 'unknown') <> 'chlenix.ru'
+      AND (is_suspect IS NULL OR is_suspect = 0)
     GROUP BY DATE(visited_at)
 ");
 foreach ($uniqRows as $r) {
@@ -434,7 +435,9 @@ $today = $FRMWRK->DBRecords("
         COUNT(DISTINCT CASE WHEN is_bot=0 THEN ip END) AS uniq_non_bot,
         SUM(CASE WHEN is_bot=1 THEN 1 ELSE 0 END) AS bots
     FROM analytics_visits
-    WHERE DATE(visited_at)=CURDATE()
+    WHERE visited_at >= CURDATE()
+      AND visited_at < CURDATE() + INTERVAL 1 DAY
+      AND (is_suspect IS NULL OR is_suspect = 0)
 ");
 
 $todayVisits = (int)($today[0]['total_non_bot'] ?? 0);          // визиты без ботов
@@ -448,7 +451,9 @@ $sum = $FRMWRK->DBRecords("
         COUNT(DISTINCT CASE WHEN is_bot = 0 THEN ip END) AS uniq_non_bot,
         SUM(CASE WHEN is_bot = 1 THEN 1 ELSE 0 END) AS bots
     FROM analytics_visits
-    WHERE visited_at >= NOW() - INTERVAL 30 DAY
+    WHERE visited_at >= {$trendFromDateSql}
+      AND visited_at < {$trendToDateSql}
+      AND (is_suspect IS NULL OR is_suspect = 0)
 ");
 
 $visits30d = (int)($sum[0]['total_non_bot'] ?? 0);        // все не-бот визиты
@@ -460,8 +465,10 @@ $botVisits30d = (int)($sum[0]['bots'] ?? 0);              // визиты бот
 $sumNonBotUniq = $FRMWRK->DBRecords("
     SELECT COUNT(DISTINCT ip) uniq 
     FROM analytics_visits 
-    WHERE visited_at >= NOW() - INTERVAL 30 DAY 
+    WHERE visited_at >= {$trendFromDateSql}
+      AND visited_at < {$trendToDateSql}
       AND is_bot=0
+      AND (is_suspect IS NULL OR is_suspect = 0)
 ");
 $nonBotUniqueVisitors30d = (int)($sumNonBotUniq[0]['uniq'] ?? 0);
 

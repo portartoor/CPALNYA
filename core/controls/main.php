@@ -36,7 +36,7 @@ if (function_exists('public_portal_fetch_latest_comments')) {
     $latestComments = (array)public_portal_fetch_latest_comments($FRMWRK, $host, $lang, 4);
 }
 
-$decorateItems = static function (array $items, string $section): array {
+$decorateItems = static function (array $items, string $section) use ($FRMWRK): array {
     foreach ($items as &$row) {
         if (!is_array($row)) {
             continue;
@@ -46,6 +46,10 @@ $decorateItems = static function (array $items, string $section): array {
         $base = trim((string)($row['preview_image_data'] ?? ''));
         $row['image_src'] = $thumb !== '' ? $thumb : ($full !== '' ? $full : $base);
         $row['source_section'] = $section;
+        $contentId = (int)($row['id'] ?? 0);
+        $row['comment_count'] = ($contentId > 0 && function_exists('public_portal_comment_total_for_content'))
+            ? public_portal_comment_total_for_content($FRMWRK, 'examples', $contentId)
+            : 0;
     }
     unset($row);
     return array_values($items);

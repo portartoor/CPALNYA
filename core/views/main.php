@@ -89,6 +89,13 @@ $commentExcerpt = static function (string $html, int $limit = 220): string {
     }
     return rtrim((string)mb_substr($text, 0, $limit - 1, 'UTF-8')) . '...';
 };
+$statIcon = static function (string $type): string {
+    $icons = [
+        'eye' => '<svg class="home-z-stat-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 5.2c5.2 0 8.7 4.4 9.7 5.8.4.6.4 1.4 0 2-1 1.4-4.5 5.8-9.7 5.8S3.3 14.4 2.3 13a1.8 1.8 0 0 1 0-2c1-1.4 4.5-5.8 9.7-5.8Zm0 2C7.9 7.2 5 10.6 4 12c1 1.4 3.9 4.8 8 4.8s7-3.4 8-4.8c-1-1.4-3.9-4.8-8-4.8Zm0 1.7a3.1 3.1 0 1 1 0 6.2 3.1 3.1 0 0 1 0-6.2Zm0 2a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2Z"/></svg>',
+        'comments' => '<svg class="home-z-stat-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 4h14a3 3 0 0 1 3 3v7.2a3 3 0 0 1-3 3h-7.1l-5.2 3.9a1 1 0 0 1-1.6-.8v-3.1H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Zm14 2H5a1 1 0 0 0-1 1v7.2a1 1 0 0 0 1 1h1.1a1 1 0 0 1 1 1v2.1l3.9-2.9a1 1 0 0 1 .6-.2H19a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1Z"/></svg>',
+    ];
+    return $icons[$type] ?? '';
+};
 $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover : null);
 $heroSection = trim((string)($heroCard['source_section'] ?? 'journal'));
 $heroSectionTitles = [
@@ -136,7 +143,8 @@ $heroSectionTitles = [
 .home-z-card-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
 .home-z-card h3{margin:0;font:700 1.06rem/1.16 "Space Grotesk","Sora",sans-serif}
 .home-z-stat{display:inline-flex;align-items:center;gap:7px;color:var(--shell-muted);font-size:12px;text-transform:uppercase;letter-spacing:.12em}
-.home-z-stat-eye{font-style:normal;line-height:1}
+.home-z-card-stats{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.home-z-stat-icon{width:15px;height:15px;display:block;flex:0 0 15px;opacity:.86}
 .home-z-comments{padding:24px;display:grid;gap:18px}
 .home-z-comments-head{display:grid;gap:10px;max-width:880px}
 .home-z-comments-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
@@ -198,7 +206,10 @@ $heroSectionTitles = [
                                 <?php if ($heroCardDate !== ''): ?>
                                     <span class="home-z-meta"><?= htmlspecialchars($heroCardDate, ENT_QUOTES, 'UTF-8') ?></span>
                                 <?php endif; ?>
-                                <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($heroCard['view_count'] ?? 0) ?></span>
+                                <span class="home-z-card-stats">
+                                    <span class="home-z-stat"><?= $statIcon('eye') ?><?= (int)($heroCard['view_count'] ?? 0) ?></span>
+                                    <span class="home-z-stat"><?= $statIcon('comments') ?><?= (int)($heroCard['comment_count'] ?? 0) ?></span>
+                                </span>
                             </div>
                             <h3><a href="<?= htmlspecialchars($buildArticleUrl((array)$heroCard, $heroSection), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)($heroCard['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></a></h3>
                             <p><?= htmlspecialchars($excerpt((string)($heroCard['excerpt_html'] ?? $heroCard['content_html'] ?? ''), 240), ENT_QUOTES, 'UTF-8') ?></p>
@@ -238,7 +249,10 @@ $heroSectionTitles = [
                             <div class="home-z-card-copy">
                                 <div class="home-z-card-head">
                                     <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
-                                    <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                    <span class="home-z-card-stats">
+                                        <span class="home-z-stat"><?= $statIcon('eye') ?><?= (int)($item['view_count'] ?? 0) ?></span>
+                                        <span class="home-z-stat"><?= $statIcon('comments') ?><?= (int)($item['comment_count'] ?? 0) ?></span>
+                                    </span>
                                 </div>
                                 <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
@@ -273,7 +287,10 @@ $heroSectionTitles = [
                             <div class="home-z-card-copy">
                                 <div class="home-z-card-head">
                                     <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
-                                    <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                    <span class="home-z-card-stats">
+                                        <span class="home-z-stat"><?= $statIcon('eye') ?><?= (int)($item['view_count'] ?? 0) ?></span>
+                                        <span class="home-z-stat"><?= $statIcon('comments') ?><?= (int)($item['comment_count'] ?? 0) ?></span>
+                                    </span>
                                 </div>
                                 <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
@@ -308,7 +325,10 @@ $heroSectionTitles = [
                             <div class="home-z-card-copy">
                                 <div class="home-z-card-head">
                                     <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
-                                    <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                    <span class="home-z-card-stats">
+                                        <span class="home-z-stat"><?= $statIcon('eye') ?><?= (int)($item['view_count'] ?? 0) ?></span>
+                                        <span class="home-z-stat"><?= $statIcon('comments') ?><?= (int)($item['comment_count'] ?? 0) ?></span>
+                                    </span>
                                 </div>
                                 <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
@@ -343,7 +363,10 @@ $heroSectionTitles = [
                             <div class="home-z-card-copy">
                                 <div class="home-z-card-head">
                                     <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
-                                    <span class="home-z-stat"><i class="home-z-stat-eye" aria-hidden="true">&#9673;</i><?= (int)($item['view_count'] ?? 0) ?></span>
+                                    <span class="home-z-card-stats">
+                                        <span class="home-z-stat"><?= $statIcon('eye') ?><?= (int)($item['view_count'] ?? 0) ?></span>
+                                        <span class="home-z-stat"><?= $statIcon('comments') ?><?= (int)($item['comment_count'] ?? 0) ?></span>
+                                    </span>
                                 </div>
                                 <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
