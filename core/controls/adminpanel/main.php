@@ -376,12 +376,13 @@ if (isset($_GET['threat_added'])) {
 }
 
 if ($hasVisits) {
-// 🔹 Считаем визиты по дням за 30 дней по тем же строкам, что видны в таблице логов
+// 🔹 Считаем human-визиты по дням за 30 дней: боты и suspect-трафик отдельно
 $rows = $FRMWRK->DBRecords("
     SELECT DATE(visited_at) AS d, COUNT(*) AS c
     FROM analytics_visits
     WHERE visited_at >= {$trendFromDateSql}
       AND visited_at < {$trendToDateSql}
+      AND is_bot = 0
       AND (is_suspect IS NULL OR is_suspect = 0)
     GROUP BY DATE(visited_at)
 ");
@@ -399,7 +400,6 @@ $botRows = $FRMWRK->DBRecords("
     WHERE visited_at >= {$trendFromDateSql}
       AND visited_at < {$trendToDateSql}
       AND is_bot = 1
-      AND (is_suspect IS NULL OR is_suspect = 0)
     GROUP BY DATE(visited_at)
 ");
 foreach ($botRows as $r) {
@@ -410,12 +410,13 @@ foreach ($botRows as $r) {
 }
 
 
-// 🔹 Уникальные посетители по тем же строкам, что видны в таблице логов
+// 🔹 Уникальные human-посетители
 $uniqRows = $FRMWRK->DBRecords("
     SELECT DATE(visited_at) d, COUNT(DISTINCT ip) c 
     FROM analytics_visits 
     WHERE visited_at >= {$trendFromDateSql}
       AND visited_at < {$trendToDateSql}
+      AND is_bot = 0
       AND (is_suspect IS NULL OR is_suspect = 0)
     GROUP BY DATE(visited_at)
 ");
@@ -426,36 +427,34 @@ foreach ($uniqRows as $r) {
     }
 }
 
-// 🔹 Сегодняшние визиты по тем же строкам, что видны в таблице логов
+// 🔹 Сегодняшние human-визиты
 $today = $FRMWRK->DBRecords("
     SELECT 
-        COUNT(*) AS total_visits,
-        COUNT(DISTINCT ip) AS uniq_visits,
+        SUM(CASE WHEN is_bot = 0 AND (is_suspect IS NULL OR is_suspect = 0) THEN 1 ELSE 0 END) AS total_non_bot,
+        COUNT(DISTINCT CASE WHEN is_bot = 0 AND (is_suspect IS NULL OR is_suspect = 0) THEN ip END) AS uniq_non_bot,
         SUM(CASE WHEN is_bot=1 THEN 1 ELSE 0 END) AS bots
     FROM analytics_visits
     WHERE visited_at >= CURDATE()
       AND visited_at < CURDATE() + INTERVAL 1 DAY
-      AND (is_suspect IS NULL OR is_suspect = 0)
 ");
 
-$todayVisits = (int)($today[0]['total_visits'] ?? 0);
-$todayUniqueVisitors = (int)($today[0]['uniq_visits'] ?? 0);
+$todayVisits = (int)($today[0]['total_non_bot'] ?? 0);
+$todayUniqueVisitors = (int)($today[0]['uniq_non_bot'] ?? 0);
 $todayBotVisits = (int)($today[0]['bots'] ?? 0);                // боты сегодня
 
-// 🔹 30-дневная статистика по тем же строкам, что видны в таблице логов
+// 🔹 30-дневная статистика: human / bot
 $sum = $FRMWRK->DBRecords("
     SELECT 
-        COUNT(*) AS total_visits,
-        COUNT(DISTINCT ip) AS uniq_visits,
+        SUM(CASE WHEN is_bot = 0 AND (is_suspect IS NULL OR is_suspect = 0) THEN 1 ELSE 0 END) AS total_non_bot,
+        COUNT(DISTINCT CASE WHEN is_bot = 0 AND (is_suspect IS NULL OR is_suspect = 0) THEN ip END) AS uniq_non_bot,
         SUM(CASE WHEN is_bot = 1 THEN 1 ELSE 0 END) AS bots
     FROM analytics_visits
     WHERE visited_at >= {$trendFromDateSql}
       AND visited_at < {$trendToDateSql}
-      AND (is_suspect IS NULL OR is_suspect = 0)
 ");
 
-$visits30d = (int)($sum[0]['total_visits'] ?? 0);
-$uniqueVisitors30d = (int)($sum[0]['uniq_visits'] ?? 0);
+$visits30d = (int)($sum[0]['total_non_bot'] ?? 0);
+$uniqueVisitors30d = (int)($sum[0]['uniq_non_bot'] ?? 0);
 $botVisits30d = (int)($sum[0]['bots'] ?? 0);              // визиты ботов
 
 
@@ -944,13 +943,12 @@ $referrersStats = $FRMWRK->DBRecords("
     $refLimitSql
 ");
 
-// 🔹 Логи для таблицы (только не-боты и не подозрительные визиты)
+// Logs table: include all recent visits so bot/suspect rows remain auditable.
 $totalRows = $FRMWRK->DBRecords("
     SELECT COUNT(*) AS total 
     FROM analytics_visits
     WHERE visited_at >= {$trendFromDateSql}
       AND visited_at < {$trendToDateSql}
-      AND (is_suspect IS NULL OR is_suspect = 0)
 ");
 $logsTotalRows = (int)($totalRows[0]['total'] ?? 0);
 $logsTotalPages = max(1, (int)ceil($logsTotalRows / $logsPerPage));
@@ -963,11 +961,10 @@ $logsSearchSelect = $hasVisitsSearchQuery ? "search_query" : "NULL AS search_que
 $logsRows = $FRMWRK->DBRecords("
     SELECT
         id, visited_at, host, ip, method, path, source_type, referrer_host, country_iso2, country_name, city_name, device_type, is_bot, user_agent, query_string,
-        utm_source, utm_medium, utm_campaign, utm_term, utm_content, {$logsSearchSelect}
+        is_suspect, suspect_reason, utm_source, utm_medium, utm_campaign, utm_term, utm_content, {$logsSearchSelect}
     FROM analytics_visits
     WHERE visited_at >= {$trendFromDateSql}
       AND visited_at < {$trendToDateSql}
-      AND (is_suspect IS NULL OR is_suspect = 0)
     ORDER BY id DESC
     LIMIT " . (int)$logsPerPage . " OFFSET " . (int)$offset
 );

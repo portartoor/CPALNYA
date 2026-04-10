@@ -34,13 +34,13 @@
     <div class="row g-3 mb-2">
         <div class="col-xl-3 col-md-6 col-12">
             <div class="card h-100"><div class="card-body d-flex flex-column justify-content-between">
-                <h6 class="text-muted mb-1"><i class="ti ti-activity me-1"></i>Visits (Today / 30d)</h6>
+                <h6 class="text-muted mb-1"><i class="ti ti-activity me-1"></i>Human Visits (Today / 30d)</h6>
                 <h3 class="mb-0"><?= (int)$kpi['today_visits'] ?> / <?= (int)$kpi['visits_30d'] ?></h3>
             </div></div>
         </div>
         <div class="col-xl-3 col-md-6 col-12">
             <div class="card h-100"><div class="card-body d-flex flex-column justify-content-between">
-                <h6 class="text-muted mb-1"><i class="ti ti-users me-1"></i>Uniques (Today / 30d)</h6>
+                <h6 class="text-muted mb-1"><i class="ti ti-users me-1"></i>Human Uniques (Today / 30d)</h6>
                 <h3 class="mb-0"><?= (int)$kpi['today_unique_visitors'] ?> / <?= (int)$kpi['unique_visitors_30d'] ?></h3>
             </div></div>
         </div>
@@ -246,6 +246,9 @@
                         <th>Search Query</th>
                         <th>Device</th>
                         <th>Bot</th>
+                        <th>Suspect</th>
+                        <th>Reason</th>
+                        <th>User Agent</th>
                         <th>Query</th>
                     </tr>
                 </thead>
@@ -269,6 +272,12 @@
                             if ($countryIso2 !== '' && preg_match('/^[A-Z]{2}$/', $countryIso2)) {
                                 $countryFlag = 'https://flagcdn.com/w20/' . strtolower($countryIso2) . '.png';
                             }
+                            $botReason = trim((string)($row['suspect_reason'] ?? ''));
+                            if ($botReason === '' && (int)($row['is_bot'] ?? 0) === 1) {
+                                $botReason = 'ua_pattern';
+                            }
+                            $userAgentFull = (string)($row['user_agent'] ?? '');
+                            $userAgentShort = function_exists('mb_substr') ? mb_substr($userAgentFull, 0, 160) : substr($userAgentFull, 0, 160);
                         ?>
                         <td><?= (int)($row['id'] ?? 0) ?></td>
                         <td class="text-nowrap"><?= htmlspecialchars((string)($row['visited_at'] ?? '')) ?></td>
@@ -292,6 +301,11 @@
                         <td class="visit-logs-break"><?= htmlspecialchars((string)($row['search_query'] ?? '')) ?></td>
                         <td><?= htmlspecialchars((string)($row['device_type'] ?? '')) ?></td>
                         <td><?= ((int)($row['is_bot'] ?? 0) === 1) ? 'yes' : 'no' ?></td>
+                        <td><?= ((int)($row['is_suspect'] ?? 0) === 1) ? 'yes' : 'no' ?></td>
+                        <td class="visit-logs-break"><?= htmlspecialchars($botReason) ?></td>
+                        <td class="visit-logs-break" title="<?= htmlspecialchars($userAgentFull) ?>">
+                            <?= htmlspecialchars($userAgentShort) ?>
+                        </td>
                         <td class="position-relative pb-4 visit-logs-query">
                             <small class="d-block pe-2"><?= htmlspecialchars((string)($row['query_string'] ?? '')) ?></small>
                             <form method="post" class="position-absolute" style="right:6px;bottom:6px;">
@@ -304,7 +318,7 @@
                         </td>
                     </tr>
                 <?php endforeach; else: ?>
-                    <tr><td colspan="19" class="text-muted">No logs yet</td></tr>
+                    <tr><td colspan="22" class="text-muted">No logs yet</td></tr>
                 <?php endif; ?>
                 </tbody>
             </table>
@@ -340,12 +354,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const visitsOptions = {
         chart: { type: 'line', height: 300, toolbar: { show: false } },
         series: [
-            { name: 'Visits', data: data.visits30d || [] },
-            { name: 'Uniques', data: data.uniques30d || [] }
+            { name: 'Human Visits', data: data.visits30d || [] },
+            { name: 'Human Uniques', data: data.uniques30d || [] },
+            { name: 'Bot Visits', data: data.botVisits30d || [] }
         ],
         xaxis: { categories: data.labels30d || [] },
         stroke: { curve: 'smooth', width: 2 },
-        colors: ['#1f8ef1', '#00b894'],
+        colors: ['#1f8ef1', '#00b894', '#ff7675'],
         dataLabels: { enabled: false },
         grid: { strokeDashArray: 4 },
         legend: { position: 'top' }
