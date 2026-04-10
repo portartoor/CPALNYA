@@ -88,6 +88,21 @@ $navSections = [
     ],
 ];
 
+$mobileSearchPlaceholder = $isRu
+    ? 'Поиск по выпуску'
+    : 'Search issues';
+$mobileSearchButton = $isRu ? 'Найти' : 'Search';
+$mobileAccountLabel = $isRu ? 'Аккаунт / вход' : 'Account / sign in';
+?>
+    <div class="nav-mobile-tools">
+        <form class="nav-mobile-search" method="get" action="/journal/">
+            <input type="text" name="q" placeholder="<?= htmlspecialchars($mobileSearchPlaceholder, ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+            <button type="submit"><?= htmlspecialchars($mobileSearchButton, ENT_QUOTES, 'UTF-8') ?></button>
+        </form>
+        <a class="nav-mobile-account" href="/account/"><?= htmlspecialchars($mobileAccountLabel, ENT_QUOTES, 'UTF-8') ?></a>
+    </div>
+<?php
+
 if (!empty($importantTopicItems)) {
     $navSections[] = [
         'label' => $isRu ? 'Важное' : 'Important',

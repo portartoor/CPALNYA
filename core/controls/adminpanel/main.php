@@ -72,28 +72,26 @@ function adminpanel_section_key_from_path(string $path): string
     if ($path === '' || $path === '/') {
         return 'home';
     }
-    if (
-        strpos($path, '/journal') === 0
-        || strpos($path, '/playbooks') === 0
-        || strpos($path, '/signals') === 0
-        || strpos($path, '/fun') === 0
-        || strpos($path, '/blog') === 0
-        || strpos($path, '/examples/article/') === 0
-        || strpos($path, '/articles/') === 0
-    ) {
-        return 'blog';
+    if (strpos($path, '/journal') === 0 || strpos($path, '/blog') === 0 || strpos($path, '/examples/article/') === 0 || strpos($path, '/articles/') === 0) {
+        return 'journal';
     }
-    if (strpos($path, '/services') === 0) {
-        return 'services';
+    if (strpos($path, '/playbooks') === 0) {
+        return 'playbooks';
     }
-    if (strpos($path, '/projects') === 0) {
-        return 'projects';
+    if (strpos($path, '/signals') === 0) {
+        return 'signals';
     }
-    if (strpos($path, '/cases') === 0) {
-        return 'cases';
+    if (strpos($path, '/fun') === 0) {
+        return 'fun';
+    }
+    if (strpos($path, '/examples') === 0) {
+        return 'examples';
     }
     if (strpos($path, '/contact') === 0) {
         return 'contact';
+    }
+    if (strpos($path, '/account') === 0) {
+        return 'account';
     }
     if (strpos($path, '/audit') === 0) {
         return 'audit';
@@ -219,21 +217,18 @@ $articleStats = [
     'today' => ['visits' => 0, 'uniques' => 0, 'bots' => 0],
     'd30' => ['visits' => 0, 'uniques' => 0, 'bots' => 0],
 ];
-$toolsStats = [
-    'today' => ['visits' => 0, 'uniques' => 0, 'bots' => 0],
-    'd30' => ['visits' => 0, 'uniques' => 0, 'bots' => 0],
-];
 $topArticles30d = [];
-$topTools30d = [];
 $articleTopTrendSeries30d = [];
 
 $sectionLabelsMap = [
     'home' => 'Home',
-    'blog' => 'Journal',
-    'services' => 'Services',
-    'projects' => 'Products',
-    'cases' => 'Cases',
+    'journal' => 'Journal',
+    'playbooks' => 'Playbooks',
+    'signals' => 'Signals',
+    'fun' => 'Fun',
+    'examples' => 'Examples',
     'contact' => 'Contact',
+    'account' => 'Account',
     'audit' => 'Audit',
     'adminpanel' => 'Adminpanel',
     'system' => 'System',
@@ -525,65 +520,6 @@ $articleStats['d30']['visits'] = (int)($article30d[0]['visits'] ?? 0);
 $articleStats['d30']['uniques'] = (int)($article30d[0]['uniques'] ?? 0);
 $articleStats['d30']['bots'] = (int)($article30d[0]['bots'] ?? 0);
 
-// Tools stats: /tools*
-$toolsPathWhereSql = "(
-    ((path LIKE '/tools%') OR (path LIKE '/use%'))
-    AND path NOT IN ('/tools', '/tools/', '/use', '/use/')
-)";
-$toolsToday = $FRMWRK->DBRecords("
-    SELECT
-        SUM(CASE WHEN is_bot=0 THEN 1 ELSE 0 END) AS visits,
-        COUNT(DISTINCT CASE WHEN is_bot=0 THEN ip END) AS uniques,
-        SUM(CASE WHEN is_bot=1 THEN 1 ELSE 0 END) AS bots
-    FROM analytics_visits
-    WHERE DATE(visited_at)=CURDATE()
-      AND {$toolsPathWhereSql}
-");
-$toolsStats['today']['visits'] = (int)($toolsToday[0]['visits'] ?? 0);
-$toolsStats['today']['uniques'] = (int)($toolsToday[0]['uniques'] ?? 0);
-$toolsStats['today']['bots'] = (int)($toolsToday[0]['bots'] ?? 0);
-
-$tools30d = $FRMWRK->DBRecords("
-    SELECT
-        SUM(CASE WHEN is_bot=0 THEN 1 ELSE 0 END) AS visits,
-        COUNT(DISTINCT CASE WHEN is_bot=0 THEN ip END) AS uniques,
-        SUM(CASE WHEN is_bot=1 THEN 1 ELSE 0 END) AS bots
-    FROM analytics_visits
-    WHERE visited_at >= NOW() - INTERVAL 30 DAY
-      AND {$toolsPathWhereSql}
-");
-$toolsStats['d30']['visits'] = (int)($tools30d[0]['visits'] ?? 0);
-$toolsStats['d30']['uniques'] = (int)($tools30d[0]['uniques'] ?? 0);
-$toolsStats['d30']['bots'] = (int)($tools30d[0]['bots'] ?? 0);
-
-// Top tools by non-bot visits (30d)
-$toolPathRows = $FRMWRK->DBRecords("
-    SELECT path,
-           SUM(CASE WHEN is_bot=0 THEN 1 ELSE 0 END) AS visits,
-           SUM(CASE WHEN is_bot=1 THEN 1 ELSE 0 END) AS bots
-    FROM analytics_visits
-    WHERE visited_at >= NOW() - INTERVAL 30 DAY
-      AND {$toolsPathWhereSql}
-    GROUP BY path
-    ORDER BY visits DESC
-    LIMIT 10
-");
-foreach ($toolPathRows as $row) {
-    $path = trim((string)($row['path'] ?? ''));
-    $toolPart = preg_replace('~^/(tools|use)/?~', '', $path);
-    $toolPart = preg_replace('~/.*$~', '', (string)$toolPart);
-    $toolPart = trim((string)$toolPart, '/');
-    if ($toolPart === '') {
-        continue;
-    }
-    $label = ucwords(str_replace(['-', '_'], ' ', $toolPart));
-    $topTools30d[] = [
-        'label' => $label,
-        'visits' => (int)($row['visits'] ?? 0),
-        'bots' => (int)($row['bots'] ?? 0),
-    ];
-}
-
 // Top articles by non-bot visits (30d): aggregate by slug across all article paths.
 // Then select TOP 10 RU + TOP 10 EN and build trend by this ordered set.
 $articlePathRows = $FRMWRK->DBRecords("
@@ -722,14 +658,17 @@ if (!empty($topArticleSlugs)) {
     }
 }
 
-// Section stats (Examples = /examples/* including articles)
+// Section stats for the public content sections.
 $sectionCaseSql = "
     CASE
         WHEN path IS NULL OR path = '' OR path = '/' THEN 'home'
-        WHEN path LIKE '/journal%' OR path LIKE '/playbooks%' OR path LIKE '/signals%' OR path LIKE '/fun%' OR path LIKE '/blog%' OR path LIKE '/examples/article/%' OR path LIKE '/articles/%' THEN 'blog'
-        WHEN path LIKE '/services%' THEN 'services'
-        WHEN path LIKE '/projects%' THEN 'projects'
+        WHEN path LIKE '/journal%' OR path LIKE '/blog%' OR path LIKE '/examples/article/%' OR path LIKE '/articles/%' THEN 'journal'
+        WHEN path LIKE '/playbooks%' THEN 'playbooks'
+        WHEN path LIKE '/signals%' THEN 'signals'
+        WHEN path LIKE '/fun%' THEN 'fun'
+        WHEN path LIKE '/examples%' THEN 'examples'
         WHEN path LIKE '/contact%' THEN 'contact'
+        WHEN path LIKE '/account%' THEN 'account'
         WHEN path LIKE '/audit%' THEN 'audit'
         WHEN path LIKE '/adminpanel%' OR path LIKE '/dashboard%' THEN 'adminpanel'
         WHEN path LIKE '/robots.txt%' OR path LIKE '/sitemap.xml%' THEN 'system'
@@ -1252,7 +1191,6 @@ $chart = [
     'sourceFunnel' => $sourceFunnelChart,
     'funnelSequence' => $funnelSequence,
     'topArticles30d' => $topArticles30d,
-    'topTools30d' => $topTools30d,
     'sectionStats' => array_values($sectionStats),
 ];
 
@@ -1298,12 +1236,6 @@ $kpi = [
     'article_30d_visits' => (int)($articleStats['d30']['visits'] ?? 0),
     'article_30d_uniques' => (int)($articleStats['d30']['uniques'] ?? 0),
     'article_30d_bots' => (int)($articleStats['d30']['bots'] ?? 0),
-    'tools_today_visits' => (int)($toolsStats['today']['visits'] ?? 0),
-    'tools_today_uniques' => (int)($toolsStats['today']['uniques'] ?? 0),
-    'tools_today_bots' => (int)($toolsStats['today']['bots'] ?? 0),
-    'tools_30d_visits' => (int)($toolsStats['d30']['visits'] ?? 0),
-    'tools_30d_uniques' => (int)($toolsStats['d30']['uniques'] ?? 0),
-    'tools_30d_bots' => (int)($toolsStats['d30']['bots'] ?? 0),
     'sections_today_visits' => $sectionsTodayVisits,
     'sections_today_uniques' => $sectionsTodayUniques,
     'sections_today_bots' => $sectionsTodayBots,

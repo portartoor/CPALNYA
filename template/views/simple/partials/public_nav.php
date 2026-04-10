@@ -43,9 +43,6 @@ $publicDashboardHref = function_exists('public_site_href') ? public_site_href('/
     <?php if ($publicNavPage !== 'examples'): ?>
         <a class="<?= htmlspecialchars($publicGeoBtnClass) ?>" href="<?= htmlspecialchars($publicExamplesHref) ?>"><?= htmlspecialchars($t('Примеры', 'Examples')) ?></a>
     <?php endif; ?>
-    <?php if ($publicNavPage !== 'tools'): ?>
-        <a class="<?= htmlspecialchars($publicGeoBtnClass) ?>" href="<?= htmlspecialchars($publicToolsHref) ?>"><?= htmlspecialchars($t('Инструменты', 'Tools')) ?></a>
-    <?php endif; ?>
     <a class="btn primary" href="<?= htmlspecialchars($publicDashboardHref) ?>"><?= htmlspecialchars($t('Открыть кабинет', 'Open Dashboard')) ?></a>
 <?php endif; ?>
 </nav>

@@ -165,6 +165,9 @@ $heroSectionTitles = [
 @media (max-width:1180px){.home-z-hero,.home-z-grid{grid-template-columns:1fr}}
 @media (max-width:720px){
     .home-z{padding:18px 14px 52px}
+    .home-z-hero{padding:0 0 18px;overflow:hidden}
+    .home-z-cover{order:-1;border-top:0;border-left:0;border-right:0}
+    .home-z-copy{padding:0 18px}
     .home-z-block-head{grid-template-columns:1fr}
     .home-z-feature{grid-template-columns:1fr}
     .home-z-feature-media{width:100%;aspect-ratio:16/10}

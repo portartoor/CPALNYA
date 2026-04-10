@@ -11,7 +11,7 @@ $logoAria = $logoMain . ' portal';
 $requestPath = parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 $requestPath = is_string($requestPath) && $requestPath !== '' ? $requestPath : '/';
 $firstSegment = strtolower((string)(explode('/', trim($requestPath, '/'))[0] ?? ''));
-$section = in_array($firstSegment, ['blog', 'journal', 'playbooks', 'services', 'projects', 'contact', 'audit', 'account', 'member'], true) ? $firstSegment : 'home';
+$section = in_array($firstSegment, ['blog', 'journal', 'playbooks', 'signals', 'fun', 'contact', 'audit', 'account', 'member'], true) ? $firstSegment : 'home';
 if ($section === 'blog') {
     $section = 'journal';
 }
@@ -51,20 +51,10 @@ $seoFallbacks = [
             'description' => 'Практические статьи про SEO, контент, архитектуру сайтов и рост B2B-продаж.',
             'keywords' => 'B2B блог, SEO статьи, маркетинг для услуг, архитектура сайта, рост заявок',
         ],
-        'services' => [
-            'title' => 'B2B-услуги: сайты, SaaS, Telegram-боты, API и консалтинг',
-            'description' => 'Услуги для бизнеса: разработка сайтов и платформ, интеграции API, Telegram-боты и продуктовый консалтинг.',
-            'keywords' => 'разработка сайтов B2B, SaaS разработка, Telegram боты, API интеграция, IT консалтинг',
-        ],
-        'projects' => [
-            'title' => 'Проекты и кейсы с фокусом на выручку и рост',
-            'description' => 'Портфолио проектов: что было сделано, какие решения приняты и какой бизнес-результат получен.',
-            'keywords' => 'кейсы разработки, портфолио B2B, проекты сайтов, digital кейсы, результат внедрения',
-        ],
         'contact' => [
-            'title' => 'Контакты по проектам, услугам и B2B-задачам',
+            'title' => 'Контакты для CPA-команд, редакции и B2B-задач',
             'description' => 'Обсудим вашу задачу: сроки, архитектуру решения, SEO и коммерческий результат.',
-            'keywords' => 'заказать сайт, B2B разработка под ключ, консультация по проекту, digital партнер',
+            'keywords' => 'CPA контент, affiliate редакция, B2B консультация, digital партнер',
         ],
     ],
     'en' => [
@@ -78,38 +68,13 @@ $seoFallbacks = [
             'description' => 'Actionable insights on SEO, content systems, website architecture and B2B conversion growth.',
             'keywords' => 'B2B blog, SEO insights, product marketing, conversion strategy, growth content',
         ],
-        'services' => [
-            'title' => 'B2B services: websites, SaaS, Telegram bots, APIs and consulting',
-            'description' => 'Delivery services for revenue teams: website and SaaS development, API integrations, Telegram bots and consulting.',
-            'keywords' => 'B2B services, SaaS development, API integration, Telegram bot development, digital consulting',
-        ],
-        'projects' => [
-            'title' => 'Products for geo intelligence, antifraud and AI automation',
-            'description' => 'Product catalog with pricing, backend integrations and implementation details for geo intelligence, antifraud and AI-driven SEO workflows.',
-            'keywords' => 'B2B products, geoip api, antifraud platform, AI SEO platform, backend integrations, product pricing',
-        ],
         'contact' => [
-            'title' => 'Contact for projects, services and B2B initiatives',
+            'title' => 'Contact for CPA teams, affiliate content and B2B initiatives',
             'description' => 'Share your goal and constraints to get a practical scope, timeline and growth-oriented execution plan.',
-            'keywords' => 'hire B2B developer, digital product partner, website project consultation, growth execution',
+            'keywords' => 'CPA content, affiliate editorial, B2B consultation, digital partner',
         ],
     ],
 ];
-
-if (!isset($seoFallbacks['ru']['offers'])) {
-    $seoFallbacks['ru']['offers'] = [
-        'title' => 'Офферы по интеграции VPN/Proxy detection, GeoIP и anti-fraud сценариев',
-        'description' => 'Прикладные офферы для внедрения проверки VPN/Proxy/TOR, маршрутизации лидов и compliance-контуров через geoip.space (apigeoip.ru).',
-        'keywords' => 'оффер vpn detection, проверка proxy tor, geoip api, compliance трафика, интеграция bitrix wordpress opencart drupal joomla',
-    ];
-}
-if (!isset($seoFallbacks['en']['offers'])) {
-    $seoFallbacks['en']['offers'] = [
-        'title' => 'Offers for VPN/Proxy detection, GeoIP and anti-fraud integrations',
-        'description' => 'Implementation-ready offers for VPN/Proxy/TOR detection, lead routing and compliance traffic controls via geoip.space (apigeoip.ru).',
-        'keywords' => 'vpn proxy detection offer, geoip api integration, anti fraud traffic filtering, compliance controls',
-    ];
-}
 
 $langKey = $isRu ? 'ru' : 'en';
 $fallback = $seoFallbacks[$langKey][$section] ?? $seoFallbacks[$langKey]['home'];
@@ -146,7 +111,7 @@ $canonical = $scheme . '://' . $canonicalHost . $canonicalPath;
 $ruHost = $canonicalHost;
 $enHost = $canonicalHost;
 $selfLang = $isRu ? 'ru' : 'en';
-$isEquivalentPath = in_array($canonicalPath, ['/', '/journal/', '/playbooks/', '/services/', '/projects/', '/contact/', '/audit/', '/privacy/', '/terms/'], true);
+$isEquivalentPath = in_array($canonicalPath, ['/', '/journal/', '/playbooks/', '/signals/', '/fun/', '/contact/', '/audit/', '/privacy/', '/terms/'], true);
 $hreflangLinks = [];
 $hreflangLinks[] = ['lang' => $selfLang, 'href' => $canonical];
 if ($isEquivalentPath) {
@@ -1073,6 +1038,11 @@ if (isset($_GET['header_search_preview'])) {
         order: 2;
     }
     .simple-nav-toggle { order: 3; }
+    .nav-mobile-tools,
+    .nav-mobile-search,
+    .nav-mobile-account {
+        display: none;
+    }
     .simple-search-toggle-icon {
         position: relative;
         width: 15px;
@@ -1495,6 +1465,13 @@ if (isset($_GET['header_search_preview'])) {
             transition: opacity .22s ease;
             z-index: 10000;
         }
+        body.simple-nav-open .simple-header {
+            clip-path: none;
+            overflow: visible;
+        }
+        body.simple-nav-open .simple-header::before {
+            clip-path: none;
+        }
         .simple-nav {
             position: fixed;
             right: 18px;
@@ -1517,6 +1494,55 @@ if (isset($_GET['header_search_preview'])) {
             overscroll-behavior: contain;
             transition: transform .22s ease, opacity .22s ease;
             z-index: 10001;
+        }
+        .nav-mobile-tools {
+            display: grid;
+            grid-column: 1 / -1;
+            gap: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+        .nav-mobile-search {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px;
+            align-items: center;
+            padding: 8px;
+            border: 1px solid var(--shell-border);
+            background: rgba(255,255,255,.03);
+            clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+        }
+        .nav-mobile-search input {
+            min-width: 0;
+            width: 100%;
+            padding: 9px 10px;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: var(--shell-text);
+            font-size: 13px;
+        }
+        .nav-mobile-search input::placeholder {
+            color: var(--shell-muted);
+        }
+        .nav-mobile-search button,
+        .nav-mobile-account {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+            padding: 0 12px;
+            border: 1px solid var(--shell-border);
+            background: linear-gradient(135deg, rgba(115,184,255,.2), rgba(39,223,192,.14));
+            color: var(--shell-text);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+        }
+        .nav-mobile-account {
+            justify-self: stretch;
         }
         .simple-nav a,
         .nav-cta,
@@ -1563,9 +1589,26 @@ if (isset($_GET['header_search_preview'])) {
             top: calc(var(--simple-header-height) + 6px);
             max-height: calc(100vh - var(--simple-header-height) - 18px);
             padding: 16px 14px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
         }
         .simple-nav a,
-        .nav-theme-toggle { font-size: 13px; }
+        .nav-theme-toggle {
+            min-height: 38px;
+            padding: 9px 10px;
+            font-size: 12px;
+            line-height: 1.15;
+        }
+        .nav-section-label {
+            grid-column: 1 / -1;
+            padding-top: 6px;
+        }
+        .nav-mobile-search {
+            grid-template-columns: 1fr;
+        }
+        .nav-mobile-search button {
+            width: 100%;
+        }
         .simple-search-preview {
             top: calc(100% + 8px);
             padding: 12px;
