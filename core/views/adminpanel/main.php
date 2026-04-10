@@ -34,8 +34,9 @@
     <div class="row g-3 mb-2">
         <div class="col-xl-3 col-md-6 col-12">
             <div class="card h-100"><div class="card-body d-flex flex-column justify-content-between">
-                <h6 class="text-muted mb-1"><i class="ti ti-activity me-1"></i>Human Visits (Today / 30d)</h6>
+                <h6 class="text-muted mb-1"><i class="ti ti-activity me-1"></i>Total Visits (Today / 30d)</h6>
                 <h3 class="mb-0"><?= (int)$kpi['today_visits'] ?> / <?= (int)$kpi['visits_30d'] ?></h3>
+                <small class="text-muted">Human: <?= (int)$kpi['today_human_visits'] ?> / <?= (int)$kpi['human_visits_30d'] ?></small>
             </div></div>
         </div>
         <div class="col-xl-3 col-md-6 col-12">
@@ -46,8 +47,8 @@
         </div>
         <div class="col-xl-3 col-md-6 col-12">
             <div class="card h-100"><div class="card-body d-flex flex-column justify-content-between">
-                <h6 class="text-muted mb-1"><i class="ti ti-robot me-1"></i>Bot Visits 30d</h6>
-                <h3 class="mb-0"><?= (int)$kpi['bot_visits_30d'] ?></h3>
+                <h6 class="text-muted mb-1"><i class="ti ti-robot me-1"></i>Bot Visits (Today / 30d)</h6>
+                <h3 class="mb-0"><?= (int)$kpi['today_bot_visits'] ?> / <?= (int)$kpi['bot_visits_30d'] ?></h3>
             </div></div>
         </div>
         <div class="col-xl-3 col-md-6 col-12">
@@ -354,13 +355,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const visitsOptions = {
         chart: { type: 'line', height: 300, toolbar: { show: false } },
         series: [
-            { name: 'Human Visits', data: data.visits30d || [] },
+            { name: 'Total Visits', data: data.visits30d || [] },
+            { name: 'Human Visits', data: data.humanVisits30d || [] },
             { name: 'Human Uniques', data: data.uniques30d || [] },
             { name: 'Bot Visits', data: data.botVisits30d || [] }
         ],
         xaxis: { categories: data.labels30d || [] },
         stroke: { curve: 'smooth', width: 2 },
-        colors: ['#1f8ef1', '#00b894', '#ff7675'],
+        colors: ['#1f8ef1', '#00cec9', '#00b894', '#ff7675'],
         dataLabels: { enabled: false },
         grid: { strokeDashArray: 4 },
         legend: { position: 'top' }

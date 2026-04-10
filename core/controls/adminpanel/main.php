@@ -158,10 +158,13 @@ $hasLeadsAttribution = $hasLeads
     && adminpanel_table_has_column($DB, 'analytics_lead_events', 'utm_source');
 
 $todayVisits = 0;
+$todayHumanVisits = 0;
 $todayUniqueVisitors = 0;
 $visits30d = 0;
+$humanVisits30d = 0;
 $uniqueVisitors30d = 0;
 $nonBotUniqueVisitors30d = 0;
+$todayBotVisits = 0;
 $botVisits30d = 0;
 $desktop30d = 0;
 $mobile30d = 0;
@@ -173,6 +176,7 @@ $apiLookups30d = 0;
 
 $labels30d = [];
 $seriesVisits30d = [];
+$seriesHumanVisits30d = [];
 $seriesUniques30d = [];
 $seriesBotVisits30d = [];
 $seriesApiLookups30d = [];
@@ -187,6 +191,7 @@ for ($i = 0; $i < 30; $i++) {
     $dateKey = $d->format('Y-m-d');
     $labels30d[] = $d->format('d M');
     $seriesVisits30d[$dateKey] = 0;
+    $seriesHumanVisits30d[$dateKey] = 0;
     $seriesUniques30d[$dateKey] = 0;
     $seriesBotVisits30d[$dateKey] = 0;
     $seriesApiLookups30d[$dateKey] = 0;
@@ -376,7 +381,21 @@ if (isset($_GET['threat_added'])) {
 }
 
 if ($hasVisits) {
-// 🔹 Считаем human-визиты по дням за 30 дней: боты и suspect-трафик отдельно
+$totalRows = $FRMWRK->DBRecords("
+    SELECT DATE(visited_at) AS d, COUNT(*) AS c
+    FROM analytics_visits
+    WHERE visited_at >= {$trendFromDateSql}
+      AND visited_at < {$trendToDateSql}
+    GROUP BY DATE(visited_at)
+");
+foreach ($totalRows as $r) {
+    $key = (string)($r['d'] ?? '');
+    if ($key !== '' && array_key_exists($key, $seriesVisits30d)) {
+        $seriesVisits30d[$key] = (int)($r['c'] ?? 0);
+    }
+}
+
+// Human visits by day: exclude bot and suspect traffic.
 $rows = $FRMWRK->DBRecords("
     SELECT DATE(visited_at) AS d, COUNT(*) AS c
     FROM analytics_visits
@@ -389,8 +408,8 @@ $rows = $FRMWRK->DBRecords("
 
 foreach ($rows as $r) {
     $key = (string)($r['d'] ?? '');
-    if ($key !== '' && array_key_exists($key, $seriesVisits30d)) {
-        $seriesVisits30d[$key] = (int)($r['c'] ?? 0);
+    if ($key !== '' && array_key_exists($key, $seriesHumanVisits30d)) {
+        $seriesHumanVisits30d[$key] = (int)($r['c'] ?? 0);
     }
 }
 
@@ -410,7 +429,7 @@ foreach ($botRows as $r) {
 }
 
 
-// 🔹 Уникальные human-посетители
+// Human uniques by day.
 $uniqRows = $FRMWRK->DBRecords("
     SELECT DATE(visited_at) d, COUNT(DISTINCT ip) c 
     FROM analytics_visits 
@@ -427,9 +446,10 @@ foreach ($uniqRows as $r) {
     }
 }
 
-// 🔹 Сегодняшние human-визиты
+// Today totals: total visits, human visits/uniques, and bot visits.
 $today = $FRMWRK->DBRecords("
     SELECT 
+        COUNT(*) AS total_visits,
         SUM(CASE WHEN is_bot = 0 AND (is_suspect IS NULL OR is_suspect = 0) THEN 1 ELSE 0 END) AS total_non_bot,
         COUNT(DISTINCT CASE WHEN is_bot = 0 AND (is_suspect IS NULL OR is_suspect = 0) THEN ip END) AS uniq_non_bot,
         SUM(CASE WHEN is_bot=1 THEN 1 ELSE 0 END) AS bots
@@ -438,13 +458,15 @@ $today = $FRMWRK->DBRecords("
       AND visited_at < CURDATE() + INTERVAL 1 DAY
 ");
 
-$todayVisits = (int)($today[0]['total_non_bot'] ?? 0);
+$todayVisits = (int)($today[0]['total_visits'] ?? 0);
+$todayHumanVisits = (int)($today[0]['total_non_bot'] ?? 0);
 $todayUniqueVisitors = (int)($today[0]['uniq_non_bot'] ?? 0);
 $todayBotVisits = (int)($today[0]['bots'] ?? 0);                // боты сегодня
 
-// 🔹 30-дневная статистика: human / bot
+// 30-day totals: total visits, human visits/uniques, and bot visits.
 $sum = $FRMWRK->DBRecords("
     SELECT 
+        COUNT(*) AS total_visits,
         SUM(CASE WHEN is_bot = 0 AND (is_suspect IS NULL OR is_suspect = 0) THEN 1 ELSE 0 END) AS total_non_bot,
         COUNT(DISTINCT CASE WHEN is_bot = 0 AND (is_suspect IS NULL OR is_suspect = 0) THEN ip END) AS uniq_non_bot,
         SUM(CASE WHEN is_bot = 1 THEN 1 ELSE 0 END) AS bots
@@ -453,7 +475,8 @@ $sum = $FRMWRK->DBRecords("
       AND visited_at < {$trendToDateSql}
 ");
 
-$visits30d = (int)($sum[0]['total_non_bot'] ?? 0);
+$visits30d = (int)($sum[0]['total_visits'] ?? 0);
+$humanVisits30d = (int)($sum[0]['total_non_bot'] ?? 0);
 $uniqueVisitors30d = (int)($sum[0]['uniq_non_bot'] ?? 0);
 $botVisits30d = (int)($sum[0]['bots'] ?? 0);              // визиты ботов
 
@@ -1214,6 +1237,7 @@ $funnelSequence = [
 $chart = [
     'labels30d' => $labels30d,
     'visits30d' => array_values($seriesVisits30d),
+    'humanVisits30d' => array_values($seriesHumanVisits30d),
     'uniques30d' => array_values($seriesUniques30d),
     'botVisits30d' => array_values($seriesBotVisits30d),
     'apiLookupsTrend30d' => array_values($seriesApiLookups30d),
@@ -1251,9 +1275,12 @@ $deviceTotal30d = max(1, $desktop30d + $mobile30d + $tablet30d);
 
 $kpi = [
     'today_visits' => $todayVisits,
+    'today_human_visits' => $todayHumanVisits,
     'today_unique_visitors' => $todayUniqueVisitors,
     'visits_30d' => $visits30d,
+    'human_visits_30d' => $humanVisits30d,
     'unique_visitors_30d' => $uniqueVisitors30d,
+    'today_bot_visits' => $todayBotVisits,
     'bot_visits_30d' => $botVisits30d,
     'desktop_share' => adminpanel_pct($desktop30d, $deviceTotal30d),
     'mobile_share' => adminpanel_pct($mobile30d, $deviceTotal30d),
