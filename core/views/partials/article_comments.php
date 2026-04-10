@@ -277,26 +277,26 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
                             </div>
                         </div>
                     </div>
-                    <div class="pcmt-node-actions">
-                        <a class="pcmt-anchor" href="#comment-<?= $commentId ?>">#<?= $commentId ?></a>
-                        <div class="pcmt-rating">
-                            <span class="pcmt-rating-score"><?= $commentScore ?></span>
-                            <span class="pcmt-rating-meta">+<?= $commentUp ?> / -<?= $commentDown ?></span>
-                            <?php if ($canVote): ?>
-                                <form method="post" class="pcmt-vote-form">
-                                    <input type="hidden" name="action" value="public_portal_comment_vote">
-                                    <input type="hidden" name="portal_csrf" value="<?= htmlspecialchars($portalCsrf, ENT_QUOTES, 'UTF-8') ?>">
-                                    <input type="hidden" name="return_path" value="<?= htmlspecialchars($portalCurrentUrl, ENT_QUOTES, 'UTF-8') ?>">
-                                    <input type="hidden" name="comment_id" value="<?= $commentId ?>">
-                                    <button type="submit" name="vote_value" value="1" class="<?= $currentVote > 0 ? 'is-active' : '' ?>">+</button>
-                                    <button type="submit" name="vote_value" value="-1" class="<?= $currentVote < 0 ? 'is-active' : '' ?>">-</button>
-                                </form>
-                            <?php endif; ?>
-                        </div>
-                        <?php if ($portalUser): ?>
-                            <button class="pcmt-reply" type="button" data-comment-reply="<?= $commentId ?>" data-comment-author="<?= htmlspecialchars($author, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Ответить', 'Reply'), ENT_QUOTES, 'UTF-8') ?></button>
+                </div>
+                <div class="pcmt-node-actions">
+                    <a class="pcmt-anchor" href="#comment-<?= $commentId ?>">#<?= $commentId ?></a>
+                    <div class="pcmt-rating">
+                        <span class="pcmt-rating-score"><?= $commentScore ?></span>
+                        <span class="pcmt-rating-meta">+<?= $commentUp ?> / -<?= $commentDown ?></span>
+                        <?php if ($canVote): ?>
+                            <form method="post" class="pcmt-vote-form">
+                                <input type="hidden" name="action" value="public_portal_comment_vote">
+                                <input type="hidden" name="portal_csrf" value="<?= htmlspecialchars($portalCsrf, ENT_QUOTES, 'UTF-8') ?>">
+                                <input type="hidden" name="return_path" value="<?= htmlspecialchars($portalCurrentUrl, ENT_QUOTES, 'UTF-8') ?>">
+                                <input type="hidden" name="comment_id" value="<?= $commentId ?>">
+                                <button type="submit" name="vote_value" value="1" class="<?= $currentVote > 0 ? 'is-active' : '' ?>">+</button>
+                                <button type="submit" name="vote_value" value="-1" class="<?= $currentVote < 0 ? 'is-active' : '' ?>">-</button>
+                            </form>
                         <?php endif; ?>
                     </div>
+                    <?php if ($portalUser): ?>
+                        <button class="pcmt-reply" type="button" data-comment-reply="<?= $commentId ?>" data-comment-author="<?= htmlspecialchars($author, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Ответить', 'Reply'), ENT_QUOTES, 'UTF-8') ?></button>
+                    <?php endif; ?>
                 </div>
                 <div class="pcmt-node-body"><?= (string)($node['body_html'] ?? '') ?></div>
             </div>
@@ -350,8 +350,8 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
 .pcmt-node{position:relative;padding-left:10px;scroll-margin-top:120px}
 .pcmt-node-line{position:absolute;left:0;top:0;bottom:-10px;width:1px;background:linear-gradient(180deg,rgba(122,180,255,.26),rgba(122,180,255,.04))}
 .pcmt-node::before{content:"";position:absolute;left:0;top:20px;width:10px;height:1px;background:rgba(122,180,255,.28)}
-.pcmt-node-card{display:grid;grid-template-columns:minmax(0,1fr) 104px;gap:12px;align-items:start;padding:10px 12px;border:1px solid rgba(122,180,255,.12);background:rgba(255,255,255,.025)}
-.pcmt-node-head{display:block;min-width:0}
+.pcmt-node-card{display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:8px 12px;align-items:start;padding:9px 11px;border:1px solid rgba(122,180,255,.12);background:rgba(255,255,255,.025)}
+.pcmt-node-head{grid-column:1;grid-row:1;display:block;min-width:0}
 .pcmt-node-author{display:flex;align-items:flex-start;gap:10px;min-width:0}
 .pcmt-avatar{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;width:36px;height:36px;border:1px solid rgba(122,180,255,.14);background:rgba(255,255,255,.04)}
 .pcmt-avatar img{display:block;width:100%;height:100%;object-fit:cover}
@@ -359,13 +359,13 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
 .pcmt-node-author a{color:var(--shell-text);text-decoration:none}
 .pcmt-node-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .pcmt-node-meta span,.pcmt-node-meta time{padding:6px 9px;font-size:10px;letter-spacing:.1em}
-.pcmt-node-body{grid-column:1 / 2;margin-top:4px;padding-left:46px;color:var(--shell-text);font-weight:700;line-height:1.45}
+.pcmt-node-body{grid-column:1;grid-row:2;margin-top:0;padding-left:46px;color:var(--shell-text);font-weight:700;line-height:1.4}
 .pcmt-node-body p{margin:0 0 8px}
 .pcmt-node-body p:last-child{margin-bottom:0}
 .pcmt-node-body ul{margin:12px 0 0;padding-left:18px}
 .pcmt-node-body a{color:var(--shell-accent)}
 .pcmt-children{display:grid;gap:10px;margin-top:10px;margin-left:18px}
-.pcmt-node-actions{grid-column:2 / 3;grid-row:1 / span 2;display:grid;justify-items:stretch;gap:8px;align-content:start}
+.pcmt-node-actions{grid-column:2;grid-row:1 / 3;display:grid;justify-items:stretch;gap:7px;align-content:start}
 .pcmt-anchor{color:var(--shell-muted);text-decoration:none}
 .pcmt-node-actions .pcmt-anchor{justify-content:center;padding:7px 8px}
 .pcmt-rating{display:grid;gap:6px;justify-items:center}
@@ -374,7 +374,7 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
 .pcmt-vote-form{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%}
 .pcmt-vote-form button{min-height:34px;min-width:0;padding:0 10px}
 .pcmt-vote-form button.is-active{background:rgba(39,223,192,.18);border-color:rgba(39,223,192,.32)}
-.pcmt-node-actions .pcmt-reply{width:100%;min-height:40px;padding:0 10px;font-size:12px;font-weight:700}
+.pcmt-node-actions .pcmt-reply{width:100%;min-height:34px;padding:0 8px;font-size:11px;font-weight:700}
 .pcmt-empty{padding:18px;border:1px dashed rgba(122,180,255,.16);color:var(--shell-muted);background:rgba(255,255,255,.02)}
 .pcmt-flash{margin-bottom:14px;padding:12px 14px;border:1px solid rgba(122,180,255,.16)}
 .pcmt-flash.ok{background:rgba(39,223,192,.10);color:#9fe9df}
