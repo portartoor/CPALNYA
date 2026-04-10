@@ -732,6 +732,10 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
             withLoading(true);
 
             var formData = new FormData(form);
+            var submitter = event.submitter || document.activeElement;
+            if (submitter && submitter.form === form && submitter.name) {
+                formData.set(submitter.name, submitter.value);
+            }
             fetch(window.location.href, {
                 method: 'POST',
                 body: formData,

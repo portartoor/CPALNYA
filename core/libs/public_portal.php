@@ -1420,11 +1420,17 @@ if (!function_exists('public_portal_handle_ajax_action')) {
                     'comment_anchor' => '#comment-' . $commentId,
                 ]);
             }
-            mysqli_query(
+            $voteInserted = mysqli_query(
                 $db,
                 "INSERT INTO public_comment_votes (comment_id, user_id, vote_value, created_at, updated_at)
                  VALUES ({$commentId}, " . (int)$user['id'] . ", {$voteValue}, NOW(), NOW())"
             );
+            if (!$voteInserted) {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'РќРµ СѓРґР°Р»РѕСЃСЊ СѓС‡РµСЃС‚СЊ РѕС†РµРЅРєСѓ. РџРѕРїСЂРѕР±СѓР№С‚Рµ РѕР±РЅРѕРІРёС‚СЊ СЃС‚СЂР°РЅРёС†Сѓ.'], '/', public_portal_slugify((string)($commentRow['content_type'] ?? 'examples'), 'examples'), (int)($commentRow['content_id'] ?? 0), [
+                    'comment_id' => $commentId,
+                    'comment_anchor' => '#comment-' . $commentId,
+                ]);
+            }
             public_portal_recalculate_comment_stats($db, $commentId);
             public_portal_recalculate_user_rating($db, $authorId);
             public_portal_respond($FRMWRK, ['type' => 'ok', 'message' => 'Р РµР№С‚РёРЅРі РєРѕРјРјРµРЅС‚Р°СЂРёСЏ РѕР±РЅРѕРІР»РµРЅ.'], '/', public_portal_slugify((string)($commentRow['content_type'] ?? 'examples'), 'examples'), (int)($commentRow['content_id'] ?? 0), [
@@ -1769,11 +1775,15 @@ if (!function_exists('public_portal_handle_request')) {
                 public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Оценка уже учтена. Изменить ее нельзя.']);
                 public_portal_redirect_back('/');
             }
-            mysqli_query(
+            $voteInserted = mysqli_query(
                 $db,
                 "INSERT INTO public_comment_votes (comment_id, user_id, vote_value, created_at, updated_at)
                  VALUES ({$commentId}, " . (int)$user['id'] . ", {$voteValue}, NOW(), NOW())"
             );
+            if (!$voteInserted) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Не удалось учесть оценку. Попробуйте обновить страницу.']);
+                public_portal_redirect_back('/');
+            }
             public_portal_recalculate_comment_stats($db, $commentId);
             public_portal_recalculate_user_rating($db, $authorId);
             public_portal_flash_set('portal', ['type' => 'ok', 'message' => 'Рейтинг комментария обновлен.']);
@@ -1829,7 +1839,7 @@ if (!function_exists('public_portal_fetch_comments')) {
         $currentUserId = (int)($currentUser['id'] ?? 0);
         $voteJoin = $currentUserId > 0
             ? "LEFT JOIN public_comment_votes cv ON cv.comment_id = c.id AND cv.user_id = {$currentUserId}"
-            : "LEFT JOIN (SELECT 0 AS comment_id, 0 AS vote_value) cv ON cv.comment_id = c.id";
+            : "LEFT JOIN (SELECT 0 AS id, 0 AS comment_id, 0 AS vote_value) cv ON cv.comment_id = c.id";
         $rows = $FRMWRK->DBRecords(
             "SELECT c.id, c.parent_id, c.section_code, c.body_markdown, c.body_html, c.created_at, c.updated_at,
                     c.rating_score, c.votes_up, c.votes_down,

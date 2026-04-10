@@ -870,19 +870,22 @@ function analytics_geo_lookup(string $ip, string $ua = '', ?string $userId = nul
             }
             if ($dbPath === '') {
                 analytics_log_file('Geo lookup fallback skipped: GeoLite2-City.mmdb not found');
-                return [];
+                $cityReader = false;
+            } else {
+                $cityReader = new Reader($dbPath);
             }
-            $cityReader = new Reader($dbPath);
         }
-        $city = $cityReader->city($ip);
-        return [
-            'country_iso2' => (string)($city->country->isoCode ?? ''),
-            'country_name' => (string)($city->country->name ?? ''),
-            'city_name' => (string)($city->city->name ?? ''),
-            'timezone' => (string)($city->location->timeZone ?? ''),
-            'latitude' => isset($city->location->latitude) ? (float)$city->location->latitude : null,
-            'longitude' => isset($city->location->longitude) ? (float)$city->location->longitude : null,
-        ];
+        if ($cityReader instanceof Reader) {
+            $city = $cityReader->city($ip);
+            return [
+                'country_iso2' => (string)($city->country->isoCode ?? ''),
+                'country_name' => (string)($city->country->name ?? ''),
+                'city_name' => (string)($city->city->name ?? ''),
+                'timezone' => (string)($city->location->timeZone ?? ''),
+                'latitude' => isset($city->location->latitude) ? (float)$city->location->latitude : null,
+                'longitude' => isset($city->location->longitude) ? (float)$city->location->longitude : null,
+            ];
+        }
     } catch (\Throwable $e) {
         analytics_log_file('Geo lookup local failed: ' . $e->getMessage());
     }

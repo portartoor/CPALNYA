@@ -62,6 +62,7 @@ $ContactTurnstileSecretKey = '';
 $GeoIpSpaceApiBaseUrl = 'https://geoip.space/api';
 $GeoIpSpaceApiKey = 'js223piMm9M3wGQBo5O3Gj5kpFJf7Qim236XraQG';
 $GeoIpSpaceApiTimeout = 8;
+$GeoIpSpaceApiFrontendEnabled = true;
 
 // LLM provider
 $LLMProvider = 'openrouter'; // openai | openrouter

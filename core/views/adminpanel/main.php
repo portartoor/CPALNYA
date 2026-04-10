@@ -208,7 +208,7 @@
 
     <div class="card mt-3">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h6 class="mb-0"><i class="ti ti-file-text me-1"></i>All Visit Logs</h6>
+            <h6 class="mb-0"><i class="ti ti-file-text me-1"></i>Visit Logs (Last 30 Days)</h6>
             <form method="get" class="d-flex align-items-center gap-2">
                 <input type="hidden" name="logs_page" value="1">
                 <label for="logs_per_page" class="text-muted mb-0">Per page:</label>
@@ -319,7 +319,7 @@
 
             <div class="d-flex justify-content-between align-items-center mt-2">
                 <small class="text-muted">
-                    Total logs: <?= (int)($logsPagination['total_rows'] ?? 0) ?>,
+                    Total logs 30d: <?= (int)($logsPagination['total_rows'] ?? 0) ?>,
                     page <?= $currentPage ?> / <?= $totalPages ?>
                 </small>
                 <div class="btn-group btn-group-sm">
