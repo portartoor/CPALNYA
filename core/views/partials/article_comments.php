@@ -274,13 +274,14 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
                                 <span><?= htmlspecialchars($rankLabel, ENT_QUOTES, 'UTF-8') ?></span>
                                 <span><?= $userScore ?></span>
                                 <time><?= htmlspecialchars($time, ENT_QUOTES, 'UTF-8') ?></time>
+                                <a class="pcmt-anchor" href="#comment-<?= $commentId ?>">#<?= $commentId ?></a>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="pcmt-node-actions">
-                    <a class="pcmt-anchor" href="#comment-<?= $commentId ?>">#<?= $commentId ?></a>
                     <div class="pcmt-rating">
+                        <span class="pcmt-rating-label"><?= htmlspecialchars($t('Рейтинг', 'Rating'), ENT_QUOTES, 'UTF-8') ?></span>
                         <span class="pcmt-rating-score"><?= $commentScore ?></span>
                         <span class="pcmt-rating-meta">+<?= $commentUp ?> / -<?= $commentDown ?></span>
                         <?php if ($canVote): ?>
@@ -348,18 +349,20 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
 .pcmt-reply-state.is-visible{display:flex}
 .pcmt-list{display:grid;gap:14px}
 .pcmt-node{position:relative;padding-left:10px;scroll-margin-top:120px}
-.pcmt-node-line{position:absolute;left:0;top:0;bottom:-10px;width:1px;background:linear-gradient(180deg,rgba(122,180,255,.26),rgba(122,180,255,.04))}
+.pcmt-node-line{position:absolute;left:0;top:0;bottom:-10px;width:1px;background:rgba(122,180,255,.26)}
+.pcmt-node:last-child > .pcmt-node-line{background:linear-gradient(180deg,rgba(122,180,255,.26) 0%,rgba(122,180,255,.26) 56%,rgba(122,180,255,0) 100%)}
 .pcmt-node::before{content:"";position:absolute;left:0;top:20px;width:10px;height:1px;background:rgba(122,180,255,.28)}
 .pcmt-node-card{display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:8px 12px;align-items:start;padding:9px 11px;border:1px solid rgba(122,180,255,.12);background:rgba(255,255,255,.025)}
 .pcmt-node-head{grid-column:1;grid-row:1;display:block;min-width:0}
-.pcmt-node-author{display:flex;align-items:flex-start;gap:10px;min-width:0}
+.pcmt-node-author{display:flex;align-items:center;gap:10px;min-width:0}
+.pcmt-node-author > div{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
 .pcmt-avatar{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;width:36px;height:36px;border:1px solid rgba(122,180,255,.14);background:rgba(255,255,255,.04)}
 .pcmt-avatar img{display:block;width:100%;height:100%;object-fit:cover}
-.pcmt-node-author strong{display:block;font-size:14px;line-height:1.2}
+.pcmt-node-author strong{display:block;font-size:14px;line-height:1.2;white-space:nowrap}
 .pcmt-node-author a{color:var(--shell-text);text-decoration:none}
-.pcmt-node-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.pcmt-node-meta span,.pcmt-node-meta time{padding:6px 9px;font-size:10px;letter-spacing:.1em}
-.pcmt-node-body{grid-column:1;grid-row:2;margin-top:0;padding-left:46px;color:var(--shell-text);font-weight:700;line-height:1.4}
+.pcmt-node-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:0}
+.pcmt-node-meta span,.pcmt-node-meta time,.pcmt-node-meta .pcmt-anchor{padding:6px 9px;font-size:10px;letter-spacing:.1em}
+.pcmt-node-body{grid-column:1;grid-row:2;margin-top:2px;padding-left:46px;color:var(--shell-text);font-weight:700;line-height:1.4}
 .pcmt-node-body p{margin:0 0 8px}
 .pcmt-node-body p:last-child{margin-bottom:0}
 .pcmt-node-body ul{margin:12px 0 0;padding-left:18px}
@@ -367,8 +370,8 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
 .pcmt-children{display:grid;gap:10px;margin-top:10px;margin-left:18px}
 .pcmt-node-actions{grid-column:2;grid-row:1 / 3;display:grid;justify-items:stretch;gap:7px;align-content:start}
 .pcmt-anchor{color:var(--shell-muted);text-decoration:none}
-.pcmt-node-actions .pcmt-anchor{justify-content:center;padding:7px 8px}
 .pcmt-rating{display:grid;gap:6px;justify-items:center}
+.pcmt-rating-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--shell-muted)}
 .pcmt-rating-score{font:700 1.35rem/1 "Space Grotesk","Sora",sans-serif}
 .pcmt-rating-meta{font-size:12px;color:var(--shell-muted);line-height:1}
 .pcmt-vote-form{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%}
