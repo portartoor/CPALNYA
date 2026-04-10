@@ -254,6 +254,10 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
         $commentUp = (int)($node['votes_up'] ?? 0);
         $commentDown = (int)($node['votes_down'] ?? 0);
         $currentVote = (int)($node['current_user_vote'] ?? 0);
+        $authorId = (int)($node['user_id'] ?? 0);
+        $currentUserId = (int)($portalUser['id'] ?? 0);
+        $hasCurrentUserVote = (int)($node['current_user_vote_id'] ?? 0) > 0;
+        $canVote = $currentUserId > 0 && $authorId > 0 && $authorId !== $currentUserId && !$hasCurrentUserVote;
         $userScore = (int)($node['comment_rating'] ?? 0);
         $rankLabel = (string)($node['rank_meta']['label'] ?? $t('Участник обсуждения', 'Discussion member'));
         ?>
@@ -278,7 +282,7 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
                         <div class="pcmt-rating">
                             <span class="pcmt-rating-score"><?= $commentScore ?></span>
                             <span class="pcmt-rating-meta">+<?= $commentUp ?> / -<?= $commentDown ?></span>
-                            <?php if ($portalUser): ?>
+                            <?php if ($canVote): ?>
                                 <form method="post" class="pcmt-vote-form">
                                     <input type="hidden" name="action" value="public_portal_comment_vote">
                                     <input type="hidden" name="portal_csrf" value="<?= htmlspecialchars($portalCsrf, ENT_QUOTES, 'UTF-8') ?>">
@@ -343,38 +347,41 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
 .pcmt-reply-state{display:none;align-items:center;gap:10px;padding:10px 12px;border:1px solid rgba(122,180,255,.12);background:rgba(255,255,255,.03)}
 .pcmt-reply-state.is-visible{display:flex}
 .pcmt-list{display:grid;gap:14px}
-.pcmt-node{position:relative;padding-left:24px;scroll-margin-top:120px}
-.pcmt-node-line{position:absolute;left:9px;top:0;bottom:-14px;width:1px;background:linear-gradient(180deg,rgba(122,180,255,.34),rgba(122,180,255,.06))}
-.pcmt-node::before{content:"";position:absolute;left:9px;top:28px;width:16px;height:1px;background:rgba(122,180,255,.34)}
-.pcmt-node-card{padding:16px 18px;border:1px solid rgba(122,180,255,.12);background:rgba(255,255,255,.03)}
-.pcmt-node-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-.pcmt-node-author{display:flex;align-items:flex-start;gap:12px}
-.pcmt-avatar{display:inline-flex;align-items:center;justify-content:center;overflow:hidden;width:46px;height:46px;border:1px solid rgba(122,180,255,.14);background:rgba(255,255,255,.04)}
+.pcmt-node{position:relative;padding-left:10px;scroll-margin-top:120px}
+.pcmt-node-line{position:absolute;left:0;top:0;bottom:-10px;width:1px;background:linear-gradient(180deg,rgba(122,180,255,.26),rgba(122,180,255,.04))}
+.pcmt-node::before{content:"";position:absolute;left:0;top:20px;width:10px;height:1px;background:rgba(122,180,255,.28)}
+.pcmt-node-card{display:grid;grid-template-columns:minmax(0,1fr) 104px;gap:12px;align-items:start;padding:10px 12px;border:1px solid rgba(122,180,255,.12);background:rgba(255,255,255,.025)}
+.pcmt-node-head{display:block;min-width:0}
+.pcmt-node-author{display:flex;align-items:flex-start;gap:10px;min-width:0}
+.pcmt-avatar{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;width:36px;height:36px;border:1px solid rgba(122,180,255,.14);background:rgba(255,255,255,.04)}
 .pcmt-avatar img{display:block;width:100%;height:100%;object-fit:cover}
-.pcmt-node-author strong{display:block;font-size:15px}
+.pcmt-node-author strong{display:block;font-size:14px;line-height:1.2}
 .pcmt-node-author a{color:var(--shell-text);text-decoration:none}
-.pcmt-node-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.pcmt-node-body{margin-top:12px;color:var(--shell-text);line-height:1.75}
-.pcmt-node-body p{margin:0 0 12px}
+.pcmt-node-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.pcmt-node-meta span,.pcmt-node-meta time{padding:6px 9px;font-size:10px;letter-spacing:.1em}
+.pcmt-node-body{grid-column:1 / 2;margin-top:4px;padding-left:46px;color:var(--shell-text);font-weight:700;line-height:1.45}
+.pcmt-node-body p{margin:0 0 8px}
 .pcmt-node-body p:last-child{margin-bottom:0}
 .pcmt-node-body ul{margin:12px 0 0;padding-left:18px}
 .pcmt-node-body a{color:var(--shell-accent)}
-.pcmt-children{display:grid;gap:12px;margin-top:12px;margin-left:24px}
-.pcmt-node-actions{display:grid;justify-items:end;gap:10px}
+.pcmt-children{display:grid;gap:10px;margin-top:10px;margin-left:18px}
+.pcmt-node-actions{grid-column:2 / 3;grid-row:1 / span 2;display:grid;justify-items:stretch;gap:8px;align-content:start}
 .pcmt-anchor{color:var(--shell-muted);text-decoration:none}
-.pcmt-rating{display:grid;gap:6px;justify-items:end}
-.pcmt-rating-score{font:700 1.2rem/1 "Space Grotesk","Sora",sans-serif}
-.pcmt-rating-meta{font-size:12px;color:var(--shell-muted)}
-.pcmt-vote-form{display:flex;gap:6px}
-.pcmt-vote-form button{min-height:34px;min-width:34px;padding:0 10px}
+.pcmt-node-actions .pcmt-anchor{justify-content:center;padding:7px 8px}
+.pcmt-rating{display:grid;gap:6px;justify-items:center}
+.pcmt-rating-score{font:700 1.35rem/1 "Space Grotesk","Sora",sans-serif}
+.pcmt-rating-meta{font-size:12px;color:var(--shell-muted);line-height:1}
+.pcmt-vote-form{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%}
+.pcmt-vote-form button{min-height:34px;min-width:0;padding:0 10px}
 .pcmt-vote-form button.is-active{background:rgba(39,223,192,.18);border-color:rgba(39,223,192,.32)}
+.pcmt-node-actions .pcmt-reply{width:100%;min-height:40px;padding:0 10px;font-size:12px;font-weight:700}
 .pcmt-empty{padding:18px;border:1px dashed rgba(122,180,255,.16);color:var(--shell-muted);background:rgba(255,255,255,.02)}
 .pcmt-flash{margin-bottom:14px;padding:12px 14px;border:1px solid rgba(122,180,255,.16)}
 .pcmt-flash.ok{background:rgba(39,223,192,.10);color:#9fe9df}
 .pcmt-flash.error{background:rgba(255,106,127,.10);color:#ffc0cb}
 @keyframes pcmtLoad{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 @media (max-width:980px){.pcmt-auth-form{grid-template-columns:1fr}.pcmt-auth-form .pcmt-field-full{grid-column:auto}}
-@media (max-width:720px){.pcmt{padding:20px 16px}.pcmt-form-foot,.pcmt-head,.pcmt-node-head,.pcmt-compose-tease{align-items:flex-start}.pcmt-children{margin-left:14px}.pcmt-node-actions{justify-items:start}}
+@media (max-width:720px){.pcmt{padding:20px 16px}.pcmt-form-foot,.pcmt-head,.pcmt-compose-tease{align-items:flex-start}.pcmt-node-card{grid-template-columns:1fr}.pcmt-node-body{grid-column:1;padding-left:0}.pcmt-node-actions{grid-column:1;grid-row:auto;display:flex;flex-wrap:wrap;align-items:center}.pcmt-node-actions .pcmt-anchor,.pcmt-node-actions .pcmt-reply{width:auto}.pcmt-vote-form{width:auto;min-width:74px}.pcmt-children{margin-left:12px}}
 </style>
 <section class="pcmt" id="article-comments" data-portal-auth="<?= $portalIsLoggedIn ? '1' : '0' ?>" data-content-type="<?= htmlspecialchars($portalContentType, ENT_QUOTES, 'UTF-8') ?>" data-content-id="<?= $portalContentId ?>">
     <div class="pcmt-head">

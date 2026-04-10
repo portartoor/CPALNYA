@@ -1407,13 +1407,23 @@ if (!function_exists('public_portal_handle_ajax_action')) {
             if ($authorId === (int)$user['id']) {
                 public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'РќРµР»СЊР·СЏ РіРѕР»РѕСЃРѕРІР°С‚СЊ Р·Р° СЃРѕР±СЃС‚РІРµРЅРЅС‹Р№ РєРѕРјРјРµРЅС‚Р°СЂРёР№.'], '/');
             }
+            $existingVoteRows = $FRMWRK->DBRecords(
+                "SELECT id
+                 FROM public_comment_votes
+                 WHERE comment_id = {$commentId}
+                   AND user_id = " . (int)$user['id'] . "
+                 LIMIT 1"
+            );
+            if (!empty($existingVoteRows[0])) {
+                public_portal_respond($FRMWRK, ['type' => 'error', 'message' => 'РћС†РµРЅРєР° СѓР¶Рµ СѓС‡С‚РµРЅР°. РР·РјРµРЅРёС‚СЊ РµРµ РЅРµР»СЊР·СЏ.'], '/', public_portal_slugify((string)($commentRow['content_type'] ?? 'examples'), 'examples'), (int)($commentRow['content_id'] ?? 0), [
+                    'comment_id' => $commentId,
+                    'comment_anchor' => '#comment-' . $commentId,
+                ]);
+            }
             mysqli_query(
                 $db,
                 "INSERT INTO public_comment_votes (comment_id, user_id, vote_value, created_at, updated_at)
-                 VALUES ({$commentId}, " . (int)$user['id'] . ", {$voteValue}, NOW(), NOW())
-                 ON DUPLICATE KEY UPDATE
-                    vote_value = IF(vote_value = VALUES(vote_value), 0, VALUES(vote_value)),
-                    updated_at = NOW()"
+                 VALUES ({$commentId}, " . (int)$user['id'] . ", {$voteValue}, NOW(), NOW())"
             );
             public_portal_recalculate_comment_stats($db, $commentId);
             public_portal_recalculate_user_rating($db, $authorId);
@@ -1748,13 +1758,21 @@ if (!function_exists('public_portal_handle_request')) {
                 public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Нельзя голосовать за собственный комментарий.']);
                 public_portal_redirect_back('/');
             }
+            $existingVoteRows = $FRMWRK->DBRecords(
+                "SELECT id
+                 FROM public_comment_votes
+                 WHERE comment_id = {$commentId}
+                   AND user_id = " . (int)$user['id'] . "
+                 LIMIT 1"
+            );
+            if (!empty($existingVoteRows[0])) {
+                public_portal_flash_set('portal', ['type' => 'error', 'message' => 'Оценка уже учтена. Изменить ее нельзя.']);
+                public_portal_redirect_back('/');
+            }
             mysqli_query(
                 $db,
                 "INSERT INTO public_comment_votes (comment_id, user_id, vote_value, created_at, updated_at)
-                 VALUES ({$commentId}, " . (int)$user['id'] . ", {$voteValue}, NOW(), NOW())
-                 ON DUPLICATE KEY UPDATE
-                    vote_value = IF(vote_value = VALUES(vote_value), 0, VALUES(vote_value)),
-                    updated_at = NOW()"
+                 VALUES ({$commentId}, " . (int)$user['id'] . ", {$voteValue}, NOW(), NOW())"
             );
             public_portal_recalculate_comment_stats($db, $commentId);
             public_portal_recalculate_user_rating($db, $authorId);
@@ -1817,7 +1835,7 @@ if (!function_exists('public_portal_fetch_comments')) {
                     c.rating_score, c.votes_up, c.votes_down,
                     u.id AS user_id, u.username, u.display_name, u.email, u.avatar_url, u.avatar_mode,
                     u.comment_rating, u.comment_votes_up, u.comment_votes_down, u.comments_count,
-                    cv.vote_value AS current_user_vote
+                    cv.id AS current_user_vote_id, cv.vote_value AS current_user_vote
              FROM public_comments c
              INNER JOIN public_users u ON u.id = c.user_id
              {$voteJoin}
