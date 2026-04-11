@@ -1587,14 +1587,17 @@ if (isset($_GET['header_search_preview'])) {
         .pc-brand-copy span { display: none; }
         .simple-header-action { display: none; }
         .simple-nav {
-            left: 10px;
-            right: 10px;
-            width: auto;
-            top: calc(var(--simple-header-height) + 6px);
-            max-height: calc(100vh - var(--simple-header-height) - 18px);
-            padding: 16px 14px;
+            left: 0;
+            right: 0;
+            width: 100vw;
+            top: var(--simple-header-height);
+            max-height: calc(100vh - var(--simple-header-height));
+            padding: 14px 12px 16px;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 8px;
+            border-left: 0;
+            border-right: 0;
+            clip-path: none;
         }
         .simple-nav a,
         .nav-theme-toggle {

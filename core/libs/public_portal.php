@@ -1008,9 +1008,24 @@ if (!function_exists('public_portal_fetch_user_favorites')) {
 if (!function_exists('public_portal_avatar_upload_dir')) {
     function public_portal_avatar_upload_dir(): array
     {
-        $dir = rtrim((string)DIR, '/\\') . '/cache/public_avatars/';
-        $public = '/cache/public_avatars/';
-        return ['dir' => $dir, 'public' => $public];
+        $ym = date('Y/m');
+        $root = rtrim((string)DIR, '/\\');
+        $candidates = [
+            [
+                'dir' => $root . '/uploads/public_avatars/' . $ym . '/',
+                'public' => '/uploads/public_avatars/' . $ym . '/',
+            ],
+            [
+                'dir' => $root . '/cache/public_avatars/' . $ym . '/',
+                'public' => '/cache/public_avatars/' . $ym . '/',
+            ],
+        ];
+        foreach ($candidates as $candidate) {
+            if (is_dir((string)($candidate['dir'] ?? ''))) {
+                return $candidate;
+            }
+        }
+        return $candidates[0];
     }
 }
 
@@ -1055,9 +1070,19 @@ if (!function_exists('public_portal_store_avatar_upload')) {
             return '';
         }
         $paths = public_portal_avatar_upload_dir();
-        if (!is_dir($paths['dir']) && !@mkdir($paths['dir'], 0775, true) && !is_dir($paths['dir'])) {
+        if (false && !is_dir($paths['dir']) && !@mkdir($paths['dir'], 0775, true) && !is_dir($paths['dir'])) {
             $error = 'Не удалось создать папку для аватарок.';
             return '';
+        }
+        if (!is_dir($paths['dir']) && !@mkdir($paths['dir'], 0775, true) && !is_dir($paths['dir'])) {
+            $fallbackDir = rtrim((string)DIR, '/\\') . '/cache/public_avatars/' . date('Y/m') . '/';
+            $fallbackPublic = '/cache/public_avatars/' . date('Y/m') . '/';
+            if ($fallbackDir !== $paths['dir'] && (is_dir($fallbackDir) || @mkdir($fallbackDir, 0775, true) || is_dir($fallbackDir))) {
+                $paths = ['dir' => $fallbackDir, 'public' => $fallbackPublic];
+            } else {
+                $error = 'РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ РїР°РїРєСѓ РґР»СЏ Р°РІР°С‚Р°СЂРѕРє.';
+                return '';
+            }
         }
         $name = public_portal_slugify($seed, 'avatar') . '-' . date('YmdHis') . '-' . random_int(1000, 9999) . '.' . $extMap[$mime];
         $target = $paths['dir'] . $name;
