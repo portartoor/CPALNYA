@@ -89,7 +89,7 @@ class Render {
 				}
 				$routeFirst = 'account';
 			}
-			if (in_array($routeFirst, ['services', 'projects', 'cases', 'offers', 'solutions', 'tools'], true)) {
+			if (in_array($routeFirst, ['projects', 'cases', 'offers', 'solutions', 'tools'], true)) {
 				$result['routes'][1] = '404';
 				$result['routes_count'] = 1;
 				$result['extension'] = '404';
@@ -352,7 +352,7 @@ class Render {
 			exit;
 		}
 		if (
-			preg_match('#^/(services|projects|cases|offers|solutions)(?:/|$)#', $requestPath)
+			preg_match('#^/(projects|cases|offers|solutions)(?:/|$)#', $requestPath)
 			|| (!$this->IsApiGeoOnlineHost() && preg_match('#^/tools(?:/|$)#', $requestPath))
 		) {
 			header("HTTP/1.0 404 Not Found");
@@ -360,7 +360,7 @@ class Render {
 			$routes['routes_count'] = 1;
 			$File = '404.php';
 		}
-		if (preg_match('#^/adminpanel/(services|services-edit|projects|projects-edit|cases|cases-edit|offers|offers-edit|solutions|solutions-edit|tools)(?:/|$)#', $requestPath)) {
+		if (preg_match('#^/adminpanel/(projects|projects-edit|cases|cases-edit|offers|offers-edit|solutions|solutions-edit|tools)(?:/|$)#', $requestPath)) {
 			header("HTTP/1.0 404 Not Found");
 			$routes['routes'][1] = '404';
 			$routes['routes_count'] = 1;
@@ -850,6 +850,7 @@ class Render {
 			$urls[] = ['loc' => $base.'/playbooks/', 'changefreq' => 'daily', 'priority' => '0.9'];
 			$urls[] = ['loc' => $base.'/signals/', 'changefreq' => 'daily', 'priority' => '0.8'];
 			$urls[] = ['loc' => $base.'/fun/', 'changefreq' => 'daily', 'priority' => '0.7'];
+			$urls[] = ['loc' => $base.'/services/', 'changefreq' => 'weekly', 'priority' => '0.8'];
 			$urls[] = ['loc' => $base.'/contact/', 'changefreq' => 'weekly', 'priority' => '0.8'];
 			$urls[] = ['loc' => $base.'/audit/', 'changefreq' => 'weekly', 'priority' => '0.7'];
 			$urls[] = ['loc' => $base.'/terms/', 'changefreq' => 'monthly', 'priority' => '0.3'];
@@ -858,6 +859,7 @@ class Render {
 
 		if (!$isApiGeoOnlineSitemap) {
 			$urls = array_merge($urls, $this->FetchSitemapBlogUrls($base));
+			$urls = array_merge($urls, $this->FetchSitemapServiceUrls($base));
 			$urls = array_merge($urls, $this->FetchSitemapMirrorRouteUrls($base));
 		}
 
@@ -1263,7 +1265,7 @@ class Render {
 				if ($routeName === '') {
 					continue;
 				}
-				if (in_array($routeName, ['services', 'projects', 'cases', 'offers', 'solutions', 'tools'], true)) {
+				if (in_array($routeName, ['projects', 'cases', 'offers', 'solutions', 'tools'], true)) {
 					continue;
 				}
 				$path = '';

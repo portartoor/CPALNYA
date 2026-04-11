@@ -11,7 +11,7 @@ $logoAria = $logoMain . ' portal';
 $requestPath = parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 $requestPath = is_string($requestPath) && $requestPath !== '' ? $requestPath : '/';
 $firstSegment = strtolower((string)(explode('/', trim($requestPath, '/'))[0] ?? ''));
-$section = in_array($firstSegment, ['blog', 'journal', 'playbooks', 'signals', 'fun', 'contact', 'audit', 'account', 'member'], true) ? $firstSegment : 'home';
+$section = in_array($firstSegment, ['blog', 'journal', 'playbooks', 'signals', 'fun', 'services', 'search', 'contact', 'audit', 'account', 'member'], true) ? $firstSegment : 'home';
 if ($section === 'blog') {
     $section = 'journal';
 }
@@ -111,7 +111,7 @@ $canonical = $scheme . '://' . $canonicalHost . $canonicalPath;
 $ruHost = $canonicalHost;
 $enHost = $canonicalHost;
 $selfLang = $isRu ? 'ru' : 'en';
-$isEquivalentPath = in_array($canonicalPath, ['/', '/journal/', '/playbooks/', '/signals/', '/fun/', '/contact/', '/audit/', '/privacy/', '/terms/'], true);
+$isEquivalentPath = in_array($canonicalPath, ['/', '/journal/', '/playbooks/', '/signals/', '/fun/', '/services/', '/contact/', '/audit/', '/privacy/', '/terms/'], true);
 $hreflangLinks = [];
 $hreflangLinks[] = ['lang' => $selfLang, 'href' => $canonical];
 if ($isEquivalentPath) {
@@ -1648,7 +1648,7 @@ if (isset($_GET['header_search_preview'])) {
     </div>
 
     <div class="simple-header-center">
-        <form class="simple-header-search" id="simple-header-search" method="get" action="/journal/">
+        <form class="simple-header-search" id="simple-header-search" method="get" action="/search/">
             <input type="text" name="q" data-search-input placeholder="<?= htmlspecialchars($isRu ? 'Поиск: Facebook farm, антидетект, tracker setup, nutra funnel' : 'Search: Facebook farm, anti-detect, tracker setup, nutra funnel', ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
             <button type="submit"><?= htmlspecialchars($isRu ? 'Найти в выпусках' : 'Search issues', ENT_QUOTES, 'UTF-8') ?></button>
             <div class="simple-search-preview" id="simple-search-preview" aria-hidden="true"></div>

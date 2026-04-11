@@ -44,6 +44,22 @@ if ($servicesData['group'] !== '') {
     $servicesData['group'] = public_services_normalize_group((string)$servicesData['group']);
 }
 
+if (
+    function_exists('public_services_fetch_published_count')
+    && function_exists('public_services_seed_default_catalog')
+    && public_services_fetch_published_count(
+        $FRMWRK,
+        (string)$servicesData['host'],
+        (string)$servicesData['lang']
+    ) === 0
+) {
+    public_services_seed_default_catalog(
+        $FRMWRK,
+        (string)$servicesData['host'],
+        (string)$servicesData['lang']
+    );
+}
+
 $slugParam = trim((string)($_GET['slug'] ?? ''));
 if ($slugParam === '') {
     $requestPath = parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);

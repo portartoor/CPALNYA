@@ -5836,12 +5836,12 @@ function seo_generate_article_payload(
           . "{\n  \"title\": \"...\",\n  \"slug\": \"...\",\n  \"excerpt_html\": \"<p>...</p>\",\n  \"content_html\": \"...\"\n}\n"
           . "3) slug: latin letters, numbers, dashes only, 8-180 chars.\n"
           . "4) content_html must be valid HTML with <h2>/<h3>, lists, and practical implementation details.\n"
-          . "5) Include at least 3 internal links from the allowed list (blog/services/projects), including at least one /blog/ link.\n"
+          . "5) Include at least 3 internal links from the allowed list (blog/services), including at least one /blog/ link.\n"
           . "6) Include a natural CTA to /services/.\n"
           . "7) Cover concrete questions users search for and provide checklists, steps, anti-patterns.\n"
           . "8) Avoid near-duplicate topics and titles from existing list.\n\n"
           . "9) Do not mention alternatives, competitors, third-party services, or external tools (including mindmap/mind map and competitor APIs).\n"
-          . "10) Do not add external links. Only internal links are allowed: /blog/... /services/... /projects/... and /services/.\n"
+          . "10) Do not add external links. Only internal links are allowed: /blog/... and /services/...\n"
           . "11) Keep the article focused on practical B2B architecture decisions, implementation quality and measurable outcomes in a vendor-neutral style.\n\n"
           . "12) Section cluster code for URL taxonomy: {$clusterCode}. Keep the topic strictly aligned with this cluster.\n\n"
           . "13) Apply mood '{$moodLabel}' in examples, vocabulary and pacing while keeping technical usefulness and conversion intent.\n\n"
@@ -6016,7 +6016,7 @@ function seo_expand_short_article(
           . "4) No markdown, no extra wrapper text.\n"
           . "5) Return valid HTML in append_html.\n\n"
           . "6) Do not mention alternatives, competitors, third-party services/tools (including mindmap/mind map).\n"
-          . "7) No external links. Allowed links: /blog/... /services/... /projects/... and /services/ only.\n"
+          . "7) No external links. Allowed links: /blog/... and /services/... only.\n"
           . "8) Keep focus on practical adoption, architecture quality and business value in a vendor-neutral style.\n\n"
           . "TITLE:\n{$title}\n\nEXCERPT_HTML:\n{$excerptHtml}\n\nHEADINGS:\n{$headingsText}\n\nLAST_HTML_CHUNK:\n{$tailHtml}\n\nLAST_TEXT_CHUNK:\n{$tailText}";
     $expandAppend = trim((string)($isRu
@@ -6146,10 +6146,7 @@ function seo_publish_article(
         $llmUsageSummary['total_tokens'] += (int)($topicAnalysisLlmTrace['usage']['total_tokens'] ?? 0);
     }
     $domainForLang = seo_host_for_lang($lang);
-    $internalLinks = array_merge(
-        seo_fetch_services_links($db, $lang, $domainForLang, 20),
-        seo_fetch_projects_links($db, $lang, $domainForLang, 20)
-    );
+    $internalLinks = seo_fetch_services_links($db, $lang, $domainForLang, 20);
     $liveNewsContext = [];
     if (strtolower(trim((string)($cfg['campaign_material_section'] ?? ''))) === 'signals') {
         $liveNewsProxyLabel = null;

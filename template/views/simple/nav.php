@@ -22,6 +22,7 @@ $sectionBasePaths = [
     'playbooks' => '/playbooks/',
     'signals' => '/signals/',
     'fun' => '/fun/',
+    'services' => '/services/',
 ];
 $sectionIcons = [
     'home' => '⌂',
@@ -84,6 +85,7 @@ $navSections = [
             ['title' => $sectionTitles['playbooks'], 'path' => $sectionBasePaths['playbooks'], 'icon' => $sectionIcons['playbooks']],
             ['title' => $sectionTitles['signals'], 'path' => $sectionBasePaths['signals'], 'icon' => $sectionIcons['signals']],
             ['title' => $sectionTitles['fun'], 'path' => $sectionBasePaths['fun'], 'icon' => $sectionIcons['fun']],
+            ['title' => $isRu ? 'Uslugi' : 'Services', 'path' => '/services/', 'icon' => 'S'],
         ],
     ],
 ];
@@ -95,7 +97,7 @@ $mobileSearchButton = $isRu ? 'Найти' : 'Search';
 $mobileAccountLabel = $isRu ? 'Аккаунт / вход' : 'Account / sign in';
 ?>
     <div class="nav-mobile-tools">
-        <form class="nav-mobile-search" method="get" action="/journal/">
+        <form class="nav-mobile-search" method="get" action="/search/">
             <input type="text" name="q" placeholder="<?= htmlspecialchars($mobileSearchPlaceholder, ENT_QUOTES, 'UTF-8') ?>" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
             <button type="submit"><?= htmlspecialchars($mobileSearchButton, ENT_QUOTES, 'UTF-8') ?></button>
         </form>
