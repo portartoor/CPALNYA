@@ -548,6 +548,7 @@ if (isset($_GET['header_search_preview'])) {
         right: 18px;
         top: 14px;
         z-index: 999;
+        isolation: isolate;
         display: grid;
         grid-template-columns: minmax(220px, 300px) minmax(320px, 1fr) auto;
         gap: 10px 16px;
@@ -1461,13 +1462,15 @@ if (isset($_GET['header_search_preview'])) {
             inset: 0;
             background: rgba(3, 8, 18, .62);
             opacity: 0;
+            visibility: hidden;
             pointer-events: none;
             transition: opacity .22s ease;
-            z-index: 10000;
+            z-index: 12000;
         }
         body.simple-nav-open .simple-header {
             clip-path: none;
             overflow: visible;
+            z-index: 12020;
         }
         body.simple-nav-open .simple-header::before {
             clip-path: none;
@@ -1489,11 +1492,12 @@ if (isset($_GET['header_search_preview'])) {
             gap: 10px;
             transform: translateY(-10px) scale(.98);
             opacity: 0;
+            visibility: hidden;
             pointer-events: none;
             overflow-y: auto;
             overscroll-behavior: contain;
             transition: transform .22s ease, opacity .22s ease;
-            z-index: 10001;
+            z-index: 12010;
         }
         .nav-mobile-tools {
             display: grid;
@@ -1549,8 +1553,8 @@ if (isset($_GET['header_search_preview'])) {
         .nav-theme-toggle { width: 100%; justify-content: flex-start; min-height: 42px; padding: 11px 12px; }
         .nav-section-label { width: 100%; justify-content: flex-start; padding: 8px 2px 2px; }
         .nav-section-label::before { width: 18px; }
-        body.simple-nav-open .simple-nav { transform: none; opacity: 1; pointer-events: auto; }
-        body.simple-nav-open .simple-nav-backdrop { opacity: 1; pointer-events: auto; }
+        body.simple-nav-open .simple-nav { transform: none; opacity: 1; visibility: visible; pointer-events: auto; }
+        body.simple-nav-open .simple-nav-backdrop { opacity: 1; visibility: visible; pointer-events: auto; }
         body.simple-nav-open .simple-nav-toggle span:nth-child(1) { top: 25px; transform: rotate(45deg); }
         body.simple-nav-open .simple-nav-toggle span:nth-child(2) { opacity: 0; }
         body.simple-nav-open .simple-nav-toggle span:nth-child(3) { top: 25px; transform: rotate(-45deg); }
