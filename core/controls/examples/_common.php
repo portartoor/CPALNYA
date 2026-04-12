@@ -471,7 +471,7 @@ if (!function_exists('examples_fetch_published_list')) {
 
         if (!$hasLang) {
             return $FRMWRK->DBRecords(
-                "SELECT id, domain_host, title, slug, {$clusterSelect}, excerpt_html, content_html{$previewSelect}, is_published, published_at, created_at, updated_at, 'en' AS lang_code
+                "SELECT id, domain_host, title, slug, {$clusterSelect}, excerpt_html, content_html, author_name{$previewSelect}, is_published, published_at, created_at, updated_at, 'en' AS lang_code
                  FROM examples_articles
                  WHERE is_published = 1
                    AND (domain_host IS NULL OR domain_host = '' OR domain_host = '{$hostSafe}')
@@ -487,7 +487,7 @@ if (!function_exists('examples_fetch_published_list')) {
             : "lang_code = 'en'";
 
         $rows = $FRMWRK->DBRecords(
-            "SELECT id, domain_host, lang_code, title, slug, {$clusterSelect}, excerpt_html, content_html{$previewSelect}, is_published, published_at, created_at, updated_at, sort_order
+            "SELECT id, domain_host, lang_code, title, slug, {$clusterSelect}, excerpt_html, content_html, author_name{$previewSelect}, is_published, published_at, created_at, updated_at, sort_order
              FROM examples_articles
              WHERE is_published = 1
                AND (domain_host IS NULL OR domain_host = '' OR domain_host = '{$hostSafe}')
@@ -606,7 +606,7 @@ if (!function_exists('examples_fetch_published_page')) {
         $clusterSelect = $hasCluster ? "cluster_code" : ("'" . examples_cluster_default($lang) . "' AS cluster_code");
 
         return $FRMWRK->DBRecords(
-            "SELECT id, domain_host, {$langSelect}, title, slug, {$clusterSelect}, excerpt_html, content_html{$previewSelect}, is_published, published_at, created_at, updated_at, sort_order
+            "SELECT id, domain_host, {$langSelect}, title, slug, {$clusterSelect}, excerpt_html, content_html, author_name{$previewSelect}, is_published, published_at, created_at, updated_at, sort_order
              FROM examples_articles
              WHERE {$where}
              ORDER BY COALESCE(published_at, updated_at, created_at) DESC, id DESC
@@ -684,7 +684,7 @@ if (!function_exists('examples_fetch_published_by_slug')) {
         }
         if (!$hasLang) {
             $rows = $FRMWRK->DBRecords(
-                "SELECT id, domain_host, title, slug, {$clusterSelect}, excerpt_html, content_html{$previewSelect}, is_published, published_at, created_at, updated_at, 'en' AS lang_code
+                "SELECT id, domain_host, title, slug, {$clusterSelect}, excerpt_html, content_html, author_name{$previewSelect}, is_published, published_at, created_at, updated_at, 'en' AS lang_code
                  FROM examples_articles
                  WHERE is_published = 1
                    AND {$slugWhere}
@@ -701,7 +701,7 @@ if (!function_exists('examples_fetch_published_by_slug')) {
             ? "lang_code = 'ru'"
             : "lang_code = 'en'";
         $rows = $FRMWRK->DBRecords(
-            "SELECT id, domain_host, lang_code, title, slug, {$clusterSelect}, excerpt_html, content_html{$previewSelect}, is_published, published_at, created_at, updated_at
+            "SELECT id, domain_host, lang_code, title, slug, {$clusterSelect}, excerpt_html, content_html, author_name{$previewSelect}, is_published, published_at, created_at, updated_at
              FROM examples_articles
              WHERE is_published = 1
                AND {$slugWhere}
