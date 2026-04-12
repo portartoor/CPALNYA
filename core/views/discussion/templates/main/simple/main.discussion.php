@@ -54,6 +54,7 @@ $nextPageUrl = $page < $totalPages ? $buildListUrl($currentSection, $page + 1) :
 .dsc-groups{display:grid;gap:18px}
 .dsc-block{padding:20px;display:grid;gap:16px}
 .dsc-block-head,.dsc-thread-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;flex-wrap:wrap}
+.dsc-block-title{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .dsc-stats{display:flex;gap:10px;flex-wrap:wrap;color:var(--shell-muted);font-size:12px;text-transform:uppercase;letter-spacing:.12em}
 .dsc-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--shell-text);font-weight:700}
 .dsc-pagination{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
@@ -73,6 +74,9 @@ $nextPageUrl = $page < $totalPages ? $buildListUrl($currentSection, $page + 1) :
 .dsc-board-section{display:flex;align-items:flex-start}
 .dsc-board-pill{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:8px 10px;border:1px solid rgba(122,180,255,.16);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
 .dsc-board-topic{display:grid;gap:8px;min-width:0}
+.dsc-board-topic-main{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;align-items:start}
+.dsc-board-thumb{width:64px;height:64px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12))}
+.dsc-board-thumb img{display:block;width:100%;height:100%;object-fit:cover}
 .dsc-board-topic a{color:var(--shell-text);text-decoration:none}
 .dsc-board-topic strong{display:block;font:700 1rem/1.2 "Space Grotesk","Sora",sans-serif}
 .dsc-board-excerpt{color:var(--shell-muted);font-size:14px;line-height:1.5}
@@ -84,6 +88,8 @@ $nextPageUrl = $page < $totalPages ? $buildListUrl($currentSection, $page + 1) :
     .dsc-board-row > *{border-right:0;border-top:1px solid rgba(122,180,255,.08)}
     .dsc-board-row > *:first-child{border-top:0}
     .dsc-board-section,.dsc-board-meta{justify-content:flex-start}
+    .dsc-board-topic-main{grid-template-columns:56px minmax(0,1fr)}
+    .dsc-board-thumb{width:56px;height:56px}
 }
 @media (max-width:720px){.dsc{padding:18px 14px 48px}.dsc-hero,.dsc-block,.dsc-thread{padding:18px}}
 </style>
@@ -146,7 +152,7 @@ $nextPageUrl = $page < $totalPages ? $buildListUrl($currentSection, $page + 1) :
                     <?php if (empty($sectionItems)): continue; endif; ?>
                     <section class="dsc-block">
                         <div class="dsc-block-head">
-                            <div>
+                            <div class="dsc-block-title">
                                 <span class="dsc-kicker"><?= htmlspecialchars((string)($sectionLabels[$sectionCode] ?? $sectionCode), ENT_QUOTES, 'UTF-8') ?></span>
                                 <h2><?= htmlspecialchars($t('Таблица тем', 'Thread board'), ENT_QUOTES, 'UTF-8') ?></h2>
                             </div>
@@ -172,9 +178,18 @@ $nextPageUrl = $page < $totalPages ? $buildListUrl($currentSection, $page + 1) :
                                         <span class="dsc-board-pill"><?= htmlspecialchars((string)($sectionLabels[$sectionCode] ?? $sectionCode), ENT_QUOTES, 'UTF-8') ?></span>
                                     </div>
                                     <div class="dsc-board-topic" role="cell">
-                                        <a href="<?= htmlspecialchars((string)($item['discussion_url'] ?? '/discussion/'), ENT_QUOTES, 'UTF-8') ?>">
-                                            <strong><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></strong>
-                                        </a>
+                                        <div class="dsc-board-topic-main">
+                                            <div class="dsc-board-thumb">
+                                                <?php if (!empty($item['image_src'])): ?>
+                                                    <img src="<?= htmlspecialchars((string)$item['image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                                                <?php endif; ?>
+                                            </div>
+                                            <div>
+                                                <a href="<?= htmlspecialchars((string)($item['discussion_url'] ?? '/discussion/'), ENT_QUOTES, 'UTF-8') ?>">
+                                                    <strong><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></strong>
+                                                </a>
+                                            </div>
+                                        </div>
                                         <?php if (!empty($item['short_excerpt'])): ?>
                                             <div class="dsc-board-excerpt"><?= htmlspecialchars((string)$item['short_excerpt'], ENT_QUOTES, 'UTF-8') ?></div>
                                         <?php endif; ?>

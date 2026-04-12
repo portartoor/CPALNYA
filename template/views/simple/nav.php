@@ -57,11 +57,20 @@ if (function_exists('examples_fetch_published_list')) {
             continue;
         }
         $cluster = trim((string)($item['cluster_code'] ?? ''));
+        $cluster = function_exists('examples_normalize_cluster')
+            ? examples_normalize_cluster($cluster, $isRu ? 'ru' : 'en')
+            : $cluster;
+        $topicTitle = $cluster !== '' && function_exists('examples_cluster_label')
+            ? trim((string)examples_cluster_label($cluster, $isRu ? 'ru' : 'en'))
+            : '';
+        if ($topicTitle === '') {
+            $topicTitle = $sectionTitles[$topicSection] ?? $topicSection;
+        }
         $importantTopicItems[] = [
-            'title' => trim((string)($item['title'] ?? ($sectionTitles[$topicSection] ?? $topicSection))),
-            'path' => function_exists('examples_article_url_path')
-                ? examples_article_url_path($slug, $cluster, null, $topicSection)
-                : ('/' . trim($topicSection, '/') . '/' . rawurlencode($slug) . '/'),
+            'title' => $topicTitle,
+            'path' => ($cluster !== '' && function_exists('examples_cluster_list_path'))
+                ? examples_cluster_list_path($cluster, null, $topicSection)
+                : ($sectionBasePaths[$topicSection] ?? ('/' . trim($topicSection, '/') . '/')),
             'icon' => $sectionIcons[$topicSection] ?? '•',
         ];
     }
