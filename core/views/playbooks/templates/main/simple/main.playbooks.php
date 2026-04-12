@@ -563,15 +563,15 @@ if ($sectionKey !== 'playbooks') {
                             <span class="jrnl-share-label">WhatsApp</span>
                         </a>
                         <?php if ($portalUser && !empty($selected['id'])): ?>
-                            <form class="jrnl-favorite-form" method="post" data-favorite-active-label="<?= htmlspecialchars($t('Р В РІР‚в„ў Р В РЎвЂР В Р’В·Р В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р В РЎвЂўР В РЎВ', 'Saved'), ENT_QUOTES, 'UTF-8') ?>" data-favorite-idle-label="<?= htmlspecialchars($t('Р В РІР‚СњР В РЎвЂўР В Р’В±Р В Р’В°Р В Р вЂ Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ  Р В РЎвЂР В Р’В·Р В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р В РЎвЂўР В Р’Вµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
+                            <form class="jrnl-favorite-form" method="post" data-favorite-active-label="<?= htmlspecialchars($t('В избранном', 'Saved'), ENT_QUOTES, 'UTF-8') ?>" data-favorite-idle-label="<?= htmlspecialchars($t('Добавить в избранное', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="action" value="public_portal_favorite_toggle">
                                 <input type="hidden" name="portal_csrf" value="<?= htmlspecialchars($portalCsrf, ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="return_path" value="<?= htmlspecialchars((string)($_SERVER['REQUEST_URI'] ?? '/'), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="content_type" value="examples">
                                 <input type="hidden" name="content_id" value="<?= (int)$selected['id'] ?>">
-                                <button class="jrnl-favorite-btn <?= $portalIsFavorite ? 'is-active' : '' ?>" type="submit" aria-label="<?= htmlspecialchars($t('Р В РІР‚СњР В РЎвЂўР В Р’В±Р В Р’В°Р В Р вЂ Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ  Р В РЎвЂР В Р’В·Р В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р В РЎвЂўР В Р’Вµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
+                                <button class="jrnl-favorite-btn <?= $portalIsFavorite ? 'is-active' : '' ?>" type="submit" aria-label="<?= htmlspecialchars($t('Добавить в избранное', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
                                     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.4l2.63 5.34 5.9.86-4.27 4.16 1 5.87L12 16.88 6.74 19.63l1-5.87L3.47 9.6l5.9-.86L12 3.4Z"/></svg>
-                                    <span class="jrnl-share-label"><?= htmlspecialchars($portalIsFavorite ? $t('Р В РІР‚в„ў Р В РЎвЂР В Р’В·Р В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р В РЎвЂўР В РЎВ', 'Saved') : $t('Р В РІР‚СњР В РЎвЂўР В Р’В±Р В Р’В°Р В Р вЂ Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ  Р В РЎвЂР В Р’В·Р В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р В РЎвЂўР В Р’Вµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="jrnl-share-label"><?= htmlspecialchars($portalIsFavorite ? $t('В избранном', 'Saved') : $t('Добавить в избранное', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?></span>
                                 </button>
                             </form>
                         <?php endif; ?>
