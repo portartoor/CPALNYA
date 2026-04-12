@@ -2,6 +2,7 @@
 $journal = (array)($ModelPage['journal'] ?? []);
 $items = (array)($journal['items'] ?? []);
 $selected = is_array($journal['selected'] ?? null) ? $journal['selected'] : null;
+$authorProfile = is_array($ModelPage['article_author_profile'] ?? null) ? $ModelPage['article_author_profile'] : null;
 $portalUser = is_array($ModelPage['portal_user'] ?? null) ? $ModelPage['portal_user'] : null;
 $portalIsFavorite = !empty($ModelPage['portal_is_favorite']);
 $portalCommentTotal = (int)($ModelPage['portal_comment_total'] ?? 0);
@@ -13,6 +14,23 @@ $isRu = ($lang === 'ru');
 $page = max(1, (int)($journal['page'] ?? 1));
 $totalPages = max(1, (int)($journal['total_pages'] ?? 1));
 $currentCluster = trim((string)($journal['current_cluster'] ?? ''));
+$authorDisplayName = trim((string)($authorProfile['resolved_name'] ?? ($selected['author_name'] ?? '')));
+$authorNickname = trim((string)($authorProfile['nickname'] ?? ''));
+$authorRole = trim((string)($authorProfile['resolved_role'] ?? ''));
+$authorBio = trim((string)($authorProfile['resolved_bio'] ?? ''));
+$authorInitials = '';
+if ($authorDisplayName !== '') {
+    $authorWords = preg_split('/[\s"\'.@_-]+/u', $authorDisplayName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+    foreach ($authorWords as $authorWord) {
+        $authorInitials .= mb_strtoupper((string)mb_substr((string)$authorWord, 0, 1, 'UTF-8'), 'UTF-8');
+        if (mb_strlen($authorInitials, 'UTF-8') >= 2) {
+            break;
+        }
+    }
+}
+if ($authorInitials === '' && $authorNickname !== '') {
+    $authorInitials = mb_strtoupper((string)mb_substr($authorNickname, 0, 2, 'UTF-8'), 'UTF-8');
+}
 $t = static function (string $ru, string $en) use ($isRu): string { return $isRu ? $ru : $en; };
 $strip = static function (string $html, int $limit = 170): string {
     $text = trim((string)preg_replace('/\s+/u', ' ', strip_tags($html)));
@@ -332,12 +350,19 @@ if ($selected) {
 .jrnl-cover{min-height:0;border:1px solid rgba(255,255,255,.08);background:radial-gradient(circle at 50% 22%,rgba(103,200,255,.16),transparent 26%),linear-gradient(180deg,rgba(6,11,20,.96),rgba(4,8,16,.92));display:block;align-self:start;overflow:hidden;position:relative}
 .jrnl-cover img{position:relative;display:block;width:100%;height:auto;max-width:none;object-fit:contain;object-position:center center;padding:0;transform-origin:50% 0;animation:jrnlCoverIntro 1.15s cubic-bezier(.16,1,.3,1) both}
 .jrnl-tags{display:flex;flex-wrap:wrap;gap:10px}
+.jrnl-author{display:grid;grid-template-columns:52px minmax(0,1fr);gap:14px;align-items:start;padding:16px 18px;border:1px solid rgba(122,180,255,.16);background:rgba(255,255,255,.035)}
+.jrnl-author-mark{display:flex;align-items:center;justify-content:center;width:52px;height:52px;border:1px solid rgba(122,180,255,.24);background:linear-gradient(135deg,rgba(115,184,255,.16),rgba(39,223,192,.12));font:700 1rem/1 "Space Grotesk","Sora",sans-serif;color:var(--shell-text);text-transform:uppercase}
+.jrnl-author-copy{display:grid;gap:4px;min-width:0}
+.jrnl-author-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.jrnl-author-name{margin:0;font:700 1rem/1.1 "Space Grotesk","Sora",sans-serif;color:var(--shell-text)}
+.jrnl-author-handle,.jrnl-author-role{color:var(--shell-muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.jrnl-author-bio{margin:0;color:rgba(233,242,255,.88);line-height:1.58}
 .jrnl-tag{color:var(--shell-muted);text-decoration:none}
 .jrnl-tag.is-active,.jrnl-tag:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
-.jrnl-topic-cloud{display:block;font-size:0;line-height:1.8}
-.jrnl-topic-pill{display:inline;color:rgba(196,214,238,.7);text-decoration:none;font-size:calc(var(--topic-font,12) * 1px);font-weight:700;line-height:1.02;letter-spacing:0;vertical-align:baseline}
-.jrnl-topic-pill strong,.jrnl-topic-pill span{display:inline;color:inherit;font-size:1em;font-weight:inherit}
-.jrnl-topic-pill span{opacity:.72}
+.jrnl-topic-cloud{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px 12px}
+.jrnl-topic-pill{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:42px;padding:10px 14px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:rgba(196,214,238,.78);text-decoration:none;flex:var(--topic-grow,1) 1 calc(var(--topic-basis,16) * 1%);font-size:calc(var(--topic-font,12) * 1px);font-weight:700;line-height:1.08;letter-spacing:0}
+.jrnl-topic-pill strong,.jrnl-topic-pill span{display:block;color:inherit;font-size:1em;font-weight:inherit}
+.jrnl-topic-pill span{opacity:.76;white-space:nowrap}
 .jrnl-topic-pill.is-active,.jrnl-topic-pill:hover{color:var(--shell-text)}
 .jrnl-topic-pill.is-all{opacity:.82}
 .jrnl-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
@@ -359,6 +384,7 @@ if ($selected) {
 .jrnl-stat-link:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
 .jrnl-breadcrumbs{display:flex;flex-wrap:wrap;gap:10px;align-items:center;color:rgba(214,235,255,.78);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
 .jrnl-breadcrumbs a{color:rgba(214,235,255,.72);text-decoration:none}
+.jrnl-detail .jrnl-author + .jrnl-detail-intro{margin-top:2px}
 .jrnl-breadcrumbs a:hover{color:var(--shell-text)}
 .jrnl-breadcrumb-sep{opacity:.42}
 .jrnl-breadcrumb-current{color:var(--shell-text)}
@@ -417,7 +443,7 @@ if ($selected) {
 100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0) saturate(1)}
 }
 @media (max-width:1180px){.jrnl-hero,.jrnl-grid,.jrnl-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.jrnl-hero{grid-template-columns:1fr}}
-@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-hero{padding:0 0 18px;overflow:hidden}.jrnl-cover{order:-1;border-top:0;border-left:0;border-right:0}.jrnl-copy{padding:0 18px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}}
+@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-hero{padding:0 0 18px;overflow:hidden}.jrnl-cover{order:-1;border-top:0;border-left:0;border-right:0}.jrnl-copy{padding:0 18px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}.jrnl-topic-pill{flex-basis:calc(max(var(--topic-basis,24), 42) * 1%)}.jrnl-author{grid-template-columns:1fr;padding:14px}.jrnl-author-mark{width:44px;height:44px}.jrnl-author-top{gap:8px}}
 </style>
 
 <section class="jrnl">
@@ -459,8 +485,20 @@ if ($selected) {
                         <a class="jrnl-tag" href="<?= htmlspecialchars($buildPageUrl($selectedClusterCode), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($selectedClusterLabel, ENT_QUOTES, 'UTF-8') ?></a>
                     <?php endif; ?>
                     <span class="jrnl-meta"><?= htmlspecialchars((string)($selected['published_at'] ?? $selected['created_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
-                    <?php if (!empty($selected['author_name'])): ?><span class="jrnl-meta"><?= htmlspecialchars((string)$selected['author_name'], ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
                 </div>
+                <?php if ($authorDisplayName !== ''): ?>
+                    <div class="jrnl-author">
+                        <div class="jrnl-author-mark"><?= htmlspecialchars($authorInitials !== '' ? $authorInitials : 'CP', ENT_QUOTES, 'UTF-8') ?></div>
+                        <div class="jrnl-author-copy">
+                            <div class="jrnl-author-top">
+                                <h2 class="jrnl-author-name"><?= htmlspecialchars($authorDisplayName, ENT_QUOTES, 'UTF-8') ?></h2>
+                                <?php if ($authorNickname !== ''): ?><span class="jrnl-author-handle">@<?= htmlspecialchars($authorNickname, ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
+                                <?php if ($authorRole !== ''): ?><span class="jrnl-author-role"><?= htmlspecialchars($authorRole, ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
+                            </div>
+                            <?php if ($authorBio !== ''): ?><p class="jrnl-author-bio"><?= htmlspecialchars($authorBio, ENT_QUOTES, 'UTF-8') ?></p><?php endif; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
                 <?php if ($selectedIntroHtml !== ''): ?>
                     <div class="jrnl-detail-intro"><?= $selectedIntroHtml ?></div>
                 <?php endif; ?>

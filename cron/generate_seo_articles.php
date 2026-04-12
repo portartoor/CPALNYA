@@ -21,6 +21,10 @@ $telegramNotifyLib = DIR . 'core/libs/telegram_notify.php';
 if (is_file($telegramNotifyLib)) {
     require_once $telegramNotifyLib;
 }
+$cpalnyaAuthorsLib = DIR . 'core/libs/cpalnya_authors.php';
+if (is_file($cpalnyaAuthorsLib)) {
+    require_once $cpalnyaAuthorsLib;
+}
 
 $seoCronTimezone = trim((string)($GLOBALS['AppTimezone'] ?? 'Europe/Moscow'));
 if ($seoCronTimezone === '' || @date_default_timezone_set($seoCronTimezone) === false) {
@@ -5471,6 +5475,10 @@ function seo_generate_article_payload(
 ): array
 {
     $isRu = $lang === 'ru';
+    $authorProfile = [];
+    if (function_exists('cpalnya_random_author_profile')) {
+        $authorProfile = (array)cpalnya_random_author_profile();
+    }
     $toneVariability = max(0, min(100, (int)($cfg['tone_variability'] ?? 60)));
     $voiceProfiles = [
         [
@@ -5894,12 +5902,34 @@ function seo_generate_article_payload(
     if ($articleAppend !== '') {
         $userPrompt .= "\n\n" . $articleAppend;
     }
+    $authorNickname = trim((string)($authorProfile['nickname'] ?? ''));
+    $authorDisplayName = trim((string)($authorProfile['display_name'] ?? $authorNickname));
+    $authorRole = trim((string)($authorProfile[$isRu ? 'role_ru' : 'role_en'] ?? ''));
+    $authorBio = trim((string)($authorProfile[$isRu ? 'bio_ru' : 'bio_en'] ?? ''));
+    if ($authorNickname !== '' || $authorDisplayName !== '' || $authorRole !== '' || $authorBio !== '') {
+        $userPrompt .= "\n\nAuthor persona and byline (mandatory):\n";
+        if ($authorDisplayName !== '') {
+            $userPrompt .= "- Signed author: {$authorDisplayName}\n";
+        }
+        if ($authorNickname !== '') {
+            $userPrompt .= "- Author nickname: {$authorNickname}\n";
+        }
+        if ($authorRole !== '') {
+            $userPrompt .= "- Author role/focus: {$authorRole}\n";
+        }
+        if ($authorBio !== '') {
+            $userPrompt .= "- Author operating perspective: {$authorBio}\n";
+        }
+        $userPrompt .= "- Write from this operator perspective: the angle, examples, emphasis and editorial instinct should match this persona.\n";
+        $userPrompt .= "- Do not mention the prompt, the persona instructions, or that the author is fictional.\n";
+    }
 
     return [
         'system_prompt' => $systemPrompt,
         'user_prompt' => $userPrompt,
         'related' => $related,
         'live_news_count' => count($liveNewsItems),
+        'author_profile' => $authorProfile,
         'structure' => $structure,
         'cluster_seed' => $cluster,
         'cluster_code' => $clusterCode,
@@ -6403,7 +6433,11 @@ function seo_publish_article(
     $materialSectionSafe = mysqli_real_escape_string($db, $materialSection);
     $excerptSafe = mysqli_real_escape_string($db, $excerptHtml);
     $contentSafe = mysqli_real_escape_string($db, $contentHtml);
-    $authorSafe = mysqli_real_escape_string($db, $cfg['author_name']);
+    $authorName = trim((string)(($payload['author_profile']['nickname'] ?? '') ?: ($cfg['author_name'] ?? '')));
+    if ($authorName === '') {
+        $authorName = 'cpalnya.editorial';
+    }
+    $authorSafe = mysqli_real_escape_string($db, $authorName);
     $langSafe = mysqli_real_escape_string($db, $lang);
     $domainSafe = mysqli_real_escape_string($db, $domainForLang);
     $publishedAt = trim((string)$publishedAt);
@@ -6542,6 +6576,7 @@ function seo_publish_article(
         'preview_image_thumb_url' => $previewImageThumbUrl,
         'preview_image_style' => $previewImageStyle,
         'preview_image_data' => $previewImageData,
+        'author_name' => $authorName,
         'published_at' => $publishedAt,
         'words' => $words,
         'words_initial' => $initialWords,

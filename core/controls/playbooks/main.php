@@ -30,6 +30,10 @@ if (!is_file($examplesCommon)) {
 }
 
 require_once $examplesCommon;
+$authorsLib = DIR . 'core/libs/cpalnya_authors.php';
+if (is_file($authorsLib)) {
+    require_once $authorsLib;
+}
 
 $db = $FRMWRK->DB();
 if (!$db || !function_exists('examples_table_exists') || !examples_table_exists($db)) {
@@ -271,6 +275,9 @@ if ($selectedArticle) {
     $articleImage = $pickArticleImage($selectedArticle);
     if ($articleImage !== '') {
         $ModelPage['og_image'] = $ModelPage['og_image'] ?? $articleImage;
+    }
+    if (function_exists('cpalnya_author_resolve')) {
+        $ModelPage['article_author_profile'] = cpalnya_author_resolve((string)($selectedArticle['author_name'] ?? ''), (string)$playbooksData['lang']);
     }
     $ModelPage['article_author'] = $ModelPage['article_author'] ?? trim((string)($selectedArticle['author_name'] ?? ''));
     $ModelPage['article_published_time'] = $ModelPage['article_published_time'] ?? $normalizeIso($selectedArticle['published_at'] ?? $selectedArticle['created_at'] ?? '');

@@ -32,6 +32,10 @@ if (!is_file($examplesCommon) || !is_file($issueLib)) {
 
 require_once $examplesCommon;
 require_once $issueLib;
+$authorsLib = DIR . 'core/libs/cpalnya_authors.php';
+if (is_file($authorsLib)) {
+    require_once $authorsLib;
+}
 
 $db = $FRMWRK->DB();
 if (!$db || !function_exists('examples_table_exists') || !examples_table_exists($db)) {
@@ -256,6 +260,9 @@ if ($selectedArticle) {
         $ModelPage['article_modified_time'] = $modifiedIso;
     }
     $ModelPage['article_author'] = trim((string)($selectedArticle['author_name'] ?? 'Редакция ЦПАЛЬНЯ'));
+    if (function_exists('cpalnya_author_resolve')) {
+        $ModelPage['article_author_profile'] = cpalnya_author_resolve((string)($selectedArticle['author_name'] ?? ''), (string)$journalData['lang']);
+    }
 } else {
     $title = trim((string)($journalData['issue']['issue_title'] ?? ''));
     $subtitle = trim((string)($journalData['issue']['issue_subtitle'] ?? ''));
