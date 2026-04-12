@@ -11,7 +11,7 @@ $logoAria = $logoMain . ' portal';
 $requestPath = parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 $requestPath = is_string($requestPath) && $requestPath !== '' ? $requestPath : '/';
 $firstSegment = strtolower((string)(explode('/', trim($requestPath, '/'))[0] ?? ''));
-$section = in_array($firstSegment, ['blog', 'journal', 'playbooks', 'signals', 'fun', 'services', 'search', 'contact', 'audit', 'account', 'member'], true) ? $firstSegment : 'home';
+$section = in_array($firstSegment, ['blog', 'journal', 'playbooks', 'signals', 'fun', 'discussion', 'services', 'search', 'contact', 'audit', 'account', 'member'], true) ? $firstSegment : 'home';
 if ($section === 'blog') {
     $section = 'journal';
 }
@@ -111,7 +111,7 @@ $canonical = $scheme . '://' . $canonicalHost . $canonicalPath;
 $ruHost = $canonicalHost;
 $enHost = $canonicalHost;
 $selfLang = $isRu ? 'ru' : 'en';
-$isEquivalentPath = in_array($canonicalPath, ['/', '/journal/', '/playbooks/', '/signals/', '/fun/', '/services/', '/contact/', '/audit/', '/privacy/', '/terms/'], true);
+$isEquivalentPath = in_array($canonicalPath, ['/', '/journal/', '/playbooks/', '/signals/', '/fun/', '/discussion/', '/services/', '/contact/', '/audit/', '/privacy/', '/terms/'], true);
 $hreflangLinks = [];
 $hreflangLinks[] = ['lang' => $selfLang, 'href' => $canonical];
 if ($isEquivalentPath) {

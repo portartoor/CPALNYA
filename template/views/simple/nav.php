@@ -16,12 +16,14 @@ $sectionTitles = [
     'playbooks' => $isRu ? 'Практика' : 'Playbooks',
     'signals' => $isRu ? 'Повестка' : 'Signals',
     'fun' => $isRu ? 'Фан' : 'Fun',
+    'discussion' => $isRu ? 'Обсуждение' : 'Discussion',
 ];
 $sectionBasePaths = [
     'journal' => '/journal/',
     'playbooks' => '/playbooks/',
     'signals' => '/signals/',
     'fun' => '/fun/',
+    'discussion' => '/discussion/',
     'services' => '/services/',
 ];
 $sectionIcons = [
@@ -30,6 +32,7 @@ $sectionIcons = [
     'playbooks' => '⚙',
     'signals' => '⌁',
     'fun' => '✺',
+    'discussion' => '☰',
     'contact' => '✉',
 ];
 
@@ -41,38 +44,26 @@ if (!function_exists('examples_fetch_clusters') && defined('DIR')) {
 }
 
 $importantTopicItems = [];
-if (function_exists('examples_fetch_clusters')) {
+if (function_exists('examples_fetch_published_list')) {
     $topicSections = ['journal', 'playbooks', 'signals', 'fun'];
-    $seenTopicLabels = [];
     foreach ($topicSections as $topicSection) {
-        $clusters = array_values((array)examples_fetch_clusters($FRMWRK, (string)$host, $isRu ? 'ru' : 'en', 1, $topicSection));
-        $sectionAdded = 0;
-        foreach ($clusters as $cluster) {
-            $cluster = (array)$cluster;
-            $code = trim((string)($cluster['code'] ?? ''));
-            $label = trim((string)($cluster['label'] ?? $code));
-            if ($code === '' || $label === '') {
-                continue;
-            }
-            $labelKey = function_exists('mb_strtolower')
-                ? mb_strtolower($label, 'UTF-8')
-                : strtolower($label);
-            if (isset($seenTopicLabels[$labelKey])) {
-                continue;
-            }
-            $seenTopicLabels[$labelKey] = true;
-            $importantTopicItems[] = [
-                'title' => $label,
-                'path' => function_exists('examples_cluster_list_path')
-                    ? examples_cluster_list_path($code, null, $topicSection)
-                    : ('/' . trim($topicSection, '/') . '/' . $code . '/'),
-                'icon' => $sectionIcons[$topicSection] ?? '•',
-            ];
-            $sectionAdded++;
-            if ($sectionAdded >= 1) {
-                break;
-            }
+        $items = array_values((array)examples_fetch_published_list($FRMWRK, (string)$host, 1, $isRu ? 'ru' : 'en', '', $topicSection));
+        $item = isset($items[0]) && is_array($items[0]) ? $items[0] : null;
+        if (!$item) {
+            continue;
         }
+        $slug = trim((string)($item['slug'] ?? ''));
+        if ($slug === '') {
+            continue;
+        }
+        $cluster = trim((string)($item['cluster_code'] ?? ''));
+        $importantTopicItems[] = [
+            'title' => trim((string)($item['title'] ?? ($sectionTitles[$topicSection] ?? $topicSection))),
+            'path' => function_exists('examples_article_url_path')
+                ? examples_article_url_path($slug, $cluster, null, $topicSection)
+                : ('/' . trim($topicSection, '/') . '/' . rawurlencode($slug) . '/'),
+            'icon' => $sectionIcons[$topicSection] ?? '•',
+        ];
     }
 }
 
@@ -85,7 +76,8 @@ $navSections = [
             ['title' => $sectionTitles['playbooks'], 'path' => $sectionBasePaths['playbooks'], 'icon' => $sectionIcons['playbooks']],
             ['title' => $sectionTitles['signals'], 'path' => $sectionBasePaths['signals'], 'icon' => $sectionIcons['signals']],
             ['title' => $sectionTitles['fun'], 'path' => $sectionBasePaths['fun'], 'icon' => $sectionIcons['fun']],
-            ['title' => $isRu ? 'Uslugi' : 'Services', 'path' => '/services/', 'icon' => 'S'],
+            ['title' => $sectionTitles['discussion'], 'path' => $sectionBasePaths['discussion'], 'icon' => $sectionIcons['discussion']],
+            ['title' => 'Services', 'path' => '/services/', 'icon' => 'S'],
         ],
     ],
 ];
