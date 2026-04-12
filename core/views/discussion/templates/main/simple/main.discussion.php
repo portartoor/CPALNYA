@@ -59,7 +59,8 @@ $nextPageUrl = $page < $totalPages ? $buildListUrl($currentSection, $page + 1) :
 .dsc-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--shell-text);font-weight:700}
 .dsc-pagination{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
 .dsc-page-btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-text);text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-.dsc-thread{padding:22px;display:grid;gap:18px}
+.dsc-thread{padding:22px 22px 0;display:grid;gap:18px}
+.dsc-thread .pcmt{margin-bottom:0;padding-bottom:0}
 .dsc-thread-cover{overflow:hidden;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12))}
 .dsc-thread-cover img{display:block;width:100%;height:auto}
 .dsc-thread-actions{display:flex;gap:10px;flex-wrap:wrap}
