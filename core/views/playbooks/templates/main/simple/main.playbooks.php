@@ -364,13 +364,12 @@ if ($sectionKey !== 'playbooks') {
 .jrnl-tags{display:flex;flex-wrap:wrap;gap:10px}
 .jrnl-tag{color:var(--shell-muted);text-decoration:none}
 .jrnl-tag.is-active,.jrnl-tag:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
-.jrnl-topic-cloud{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px 12px}
-.jrnl-topic-pill{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:42px;padding:10px 14px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-muted);text-decoration:none;flex:var(--topic-grow,1) 1 calc(var(--topic-basis,16) * 1%);font-size:calc(var(--topic-font,12) * 1px);font-weight:700;line-height:1.15}
-.jrnl-topic-pill strong,.jrnl-topic-pill span{display:block}
-.jrnl-topic-pill strong{color:inherit;font-size:1em}
-.jrnl-topic-pill span{font-size:.92em;opacity:.8;white-space:nowrap}
-.jrnl-topic-pill.is-active,.jrnl-topic-pill:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
-.jrnl-topic-pill.is-all{flex-basis:calc(max(var(--topic-basis,18), 18) * 1%)}
+.jrnl-topic-cloud{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 18px}
+.jrnl-topic-pill{display:inline-flex;align-items:flex-end;min-height:auto;padding:0;border:0;background:transparent;color:rgba(196,214,238,.7);text-decoration:none;flex:var(--topic-grow,1) 1 calc(var(--topic-basis,16) * 1%);font-size:calc(var(--topic-font,12) * 1px);font-weight:700;line-height:1.02;letter-spacing:0}
+.jrnl-topic-pill strong{display:block;color:inherit;font-size:1em;font-weight:inherit}
+.jrnl-topic-pill span{display:none}
+.jrnl-topic-pill.is-active,.jrnl-topic-pill:hover{color:var(--shell-text)}
+.jrnl-topic-pill.is-all{opacity:.82}
 .jrnl-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
 .jrnl-card{display:grid;gap:14px;padding:16px;text-decoration:none;color:inherit;min-height:100%}
 .jrnl-card-media{aspect-ratio:16/10;background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));border:1px solid rgba(255,255,255,.08);overflow:hidden}
@@ -602,7 +601,6 @@ if ($sectionKey !== 'playbooks') {
                             style="--topic-basis:<?= (int)($topicItem['basis'] ?? ($isAllTopic ? 18 : 16)) ?>;--topic-grow:<?= htmlspecialchars((string)($topicItem['grow'] ?? ($isAllTopic ? '1.1' : '1')), ENT_QUOTES, 'UTF-8') ?>;--topic-font:<?= (int)($topicItem['font'] ?? 12) ?>"
                         >
                             <strong><?= htmlspecialchars((string)($topicItem['label'] ?? $topicCode), ENT_QUOTES, 'UTF-8') ?></strong>
-                            <span><?= (int)($topicItem['count'] ?? 0) ?></span>
                         </a>
                     <?php endforeach; ?>
                 </div>
