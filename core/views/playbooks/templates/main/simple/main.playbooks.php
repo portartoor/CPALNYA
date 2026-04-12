@@ -23,7 +23,7 @@ $authorNickname = trim((string)($authorProfile['nickname'] ?? ''));
 $authorRole = trim((string)($authorProfile['resolved_role'] ?? ''));
 $authorBio = trim((string)($authorProfile['resolved_bio'] ?? ''));
 if ($authorDisplayName === '') {
-    $authorDisplayName = $isRu ? 'Р В Р ВµР Т‘Р В°Р С”РЎвЂ Р С‘РЎРЏ Р В¦Р СџР С’Р вЂєР В¬Р СњР Р‡' : 'CPALNYA Editorial';
+    $authorDisplayName = $isRu ? 'Редакция ЦПАЛЬНЯ' : 'CPALNYA Editorial';
 }
 $authorInitials = '';
 if ($authorDisplayName !== '') {
@@ -241,13 +241,13 @@ $clusterLabelByCode = static function (string $clusterCode) use ($clusters): str
 };
 $sectionCrumbLabel = isset($issueTitle) && trim((string)$issueTitle) !== ''
     ? trim((string)$issueTitle)
-    : $t('Р–СѓСЂРЅР°Р»', 'Journal');
+    : $t('Журнал', 'Journal');
 if ($sectionKey === 'playbooks') {
-    $sectionCrumbLabel = $t('РџСЂР°РєС‚РёРєР°', 'Playbooks');
+    $sectionCrumbLabel = $t('Практика', 'Playbooks');
 } elseif ($sectionKey === 'signals') {
-    $sectionCrumbLabel = $t('РќРѕРІРѕСЃС‚Рё Рё СЃРёРіРЅР°Р»С‹', 'Signals');
+    $sectionCrumbLabel = $t('Повестка', 'Signals');
 } elseif ($sectionKey === 'fun') {
-    $sectionCrumbLabel = $t('Р›РµРіРєР°СЏ СЂРµРґР°РєС†РёСЏ', 'Fun');
+    $sectionCrumbLabel = $t('Фан', 'Fun');
 }
 $selectedClusterCode = trim((string)($selected['cluster_code'] ?? ''));
 $selectedClusterLabel = $clusterLabelByCode($selectedClusterCode);
@@ -274,7 +274,7 @@ if (!empty($clusters)) {
     shuffle($clusterPool);
     $topicCloudItems[] = [
         'code' => '',
-        'label' => $t('Р’СЃРµ С‚РµРјС‹', 'All topics'),
+        'label' => $t('Все темы', 'All topics'),
         'count' => max(1, $maxClusterCount),
         'is_all' => true,
         'basis' => 18,
@@ -705,9 +705,6 @@ if ($sectionKey !== 'playbooks') {
                     <p><?= htmlspecialchars($t('Опубликованные материалы появятся здесь как отдельный раздел практики с фильтрацией по темам.', 'Published pieces will appear here as a dedicated practical section with topic filters.'), ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
             <?php endif; ?>
-        <?php endif; ?>
-    </div>
-</section>
         <?php endif; ?>
     </div>
 </section>

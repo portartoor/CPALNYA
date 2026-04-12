@@ -276,26 +276,6 @@ $heroSectionTitles = [
                 </div>
             </section>
 
-            <section class="home-z-join">
-                <div class="home-z-join-copy">
-                    <span class="home-z-tag"><?= htmlspecialchars($t('Войти в обсуждение', 'Join the discussion'), ENT_QUOTES, 'UTF-8') ?></span>
-                    <h2><?= htmlspecialchars($t('Зарегистрируйся, чтобы спорить, добавлять практику и продолжать материалы вместе с ЦПАЛЬНЯ.', 'Create an account to argue, add field notes, and keep the material going with the rest of CPALNYA.'), ENT_QUOTES, 'UTF-8') ?></h2>
-                    <p><?= htmlspecialchars($t('Личный кабинет нужен не для галочки, а чтобы оставлять комментарии, оценивать чужие реплики, возвращаться к болевым темам и наблюдать, как материалы доживают в обсуждении.', 'The account is not there for ceremony. It lets readers comment, rate replies, return to the sharper threads, and keep the material alive after publication.'), ENT_QUOTES, 'UTF-8') ?></p>
-                    <div class="home-z-join-actions">
-                        <a class="home-z-btn" href="/account/"><span class="home-z-btn-icon" aria-hidden="true">+</span><span><?= htmlspecialchars($t('Вход / регистрация', 'Sign in / register'), ENT_QUOTES, 'UTF-8') ?></span></a>
-                        <a class="home-z-btn home-z-btn-telegram" href="https://t.me/cpalnya_journal" target="_blank" rel="noopener noreferrer">
-                            <span class="home-z-btn-icon" aria-hidden="true"><?= $telegramIcon ?></span>
-                            <span><?= htmlspecialchars($t('Обсуждать в Telegram', 'Discuss in Telegram'), ENT_QUOTES, 'UTF-8') ?></span>
-                        </a>
-                    </div>
-                </div>
-                <div class="home-z-join-note">
-                    <span class="home-z-meta"><?= htmlspecialchars($t('Telegram-канал обсуждений', 'Telegram discussion room'), ENT_QUOTES, 'UTF-8') ?></span>
-                    <strong><?= htmlspecialchars($t('Если хочется обсудить материалы быстрее и живее, иди прямо в чат.', 'If you want a faster, louder discussion around the issue, jump straight into the Telegram room.'), ENT_QUOTES, 'UTF-8') ?></strong>
-                    <p><?= htmlspecialchars($t('Там обычно появляются те наблюдения, которые не доходят до формального комментария: короткие споры, тихие edge cases, дополнения по связкам и настоящая операционка без витрины.', 'That is where the smaller observations usually surface first: quick arguments, edge cases, extra setup detail, and the operational reality before it turns into a formal comment.'), ENT_QUOTES, 'UTF-8') ?></p>
-                </div>
-            </section>
-
             <section class="home-z-block">
                 <div class="home-z-block-head">
                     <div class="home-z-block-title">
@@ -331,6 +311,26 @@ $heroSectionTitles = [
                             </div>
                         </a>
                     <?php endforeach; ?>
+                </div>
+            </section>
+
+            <section class="home-z-join">
+                <div class="home-z-join-copy">
+                    <span class="home-z-tag"><?= htmlspecialchars($t('Войти в обсуждение', 'Join the discussion'), ENT_QUOTES, 'UTF-8') ?></span>
+                    <h2><?= htmlspecialchars($t('Зарегистрируйся, чтобы спорить, добавлять практику и продолжать материалы вместе с ЦПАЛЬНЯ.', 'Create an account to argue, add field notes, and keep the material going with the rest of CPALNYA.'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <p><?= htmlspecialchars($t('Личный кабинет нужен не для галочки, а чтобы оставлять комментарии, оценивать чужие реплики, возвращаться к болевым темам и наблюдать, как материалы доживают в обсуждении.', 'The account is not there for ceremony. It lets readers comment, rate replies, return to the sharper threads, and keep the material alive after publication.'), ENT_QUOTES, 'UTF-8') ?></p>
+                    <div class="home-z-join-actions">
+                        <a class="home-z-btn" href="/account/"><span class="home-z-btn-icon" aria-hidden="true">+</span><span><?= htmlspecialchars($t('Вход / регистрация', 'Sign in / register'), ENT_QUOTES, 'UTF-8') ?></span></a>
+                        <a class="home-z-btn home-z-btn-telegram" href="https://t.me/cpalnya_journal" target="_blank" rel="noopener noreferrer">
+                            <span class="home-z-btn-icon" aria-hidden="true"><?= $telegramIcon ?></span>
+                            <span><?= htmlspecialchars($t('Обсуждать в Telegram', 'Discuss in Telegram'), ENT_QUOTES, 'UTF-8') ?></span>
+                        </a>
+                    </div>
+                </div>
+                <div class="home-z-join-note">
+                    <span class="home-z-meta"><?= htmlspecialchars($t('Telegram-канал обсуждений', 'Telegram discussion room'), ENT_QUOTES, 'UTF-8') ?></span>
+                    <strong><?= htmlspecialchars($t('Если хочется обсудить материалы быстрее и живее, иди прямо в чат.', 'If you want a faster, louder discussion around the issue, jump straight into the Telegram room.'), ENT_QUOTES, 'UTF-8') ?></strong>
+                    <p><?= htmlspecialchars($t('Там обычно появляются те наблюдения, которые не доходят до формального комментария: короткие споры, тихие edge cases, дополнения по связкам и настоящая операционка без витрины.', 'That is where the smaller observations usually surface first: quick arguments, edge cases, extra setup detail, and the operational reality before it turns into a formal comment.'), ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
             </section>
 

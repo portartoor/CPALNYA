@@ -640,7 +640,7 @@ if ($selected) {
                 <?php if ($totalPages > 1): ?>
                     <nav class="jrnl-pager" aria-label="<?= htmlspecialchars($t('Р СџР В°Р С–Р С‘Р Р…Р В°РЎвЂ Р С‘РЎРЏ', 'Pagination'), ENT_QUOTES, 'UTF-8') ?>">
                         <?php if ($page > 1): ?>
-                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page - 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Р СњР В°Р В·Р В°Р Т‘', 'Prev'), ENT_QUOTES, 'UTF-8') ?></a>
+                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page - 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Назад', 'Prev'), ENT_QUOTES, 'UTF-8') ?></a>
                         <?php endif; ?>
                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                             <?php if ($i < $page - 2 || $i > $page + 2) { continue; } ?>
@@ -651,7 +651,7 @@ if ($selected) {
                             <?php endif; ?>
                         <?php endfor; ?>
                         <?php if ($page < $totalPages): ?>
-                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page + 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Р вЂ™Р С—Р ВµРЎР‚Р ВµР Т‘', 'Next'), ENT_QUOTES, 'UTF-8') ?></a>
+                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page + 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Вперед', 'Next'), ENT_QUOTES, 'UTF-8') ?></a>
                         <?php endif; ?>
                     </nav>
                 <?php endif; ?>
