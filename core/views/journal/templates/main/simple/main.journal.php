@@ -219,6 +219,54 @@ $clusterLabelByCode = static function (string $clusterCode) use ($clusters): str
 };
 $selectedClusterCode = trim((string)($selected['cluster_code'] ?? ''));
 $selectedClusterLabel = $clusterLabelByCode($selectedClusterCode);
+$topicCloudItems = [];
+if (!empty($clusters)) {
+    $clusterPool = [];
+    $maxClusterCount = 1;
+    foreach ($clusters as $cluster) {
+        if (!is_array($cluster)) {
+            continue;
+        }
+        $clusterCode = trim((string)($cluster['code'] ?? ''));
+        if ($clusterCode === '') {
+            continue;
+        }
+        $count = max(1, (int)($cluster['count'] ?? 1));
+        $maxClusterCount = max($maxClusterCount, $count);
+        $clusterPool[] = [
+            'code' => $clusterCode,
+            'label' => trim((string)($cluster['label'] ?? $clusterCode)),
+            'count' => $count,
+        ];
+    }
+    shuffle($clusterPool);
+    $topicCloudItems[] = [
+        'code' => '',
+        'label' => $t('Все темы', 'All topics'),
+        'count' => max(1, $maxClusterCount),
+        'is_all' => true,
+        'basis' => 18,
+        'grow' => 1.1,
+        'font' => 12,
+    ];
+    foreach ($clusterPool as $cluster) {
+        $ratio = $maxClusterCount > 0 ? ((float)$cluster['count'] / (float)$maxClusterCount) : 0;
+        $tier = 1;
+        if ($ratio >= 0.85) {
+            $tier = 5;
+        } elseif ($ratio >= 0.58) {
+            $tier = 4;
+        } elseif ($ratio >= 0.33) {
+            $tier = 3;
+        } elseif ($ratio >= 0.16) {
+            $tier = 2;
+        }
+        $cluster['basis'] = [14, 16, 20, 24, 30][$tier - 1];
+        $cluster['grow'] = [0.85, 1, 1.15, 1.35, 1.6][$tier - 1];
+        $cluster['font'] = [11, 12, 13, 15, 17][$tier - 1];
+        $topicCloudItems[] = $cluster;
+    }
+}
 $detailBreadcrumbs = [];
 if ($selected) {
     $detailBreadcrumbs[] = [
@@ -286,6 +334,13 @@ if ($selected) {
 .jrnl-tags{display:flex;flex-wrap:wrap;gap:10px}
 .jrnl-tag{color:var(--shell-muted);text-decoration:none}
 .jrnl-tag.is-active,.jrnl-tag:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
+.jrnl-topic-cloud{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px 12px}
+.jrnl-topic-pill{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:42px;padding:10px 14px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-muted);text-decoration:none;flex:var(--topic-grow,1) 1 calc(var(--topic-basis,16) * 1%);font-size:calc(var(--topic-font,12) * 1px);font-weight:700;line-height:1.15}
+.jrnl-topic-pill strong,.jrnl-topic-pill span{display:block}
+.jrnl-topic-pill strong{color:inherit;font-size:1em}
+.jrnl-topic-pill span{font-size:.92em;opacity:.8;white-space:nowrap}
+.jrnl-topic-pill.is-active,.jrnl-topic-pill:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
+.jrnl-topic-pill.is-all{flex-basis:calc(max(var(--topic-basis,18), 18) * 1%)}
 .jrnl-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
 .jrnl-card{display:grid;gap:14px;padding:16px;text-decoration:none;color:inherit;min-height:100%}
 .jrnl-card-media{aspect-ratio:16/10;background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));border:1px solid rgba(255,255,255,.08);overflow:hidden}
@@ -363,7 +418,7 @@ if ($selected) {
 100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0) saturate(1)}
 }
 @media (max-width:1180px){.jrnl-hero,.jrnl-grid,.jrnl-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.jrnl-hero{grid-template-columns:1fr}}
-@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-hero{padding:0 0 18px;overflow:hidden}.jrnl-cover{order:-1;border-top:0;border-left:0;border-right:0}.jrnl-copy{padding:0 18px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}}
+@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-hero{padding:0 0 18px;overflow:hidden}.jrnl-cover{order:-1;border-top:0;border-left:0;border-right:0}.jrnl-copy{padding:0 18px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}.jrnl-topic-pill{flex-basis:calc(max(var(--topic-basis,24), 42) * 1%)}}
 </style>
 
 <section class="jrnl">
@@ -506,15 +561,18 @@ if ($selected) {
                 </div>
             </header>
 
-            <?php if (!empty($clusters)): ?>
-                <div class="jrnl-tags" aria-label="<?= htmlspecialchars($t('Темы выпуска', 'Issue topics'), ENT_QUOTES, 'UTF-8') ?>">
-                    <a class="jrnl-tag <?= $currentCluster === '' ? 'is-active' : '' ?>" href="<?= htmlspecialchars($buildPageUrl(''), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Все темы', 'All topics'), ENT_QUOTES, 'UTF-8') ?></a>
-                    <?php foreach ($clusters as $cluster): ?>
-                        <?php $clusterCode = trim((string)($cluster['code'] ?? '')); ?>
-                        <?php if ($clusterCode === '') { continue; } ?>
-                        <a class="jrnl-tag <?= $currentCluster === $clusterCode ? 'is-active' : '' ?>" href="<?= htmlspecialchars($buildPageUrl($clusterCode), ENT_QUOTES, 'UTF-8') ?>">
-                            <?= htmlspecialchars((string)($cluster['label'] ?? $clusterCode), ENT_QUOTES, 'UTF-8') ?>
-                            <?php if (isset($cluster['count'])): ?> · <?= (int)$cluster['count'] ?><?php endif; ?>
+            <?php if (!empty($topicCloudItems)): ?>
+                <div class="jrnl-topic-cloud" aria-label="<?= htmlspecialchars($t('Темы выпуска', 'Issue topics'), ENT_QUOTES, 'UTF-8') ?>">
+                    <?php foreach ($topicCloudItems as $topicItem): ?>
+                        <?php $topicCode = trim((string)($topicItem['code'] ?? '')); ?>
+                        <?php $isAllTopic = !empty($topicItem['is_all']); ?>
+                        <a
+                            class="jrnl-topic-pill <?= $currentCluster === $topicCode ? 'is-active' : '' ?> <?= $isAllTopic ? 'is-all' : '' ?>"
+                            href="<?= htmlspecialchars($buildPageUrl($topicCode), ENT_QUOTES, 'UTF-8') ?>"
+                            style="--topic-basis:<?= (int)($topicItem['basis'] ?? ($isAllTopic ? 18 : 16)) ?>;--topic-grow:<?= htmlspecialchars((string)($topicItem['grow'] ?? ($isAllTopic ? '1.1' : '1')), ENT_QUOTES, 'UTF-8') ?>;--topic-font:<?= (int)($topicItem['font'] ?? 12) ?>"
+                        >
+                            <strong><?= htmlspecialchars((string)($topicItem['label'] ?? $topicCode), ENT_QUOTES, 'UTF-8') ?></strong>
+                            <span><?= (int)($topicItem['count'] ?? 0) ?></span>
                         </a>
                     <?php endforeach; ?>
                 </div>
