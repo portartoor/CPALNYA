@@ -550,7 +550,7 @@ if ($selected) {
                 <div class="jrnl-detail-body">
                     <div class="jrnl-detail-content"><?= $selectedBodyHtml ?></div>
                     <div class="jrnl-actions">
-                        <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Р СњР В°Р В·Р В°Р Т‘ Р Р† Р В¶РЎС“РЎР‚Р Р…Р В°Р В»', 'Back to journal'), ENT_QUOTES, 'UTF-8') ?></a>
+                        <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Назад в журнал', 'Back to journal'), ENT_QUOTES, 'UTF-8') ?></a>
                     </div>
                 </div>
             </article>
