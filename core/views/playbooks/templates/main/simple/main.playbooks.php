@@ -532,32 +532,6 @@ if ($sectionKey !== 'playbooks') {
                     <?php endif; ?>
                     <span class="jrnl-meta"><?= htmlspecialchars((string)($selected['published_at'] ?? $selected['created_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
                 </div>
-                <?php if (false && $authorDisplayName !== ''): ?>
-                    <div class="jrnl-author">
-                        <div class="jrnl-author-mark"><?= htmlspecialchars($authorInitials !== '' ? $authorInitials : 'CP', ENT_QUOTES, 'UTF-8') ?></div>
-                        <div class="jrnl-author-copy">
-                            <div class="jrnl-author-top">
-                                <h2 class="jrnl-author-name"><?= htmlspecialchars($authorDisplayName, ENT_QUOTES, 'UTF-8') ?></h2>
-                                <?php if ($authorNickname !== ''): ?><span class="jrnl-author-handle">@<?= htmlspecialchars($authorNickname, ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
-                                <?php if ($authorRole !== ''): ?><span class="jrnl-author-role"><?= htmlspecialchars($authorRole, ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
-                            </div>
-                            <?php if ($authorBio !== ''): ?><p class="jrnl-author-bio"><?= htmlspecialchars($authorBio, ENT_QUOTES, 'UTF-8') ?></p><?php endif; ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
-                <?php if (false && $authorDisplayName !== ''): ?>
-                    <div class="jrnl-author">
-                        <div class="jrnl-author-mark"><?= htmlspecialchars($authorInitials !== '' ? $authorInitials : 'CP', ENT_QUOTES, 'UTF-8') ?></div>
-                        <div class="jrnl-author-copy">
-                            <div class="jrnl-author-top">
-                                <h2 class="jrnl-author-name"><?= htmlspecialchars($authorDisplayName, ENT_QUOTES, 'UTF-8') ?></h2>
-                                <?php if ($authorNickname !== ''): ?><span class="jrnl-author-handle">@<?= htmlspecialchars($authorNickname, ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
-                                <?php if ($authorRole !== ''): ?><span class="jrnl-author-role"><?= htmlspecialchars($authorRole, ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
-                            </div>
-                            <?php if ($authorBio !== ''): ?><p class="jrnl-author-bio"><?= htmlspecialchars($authorBio, ENT_QUOTES, 'UTF-8') ?></p><?php endif; ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
                 <?php if ($selectedIntroHtml !== ''): ?>
                     <div class="jrnl-detail-intro"><?= $selectedIntroHtml ?></div>
                 <?php endif; ?>
