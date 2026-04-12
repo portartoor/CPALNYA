@@ -23,7 +23,7 @@ $authorNickname = trim((string)($authorProfile['nickname'] ?? ''));
 $authorRole = trim((string)($authorProfile['resolved_role'] ?? ''));
 $authorBio = trim((string)($authorProfile['resolved_bio'] ?? ''));
 if ($authorDisplayName === '') {
-    $authorDisplayName = $t('Редакция ЦПАЛЬНЯ', 'CPALNYA Editorial');
+    $authorDisplayName = $isRu ? 'Редакция ЦПАЛЬНЯ' : 'CPALNYA Editorial';
 }
 $authorInitials = '';
 if ($authorDisplayName !== '') {
@@ -241,13 +241,13 @@ $clusterLabelByCode = static function (string $clusterCode) use ($clusters): str
 };
 $sectionCrumbLabel = isset($issueTitle) && trim((string)$issueTitle) !== ''
     ? trim((string)$issueTitle)
-    : $t('Журнал', 'Journal');
+    : $t('Р–СѓСЂРЅР°Р»', 'Journal');
 if ($sectionKey === 'playbooks') {
-    $sectionCrumbLabel = $t('Практика', 'Playbooks');
+    $sectionCrumbLabel = $t('РџСЂР°РєС‚РёРєР°', 'Playbooks');
 } elseif ($sectionKey === 'signals') {
-    $sectionCrumbLabel = $t('Новости и сигналы', 'Signals');
+    $sectionCrumbLabel = $t('РќРѕРІРѕСЃС‚Рё Рё СЃРёРіРЅР°Р»С‹', 'Signals');
 } elseif ($sectionKey === 'fun') {
-    $sectionCrumbLabel = $t('Легкая редакция', 'Fun');
+    $sectionCrumbLabel = $t('Р›РµРіРєР°СЏ СЂРµРґР°РєС†РёСЏ', 'Fun');
 }
 $selectedClusterCode = trim((string)($selected['cluster_code'] ?? ''));
 $selectedClusterLabel = $clusterLabelByCode($selectedClusterCode);
@@ -274,7 +274,7 @@ if (!empty($clusters)) {
     shuffle($clusterPool);
     $topicCloudItems[] = [
         'code' => '',
-        'label' => $t('Все темы', 'All topics'),
+        'label' => $t('Р’СЃРµ С‚РµРјС‹', 'All topics'),
         'count' => max(1, $maxClusterCount),
         'is_all' => true,
         'basis' => 18,
@@ -312,7 +312,7 @@ if ($selected) {
         ];
     }
     $detailBreadcrumbs[] = [
-        'label' => $selectedShareTitle !== '' ? $selectedShareTitle : $t('Материал', 'Article'),
+        'label' => $selectedShareTitle !== '' ? $selectedShareTitle : $t('РњР°С‚РµСЂРёР°Р»', 'Article'),
         'url' => '',
     ];
 }
@@ -346,15 +346,15 @@ if ($selected) {
     }
 }
 
-$heroKicker = $t('PLAYBOOKS / ЦПАЛЬНЯ', 'PLAYBOOKS / ЦПАЛЬНЯ');
-$heroTitle = $t('Практика affiliate-операционки', 'Operational playbooks for affiliate teams');
+$heroKicker = $t('PLAYBOOKS / Р¦РџРђР›Р¬РќРЇ', 'PLAYBOOKS / Р¦РџРђР›Р¬РќРЇ');
+$heroTitle = $t('РџСЂР°РєС‚РёРєР° affiliate-РѕРїРµСЂР°С†РёРѕРЅРєРё', 'Operational playbooks for affiliate teams');
 $heroDescription = $t(
-    "Раздел для тех, кто строит affiliate-операционку не вокруг удачных совпадений, а вокруг повторяемых действий: сетапов, чеклистов, handoff-процессов, трекинга, farm-ритма, креативных циклов и решений, которые должны переживать смену офферов, банов и платформенных сдвигов.\n\nЗдесь практика рассматривается не как набор советов, а как живая система поддержки команды. Один материал помогает быстрее собрать запуск, другой удерживает трекер в чистом состоянии, третий возвращает контроль, когда ломается связка, проседает модерация или расползается handoff между ролями.\n\nЭто не архив инструкций, а рабочая библиотека backstage-практики: место, где шаги, роли, rollback-планы и troubleshooting уже собраны под рукой.",
+    "Р Р°Р·РґРµР» РґР»СЏ С‚РµС…, РєС‚Рѕ СЃС‚СЂРѕРёС‚ affiliate-РѕРїРµСЂР°С†РёРѕРЅРєСѓ РЅРµ РІРѕРєСЂСѓРі СѓРґР°С‡РЅС‹С… СЃРѕРІРїР°РґРµРЅРёР№, Р° РІРѕРєСЂСѓРі РїРѕРІС‚РѕСЂСЏРµРјС‹С… РґРµР№СЃС‚РІРёР№: СЃРµС‚Р°РїРѕРІ, С‡РµРєР»РёСЃС‚РѕРІ, handoff-РїСЂРѕС†РµСЃСЃРѕРІ, С‚СЂРµРєРёРЅРіР°, farm-СЂРёС‚РјР°, РєСЂРµР°С‚РёРІРЅС‹С… С†РёРєР»РѕРІ Рё СЂРµС€РµРЅРёР№, РєРѕС‚РѕСЂС‹Рµ РґРѕР»Р¶РЅС‹ РїРµСЂРµР¶РёРІР°С‚СЊ СЃРјРµРЅСѓ РѕС„С„РµСЂРѕРІ, Р±Р°РЅРѕРІ Рё РїР»Р°С‚С„РѕСЂРјРµРЅРЅС‹С… СЃРґРІРёРіРѕРІ.\n\nР—РґРµСЃСЊ РїСЂР°РєС‚РёРєР° СЂР°СЃСЃРјР°С‚СЂРёРІР°РµС‚СЃСЏ РЅРµ РєР°Рє РЅР°Р±РѕСЂ СЃРѕРІРµС‚РѕРІ, Р° РєР°Рє Р¶РёРІР°СЏ СЃРёСЃС‚РµРјР° РїРѕРґРґРµСЂР¶РєРё РєРѕРјР°РЅРґС‹. РћРґРёРЅ РјР°С‚РµСЂРёР°Р» РїРѕРјРѕРіР°РµС‚ Р±С‹СЃС‚СЂРµРµ СЃРѕР±СЂР°С‚СЊ Р·Р°РїСѓСЃРє, РґСЂСѓРіРѕР№ СѓРґРµСЂР¶РёРІР°РµС‚ С‚СЂРµРєРµСЂ РІ С‡РёСЃС‚РѕРј СЃРѕСЃС‚РѕСЏРЅРёРё, С‚СЂРµС‚РёР№ РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕРЅС‚СЂРѕР»СЊ, РєРѕРіРґР° Р»РѕРјР°РµС‚СЃСЏ СЃРІСЏР·РєР°, РїСЂРѕСЃРµРґР°РµС‚ РјРѕРґРµСЂР°С†РёСЏ РёР»Рё СЂР°СЃРїРѕР»Р·Р°РµС‚СЃСЏ handoff РјРµР¶РґСѓ СЂРѕР»СЏРјРё.\n\nР­С‚Рѕ РЅРµ Р°СЂС…РёРІ РёРЅСЃС‚СЂСѓРєС†РёР№, Р° СЂР°Р±РѕС‡Р°СЏ Р±РёР±Р»РёРѕС‚РµРєР° backstage-РїСЂР°РєС‚РёРєРё: РјРµСЃС‚Рѕ, РіРґРµ С€Р°РіРё, СЂРѕР»Рё, rollback-РїР»Р°РЅС‹ Рё troubleshooting СѓР¶Рµ СЃРѕР±СЂР°РЅС‹ РїРѕРґ СЂСѓРєРѕР№.",
     "A section for teams building affiliate operations around repeatable systems rather than lucky runs: setups, checklists, handoffs, tracking discipline, farm cadence, creative loops, and solutions that must survive offer churn, bans, and platform shifts.\n\nHere, practice is treated not as a loose pile of advice but as a support system for the whole operation. One piece helps assemble a launch faster, another keeps tracking readable, and a third restores control when a bundle slips or moderation tightens.\n\nThis is not a dry archive of instructions, but a working backstage library where steps, roles, rollback plans, and troubleshooting stay close at hand."
 );
-$issueTitle = $t('Навигация по backstage-практике', 'Backstage operations index');
+$issueTitle = $t('РќР°РІРёРіР°С†РёСЏ РїРѕ backstage-РїСЂР°РєС‚РёРєРµ', 'Backstage operations index');
 $issueSubtitle = $t(
-    "Гайды, troubleshooting-материалы, рабочие заметки и операционные playbooks для баеров, фармеров, трекинг-операторов, креативных команд и тех, кто держит в руках повседневную механику affiliate-производства.\n\nЭто библиотека не для вдохновения, а для возврата к рабочей форме: быстро проверить шаг, восстановить логику сетапа, сравнить решение или не потерять темп в шуме ежедневной операционки.\n\nСюда приходят не за общими словами, а за следующим точным действием.",
+    "Р“Р°Р№РґС‹, troubleshooting-РјР°С‚РµСЂРёР°Р»С‹, СЂР°Р±РѕС‡РёРµ Р·Р°РјРµС‚РєРё Рё РѕРїРµСЂР°С†РёРѕРЅРЅС‹Рµ playbooks РґР»СЏ Р±Р°РµСЂРѕРІ, С„Р°СЂРјРµСЂРѕРІ, С‚СЂРµРєРёРЅРі-РѕРїРµСЂР°С‚РѕСЂРѕРІ, РєСЂРµР°С‚РёРІРЅС‹С… РєРѕРјР°РЅРґ Рё С‚РµС…, РєС‚Рѕ РґРµСЂР¶РёС‚ РІ СЂСѓРєР°С… РїРѕРІСЃРµРґРЅРµРІРЅСѓСЋ РјРµС…Р°РЅРёРєСѓ affiliate-РїСЂРѕРёР·РІРѕРґСЃС‚РІР°.\n\nР­С‚Рѕ Р±РёР±Р»РёРѕС‚РµРєР° РЅРµ РґР»СЏ РІРґРѕС…РЅРѕРІРµРЅРёСЏ, Р° РґР»СЏ РІРѕР·РІСЂР°С‚Р° Рє СЂР°Р±РѕС‡РµР№ С„РѕСЂРјРµ: Р±С‹СЃС‚СЂРѕ РїСЂРѕРІРµСЂРёС‚СЊ С€Р°Рі, РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ Р»РѕРіРёРєСѓ СЃРµС‚Р°РїР°, СЃСЂР°РІРЅРёС‚СЊ СЂРµС€РµРЅРёРµ РёР»Рё РЅРµ РїРѕС‚РµСЂСЏС‚СЊ С‚РµРјРї РІ С€СѓРјРµ РµР¶РµРґРЅРµРІРЅРѕР№ РѕРїРµСЂР°С†РёРѕРЅРєРё.\n\nРЎСЋРґР° РїСЂРёС…РѕРґСЏС‚ РЅРµ Р·Р° РѕР±С‰РёРјРё СЃР»РѕРІР°РјРё, Р° Р·Р° СЃР»РµРґСѓСЋС‰РёРј С‚РѕС‡РЅС‹Рј РґРµР№СЃС‚РІРёРµРј.",
     "How-to guides, troubleshooting notes, working memos, and reusable operating playbooks for buyers, farmers, tracking operators, creative teams, and everyone holding the daily mechanics of affiliate production together.\n\nThis is a library you return to not for inspiration, but to verify a step, restore setup logic, compare solutions, or keep tempo inside noisy daily operations.\n\nPeople come here not for generic advice, but for the exact next move."
 );
 if ($sectionKey !== 'playbooks') {
@@ -505,7 +505,7 @@ if ($sectionKey !== 'playbooks') {
             <article class="jrnl-detail">
                 <div class="jrnl-detail-top">
                     <?php if (!empty($detailBreadcrumbs)): ?>
-                        <nav class="jrnl-breadcrumbs" aria-label="<?= htmlspecialchars($t('Хлебные крошки', 'Breadcrumbs'), ENT_QUOTES, 'UTF-8') ?>">
+                        <nav class="jrnl-breadcrumbs" aria-label="<?= htmlspecialchars($t('РҐР»РµР±РЅС‹Рµ РєСЂРѕС€РєРё', 'Breadcrumbs'), ENT_QUOTES, 'UTF-8') ?>">
                             <?php foreach ($detailBreadcrumbs as $index => $crumb): ?>
                                 <?php if ($index > 0): ?><span class="jrnl-breadcrumb-sep">/</span><?php endif; ?>
                                 <?php if (!empty($crumb['url'])): ?>
@@ -563,15 +563,15 @@ if ($sectionKey !== 'playbooks') {
                             <span class="jrnl-share-label">WhatsApp</span>
                         </a>
                         <?php if ($portalUser && !empty($selected['id'])): ?>
-                            <form class="jrnl-favorite-form" method="post" data-favorite-active-label="<?= htmlspecialchars($t('В избранном', 'Saved'), ENT_QUOTES, 'UTF-8') ?>" data-favorite-idle-label="<?= htmlspecialchars($t('Добавить в избранное', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
+                            <form class="jrnl-favorite-form" method="post" data-favorite-active-label="<?= htmlspecialchars($t('Р’ РёР·Р±СЂР°РЅРЅРѕРј', 'Saved'), ENT_QUOTES, 'UTF-8') ?>" data-favorite-idle-label="<?= htmlspecialchars($t('Р”РѕР±Р°РІРёС‚СЊ РІ РёР·Р±СЂР°РЅРЅРѕРµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="action" value="public_portal_favorite_toggle">
                                 <input type="hidden" name="portal_csrf" value="<?= htmlspecialchars($portalCsrf, ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="return_path" value="<?= htmlspecialchars((string)($_SERVER['REQUEST_URI'] ?? '/'), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="content_type" value="examples">
                                 <input type="hidden" name="content_id" value="<?= (int)$selected['id'] ?>">
-                                <button class="jrnl-favorite-btn <?= $portalIsFavorite ? 'is-active' : '' ?>" type="submit" aria-label="<?= htmlspecialchars($t('Добавить в избранное', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
+                                <button class="jrnl-favorite-btn <?= $portalIsFavorite ? 'is-active' : '' ?>" type="submit" aria-label="<?= htmlspecialchars($t('Р”РѕР±Р°РІРёС‚СЊ РІ РёР·Р±СЂР°РЅРЅРѕРµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
                                     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.4l2.63 5.34 5.9.86-4.27 4.16 1 5.87L12 16.88 6.74 19.63l1-5.87L3.47 9.6l5.9-.86L12 3.4Z"/></svg>
-                                    <span class="jrnl-share-label"><?= htmlspecialchars($portalIsFavorite ? $t('В избранном', 'Saved') : $t('Добавить в избранное', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="jrnl-share-label"><?= htmlspecialchars($portalIsFavorite ? $t('Р’ РёР·Р±СЂР°РЅРЅРѕРј', 'Saved') : $t('Р”РѕР±Р°РІРёС‚СЊ РІ РёР·Р±СЂР°РЅРЅРѕРµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?></span>
                                 </button>
                             </form>
                         <?php endif; ?>
@@ -580,7 +580,7 @@ if ($sectionKey !== 'playbooks') {
                 <div class="jrnl-detail-body">
                     <div class="jrnl-detail-content"><?= $selectedBodyHtml ?></div>
                     <div class="jrnl-actions">
-                        <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Назад в раздел', 'Back to section'), ENT_QUOTES, 'UTF-8') ?></a>
+                        <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('РќР°Р·Р°Рґ РІ СЂР°Р·РґРµР»', 'Back to section'), ENT_QUOTES, 'UTF-8') ?></a>
                     </div>
                 </div>
             </article>
@@ -596,13 +596,13 @@ if ($sectionKey !== 'playbooks') {
 
             <?php if (!empty($relatedItems)): ?>
                 <section class="jrnl-related">
-                    <h2><?= htmlspecialchars($t('Дальше по теме', 'Continue reading'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <h2><?= htmlspecialchars($t('Р”Р°Р»СЊС€Рµ РїРѕ С‚РµРјРµ', 'Continue reading'), ENT_QUOTES, 'UTF-8') ?></h2>
                     <div class="jrnl-related-grid">
                         <?php foreach ($relatedItems as $item): ?>
                             <?php $cluster = trim((string)($item['cluster_code'] ?? '')); ?>
                             <a class="jrnl-card" href="<?= htmlspecialchars($buildArticleUrl((string)($item['slug'] ?? ''), $cluster), ENT_QUOTES, 'UTF-8') ?>">
                                 <div class="jrnl-card-media"><?php if (!empty($item['image_src'])): ?><img src="<?= htmlspecialchars((string)$item['image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?></div>
-                                <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('Материал', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('РњР°С‚РµСЂРёР°Р»', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
                                 <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                                 <p><?= htmlspecialchars($strip((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 140), ENT_QUOTES, 'UTF-8') ?></p>
                                 <div class="jrnl-card-foot">
@@ -632,7 +632,7 @@ if ($sectionKey !== 'playbooks') {
             </header>
 
             <?php if (!empty($topicCloudItems)): ?>
-                <div class="jrnl-topic-cloud" aria-label="<?= htmlspecialchars($t('Темы раздела', 'Section topics'), ENT_QUOTES, 'UTF-8') ?>">
+                <div class="jrnl-topic-cloud" aria-label="<?= htmlspecialchars($t('РўРµРјС‹ СЂР°Р·РґРµР»Р°', 'Section topics'), ENT_QUOTES, 'UTF-8') ?>">
                     <?php foreach ($topicCloudItems as $topicItem): ?>
                         <?php $topicCode = trim((string)($topicItem['code'] ?? '')); ?>
                         <?php $isAllTopic = !empty($topicItem['is_all']); ?>
@@ -648,14 +648,14 @@ if ($sectionKey !== 'playbooks') {
             <?php endif; ?>
 
             <?php if (false && !empty($clusters)): ?>
-                <div class="jrnl-tags" aria-label="<?= htmlspecialchars($t('Темы раздела', 'Section topics'), ENT_QUOTES, 'UTF-8') ?>">
-                    <a class="jrnl-tag <?= $currentCluster === '' ? 'is-active' : '' ?>" href="<?= htmlspecialchars($buildPageUrl(''), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Все темы', 'All topics'), ENT_QUOTES, 'UTF-8') ?></a>
+                <div class="jrnl-tags" aria-label="<?= htmlspecialchars($t('РўРµРјС‹ СЂР°Р·РґРµР»Р°', 'Section topics'), ENT_QUOTES, 'UTF-8') ?>">
+                    <a class="jrnl-tag <?= $currentCluster === '' ? 'is-active' : '' ?>" href="<?= htmlspecialchars($buildPageUrl(''), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Р’СЃРµ С‚РµРјС‹', 'All topics'), ENT_QUOTES, 'UTF-8') ?></a>
                     <?php foreach ($clusters as $cluster): ?>
                         <?php $clusterCode = trim((string)($cluster['code'] ?? '')); ?>
                         <?php if ($clusterCode === '') { continue; } ?>
                         <a class="jrnl-tag <?= $currentCluster === $clusterCode ? 'is-active' : '' ?>" href="<?= htmlspecialchars($buildPageUrl($clusterCode), ENT_QUOTES, 'UTF-8') ?>">
                             <?= htmlspecialchars((string)($cluster['label'] ?? $clusterCode), ENT_QUOTES, 'UTF-8') ?>
-                            <?php if (isset($cluster['count'])): ?> · <?= (int)$cluster['count'] ?><?php endif; ?>
+                            <?php if (isset($cluster['count'])): ?> В· <?= (int)$cluster['count'] ?><?php endif; ?>
                         </a>
                     <?php endforeach; ?>
                 </div>
@@ -667,7 +667,7 @@ if ($sectionKey !== 'playbooks') {
                         <?php $cluster = trim((string)($item['cluster_code'] ?? '')); ?>
                         <a class="jrnl-card" href="<?= htmlspecialchars($buildArticleUrl((string)($item['slug'] ?? ''), $cluster), ENT_QUOTES, 'UTF-8') ?>">
                             <div class="jrnl-card-media"><?php if (!empty($item['image_src'])): ?><img src="<?= htmlspecialchars((string)$item['image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?></div>
-                            <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('Материал', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
+                            <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('РњР°С‚РµСЂРёР°Р»', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
                             <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                             <p><?= htmlspecialchars($strip((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 160), ENT_QUOTES, 'UTF-8') ?></p>
                             <div class="jrnl-card-foot">
@@ -682,9 +682,9 @@ if ($sectionKey !== 'playbooks') {
                 </div>
 
                 <?php if ($totalPages > 1): ?>
-                    <nav class="jrnl-pager" aria-label="<?= htmlspecialchars($t('Пагинация', 'Pagination'), ENT_QUOTES, 'UTF-8') ?>">
+                    <nav class="jrnl-pager" aria-label="<?= htmlspecialchars($t('РџР°РіРёРЅР°С†РёСЏ', 'Pagination'), ENT_QUOTES, 'UTF-8') ?>">
                         <?php if ($page > 1): ?>
-                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page - 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Назад', 'Prev'), ENT_QUOTES, 'UTF-8') ?></a>
+                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page - 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('РќР°Р·Р°Рґ', 'Prev'), ENT_QUOTES, 'UTF-8') ?></a>
                         <?php endif; ?>
                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                             <?php if ($i < $page - 2 || $i > $page + 2) { continue; } ?>
@@ -695,14 +695,14 @@ if ($sectionKey !== 'playbooks') {
                             <?php endif; ?>
                         <?php endfor; ?>
                         <?php if ($page < $totalPages): ?>
-                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page + 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Вперед', 'Next'), ENT_QUOTES, 'UTF-8') ?></a>
+                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page + 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Р’РїРµСЂРµРґ', 'Next'), ENT_QUOTES, 'UTF-8') ?></a>
                         <?php endif; ?>
                     </nav>
                 <?php endif; ?>
             <?php else: ?>
                 <div class="jrnl-empty">
-                    <h2><?= htmlspecialchars($t('Пока нет материалов', 'No playbook materials yet'), ENT_QUOTES, 'UTF-8') ?></h2>
-                    <p><?= htmlspecialchars($t('Когда статьи появятся, они будут собраны здесь как отдельный раздел практики с фильтрацией по темам и рабочим сценариям.', 'Published articles will appear here as a dedicated practical section with topic and scenario filters.'), ENT_QUOTES, 'UTF-8') ?></p>
+                    <h2><?= htmlspecialchars($t('РџРѕРєР° РЅРµС‚ РјР°С‚РµСЂРёР°Р»РѕРІ', 'No playbook materials yet'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <p><?= htmlspecialchars($t('РљРѕРіРґР° СЃС‚Р°С‚СЊРё РїРѕСЏРІСЏС‚СЃСЏ, РѕРЅРё Р±СѓРґСѓС‚ СЃРѕР±СЂР°РЅС‹ Р·РґРµСЃСЊ РєР°Рє РѕС‚РґРµР»СЊРЅС‹Р№ СЂР°Р·РґРµР» РїСЂР°РєС‚РёРєРё СЃ С„РёР»СЊС‚СЂР°С†РёРµР№ РїРѕ С‚РµРјР°Рј Рё СЂР°Р±РѕС‡РёРј СЃС†РµРЅР°СЂРёСЏРј.', 'Published articles will appear here as a dedicated practical section with topic and scenario filters.'), ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
             <?php endif; ?>
         <?php endif; ?>
