@@ -38,7 +38,7 @@ $prevPageUrl = $page > 1 ? $buildListUrl($currentSection, $page - 1) : '';
 $nextPageUrl = $page < $totalPages ? $buildListUrl($currentSection, $page + 1) : '';
 ?>
 <style>
-.dsc{max-width:1240px;margin:0 auto;padding:28px 18px 56px;color:var(--shell-text)}
+.dsc{max-width:1240px;margin:0 auto;padding:28px 18px 0;color:var(--shell-text)}
 .dsc-shell{display:grid;gap:22px}
 .dsc-hero,.dsc-block,.dsc-thread{border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(6,12,24,.9),rgba(5,10,20,.78));box-shadow:var(--shell-shadow)}
 .dsc-hero{display:grid;gap:14px;padding:26px}
@@ -59,7 +59,7 @@ $nextPageUrl = $page < $totalPages ? $buildListUrl($currentSection, $page + 1) :
 .dsc-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--shell-text);font-weight:700}
 .dsc-pagination{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
 .dsc-page-btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-text);text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-.dsc-thread{padding:22px 22px 0;display:grid;gap:18px}
+.dsc-thread{padding:20px;display:grid;gap:18px}
 .dsc-thread .pcmt{margin-bottom:0;padding-bottom:0}
 .dsc-thread-cover{overflow:hidden;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12))}
 .dsc-thread-cover img{display:block;width:100%;height:auto}
