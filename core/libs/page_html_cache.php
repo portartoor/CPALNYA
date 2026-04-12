@@ -45,6 +45,7 @@ if (!function_exists('page_html_cache_defaults')) {
                 '/playbooks/' => 600,
                 '/signals/' => 300,
                 '/fun/' => 300,
+                '/discussion/' => 300,
                 '/services/' => 900,
                 '/projects/' => 900,
                 '/cases/' => 900,
@@ -595,6 +596,7 @@ if (!function_exists('page_html_cache_purge_content_routes')) {
             '/playbooks/',
             '/signals/',
             '/fun/',
+            '/discussion/',
         ];
         $targets = [];
         foreach (array_merge($defaults, $prefixes) as $prefix) {

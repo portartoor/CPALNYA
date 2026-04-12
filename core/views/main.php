@@ -205,6 +205,7 @@ $heroSectionTitles = [
                     <a class="home-z-btn" href="/playbooks/"><span class="home-z-btn-icon" aria-hidden="true">⚙</span><span><?= htmlspecialchars($t('Практика', 'Playbooks'), ENT_QUOTES, 'UTF-8') ?></span></a>
                     <a class="home-z-btn" href="/signals/"><span class="home-z-btn-icon" aria-hidden="true">⌁</span><span><?= htmlspecialchars($t('Повестка', 'Signals'), ENT_QUOTES, 'UTF-8') ?></span></a>
                     <a class="home-z-btn" href="/fun/"><span class="home-z-btn-icon" aria-hidden="true">✺</span><span><?= htmlspecialchars($t('Фан', 'Fun'), ENT_QUOTES, 'UTF-8') ?></span></a>
+                    <a class="home-z-btn" href="/discussion/"><span class="home-z-btn-icon" aria-hidden="true">☰</span><span><?= htmlspecialchars($t('Обсуждение', 'Discussion'), ENT_QUOTES, 'UTF-8') ?></span></a>
                 </div>
                 <?php if (is_array($heroCard)): ?>
                     <?php $heroCardImage = $imageSrc((array)$heroCard); ?>

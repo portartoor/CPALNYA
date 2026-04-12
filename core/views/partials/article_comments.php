@@ -329,9 +329,17 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
 .pcmt-btn-ghost{background:rgba(255,255,255,.03)}
 .pcmt-auth-shell{display:grid;gap:14px;margin-bottom:18px}
 .pcmt-auth-tease{display:grid;gap:12px;padding:18px;border:1px solid rgba(122,180,255,.12);background:rgba(255,255,255,.03)}
-.pcmt-auth-form{display:none;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;padding:18px;border:1px solid rgba(122,180,255,.12);background:rgba(8,14,26,.74);opacity:0;transform:translateY(10px);transition:opacity .24s ease,transform .24s ease}
-.pcmt-auth-shell.is-open .pcmt-auth-form{display:grid;opacity:1;transform:none}
+.pcmt-auth-panel{display:none;gap:14px;padding:18px;border:1px solid rgba(122,180,255,.12);background:rgba(8,14,26,.74);opacity:0;transform:translateY(10px);transition:opacity .24s ease,transform .24s ease}
+.pcmt-auth-shell.is-open .pcmt-auth-panel{display:grid;opacity:1;transform:none}
+.pcmt-auth-tabs{display:flex;flex-wrap:wrap;gap:10px}
+.pcmt-auth-tab{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border:1px solid rgba(122,180,255,.14);background:rgba(255,255,255,.03);color:var(--shell-muted);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.pcmt-auth-tab.is-active{color:var(--shell-text);border-color:rgba(122,180,255,.32);background:rgba(122,180,255,.1)}
+.pcmt-auth-pane{display:none}
+.pcmt-auth-pane.is-active{display:block}
+.pcmt-auth-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
 .pcmt-auth-form .pcmt-field-full{grid-column:1 / -1}
+.pcmt-auth-switch{display:flex;flex-wrap:wrap;gap:10px;align-items:center;color:var(--shell-muted);font-size:13px}
+.pcmt-auth-switch button{padding:0;border:0;background:none;color:var(--shell-text);font:inherit;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .pcmt-auth-form input,.pcmt-auth-form textarea,.pcmt-form input,.pcmt-form textarea,.pcmt-form select{width:100%;padding:13px 14px;border:1px solid rgba(122,180,255,.16);background:rgba(4,8,18,.58);color:var(--shell-text)}
 .pcmt-captcha{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid rgba(122,180,255,.12);background:linear-gradient(135deg,rgba(115,184,255,.08),rgba(39,223,192,.06))}
 .pcmt-captcha-code{display:flex;align-items:center;gap:10px;font:700 1.15rem/1 "Space Grotesk","Sora",sans-serif;letter-spacing:.04em}
@@ -415,41 +423,61 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
                         <button class="pcmt-btn" type="button" data-comment-auth-open><?= htmlspecialchars($portalCommentTotal > 0 ? $t('Войти и обсудить', 'Join the discussion') : $t('Оставить первый комментарий', 'Leave the first comment'), ENT_QUOTES, 'UTF-8') ?></button>
                     </div>
                 </div>
-                <form class="pcmt-auth-form" method="post">
-                    <input type="hidden" name="action" value="public_portal_register">
-                    <input type="hidden" name="portal_csrf" value="<?= htmlspecialchars($portalCsrf, ENT_QUOTES, 'UTF-8') ?>">
-                    <input type="hidden" name="return_path" value="<?= htmlspecialchars($portalCurrentUrl, ENT_QUOTES, 'UTF-8') ?>">
-                    <input type="hidden" name="content_type" value="<?= htmlspecialchars($portalContentType, ENT_QUOTES, 'UTF-8') ?>">
-                    <input type="hidden" name="content_id" value="<?= $portalContentId ?>">
-                    <div><span class="pcmt-auth-kicker"><?= htmlspecialchars($t('Быстрый вход в обсуждение', 'Quick access to discussion'), ENT_QUOTES, 'UTF-8') ?></span></div>
-                    <div><input type="text" name="username" placeholder="<?= htmlspecialchars($t('Логин', 'Login'), ENT_QUOTES, 'UTF-8') ?>" required></div>
-                    <div class="pcmt-field-full"><input type="password" name="password" placeholder="<?= htmlspecialchars($t('Пароль от 8 символов', 'Password, min 8 chars'), ENT_QUOTES, 'UTF-8') ?>" required></div>
-                    <div class="pcmt-field-full pcmt-captcha">
-                        <div><strong><?= htmlspecialchars((string)($portalCaptcha[$portalIsRu ? 'prompt_ru' : 'prompt_en'] ?? $t('Сложите два числа рядом со знаками', 'Add the two numbers next to the symbols')), ENT_QUOTES, 'UTF-8') ?></strong></div>
-                        <div class="pcmt-captcha-code">
-                            <span><?= htmlspecialchars((string)($portalCaptcha['glyph_left'] ?? '◧'), ENT_QUOTES, 'UTF-8') ?><?= (int)($portalCaptcha['left'] ?? 0) ?></span>
-                            <span>+</span>
-                            <span><?= htmlspecialchars((string)($portalCaptcha['glyph_right'] ?? '◩'), ENT_QUOTES, 'UTF-8') ?><?= (int)($portalCaptcha['right'] ?? 0) ?></span>
-                        </div>
-                        <input type="text" name="captcha_answer" placeholder="<?= htmlspecialchars($t('Ответ', 'Answer'), ENT_QUOTES, 'UTF-8') ?>" required>
+                <div class="pcmt-auth-panel" data-auth-panel>
+                    <div class="pcmt-auth-tabs" role="tablist" aria-label="<?= htmlspecialchars($t('Вход и регистрация', 'Sign in and registration'), ENT_QUOTES, 'UTF-8') ?>">
+                        <button class="pcmt-auth-tab is-active" type="button" role="tab" aria-selected="true" data-auth-tab="login"><?= htmlspecialchars($t('Вход', 'Sign in'), ENT_QUOTES, 'UTF-8') ?></button>
+                        <button class="pcmt-auth-tab" type="button" role="tab" aria-selected="false" data-auth-tab="register"><?= htmlspecialchars($t('Регистрация', 'Register'), ENT_QUOTES, 'UTF-8') ?></button>
                     </div>
-                    <div class="pcmt-field-full pcmt-guest-cta">
-                        <button class="pcmt-btn" type="submit"><?= htmlspecialchars($t('Создать аккаунт и продолжить', 'Create account and continue'), ENT_QUOTES, 'UTF-8') ?></button>
+
+                    <div class="pcmt-auth-pane is-active" data-auth-pane="login">
+                        <form class="pcmt-auth-form" method="post">
+                            <input type="hidden" name="action" value="public_portal_login">
+                            <input type="hidden" name="portal_csrf" value="<?= htmlspecialchars($portalCsrf, ENT_QUOTES, 'UTF-8') ?>">
+                            <input type="hidden" name="return_path" value="<?= htmlspecialchars($portalCurrentUrl, ENT_QUOTES, 'UTF-8') ?>">
+                            <input type="hidden" name="content_type" value="<?= htmlspecialchars($portalContentType, ENT_QUOTES, 'UTF-8') ?>">
+                            <input type="hidden" name="content_id" value="<?= $portalContentId ?>">
+                            <div><span class="pcmt-auth-kicker"><?= htmlspecialchars($t('Уже есть аккаунт', 'Already have an account'), ENT_QUOTES, 'UTF-8') ?></span></div>
+                            <div><input type="text" name="login" placeholder="<?= htmlspecialchars($t('Логин или email', 'Login or email'), ENT_QUOTES, 'UTF-8') ?>" required></div>
+                            <div><input type="password" name="password" placeholder="<?= htmlspecialchars($t('Пароль', 'Password'), ENT_QUOTES, 'UTF-8') ?>" required></div>
+                            <div class="pcmt-field-full pcmt-guest-cta">
+                                <button class="pcmt-btn" type="submit"><?= htmlspecialchars($t('Войти и продолжить', 'Sign in and continue'), ENT_QUOTES, 'UTF-8') ?></button>
+                            </div>
+                            <div class="pcmt-field-full pcmt-auth-switch">
+                                <span><?= htmlspecialchars($t('Нет аккаунта?', 'No account yet?'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <button type="button" data-auth-switch="register"><?= htmlspecialchars($t('Регистрация', 'Register'), ENT_QUOTES, 'UTF-8') ?></button>
+                            </div>
+                        </form>
                     </div>
-                </form>
-                <form class="pcmt-auth-form" method="post">
-                    <input type="hidden" name="action" value="public_portal_login">
-                    <input type="hidden" name="portal_csrf" value="<?= htmlspecialchars($portalCsrf, ENT_QUOTES, 'UTF-8') ?>">
-                    <input type="hidden" name="return_path" value="<?= htmlspecialchars($portalCurrentUrl, ENT_QUOTES, 'UTF-8') ?>">
-                    <input type="hidden" name="content_type" value="<?= htmlspecialchars($portalContentType, ENT_QUOTES, 'UTF-8') ?>">
-                    <input type="hidden" name="content_id" value="<?= $portalContentId ?>">
-                    <div><span class="pcmt-auth-kicker"><?= htmlspecialchars($t('Уже есть аккаунт', 'Already have an account'), ENT_QUOTES, 'UTF-8') ?></span></div>
-                    <div><input type="text" name="login" placeholder="<?= htmlspecialchars($t('Логин или email', 'Login or email'), ENT_QUOTES, 'UTF-8') ?>" required></div>
-                    <div><input type="password" name="password" placeholder="<?= htmlspecialchars($t('Пароль', 'Password'), ENT_QUOTES, 'UTF-8') ?>" required></div>
-                    <div class="pcmt-field-full pcmt-guest-cta">
-                        <button class="pcmt-btn-ghost" type="submit"><?= htmlspecialchars($t('Войти и продолжить', 'Sign in and continue'), ENT_QUOTES, 'UTF-8') ?></button>
+
+                    <div class="pcmt-auth-pane" data-auth-pane="register">
+                        <form class="pcmt-auth-form" method="post">
+                            <input type="hidden" name="action" value="public_portal_register">
+                            <input type="hidden" name="portal_csrf" value="<?= htmlspecialchars($portalCsrf, ENT_QUOTES, 'UTF-8') ?>">
+                            <input type="hidden" name="return_path" value="<?= htmlspecialchars($portalCurrentUrl, ENT_QUOTES, 'UTF-8') ?>">
+                            <input type="hidden" name="content_type" value="<?= htmlspecialchars($portalContentType, ENT_QUOTES, 'UTF-8') ?>">
+                            <input type="hidden" name="content_id" value="<?= $portalContentId ?>">
+                            <div><span class="pcmt-auth-kicker"><?= htmlspecialchars($t('Быстрый вход в обсуждение', 'Quick access to discussion'), ENT_QUOTES, 'UTF-8') ?></span></div>
+                            <div><input type="text" name="username" placeholder="<?= htmlspecialchars($t('Логин', 'Login'), ENT_QUOTES, 'UTF-8') ?>" required></div>
+                            <div class="pcmt-field-full"><input type="password" name="password" placeholder="<?= htmlspecialchars($t('Пароль от 8 символов', 'Password, min 8 chars'), ENT_QUOTES, 'UTF-8') ?>" required></div>
+                            <div class="pcmt-field-full pcmt-captcha">
+                                <div><strong><?= htmlspecialchars((string)($portalCaptcha[$portalIsRu ? 'prompt_ru' : 'prompt_en'] ?? $t('Сложите два числа рядом со знаками', 'Add the two numbers next to the symbols')), ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                <div class="pcmt-captcha-code">
+                                    <span><?= htmlspecialchars((string)($portalCaptcha['glyph_left'] ?? '◧'), ENT_QUOTES, 'UTF-8') ?><?= (int)($portalCaptcha['left'] ?? 0) ?></span>
+                                    <span>+</span>
+                                    <span><?= htmlspecialchars((string)($portalCaptcha['glyph_right'] ?? '◩'), ENT_QUOTES, 'UTF-8') ?><?= (int)($portalCaptcha['right'] ?? 0) ?></span>
+                                </div>
+                                <input type="text" name="captcha_answer" placeholder="<?= htmlspecialchars($t('Ответ', 'Answer'), ENT_QUOTES, 'UTF-8') ?>" required>
+                            </div>
+                            <div class="pcmt-field-full pcmt-guest-cta">
+                                <button class="pcmt-btn" type="submit"><?= htmlspecialchars($t('Создать аккаунт и продолжить', 'Create account and continue'), ENT_QUOTES, 'UTF-8') ?></button>
+                            </div>
+                            <div class="pcmt-field-full pcmt-auth-switch">
+                                <span><?= htmlspecialchars($t('Уже есть аккаунт?', 'Already have an account?'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <button type="button" data-auth-switch="login"><?= htmlspecialchars($t('Войти', 'Sign in'), ENT_QUOTES, 'UTF-8') ?></button>
+                            </div>
+                        </form>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     <?php else: ?>
@@ -576,7 +604,23 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
             var authShell = root.querySelector('#pcmt-auth-shell');
             if (authShell) {
                 authShell.classList.add('is-open');
+                switchAuthTab('login');
             }
+        }
+
+        function switchAuthTab(tabName) {
+            var authShell = root.querySelector('#pcmt-auth-shell');
+            if (!authShell) {
+                return;
+            }
+            authShell.querySelectorAll('[data-auth-tab]').forEach(function (tab) {
+                var isActive = tab.getAttribute('data-auth-tab') === tabName;
+                tab.classList.toggle('is-active', isActive);
+                tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+            authShell.querySelectorAll('[data-auth-pane]').forEach(function (pane) {
+                pane.classList.toggle('is-active', pane.getAttribute('data-auth-pane') === tabName);
+            });
         }
 
         function openCompose() {
@@ -642,11 +686,31 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
                         var authShell = refreshedRootForAuth.querySelector('#pcmt-auth-shell');
                         if (authShell) {
                             authShell.classList.add('is-open');
+                            var loginTab = refreshedRootForAuth.querySelector('[data-auth-tab="login"]');
+                            if (loginTab) {
+                                loginTab.click();
+                            }
                             return;
                         }
                     }
                     openAuth();
                 });
+                return;
+            }
+
+            var authTab = event.target.closest('[data-auth-tab]');
+            if (authTab) {
+                switchAuthTab(authTab.getAttribute('data-auth-tab') || 'login');
+                return;
+            }
+
+            var authSwitch = event.target.closest('[data-auth-switch]');
+            if (authSwitch) {
+                var authShell = root.querySelector('#pcmt-auth-shell');
+                if (authShell) {
+                    authShell.classList.add('is-open');
+                }
+                switchAuthTab(authSwitch.getAttribute('data-auth-switch') || 'login');
                 return;
             }
 
