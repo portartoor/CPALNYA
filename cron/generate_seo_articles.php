@@ -3408,12 +3408,9 @@ function seo_daily_slots(string $jobDate, string $lang, int $minCount, int $maxC
     return $slots;
 }
 
-function seo_round_up_15_minute(int $minuteOfDay): int
+function seo_clamp_minute_of_day(int $minuteOfDay): int
 {
-    if ($minuteOfDay <= 0) {
-        return 0;
-    }
-    return (int)(ceil($minuteOfDay / 15) * 15);
+    return max(0, min(23 * 60 + 59, $minuteOfDay));
 }
 
 function seo_generate_irregular_slot_minutes(
@@ -3425,90 +3422,58 @@ function seo_generate_irregular_slot_minutes(
     int $target,
     string $seedScope = ''
 ): array {
-    $minGapSlots = 3; // 45 minutes minimum gap
-    $startSlot = max(0, (int)ceil($startMinute / 15));
-    $endSlot = min(95, (int)floor($endMinute / 15));
-    if ($endSlot < $startSlot || $target <= 0) {
+    $minGapMinutes = 35;
+    $startMinute = seo_clamp_minute_of_day($startMinute);
+    $endMinute = seo_clamp_minute_of_day($endMinute);
+    if ($endMinute < $startMinute || $target <= 0) {
         return [];
     }
 
-    $maxFeasible = (int)floor(($endSlot - $startSlot) / $minGapSlots) + 1;
+    $maxFeasible = (int)floor(($endMinute - $startMinute) / $minGapMinutes) + 1;
     $target = max(1, min($target, max(1, $maxFeasible)));
     $seedBase = "{$jobDate}|{$lang}|{$salt}|irregular|{$seedScope}";
 
-    $slots = [];
-    $latestFirst = $endSlot - (($target - 1) * $minGapSlots);
-    if ($latestFirst < $startSlot) {
-        $latestFirst = $startSlot;
+    $minutes = [];
+    $latestFirst = $endMinute - (($target - 1) * $minGapMinutes);
+    if ($latestFirst < $startMinute) {
+        $latestFirst = $startMinute;
     }
-    $first = seo_det_int("{$seedBase}|first", $startSlot, $latestFirst);
-    $slots[] = $first;
+    $first = seo_det_int("{$seedBase}|first", $startMinute, $latestFirst);
+    $minutes[] = $first;
 
     for ($i = 1; $i < $target; $i++) {
-        $prev = $slots[count($slots) - 1];
+        $prev = $minutes[count($minutes) - 1];
         $remaining = $target - $i - 1;
-        $minSlot = $prev + $minGapSlots;
-        $maxSlot = $endSlot - ($remaining * $minGapSlots);
-        if ($maxSlot < $minSlot) {
-            $maxSlot = $minSlot;
+        $minPick = $prev + $minGapMinutes;
+        $maxPick = $endMinute - ($remaining * $minGapMinutes);
+        if ($maxPick < $minPick) {
+            $maxPick = $minPick;
         }
 
         // Randomized "preferred" upper bound to keep spacing uneven.
-        $dynamicMaxGapSlots = seo_det_int("{$seedBase}|dyn-gap|{$i}", 4, 16); // 60..240 minutes
-        $preferredMax = min($maxSlot, $prev + $dynamicMaxGapSlots);
-        if ($preferredMax < $minSlot) {
-            $preferredMax = $maxSlot;
+        $dynamicMaxGapMinutes = seo_det_int("{$seedBase}|dyn-gap|{$i}", 55, 240);
+        $preferredMax = min($maxPick, $prev + $dynamicMaxGapMinutes);
+        if ($preferredMax < $minPick) {
+            $preferredMax = $maxPick;
         }
 
-        $pick = seo_det_int("{$seedBase}|pick|{$i}", $minSlot, $preferredMax);
-        if ($preferredMax < $maxSlot) {
+        $pick = seo_det_int("{$seedBase}|pick|{$i}", $minPick, $preferredMax);
+        if ($preferredMax < $maxPick) {
             $jumpChance = seo_det_int("{$seedBase}|jump|{$i}", 0, 99);
             if ($jumpChance < 30) {
-                $pick = seo_det_int("{$seedBase}|jump-pick|{$i}", $preferredMax, $maxSlot);
+                $pick = seo_det_int("{$seedBase}|jump-pick|{$i}", $preferredMax, $maxPick);
             }
         }
-        $slots[] = $pick;
+        $minutes[] = $pick;
     }
 
-    $minutes = array_map(static function (int $slot): int {
-        return $slot * 15;
-    }, $slots);
     sort($minutes, SORT_NUMERIC);
     return $minutes;
 }
 
 function seo_lang_schedule_window_minutes(string $jobDate, string $lang, string $salt): array
 {
-    $langKey = strtolower(trim($lang));
-    $windowStart = 15;
-    $windowEnd = 23 * 60 + 45;
-
-    if ($langKey === 'ru') {
-        // Moscow daytime.
-        $windowStart = 9 * 60;
-        $windowEnd = 19 * 60 + 45;
-    } elseif ($langKey === 'en') {
-        // Western hemisphere daytime projected to server clock.
-        $windowStart = 15 * 60;
-        $windowEnd = 23 * 60 + 45;
-    }
-
-    $jitterStart = seo_det_int("{$jobDate}|{$langKey}|{$salt}|window-start-jitter", -45, 45);
-    $jitterEnd = seo_det_int("{$jobDate}|{$langKey}|{$salt}|window-end-jitter", -45, 45);
-
-    $startMinute = max(0, min(23 * 60 + 45, seo_round_up_15_minute($windowStart + $jitterStart)));
-    $endMinute = max(15, min(23 * 60 + 45, (int)(floor(($windowEnd + $jitterEnd) / 15) * 15)));
-
-    if ($endMinute < $startMinute) {
-        $endMinute = min(23 * 60 + 45, $startMinute + 60);
-        $endMinute = (int)(floor($endMinute / 15) * 15);
-    }
-    if ($endMinute < $startMinute) {
-        $startMinute = max(0, min(23 * 60, $startMinute - 15));
-        $endMinute = min(23 * 60 + 45, $startMinute + 15);
-    }
-
-    return [$startMinute, $endMinute];
+    return [9 * 60, 20 * 60 + 59];
 }
 
 function seo_daily_slots_ranged(
@@ -3521,9 +3486,9 @@ function seo_daily_slots_ranged(
 ): array {
     [$langStartMinute, $langEndMinute] = seo_lang_schedule_window_minutes($jobDate, $lang, $salt);
     $endMinute = $langEndMinute;
-    $startMinute = max($langStartMinute, min($endMinute, seo_round_up_15_minute($startMinute)));
+    $startMinute = max($langStartMinute, min($endMinute, seo_clamp_minute_of_day($startMinute)));
 
-    $available = (int)floor(($endMinute - $startMinute) / 15) + 1;
+    $available = ($endMinute - $startMinute) + 1;
     if ($available <= 0) {
         $available = 1;
         $startMinute = $endMinute;
@@ -6118,7 +6083,8 @@ function seo_publish_article(
     string $lang,
     array $recent,
     bool $dryRun = false,
-    ?array $topicAnalysisPrecomputed = null
+    ?array $topicAnalysisPrecomputed = null,
+    ?string $publishedAt = null
 ): array
 {
     $isRu = $lang === 'ru';
@@ -6440,6 +6406,11 @@ function seo_publish_article(
     $authorSafe = mysqli_real_escape_string($db, $cfg['author_name']);
     $langSafe = mysqli_real_escape_string($db, $lang);
     $domainSafe = mysqli_real_escape_string($db, $domainForLang);
+    $publishedAt = trim((string)$publishedAt);
+    if ($publishedAt === '') {
+        $publishedAt = date('Y-m-d H:i:s');
+    }
+    $publishedAtSafe = mysqli_real_escape_string($db, $publishedAt);
 
     $existingDuplicate = seo_find_existing_exact_duplicate(
         $db,
@@ -6490,7 +6461,7 @@ function seo_publish_article(
     ];
     $insertValues = [
         "'{$domainSafe}'", "'{$langSafe}'", "'{$titleSafe}'", "'{$slugSafe}'", "'{$excerptSafe}'", "'{$contentSafe}'",
-        "'{$authorSafe}'", '0', '1', 'NOW()', 'NOW()', 'NOW()',
+        "'{$authorSafe}'", '0', '1', "'{$publishedAtSafe}'", 'NOW()', 'NOW()',
     ];
     if ((bool)($cfg['examples_has_cluster_code'] ?? false)) {
         $insertColumns[] = 'cluster_code';
@@ -6571,6 +6542,7 @@ function seo_publish_article(
         'preview_image_thumb_url' => $previewImageThumbUrl,
         'preview_image_style' => $previewImageStyle,
         'preview_image_data' => $previewImageData,
+        'published_at' => $publishedAt,
         'words' => $words,
         'words_initial' => $initialWords,
         'target_words' => (int)($payload['target_words'] ?? 0),
@@ -6979,7 +6951,7 @@ foreach ($cfg['langs'] as $lang) {
         if ($isTodayJob) {
             $delayMin = max(1, min(360, (int)$cfg['today_first_delay_min']));
             $minuteNow = ((int)date('G') * 60) + (int)date('i');
-            $startMinute = seo_round_up_15_minute($minuteNow + $delayMin);
+            $startMinute = seo_clamp_minute_of_day($minuteNow + $delayMin);
             $slots = seo_daily_slots_ranged($jobDate, $lang, $cfg['daily_min'], $cfg['daily_max'], $cfg['seed_salt'], $startMinute);
         } else {
             $slots = seo_daily_slots($jobDate, $lang, $cfg['daily_min'], $cfg['daily_max'], $cfg['seed_salt']);
@@ -7072,7 +7044,7 @@ foreach ($cfg['langs'] as $lang) {
         while (true) {
             $generationAttempt++;
             try {
-                $created = seo_publish_article($DB, $cfg, $lang, $recent, $runtime['dry_run'], $topicAnalysisForLang);
+                $created = seo_publish_article($DB, $cfg, $lang, $recent, $runtime['dry_run'], $topicAnalysisForLang, $plannedAt);
             $imageResult = (array)($created['preview_image_result'] ?? []);
             $imageColor = (string)($imageResult['color_scheme'] ?? '');
             $imageFamily = (string)($imageResult['scene_family'] ?? '');

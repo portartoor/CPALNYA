@@ -364,10 +364,10 @@ if ($sectionKey !== 'playbooks') {
 .jrnl-tags{display:flex;flex-wrap:wrap;gap:10px}
 .jrnl-tag{color:var(--shell-muted);text-decoration:none}
 .jrnl-tag.is-active,.jrnl-tag:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
-.jrnl-topic-cloud{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 18px}
-.jrnl-topic-pill{display:inline-flex;align-items:flex-end;min-height:auto;padding:0;border:0;background:transparent;color:rgba(196,214,238,.7);text-decoration:none;flex:var(--topic-grow,1) 1 calc(var(--topic-basis,16) * 1%);font-size:calc(var(--topic-font,12) * 1px);font-weight:700;line-height:1.02;letter-spacing:0}
-.jrnl-topic-pill strong{display:block;color:inherit;font-size:1em;font-weight:inherit}
-.jrnl-topic-pill span{display:none}
+.jrnl-topic-cloud{display:block;font-size:0;line-height:1.8}
+.jrnl-topic-pill{display:inline;color:rgba(196,214,238,.7);text-decoration:none;font-size:calc(var(--topic-font,12) * 1px);font-weight:700;line-height:1.02;letter-spacing:0;vertical-align:baseline}
+.jrnl-topic-pill strong,.jrnl-topic-pill span{display:inline;color:inherit;font-size:1em;font-weight:inherit}
+.jrnl-topic-pill span{opacity:.72}
 .jrnl-topic-pill.is-active,.jrnl-topic-pill:hover{color:var(--shell-text)}
 .jrnl-topic-pill.is-all{opacity:.82}
 .jrnl-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
@@ -447,7 +447,7 @@ if ($sectionKey !== 'playbooks') {
 100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0) saturate(1)}
 }
 @media (max-width:1180px){.jrnl-hero,.jrnl-grid,.jrnl-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.jrnl-hero{grid-template-columns:1fr}}
-@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-hero{padding:0 0 18px;overflow:hidden}.jrnl-cover{order:-1;border-top:0;border-left:0;border-right:0}.jrnl-copy{padding:0 18px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}.jrnl-topic-pill{flex-basis:calc(max(var(--topic-basis,24), 42) * 1%)}}
+@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-hero{padding:0 0 18px;overflow:hidden}.jrnl-cover{order:-1;border-top:0;border-left:0;border-right:0}.jrnl-copy{padding:0 18px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}} 
 </style>
 
 <section class="jrnl">
@@ -600,7 +600,7 @@ if ($sectionKey !== 'playbooks') {
                             href="<?= htmlspecialchars($buildPageUrl($topicCode), ENT_QUOTES, 'UTF-8') ?>"
                             style="--topic-basis:<?= (int)($topicItem['basis'] ?? ($isAllTopic ? 18 : 16)) ?>;--topic-grow:<?= htmlspecialchars((string)($topicItem['grow'] ?? ($isAllTopic ? '1.1' : '1')), ENT_QUOTES, 'UTF-8') ?>;--topic-font:<?= (int)($topicItem['font'] ?? 12) ?>"
                         >
-                            <strong><?= htmlspecialchars((string)($topicItem['label'] ?? $topicCode), ENT_QUOTES, 'UTF-8') ?></strong>
+                            <strong><?= htmlspecialchars((string)($topicItem['label'] ?? $topicCode), ENT_QUOTES, 'UTF-8') ?></strong><span><?= ' (' . (int)($topicItem['count'] ?? 0) . ')' ?></span>
                         </a>
                     <?php endforeach; ?>
                 </div>
