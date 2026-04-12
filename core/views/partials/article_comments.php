@@ -310,7 +310,7 @@ $portalCommentTree = static function (array $nodes, int $depth = 0) use (&$porta
 };
 ?>
 <style>
-.pcmt{position:relative;margin-top:28px;padding:28px;border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(6,12,24,.88),rgba(5,10,20,.76));box-shadow:var(--shell-shadow);transition:opacity .24s ease,transform .24s ease}
+.pcmt{position:relative;margin-top:28px;padding:28px 28px 20px;border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(6,12,24,.88),rgba(5,10,20,.76));box-shadow:var(--shell-shadow);transition:opacity .24s ease,transform .24s ease}
 .pcmt.is-loading{opacity:.72;pointer-events:none}
 .pcmt.is-loading::after{content:"";position:absolute;inset:0;border:1px solid rgba(122,180,255,.12);background:linear-gradient(90deg,rgba(255,255,255,0),rgba(122,180,255,.12),rgba(255,255,255,0));animation:pcmtLoad 1.1s linear infinite}
 .pcmt-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px}
