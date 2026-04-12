@@ -321,6 +321,7 @@ if (!function_exists('public_portal_users_ensure_schema')) {
                 avatar_url VARCHAR(255) NOT NULL DEFAULT '',
                 telegram_handle VARCHAR(120) NOT NULL DEFAULT '',
                 website_url VARCHAR(255) NOT NULL DEFAULT '',
+                about_text TEXT NULL,
                 nickname_changed_at DATETIME NULL DEFAULT NULL,
                 comment_rating INT NOT NULL DEFAULT 0,
                 comment_votes_up INT NOT NULL DEFAULT 0,
@@ -347,7 +348,8 @@ if (!function_exists('public_portal_users_ensure_schema')) {
         public_portal_ensure_column($db, 'public_users', 'avatar_url', "avatar_url VARCHAR(255) NOT NULL DEFAULT '' AFTER avatar_mode");
         public_portal_ensure_column($db, 'public_users', 'telegram_handle', "telegram_handle VARCHAR(120) NOT NULL DEFAULT '' AFTER avatar_url");
         public_portal_ensure_column($db, 'public_users', 'website_url', "website_url VARCHAR(255) NOT NULL DEFAULT '' AFTER telegram_handle");
-        public_portal_ensure_column($db, 'public_users', 'nickname_changed_at', "nickname_changed_at DATETIME NULL DEFAULT NULL AFTER website_url");
+        public_portal_ensure_column($db, 'public_users', 'about_text', "about_text TEXT NULL AFTER website_url");
+        public_portal_ensure_column($db, 'public_users', 'nickname_changed_at', "nickname_changed_at DATETIME NULL DEFAULT NULL AFTER about_text");
         public_portal_ensure_column($db, 'public_users', 'comment_rating', "comment_rating INT NOT NULL DEFAULT 0 AFTER nickname_changed_at");
         public_portal_ensure_column($db, 'public_users', 'comment_votes_up', "comment_votes_up INT NOT NULL DEFAULT 0 AFTER comment_rating");
         public_portal_ensure_column($db, 'public_users', 'comment_votes_down', "comment_votes_down INT NOT NULL DEFAULT 0 AFTER comment_votes_up");
@@ -695,7 +697,7 @@ if (!function_exists('public_portal_current_user')) {
         }
         $rows = $FRMWRK->DBRecords(
             "SELECT id, username, email, display_name, pin_code, avatar_mode, avatar_url,
-                    telegram_handle, website_url, nickname_changed_at, comment_rating, comment_votes_up,
+                    telegram_handle, website_url, about_text, nickname_changed_at, comment_rating, comment_votes_up,
                     comment_votes_down, comments_count, role_code, is_active,
                     is_banned, banned_reason, last_login_at, created_at
              FROM public_users
@@ -709,7 +711,7 @@ if (!function_exists('public_portal_current_user')) {
             public_portal_recalculate_user_rating($db, (int)$user['id']);
             $refresh = $FRMWRK->DBRecords(
                 "SELECT id, username, email, display_name, pin_code, avatar_mode, avatar_url,
-                        telegram_handle, website_url, nickname_changed_at, comment_rating, comment_votes_up,
+                        telegram_handle, website_url, about_text, nickname_changed_at, comment_rating, comment_votes_up,
                         comment_votes_down, comments_count, role_code, is_active,
                         is_banned, banned_reason, last_login_at, created_at
                  FROM public_users
@@ -853,6 +855,7 @@ if (!function_exists('public_portal_fetch_public_profile')) {
         $user['email_public'] = public_portal_public_contact_value((string)($user['email'] ?? ''), 'email');
         $user['telegram_public'] = public_portal_public_contact_value((string)($user['telegram_handle'] ?? ''));
         $user['website_public'] = public_portal_public_contact_value((string)($user['website_url'] ?? ''));
+        $user['about_text_public'] = trim((string)($user['about_text'] ?? ''));
         $user['favorites'] = $favorites;
         return $user;
     }
@@ -1591,6 +1594,7 @@ if (!function_exists('public_portal_handle_request')) {
             $displayName = trim((string)($_POST['display_name'] ?? ''));
             $telegram = trim((string)($_POST['telegram_handle'] ?? ''));
             $website = trim((string)($_POST['website_url'] ?? ''));
+            $aboutText = trim((string)($_POST['about_text'] ?? ''));
             $email = trim((string)($_POST['email'] ?? ''));
             $currentDisplayName = trim((string)($user['display_name'] ?? ''));
             $nicknameChangedAt = trim((string)($user['nickname_changed_at'] ?? ''));
@@ -1632,6 +1636,10 @@ if (!function_exists('public_portal_handle_request')) {
             $displayNameSafe = mysqli_real_escape_string($db, $displayName);
             $telegramSafe = mysqli_real_escape_string($db, $telegram);
             $websiteSafe = mysqli_real_escape_string($db, $website);
+            $aboutTextPrepared = function_exists('mb_substr')
+                ? mb_substr($aboutText, 0, 2000, 'UTF-8')
+                : substr($aboutText, 0, 2000);
+            $aboutTextSafe = mysqli_real_escape_string($db, $aboutTextPrepared);
             $avatarSafe = mysqli_real_escape_string($db, $avatarUrl);
             $emailFallback = (string)($user['username'] ?? 'member') . '+' . (int)($user['id'] ?? 0) . '@portal.local';
             $emailSafe = mysqli_real_escape_string($db, $email !== '' ? strtolower($email) : $emailFallback);
@@ -1642,6 +1650,7 @@ if (!function_exists('public_portal_handle_request')) {
                  SET display_name = '{$displayNameSafe}',
                      telegram_handle = '{$telegramSafe}',
                      website_url = '{$websiteSafe}',
+                     about_text = '{$aboutTextSafe}',
                      email = '{$emailSafe}',
                      avatar_mode = '" . ($avatarUrl !== '' ? 'upload' : 'generated') . "',
                      avatar_url = '{$avatarSafe}',

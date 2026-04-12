@@ -30,7 +30,7 @@ $sectionIcons = [
     'home' => '⌂',
     'journal' => '✦',
     'playbooks' => '⚙',
-    'signals' => '⌁',
+    'signals' => '⌃',
     'fun' => '✺',
     'discussion' => '☰',
     'contact' => '✉',
@@ -46,33 +46,114 @@ if (!function_exists('examples_fetch_clusters') && defined('DIR')) {
 $importantTopicItems = [];
 if (function_exists('examples_fetch_published_list')) {
     $topicSections = ['journal', 'playbooks', 'signals', 'fun'];
+    $topicLang = $isRu ? 'ru' : 'en';
+    $generalTitle = $isRu ? 'Общий' : 'General';
+    $generalKey = function_exists('mb_strtolower') ? mb_strtolower($generalTitle, 'UTF-8') : strtolower($generalTitle);
+    $expandedQuota = ['journal' => 2, 'playbooks' => 2, 'signals' => 1, 'fun' => 1];
+    $collapsedQuota = ['journal' => 1, 'playbooks' => 1, 'signals' => 1, 'fun' => 1];
+
+    $normalizeTopicKey = static function (string $value): string {
+        $value = trim((string)preg_replace('/\s+/u', ' ', $value));
+        if ($value === '') {
+            return '';
+        }
+        return function_exists('mb_strtolower')
+            ? mb_strtolower($value, 'UTF-8')
+            : strtolower($value);
+    };
+
+    $topicCandidates = [];
     foreach ($topicSections as $topicSection) {
-        $items = array_values((array)examples_fetch_published_list($FRMWRK, (string)$host, 1, $isRu ? 'ru' : 'en', '', $topicSection));
-        $item = isset($items[0]) && is_array($items[0]) ? $items[0] : null;
-        if (!$item) {
-            continue;
+        $items = array_values((array)examples_fetch_published_list($FRMWRK, (string)$host, 48, $topicLang, '', $topicSection));
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $slug = trim((string)($item['slug'] ?? ''));
+            if ($slug === '') {
+                continue;
+            }
+            $cluster = trim((string)($item['cluster_code'] ?? ''));
+            $cluster = function_exists('examples_normalize_cluster')
+                ? examples_normalize_cluster($cluster, $topicLang)
+                : $cluster;
+            $topicTitle = function_exists('examples_cluster_label')
+                ? trim((string)examples_cluster_label($cluster, $topicLang))
+                : '';
+            if ($topicTitle === '') {
+                $topicTitle = $generalTitle;
+            }
+            $topicCandidates[$topicSection][] = [
+                'title' => $topicTitle,
+                'topic_key' => $normalizeTopicKey($topicTitle),
+                'cluster' => $cluster,
+                'path' => function_exists('examples_cluster_list_path')
+                    ? examples_cluster_list_path($cluster, null, $topicSection)
+                    : ($sectionBasePaths[$topicSection] ?? ('/' . trim($topicSection, '/') . '/')),
+                'icon' => $sectionIcons[$topicSection] ?? '•',
+                'section' => $topicSection,
+            ];
         }
-        $slug = trim((string)($item['slug'] ?? ''));
-        if ($slug === '') {
-            continue;
+    }
+
+    $generalTopicItem = null;
+    $usedTopicKeys = [];
+    foreach ($topicSections as $topicSection) {
+        foreach ((array)($topicCandidates[$topicSection] ?? []) as $candidate) {
+            $clusterCode = trim((string)($candidate['cluster'] ?? ''));
+            $topicKey = (string)($candidate['topic_key'] ?? '');
+            if (!in_array($clusterCode, ['general', 'obshchiy', ''], true) && $topicKey !== $generalKey) {
+                continue;
+            }
+            $generalTopicItem = $candidate;
+            $generalTopicItem['title'] = $generalTitle;
+            $generalTopicItem['topic_key'] = $generalKey;
+            $usedTopicKeys[$generalKey] = true;
+            break 2;
         }
-        $cluster = trim((string)($item['cluster_code'] ?? ''));
-        $cluster = function_exists('examples_normalize_cluster')
-            ? examples_normalize_cluster($cluster, $isRu ? 'ru' : 'en')
-            : $cluster;
-        $topicTitle = $cluster !== '' && function_exists('examples_cluster_label')
-            ? trim((string)examples_cluster_label($cluster, $isRu ? 'ru' : 'en'))
-            : '';
-        if ($topicTitle === '') {
-            $topicTitle = $sectionTitles[$topicSection] ?? $topicSection;
+    }
+
+    $pickTopics = static function (array $quotaMap, array $seedUsed) use ($topicSections, $topicCandidates): array {
+        $result = [];
+        $used = $seedUsed;
+        foreach ($topicSections as $topicSection) {
+            $limit = (int)($quotaMap[$topicSection] ?? 0);
+            if ($limit < 1) {
+                continue;
+            }
+            foreach ((array)($topicCandidates[$topicSection] ?? []) as $candidate) {
+                $topicKey = (string)($candidate['topic_key'] ?? '');
+                if ($topicKey === '' || isset($used[$topicKey])) {
+                    continue;
+                }
+                $used[$topicKey] = true;
+                $result[] = $candidate;
+                $limit--;
+                if ($limit <= 0) {
+                    break;
+                }
+            }
         }
-        $importantTopicItems[] = [
-            'title' => $topicTitle,
-            'path' => ($cluster !== '' && function_exists('examples_cluster_list_path'))
-                ? examples_cluster_list_path($cluster, null, $topicSection)
-                : ($sectionBasePaths[$topicSection] ?? ('/' . trim($topicSection, '/') . '/')),
-            'icon' => $sectionIcons[$topicSection] ?? '•',
-        ];
+        return $result;
+    };
+
+    $expandedTopicItems = $pickTopics($expandedQuota, $usedTopicKeys);
+    $collapsedTopicItems = $pickTopics($collapsedQuota, $usedTopicKeys);
+    $collapsedPaths = [];
+    foreach ($collapsedTopicItems as $collapsedItem) {
+        $collapsedPaths[(string)($collapsedItem['path'] ?? '')] = true;
+    }
+
+    if (is_array($generalTopicItem)) {
+        $generalTopicItem['class'] = 'nav-topic-item';
+        $importantTopicItems[] = $generalTopicItem;
+        $collapsedPaths[(string)($generalTopicItem['path'] ?? '')] = true;
+    }
+
+    foreach ($expandedTopicItems as $topicItem) {
+        $topicPath = (string)($topicItem['path'] ?? '');
+        $topicItem['class'] = isset($collapsedPaths[$topicPath]) ? 'nav-topic-item' : 'nav-topic-item nav-topic-item-extra';
+        $importantTopicItems[] = $topicItem;
     }
 }
 
@@ -91,9 +172,7 @@ $navSections = [
     ],
 ];
 
-$mobileSearchPlaceholder = $isRu
-    ? 'Поиск по выпуску'
-    : 'Search issues';
+$mobileSearchPlaceholder = $isRu ? 'Поиск по выпуску' : 'Search issues';
 $mobileSearchButton = $isRu ? 'Найти' : 'Search';
 $mobileAccountLabel = $isRu ? 'Аккаунт / вход' : 'Account / sign in';
 ?>
@@ -133,8 +212,9 @@ foreach ($navSections as $sectionBlock):
         $isActive = ($pathForMatch === '/')
             ? ($currentPath === '/')
             : (strpos($currentPath, $pathForMatch) === 0);
+        $itemClasses = trim(((string)($item['class'] ?? '')) . ' ' . ($isActive ? 'is-active' : ''));
     ?>
-        <a class="<?= $isActive ? 'is-active' : '' ?>" href="<?= htmlspecialchars($path, ENT_QUOTES, 'UTF-8') ?>">
+        <a class="<?= htmlspecialchars($itemClasses, ENT_QUOTES, 'UTF-8') ?>" href="<?= htmlspecialchars($path, ENT_QUOTES, 'UTF-8') ?>">
             <span class="nav-item-icon" aria-hidden="true"><?= htmlspecialchars((string)($item['icon'] ?? '•'), ENT_QUOTES, 'UTF-8') ?></span>
             <span><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
         </a>

@@ -1164,6 +1164,9 @@ if (isset($_GET['header_search_preview'])) {
         padding: 5px 8px;
         font-size: 11px;
     }
+    .simple-header.is-scrolled .simple-nav a.nav-topic-item-extra {
+        display: none;
+    }
     .simple-header.is-scrolled.is-search-open .simple-header-center {
         position: absolute;
         left: clamp(220px, 24vw, 300px);
