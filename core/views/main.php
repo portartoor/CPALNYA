@@ -96,6 +96,7 @@ $statIcon = static function (string $type): string {
     ];
     return $icons[$type] ?? '';
 };
+$telegramIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.94 4.66a1.5 1.5 0 0 0-1.68-.2L3.2 12.84a1 1 0 0 0 .1 1.85l4.34 1.49 1.66 5.06a1 1 0 0 0 1.73.33l2.42-3 4.76 3.48a1.5 1.5 0 0 0 2.36-.92l2.3-14.5a1.5 1.5 0 0 0-.93-1.97ZM9.4 15.47l-.56 3.03-.96-2.91 9.88-7.42-8.36 7.3Z"/></svg>';
 $heroCard = is_array($heroFeature) ? $heroFeature : (is_array($cover) ? $cover : null);
 $heroSection = trim((string)($heroCard['source_section'] ?? 'journal'));
 $heroSectionTitles = [
@@ -146,6 +147,16 @@ $heroSectionTitles = [
 .home-z-card-stats{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 .home-z-stat-icon{width:15px;height:15px;display:block;flex:0 0 15px;opacity:.86}
 .home-z-comments{padding:24px;display:grid;gap:18px}
+.home-z-join{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:18px;padding:24px;border:1px solid rgba(122,180,255,.16);background:linear-gradient(180deg,rgba(10,18,34,.92),rgba(6,12,24,.82));box-shadow:var(--shell-shadow)}
+.home-z-join-copy{display:grid;gap:12px;align-content:start}
+.home-z-join-copy p{margin:0;color:var(--shell-muted);line-height:1.68;max-width:70ch}
+.home-z-join-actions{display:flex;flex-wrap:wrap;gap:10px}
+.home-z-join-note{display:grid;gap:10px;align-content:start;padding:18px;border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(122,180,255,.05))}
+.home-z-join-note strong{font:700 1rem/1.2 "Space Grotesk","Sora",sans-serif}
+.home-z-join-note p{margin:0;color:var(--shell-muted);line-height:1.62}
+.home-z-btn-telegram{background:linear-gradient(135deg,rgba(91,189,255,.22),rgba(57,141,255,.18));border-color:rgba(91,189,255,.28)}
+.home-z-btn-telegram .home-z-btn-icon{width:16px;min-width:16px;height:16px;color:#7fd7ff;font-size:0}
+.home-z-btn-telegram .home-z-btn-icon svg{display:block;width:16px;height:16px}
 .home-z-comments-head{display:grid;gap:10px;max-width:880px}
 .home-z-comments-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .home-z-comment-card{display:grid;gap:14px;padding:18px 18px 20px;border:1px solid rgba(122,180,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(122,180,255,.05));text-decoration:none;color:inherit}
@@ -169,6 +180,7 @@ $heroSectionTitles = [
     .home-z-cover{order:-1;border-top:0;border-left:0;border-right:0}
     .home-z-copy{padding:0 18px}
     .home-z-block-head{grid-template-columns:1fr}
+    .home-z-join{grid-template-columns:1fr}
     .home-z-feature{grid-template-columns:1fr}
     .home-z-feature-media{width:100%;aspect-ratio:16/10}
     .home-z-card{grid-template-columns:1fr}
@@ -261,6 +273,26 @@ $heroSectionTitles = [
                             </div>
                         </a>
                     <?php endforeach; ?>
+                </div>
+            </section>
+
+            <section class="home-z-join">
+                <div class="home-z-join-copy">
+                    <span class="home-z-tag"><?= htmlspecialchars($t('Войти в обсуждение', 'Join the discussion'), ENT_QUOTES, 'UTF-8') ?></span>
+                    <h2><?= htmlspecialchars($t('Зарегистрируйся, чтобы спорить, добавлять практику и продолжать материалы вместе с ЦПАЛЬНЯ.', 'Create an account to argue, add field notes, and keep the material going with the rest of CPALNYA.'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <p><?= htmlspecialchars($t('Личный кабинет нужен не для галочки, а чтобы оставлять комментарии, оценивать чужие реплики, возвращаться к болевым темам и наблюдать, как материалы доживают в обсуждении.', 'The account is not there for ceremony. It lets readers comment, rate replies, return to the sharper threads, and keep the material alive after publication.'), ENT_QUOTES, 'UTF-8') ?></p>
+                    <div class="home-z-join-actions">
+                        <a class="home-z-btn" href="/account/"><span class="home-z-btn-icon" aria-hidden="true">+</span><span><?= htmlspecialchars($t('Вход / регистрация', 'Sign in / register'), ENT_QUOTES, 'UTF-8') ?></span></a>
+                        <a class="home-z-btn home-z-btn-telegram" href="https://t.me/cpalnya_journal" target="_blank" rel="noopener noreferrer">
+                            <span class="home-z-btn-icon" aria-hidden="true"><?= $telegramIcon ?></span>
+                            <span><?= htmlspecialchars($t('Обсуждать в Telegram', 'Discuss in Telegram'), ENT_QUOTES, 'UTF-8') ?></span>
+                        </a>
+                    </div>
+                </div>
+                <div class="home-z-join-note">
+                    <span class="home-z-meta"><?= htmlspecialchars($t('Telegram-канал обсуждений', 'Telegram discussion room'), ENT_QUOTES, 'UTF-8') ?></span>
+                    <strong><?= htmlspecialchars($t('Если хочется обсудить материалы быстрее и живее, иди прямо в чат.', 'If you want a faster, louder discussion around the issue, jump straight into the Telegram room.'), ENT_QUOTES, 'UTF-8') ?></strong>
+                    <p><?= htmlspecialchars($t('Там обычно появляются те наблюдения, которые не доходят до формального комментария: короткие споры, тихие edge cases, дополнения по связкам и настоящая операционка без витрины.', 'That is where the smaller observations usually surface first: quick arguments, edge cases, extra setup detail, and the operational reality before it turns into a formal comment.'), ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
             </section>
 

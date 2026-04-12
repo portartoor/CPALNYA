@@ -19,7 +19,7 @@ $authorNickname = trim((string)($authorProfile['nickname'] ?? ''));
 $authorRole = trim((string)($authorProfile['resolved_role'] ?? ''));
 $authorBio = trim((string)($authorProfile['resolved_bio'] ?? ''));
 if ($authorDisplayName === '') {
-    $authorDisplayName = $isRu ? 'Редакция ЦПАЛЬНЯ' : 'CPALNYA Editorial';
+    $authorDisplayName = $isRu ? 'Р РµРґР°РєС†РёСЏ Р¦РџРђР›Р¬РќРЇ' : 'CPALNYA Editorial';
 }
 $authorInitials = '';
 if ($authorDisplayName !== '') {
@@ -263,7 +263,7 @@ if (!empty($clusters)) {
     shuffle($clusterPool);
     $topicCloudItems[] = [
         'code' => '',
-        'label' => $t('Р’СЃРµ С‚РµРјС‹', 'All topics'),
+        'label' => $t('Все темы', 'All topics'),
         'count' => max(1, $maxClusterCount),
         'is_all' => true,
         'basis' => 18,
@@ -291,7 +291,7 @@ if (!empty($clusters)) {
 $detailBreadcrumbs = [];
 if ($selected) {
     $detailBreadcrumbs[] = [
-        'label' => $t('Р–СѓСЂРЅР°Р»', 'Journal'),
+        'label' => $t('Р вЂ“РЎС“РЎР‚Р Р…Р В°Р В»', 'Journal'),
         'url' => $buildPageUrl(),
     ];
     if ($selectedClusterLabel !== '') {
@@ -301,7 +301,7 @@ if ($selected) {
         ];
     }
     $detailBreadcrumbs[] = [
-        'label' => $selectedShareTitle !== '' ? $selectedShareTitle : $t('РњР°С‚РµСЂРёР°Р»', 'Article'),
+        'label' => $selectedShareTitle !== '' ? $selectedShareTitle : $t('Р СљР В°РЎвЂљР ВµРЎР‚Р С‘Р В°Р В»', 'Article'),
         'url' => '',
     ];
 }
@@ -363,8 +363,8 @@ if ($selected) {
 .jrnl-tag{color:var(--shell-muted);text-decoration:none}
 .jrnl-tag.is-active,.jrnl-tag:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
 .jrnl-topic-cloud{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px 12px}
-.jrnl-topic-pill{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:42px;padding:10px 14px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:rgba(196,214,238,.78);text-decoration:none;flex:var(--topic-grow,1) 1 calc(var(--topic-basis,16) * 1%);font-size:calc(var(--topic-font,12) * 1px);font-weight:700;line-height:1.08;letter-spacing:0}
-.jrnl-topic-pill strong,.jrnl-topic-pill span{display:block;color:inherit;font-size:1em;font-weight:inherit}
+.jrnl-topic-pill{display:inline-flex;align-items:center;justify-content:flex-start;gap:8px;min-height:0;padding:8px 12px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:rgba(196,214,238,.78);text-decoration:none;flex:0 0 auto;font-size:calc(var(--topic-font,12) * 1px);font-weight:700;line-height:1.08;letter-spacing:0;white-space:nowrap}
+.jrnl-topic-pill strong,.jrnl-topic-pill span{display:inline;color:inherit;font-size:1em;font-weight:inherit}
 .jrnl-topic-pill span{opacity:.76;white-space:nowrap}
 .jrnl-topic-pill.is-active,.jrnl-topic-pill:hover{color:var(--shell-text)}
 .jrnl-topic-pill.is-all{opacity:.82}
@@ -456,7 +456,7 @@ if ($selected) {
 100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0) saturate(1)}
 }
 @media (max-width:1180px){.jrnl-hero,.jrnl-grid,.jrnl-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.jrnl-hero{grid-template-columns:1fr}}
-@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-hero{padding:0 0 18px;overflow:hidden}.jrnl-cover{order:-1;border-top:0;border-left:0;border-right:0}.jrnl-copy{padding:0 18px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}.jrnl-topic-pill{flex-basis:calc(max(var(--topic-basis,24), 42) * 1%)}.jrnl-author{grid-template-columns:1fr;padding:14px}.jrnl-author-mark{width:44px;height:44px}.jrnl-author-top{gap:8px}}
+@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-hero{padding:0 0 18px;overflow:hidden}.jrnl-cover{order:-1;border-top:0;border-left:0;border-right:0}.jrnl-copy{padding:0 18px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}.jrnl-topic-pill{flex-basis:auto}.jrnl-author{grid-template-columns:1fr;padding:14px}.jrnl-author-mark{width:44px;height:44px}.jrnl-author-top{gap:8px}}
 </style>
 
 <section class="jrnl">
@@ -475,7 +475,7 @@ if ($selected) {
             <article class="jrnl-detail">
                 <div class="jrnl-detail-top">
                     <?php if (!empty($detailBreadcrumbs)): ?>
-                        <nav class="jrnl-breadcrumbs" aria-label="<?= htmlspecialchars($t('РҐР»РµР±РЅС‹Рµ РєСЂРѕС€РєРё', 'Breadcrumbs'), ENT_QUOTES, 'UTF-8') ?>">
+                        <nav class="jrnl-breadcrumbs" aria-label="<?= htmlspecialchars($t('Р ТђР В»Р ВµР В±Р Р…РЎвЂ№Р Вµ Р С”РЎР‚Р С•РЎв‚¬Р С”Р С‘', 'Breadcrumbs'), ENT_QUOTES, 'UTF-8') ?>">
                             <?php foreach ($detailBreadcrumbs as $index => $crumb): ?>
                                 <?php if ($index > 0): ?><span class="jrnl-breadcrumb-sep">/</span><?php endif; ?>
                                 <?php if (!empty($crumb['url'])): ?>
@@ -491,7 +491,7 @@ if ($selected) {
                         <a class="jrnl-meta jrnl-stat jrnl-stat-link" href="#article-comments"><?= $statIcon('comments') ?><?= (int)$portalCommentTotal ?></a>
                     </div>
                 </div>
-                <span class="jrnl-kicker"><?= htmlspecialchars((string)($issue['issue_title'] ?? $t('Р–СѓСЂРЅР°Р»', 'Journal')), ENT_QUOTES, 'UTF-8') ?></span>
+                <span class="jrnl-kicker"><?= htmlspecialchars((string)($issue['issue_title'] ?? $t('Р вЂ“РЎС“РЎР‚Р Р…Р В°Р В»', 'Journal')), ENT_QUOTES, 'UTF-8') ?></span>
                 <h1><?= htmlspecialchars((string)($selected['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h1>
                 <div class="jrnl-tags">
                     <?php if ($authorDisplayName !== ''): ?>
@@ -533,15 +533,15 @@ if ($selected) {
                             <span class="jrnl-share-label">WhatsApp</span>
                         </a>
                         <?php if ($portalUser && !empty($selected['id'])): ?>
-                            <form class="jrnl-favorite-form" method="post" data-favorite-active-label="<?= htmlspecialchars($t('Р’ РёР·Р±СЂР°РЅРЅРѕРј', 'Saved'), ENT_QUOTES, 'UTF-8') ?>" data-favorite-idle-label="<?= htmlspecialchars($t('Р”РѕР±Р°РІРёС‚СЊ РІ РёР·Р±СЂР°РЅРЅРѕРµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
+                            <form class="jrnl-favorite-form" method="post" data-favorite-active-label="<?= htmlspecialchars($t('Р вЂ™ Р С‘Р В·Р В±РЎР‚Р В°Р Р…Р Р…Р С•Р С', 'Saved'), ENT_QUOTES, 'UTF-8') ?>" data-favorite-idle-label="<?= htmlspecialchars($t('Р вЂќР С•Р В±Р В°Р Р†Р С‘РЎвЂљРЎРЉ Р Р† Р С‘Р В·Р В±РЎР‚Р В°Р Р…Р Р…Р С•Р Вµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="action" value="public_portal_favorite_toggle">
                                 <input type="hidden" name="portal_csrf" value="<?= htmlspecialchars($portalCsrf, ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="return_path" value="<?= htmlspecialchars((string)($_SERVER['REQUEST_URI'] ?? '/'), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="content_type" value="examples">
                                 <input type="hidden" name="content_id" value="<?= (int)$selected['id'] ?>">
-                                <button class="jrnl-favorite-btn <?= $portalIsFavorite ? 'is-active' : '' ?>" type="submit" aria-label="<?= htmlspecialchars($t('Р”РѕР±Р°РІРёС‚СЊ РІ РёР·Р±СЂР°РЅРЅРѕРµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
+                                <button class="jrnl-favorite-btn <?= $portalIsFavorite ? 'is-active' : '' ?>" type="submit" aria-label="<?= htmlspecialchars($t('Р вЂќР С•Р В±Р В°Р Р†Р С‘РЎвЂљРЎРЉ Р Р† Р С‘Р В·Р В±РЎР‚Р В°Р Р…Р Р…Р С•Р Вµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
                                     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.4l2.63 5.34 5.9.86-4.27 4.16 1 5.87L12 16.88 6.74 19.63l1-5.87L3.47 9.6l5.9-.86L12 3.4Z"/></svg>
-                                    <span class="jrnl-share-label"><?= htmlspecialchars($portalIsFavorite ? $t('Р’ РёР·Р±СЂР°РЅРЅРѕРј', 'Saved') : $t('Р”РѕР±Р°РІРёС‚СЊ РІ РёР·Р±СЂР°РЅРЅРѕРµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="jrnl-share-label"><?= htmlspecialchars($portalIsFavorite ? $t('Р вЂ™ Р С‘Р В·Р В±РЎР‚Р В°Р Р…Р Р…Р С•Р С', 'Saved') : $t('Р вЂќР С•Р В±Р В°Р Р†Р С‘РЎвЂљРЎРЉ Р Р† Р С‘Р В·Р В±РЎР‚Р В°Р Р…Р Р…Р С•Р Вµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?></span>
                                 </button>
                             </form>
                         <?php endif; ?>
@@ -550,7 +550,7 @@ if ($selected) {
                 <div class="jrnl-detail-body">
                     <div class="jrnl-detail-content"><?= $selectedBodyHtml ?></div>
                     <div class="jrnl-actions">
-                        <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('РќР°Р·Р°Рґ РІ Р¶СѓСЂРЅР°Р»', 'Back to journal'), ENT_QUOTES, 'UTF-8') ?></a>
+                        <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Р СњР В°Р В·Р В°Р Т‘ Р Р† Р В¶РЎС“РЎР‚Р Р…Р В°Р В»', 'Back to journal'), ENT_QUOTES, 'UTF-8') ?></a>
                     </div>
                 </div>
             </article>
@@ -566,13 +566,13 @@ if ($selected) {
 
             <?php if (!empty($relatedItems)): ?>
                 <section class="jrnl-related">
-                    <h2><?= htmlspecialchars($t('Р”Р°Р»СЊС€Рµ РїРѕ С‚РµРјРµ', 'Continue reading'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <h2><?= htmlspecialchars($t('Р вЂќР В°Р В»РЎРЉРЎв‚¬Р Вµ Р С—Р С• РЎвЂљР ВµР СР Вµ', 'Continue reading'), ENT_QUOTES, 'UTF-8') ?></h2>
                     <div class="jrnl-related-grid">
                         <?php foreach ($relatedItems as $item): ?>
                             <?php $cluster = trim((string)($item['cluster_code'] ?? '')); ?>
                             <a class="jrnl-card" href="<?= htmlspecialchars($buildArticleUrl((string)($item['slug'] ?? ''), $cluster), ENT_QUOTES, 'UTF-8') ?>">
                                 <div class="jrnl-card-media"><?php if (!empty($item['image_src'])): ?><img src="<?= htmlspecialchars((string)$item['image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?></div>
-                                <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('РњР°С‚РµСЂРёР°Р»', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('Р СљР В°РЎвЂљР ВµРЎР‚Р С‘Р В°Р В»', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
                                 <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                                 <p><?= htmlspecialchars($strip((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 140), ENT_QUOTES, 'UTF-8') ?></p>
                                 <div class="jrnl-card-foot">
@@ -591,7 +591,7 @@ if ($selected) {
             <header class="jrnl-hero">
                 <div class="jrnl-copy">
                     <?php if (!empty($issue['issue_kicker'])): ?><span class="jrnl-kicker"><?= htmlspecialchars((string)$issue['issue_kicker'], ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
-                    <h1><?= htmlspecialchars((string)($issue['hero_title'] ?? $issue['issue_title'] ?? $t('Р–СѓСЂРЅР°Р»', 'Journal')), ENT_QUOTES, 'UTF-8') ?></h1>
+                    <h1><?= htmlspecialchars((string)($issue['hero_title'] ?? $issue['issue_title'] ?? $t('Р вЂ“РЎС“РЎР‚Р Р…Р В°Р В»', 'Journal')), ENT_QUOTES, 'UTF-8') ?></h1>
                     <?php if (!empty($issue['hero_description'])): ?><?= $renderIssueText((string)$issue['hero_description'], 'jrnl-hero-description') ?><?php endif; ?>
                     <?php if (!empty($issue['issue_title'])): ?><h2><?= htmlspecialchars((string)$issue['issue_title'], ENT_QUOTES, 'UTF-8') ?></h2><?php endif; ?>
                     <?php if (!empty($issue['issue_subtitle'])): ?><?= $renderIssueText((string)$issue['issue_subtitle'], 'jrnl-issue-subtitle') ?><?php endif; ?>
@@ -602,7 +602,7 @@ if ($selected) {
             </header>
 
             <?php if (!empty($topicCloudItems)): ?>
-                <div class="jrnl-topic-cloud" aria-label="<?= htmlspecialchars($t('РўРµРјС‹ РІС‹РїСѓСЃРєР°', 'Issue topics'), ENT_QUOTES, 'UTF-8') ?>">
+                <div class="jrnl-topic-cloud" aria-label="<?= htmlspecialchars($t('Р СћР ВµР СРЎвЂ№ Р Р†РЎвЂ№Р С—РЎС“РЎРѓР С”Р В°', 'Issue topics'), ENT_QUOTES, 'UTF-8') ?>">
                     <?php foreach ($topicCloudItems as $topicItem): ?>
                         <?php $topicCode = trim((string)($topicItem['code'] ?? '')); ?>
                         <?php $isAllTopic = !empty($topicItem['is_all']); ?>
@@ -623,7 +623,7 @@ if ($selected) {
                         <?php $cluster = trim((string)($item['cluster_code'] ?? '')); ?>
                         <a class="jrnl-card" href="<?= htmlspecialchars($buildArticleUrl((string)($item['slug'] ?? ''), $cluster), ENT_QUOTES, 'UTF-8') ?>">
                             <div class="jrnl-card-media"><?php if (!empty($item['image_src'])): ?><img src="<?= htmlspecialchars((string)$item['image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?></div>
-                            <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('РњР°С‚РµСЂРёР°Р»', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
+                            <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('Р СљР В°РЎвЂљР ВµРЎР‚Р С‘Р В°Р В»', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
                             <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                             <p><?= htmlspecialchars($strip((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 160), ENT_QUOTES, 'UTF-8') ?></p>
                             <div class="jrnl-card-foot">
@@ -638,9 +638,9 @@ if ($selected) {
                 </div>
 
                 <?php if ($totalPages > 1): ?>
-                    <nav class="jrnl-pager" aria-label="<?= htmlspecialchars($t('РџР°РіРёРЅР°С†РёСЏ', 'Pagination'), ENT_QUOTES, 'UTF-8') ?>">
+                    <nav class="jrnl-pager" aria-label="<?= htmlspecialchars($t('Р СџР В°Р С–Р С‘Р Р…Р В°РЎвЂ Р С‘РЎРЏ', 'Pagination'), ENT_QUOTES, 'UTF-8') ?>">
                         <?php if ($page > 1): ?>
-                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page - 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('РќР°Р·Р°Рґ', 'Prev'), ENT_QUOTES, 'UTF-8') ?></a>
+                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page - 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Р СњР В°Р В·Р В°Р Т‘', 'Prev'), ENT_QUOTES, 'UTF-8') ?></a>
                         <?php endif; ?>
                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                             <?php if ($i < $page - 2 || $i > $page + 2) { continue; } ?>
@@ -651,14 +651,14 @@ if ($selected) {
                             <?php endif; ?>
                         <?php endfor; ?>
                         <?php if ($page < $totalPages): ?>
-                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page + 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Р’РїРµСЂРµРґ', 'Next'), ENT_QUOTES, 'UTF-8') ?></a>
+                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page + 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Р вЂ™Р С—Р ВµРЎР‚Р ВµР Т‘', 'Next'), ENT_QUOTES, 'UTF-8') ?></a>
                         <?php endif; ?>
                     </nav>
                 <?php endif; ?>
             <?php else: ?>
                 <div class="jrnl-empty">
-                    <h2><?= htmlspecialchars($t('РџРѕРєР° РЅРµС‚ РјР°С‚РµСЂРёР°Р»РѕРІ', 'No journal materials yet'), ENT_QUOTES, 'UTF-8') ?></h2>
-                    <p><?= htmlspecialchars($t('РљРѕРіРґР° СЃС‚Р°С‚СЊРё РїРѕСЏРІСЏС‚СЃСЏ, РѕРЅРё Р±СѓРґСѓС‚ РІС‹РІРµРґРµРЅС‹ Р·РґРµСЃСЊ РєР°Рє РІС‹РїСѓСЃРє Р¶СѓСЂРЅР°Р»Р° СЃ С„РёР»СЊС‚СЂР°С†РёРµР№ РїРѕ С‚РµРјР°Рј.', 'Published articles will appear here as a journal issue with topic filters.'), ENT_QUOTES, 'UTF-8') ?></p>
+                    <h2><?= htmlspecialchars($t('Р СџР С•Р С”Р В° Р Р…Р ВµРЎвЂљ Р СР В°РЎвЂљР ВµРЎР‚Р С‘Р В°Р В»Р С•Р Р†', 'No journal materials yet'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <p><?= htmlspecialchars($t('Р С™Р С•Р С–Р Т‘Р В° РЎРѓРЎвЂљР В°РЎвЂљРЎРЉР С‘ Р С—Р С•РЎРЏР Р†РЎРЏРЎвЂљРЎРѓРЎРЏ, Р С•Р Р…Р С‘ Р В±РЎС“Р Т‘РЎС“РЎвЂљ Р Р†РЎвЂ№Р Р†Р ВµР Т‘Р ВµР Р…РЎвЂ№ Р В·Р Т‘Р ВµРЎРѓРЎРЉ Р С”Р В°Р С” Р Р†РЎвЂ№Р С—РЎС“РЎРѓР С” Р В¶РЎС“РЎР‚Р Р…Р В°Р В»Р В° РЎРѓ РЎвЂћР С‘Р В»РЎРЉРЎвЂљРЎР‚Р В°РЎвЂ Р С‘Р ВµР в„– Р С—Р С• РЎвЂљР ВµР СР В°Р С.', 'Published articles will appear here as a journal issue with topic filters.'), ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
             <?php endif; ?>
         <?php endif; ?>

@@ -23,7 +23,7 @@ $authorNickname = trim((string)($authorProfile['nickname'] ?? ''));
 $authorRole = trim((string)($authorProfile['resolved_role'] ?? ''));
 $authorBio = trim((string)($authorProfile['resolved_bio'] ?? ''));
 if ($authorDisplayName === '') {
-    $authorDisplayName = $isRu ? 'Редакция ЦПАЛЬНЯ' : 'CPALNYA Editorial';
+    $authorDisplayName = $isRu ? 'Р В Р ВµР Т‘Р В°Р С”РЎвЂ Р С‘РЎРЏ Р В¦Р СџР С’Р вЂєР В¬Р СњР Р‡' : 'CPALNYA Editorial';
 }
 $authorInitials = '';
 if ($authorDisplayName !== '') {
@@ -312,7 +312,7 @@ if ($selected) {
         ];
     }
     $detailBreadcrumbs[] = [
-        'label' => $selectedShareTitle !== '' ? $selectedShareTitle : $t('РњР°С‚РµСЂРёР°Р»', 'Article'),
+        'label' => $selectedShareTitle !== '' ? $selectedShareTitle : $t('Р В РЎС™Р В Р’В°Р РЋРІР‚С™Р В Р’ВµР РЋР вЂљР В РЎвЂР В Р’В°Р В Р’В»', 'Article'),
         'url' => '',
     ];
 }
@@ -346,15 +346,15 @@ if ($selected) {
     }
 }
 
-$heroKicker = $t('PLAYBOOKS / Р¦РџРђР›Р¬РќРЇ', 'PLAYBOOKS / Р¦РџРђР›Р¬РќРЇ');
-$heroTitle = $t('РџСЂР°РєС‚РёРєР° affiliate-РѕРїРµСЂР°С†РёРѕРЅРєРё', 'Operational playbooks for affiliate teams');
+$heroKicker = $t('PLAYBOOKS / Р В Р’В¦Р В РЎСџР В РЎвЂ™Р В РІР‚С”Р В Р’В¬Р В РЎСљР В Р вЂЎ', 'PLAYBOOKS / Р В Р’В¦Р В РЎСџР В РЎвЂ™Р В РІР‚С”Р В Р’В¬Р В РЎСљР В Р вЂЎ');
+$heroTitle = $t('Р В РЎСџР РЋР вЂљР В Р’В°Р В РЎвЂќР РЋРІР‚С™Р В РЎвЂР В РЎвЂќР В Р’В° affiliate-Р В РЎвЂўР В РЎвЂ”Р В Р’ВµР РЋР вЂљР В Р’В°Р РЋРІР‚В Р В РЎвЂР В РЎвЂўР В Р вЂ¦Р В РЎвЂќР В РЎвЂ', 'Operational playbooks for affiliate teams');
 $heroDescription = $t(
-    "Р Р°Р·РґРµР» РґР»СЏ С‚РµС…, РєС‚Рѕ СЃС‚СЂРѕРёС‚ affiliate-РѕРїРµСЂР°С†РёРѕРЅРєСѓ РЅРµ РІРѕРєСЂСѓРі СѓРґР°С‡РЅС‹С… СЃРѕРІРїР°РґРµРЅРёР№, Р° РІРѕРєСЂСѓРі РїРѕРІС‚РѕСЂСЏРµРјС‹С… РґРµР№СЃС‚РІРёР№: СЃРµС‚Р°РїРѕРІ, С‡РµРєР»РёСЃС‚РѕРІ, handoff-РїСЂРѕС†РµСЃСЃРѕРІ, С‚СЂРµРєРёРЅРіР°, farm-СЂРёС‚РјР°, РєСЂРµР°С‚РёРІРЅС‹С… С†РёРєР»РѕРІ Рё СЂРµС€РµРЅРёР№, РєРѕС‚РѕСЂС‹Рµ РґРѕР»Р¶РЅС‹ РїРµСЂРµР¶РёРІР°С‚СЊ СЃРјРµРЅСѓ РѕС„С„РµСЂРѕРІ, Р±Р°РЅРѕРІ Рё РїР»Р°С‚С„РѕСЂРјРµРЅРЅС‹С… СЃРґРІРёРіРѕРІ.\n\nР—РґРµСЃСЊ РїСЂР°РєС‚РёРєР° СЂР°СЃСЃРјР°С‚СЂРёРІР°РµС‚СЃСЏ РЅРµ РєР°Рє РЅР°Р±РѕСЂ СЃРѕРІРµС‚РѕРІ, Р° РєР°Рє Р¶РёРІР°СЏ СЃРёСЃС‚РµРјР° РїРѕРґРґРµСЂР¶РєРё РєРѕРјР°РЅРґС‹. РћРґРёРЅ РјР°С‚РµСЂРёР°Р» РїРѕРјРѕРіР°РµС‚ Р±С‹СЃС‚СЂРµРµ СЃРѕР±СЂР°С‚СЊ Р·Р°РїСѓСЃРє, РґСЂСѓРіРѕР№ СѓРґРµСЂР¶РёРІР°РµС‚ С‚СЂРµРєРµСЂ РІ С‡РёСЃС‚РѕРј СЃРѕСЃС‚РѕСЏРЅРёРё, С‚СЂРµС‚РёР№ РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕРЅС‚СЂРѕР»СЊ, РєРѕРіРґР° Р»РѕРјР°РµС‚СЃСЏ СЃРІСЏР·РєР°, РїСЂРѕСЃРµРґР°РµС‚ РјРѕРґРµСЂР°С†РёСЏ РёР»Рё СЂР°СЃРїРѕР»Р·Р°РµС‚СЃСЏ handoff РјРµР¶РґСѓ СЂРѕР»СЏРјРё.\n\nР­С‚Рѕ РЅРµ Р°СЂС…РёРІ РёРЅСЃС‚СЂСѓРєС†РёР№, Р° СЂР°Р±РѕС‡Р°СЏ Р±РёР±Р»РёРѕС‚РµРєР° backstage-РїСЂР°РєС‚РёРєРё: РјРµСЃС‚Рѕ, РіРґРµ С€Р°РіРё, СЂРѕР»Рё, rollback-РїР»Р°РЅС‹ Рё troubleshooting СѓР¶Рµ СЃРѕР±СЂР°РЅС‹ РїРѕРґ СЂСѓРєРѕР№.",
+    "Р В Р’В Р В Р’В°Р В Р’В·Р В РўвЂР В Р’ВµР В Р’В» Р В РўвЂР В Р’В»Р РЋР РЏ Р РЋРІР‚С™Р В Р’ВµР РЋРІР‚В¦, Р В РЎвЂќР РЋРІР‚С™Р В РЎвЂў Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР В РЎвЂўР В РЎвЂР РЋРІР‚С™ affiliate-Р В РЎвЂўР В РЎвЂ”Р В Р’ВµР РЋР вЂљР В Р’В°Р РЋРІР‚В Р В РЎвЂР В РЎвЂўР В Р вЂ¦Р В РЎвЂќР РЋРЎвЂњ Р В Р вЂ¦Р В Р’Вµ Р В Р вЂ Р В РЎвЂўР В РЎвЂќР РЋР вЂљР РЋРЎвЂњР В РЎвЂ“ Р РЋРЎвЂњР В РўвЂР В Р’В°Р РЋРІР‚РЋР В Р вЂ¦Р РЋРІР‚в„–Р РЋРІР‚В¦ Р РЋР С“Р В РЎвЂўР В Р вЂ Р В РЎвЂ”Р В Р’В°Р В РўвЂР В Р’ВµР В Р вЂ¦Р В РЎвЂР В РІвЂћвЂ“, Р В Р’В° Р В Р вЂ Р В РЎвЂўР В РЎвЂќР РЋР вЂљР РЋРЎвЂњР В РЎвЂ“ Р В РЎвЂ”Р В РЎвЂўР В Р вЂ Р РЋРІР‚С™Р В РЎвЂўР РЋР вЂљР РЋР РЏР В Р’ВµР В РЎВР РЋРІР‚в„–Р РЋРІР‚В¦ Р В РўвЂР В Р’ВµР В РІвЂћвЂ“Р РЋР С“Р РЋРІР‚С™Р В Р вЂ Р В РЎвЂР В РІвЂћвЂ“: Р РЋР С“Р В Р’ВµР РЋРІР‚С™Р В Р’В°Р В РЎвЂ”Р В РЎвЂўР В Р вЂ , Р РЋРІР‚РЋР В Р’ВµР В РЎвЂќР В Р’В»Р В РЎвЂР РЋР С“Р РЋРІР‚С™Р В РЎвЂўР В Р вЂ , handoff-Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР РЋРІР‚В Р В Р’ВµР РЋР С“Р РЋР С“Р В РЎвЂўР В Р вЂ , Р РЋРІР‚С™Р РЋР вЂљР В Р’ВµР В РЎвЂќР В РЎвЂР В Р вЂ¦Р В РЎвЂ“Р В Р’В°, farm-Р РЋР вЂљР В РЎвЂР РЋРІР‚С™Р В РЎВР В Р’В°, Р В РЎвЂќР РЋР вЂљР В Р’ВµР В Р’В°Р РЋРІР‚С™Р В РЎвЂР В Р вЂ Р В Р вЂ¦Р РЋРІР‚в„–Р РЋРІР‚В¦ Р РЋРІР‚В Р В РЎвЂР В РЎвЂќР В Р’В»Р В РЎвЂўР В Р вЂ  Р В РЎвЂ Р РЋР вЂљР В Р’ВµР РЋРІвЂљВ¬Р В Р’ВµР В Р вЂ¦Р В РЎвЂР В РІвЂћвЂ“, Р В РЎвЂќР В РЎвЂўР РЋРІР‚С™Р В РЎвЂўР РЋР вЂљР РЋРІР‚в„–Р В Р’Вµ Р В РўвЂР В РЎвЂўР В Р’В»Р В Р’В¶Р В Р вЂ¦Р РЋРІР‚в„– Р В РЎвЂ”Р В Р’ВµР РЋР вЂљР В Р’ВµР В Р’В¶Р В РЎвЂР В Р вЂ Р В Р’В°Р РЋРІР‚С™Р РЋР Р‰ Р РЋР С“Р В РЎВР В Р’ВµР В Р вЂ¦Р РЋРЎвЂњ Р В РЎвЂўР РЋРІР‚С›Р РЋРІР‚С›Р В Р’ВµР РЋР вЂљР В РЎвЂўР В Р вЂ , Р В Р’В±Р В Р’В°Р В Р вЂ¦Р В РЎвЂўР В Р вЂ  Р В РЎвЂ Р В РЎвЂ”Р В Р’В»Р В Р’В°Р РЋРІР‚С™Р РЋРІР‚С›Р В РЎвЂўР РЋР вЂљР В РЎВР В Р’ВµР В Р вЂ¦Р В Р вЂ¦Р РЋРІР‚в„–Р РЋРІР‚В¦ Р РЋР С“Р В РўвЂР В Р вЂ Р В РЎвЂР В РЎвЂ“Р В РЎвЂўР В Р вЂ .\n\nР В РІР‚вЂќР В РўвЂР В Р’ВµР РЋР С“Р РЋР Р‰ Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В РЎвЂќР РЋРІР‚С™Р В РЎвЂР В РЎвЂќР В Р’В° Р РЋР вЂљР В Р’В°Р РЋР С“Р РЋР С“Р В РЎВР В Р’В°Р РЋРІР‚С™Р РЋР вЂљР В РЎвЂР В Р вЂ Р В Р’В°Р В Р’ВµР РЋРІР‚С™Р РЋР С“Р РЋР РЏ Р В Р вЂ¦Р В Р’Вµ Р В РЎвЂќР В Р’В°Р В РЎвЂќ Р В Р вЂ¦Р В Р’В°Р В Р’В±Р В РЎвЂўР РЋР вЂљ Р РЋР С“Р В РЎвЂўР В Р вЂ Р В Р’ВµР РЋРІР‚С™Р В РЎвЂўР В Р вЂ , Р В Р’В° Р В РЎвЂќР В Р’В°Р В РЎвЂќ Р В Р’В¶Р В РЎвЂР В Р вЂ Р В Р’В°Р РЋР РЏ Р РЋР С“Р В РЎвЂР РЋР С“Р РЋРІР‚С™Р В Р’ВµР В РЎВР В Р’В° Р В РЎвЂ”Р В РЎвЂўР В РўвЂР В РўвЂР В Р’ВµР РЋР вЂљР В Р’В¶Р В РЎвЂќР В РЎвЂ Р В РЎвЂќР В РЎвЂўР В РЎВР В Р’В°Р В Р вЂ¦Р В РўвЂР РЋРІР‚в„–. Р В РЎвЂєР В РўвЂР В РЎвЂР В Р вЂ¦ Р В РЎВР В Р’В°Р РЋРІР‚С™Р В Р’ВµР РЋР вЂљР В РЎвЂР В Р’В°Р В Р’В» Р В РЎвЂ”Р В РЎвЂўР В РЎВР В РЎвЂўР В РЎвЂ“Р В Р’В°Р В Р’ВµР РЋРІР‚С™ Р В Р’В±Р РЋРІР‚в„–Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР В Р’ВµР В Р’Вµ Р РЋР С“Р В РЎвЂўР В Р’В±Р РЋР вЂљР В Р’В°Р РЋРІР‚С™Р РЋР Р‰ Р В Р’В·Р В Р’В°Р В РЎвЂ”Р РЋРЎвЂњР РЋР С“Р В РЎвЂќ, Р В РўвЂР РЋР вЂљР РЋРЎвЂњР В РЎвЂ“Р В РЎвЂўР В РІвЂћвЂ“ Р РЋРЎвЂњР В РўвЂР В Р’ВµР РЋР вЂљР В Р’В¶Р В РЎвЂР В Р вЂ Р В Р’В°Р В Р’ВµР РЋРІР‚С™ Р РЋРІР‚С™Р РЋР вЂљР В Р’ВµР В РЎвЂќР В Р’ВµР РЋР вЂљ Р В Р вЂ  Р РЋРІР‚РЋР В РЎвЂР РЋР С“Р РЋРІР‚С™Р В РЎвЂўР В РЎВ Р РЋР С“Р В РЎвЂўР РЋР С“Р РЋРІР‚С™Р В РЎвЂўР РЋР РЏР В Р вЂ¦Р В РЎвЂР В РЎвЂ, Р РЋРІР‚С™Р РЋР вЂљР В Р’ВµР РЋРІР‚С™Р В РЎвЂР В РІвЂћвЂ“ Р В Р вЂ Р В РЎвЂўР В Р’В·Р В Р вЂ Р РЋР вЂљР В Р’В°Р РЋРІР‚В°Р В Р’В°Р В Р’ВµР РЋРІР‚С™ Р В РЎвЂќР В РЎвЂўР В Р вЂ¦Р РЋРІР‚С™Р РЋР вЂљР В РЎвЂўР В Р’В»Р РЋР Р‰, Р В РЎвЂќР В РЎвЂўР В РЎвЂ“Р В РўвЂР В Р’В° Р В Р’В»Р В РЎвЂўР В РЎВР В Р’В°Р В Р’ВµР РЋРІР‚С™Р РЋР С“Р РЋР РЏ Р РЋР С“Р В Р вЂ Р РЋР РЏР В Р’В·Р В РЎвЂќР В Р’В°, Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР РЋР С“Р В Р’ВµР В РўвЂР В Р’В°Р В Р’ВµР РЋРІР‚С™ Р В РЎВР В РЎвЂўР В РўвЂР В Р’ВµР РЋР вЂљР В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ Р В РЎвЂР В Р’В»Р В РЎвЂ Р РЋР вЂљР В Р’В°Р РЋР С“Р В РЎвЂ”Р В РЎвЂўР В Р’В»Р В Р’В·Р В Р’В°Р В Р’ВµР РЋРІР‚С™Р РЋР С“Р РЋР РЏ handoff Р В РЎВР В Р’ВµР В Р’В¶Р В РўвЂР РЋРЎвЂњ Р РЋР вЂљР В РЎвЂўР В Р’В»Р РЋР РЏР В РЎВР В РЎвЂ.\n\nР В Р’В­Р РЋРІР‚С™Р В РЎвЂў Р В Р вЂ¦Р В Р’Вµ Р В Р’В°Р РЋР вЂљР РЋРІР‚В¦Р В РЎвЂР В Р вЂ  Р В РЎвЂР В Р вЂ¦Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР РЋРЎвЂњР В РЎвЂќР РЋРІР‚В Р В РЎвЂР В РІвЂћвЂ“, Р В Р’В° Р РЋР вЂљР В Р’В°Р В Р’В±Р В РЎвЂўР РЋРІР‚РЋР В Р’В°Р РЋР РЏ Р В Р’В±Р В РЎвЂР В Р’В±Р В Р’В»Р В РЎвЂР В РЎвЂўР РЋРІР‚С™Р В Р’ВµР В РЎвЂќР В Р’В° backstage-Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В РЎвЂќР РЋРІР‚С™Р В РЎвЂР В РЎвЂќР В РЎвЂ: Р В РЎВР В Р’ВµР РЋР С“Р РЋРІР‚С™Р В РЎвЂў, Р В РЎвЂ“Р В РўвЂР В Р’Вµ Р РЋРІвЂљВ¬Р В Р’В°Р В РЎвЂ“Р В РЎвЂ, Р РЋР вЂљР В РЎвЂўР В Р’В»Р В РЎвЂ, rollback-Р В РЎвЂ”Р В Р’В»Р В Р’В°Р В Р вЂ¦Р РЋРІР‚в„– Р В РЎвЂ troubleshooting Р РЋРЎвЂњР В Р’В¶Р В Р’Вµ Р РЋР С“Р В РЎвЂўР В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р РЋРІР‚в„– Р В РЎвЂ”Р В РЎвЂўР В РўвЂ Р РЋР вЂљР РЋРЎвЂњР В РЎвЂќР В РЎвЂўР В РІвЂћвЂ“.",
     "A section for teams building affiliate operations around repeatable systems rather than lucky runs: setups, checklists, handoffs, tracking discipline, farm cadence, creative loops, and solutions that must survive offer churn, bans, and platform shifts.\n\nHere, practice is treated not as a loose pile of advice but as a support system for the whole operation. One piece helps assemble a launch faster, another keeps tracking readable, and a third restores control when a bundle slips or moderation tightens.\n\nThis is not a dry archive of instructions, but a working backstage library where steps, roles, rollback plans, and troubleshooting stay close at hand."
 );
-$issueTitle = $t('РќР°РІРёРіР°С†РёСЏ РїРѕ backstage-РїСЂР°РєС‚РёРєРµ', 'Backstage operations index');
+$issueTitle = $t('Р В РЎСљР В Р’В°Р В Р вЂ Р В РЎвЂР В РЎвЂ“Р В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ Р В РЎвЂ”Р В РЎвЂў backstage-Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В РЎвЂќР РЋРІР‚С™Р В РЎвЂР В РЎвЂќР В Р’Вµ', 'Backstage operations index');
 $issueSubtitle = $t(
-    "Р“Р°Р№РґС‹, troubleshooting-РјР°С‚РµСЂРёР°Р»С‹, СЂР°Р±РѕС‡РёРµ Р·Р°РјРµС‚РєРё Рё РѕРїРµСЂР°С†РёРѕРЅРЅС‹Рµ playbooks РґР»СЏ Р±Р°РµСЂРѕРІ, С„Р°СЂРјРµСЂРѕРІ, С‚СЂРµРєРёРЅРі-РѕРїРµСЂР°С‚РѕСЂРѕРІ, РєСЂРµР°С‚РёРІРЅС‹С… РєРѕРјР°РЅРґ Рё С‚РµС…, РєС‚Рѕ РґРµСЂР¶РёС‚ РІ СЂСѓРєР°С… РїРѕРІСЃРµРґРЅРµРІРЅСѓСЋ РјРµС…Р°РЅРёРєСѓ affiliate-РїСЂРѕРёР·РІРѕРґСЃС‚РІР°.\n\nР­С‚Рѕ Р±РёР±Р»РёРѕС‚РµРєР° РЅРµ РґР»СЏ РІРґРѕС…РЅРѕРІРµРЅРёСЏ, Р° РґР»СЏ РІРѕР·РІСЂР°С‚Р° Рє СЂР°Р±РѕС‡РµР№ С„РѕСЂРјРµ: Р±С‹СЃС‚СЂРѕ РїСЂРѕРІРµСЂРёС‚СЊ С€Р°Рі, РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ Р»РѕРіРёРєСѓ СЃРµС‚Р°РїР°, СЃСЂР°РІРЅРёС‚СЊ СЂРµС€РµРЅРёРµ РёР»Рё РЅРµ РїРѕС‚РµСЂСЏС‚СЊ С‚РµРјРї РІ С€СѓРјРµ РµР¶РµРґРЅРµРІРЅРѕР№ РѕРїРµСЂР°С†РёРѕРЅРєРё.\n\nРЎСЋРґР° РїСЂРёС…РѕРґСЏС‚ РЅРµ Р·Р° РѕР±С‰РёРјРё СЃР»РѕРІР°РјРё, Р° Р·Р° СЃР»РµРґСѓСЋС‰РёРј С‚РѕС‡РЅС‹Рј РґРµР№СЃС‚РІРёРµРј.",
+    "Р В РІР‚СљР В Р’В°Р В РІвЂћвЂ“Р В РўвЂР РЋРІР‚в„–, troubleshooting-Р В РЎВР В Р’В°Р РЋРІР‚С™Р В Р’ВµР РЋР вЂљР В РЎвЂР В Р’В°Р В Р’В»Р РЋРІР‚в„–, Р РЋР вЂљР В Р’В°Р В Р’В±Р В РЎвЂўР РЋРІР‚РЋР В РЎвЂР В Р’Вµ Р В Р’В·Р В Р’В°Р В РЎВР В Р’ВµР РЋРІР‚С™Р В РЎвЂќР В РЎвЂ Р В РЎвЂ Р В РЎвЂўР В РЎвЂ”Р В Р’ВµР РЋР вЂљР В Р’В°Р РЋРІР‚В Р В РЎвЂР В РЎвЂўР В Р вЂ¦Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ playbooks Р В РўвЂР В Р’В»Р РЋР РЏ Р В Р’В±Р В Р’В°Р В Р’ВµР РЋР вЂљР В РЎвЂўР В Р вЂ , Р РЋРІР‚С›Р В Р’В°Р РЋР вЂљР В РЎВР В Р’ВµР РЋР вЂљР В РЎвЂўР В Р вЂ , Р РЋРІР‚С™Р РЋР вЂљР В Р’ВµР В РЎвЂќР В РЎвЂР В Р вЂ¦Р В РЎвЂ“-Р В РЎвЂўР В РЎвЂ”Р В Р’ВµР РЋР вЂљР В Р’В°Р РЋРІР‚С™Р В РЎвЂўР РЋР вЂљР В РЎвЂўР В Р вЂ , Р В РЎвЂќР РЋР вЂљР В Р’ВµР В Р’В°Р РЋРІР‚С™Р В РЎвЂР В Р вЂ Р В Р вЂ¦Р РЋРІР‚в„–Р РЋРІР‚В¦ Р В РЎвЂќР В РЎвЂўР В РЎВР В Р’В°Р В Р вЂ¦Р В РўвЂ Р В РЎвЂ Р РЋРІР‚С™Р В Р’ВµР РЋРІР‚В¦, Р В РЎвЂќР РЋРІР‚С™Р В РЎвЂў Р В РўвЂР В Р’ВµР РЋР вЂљР В Р’В¶Р В РЎвЂР РЋРІР‚С™ Р В Р вЂ  Р РЋР вЂљР РЋРЎвЂњР В РЎвЂќР В Р’В°Р РЋРІР‚В¦ Р В РЎвЂ”Р В РЎвЂўР В Р вЂ Р РЋР С“Р В Р’ВµР В РўвЂР В Р вЂ¦Р В Р’ВµР В Р вЂ Р В Р вЂ¦Р РЋРЎвЂњР РЋР вЂ№ Р В РЎВР В Р’ВµР РЋРІР‚В¦Р В Р’В°Р В Р вЂ¦Р В РЎвЂР В РЎвЂќР РЋРЎвЂњ affiliate-Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР В РЎвЂР В Р’В·Р В Р вЂ Р В РЎвЂўР В РўвЂР РЋР С“Р РЋРІР‚С™Р В Р вЂ Р В Р’В°.\n\nР В Р’В­Р РЋРІР‚С™Р В РЎвЂў Р В Р’В±Р В РЎвЂР В Р’В±Р В Р’В»Р В РЎвЂР В РЎвЂўР РЋРІР‚С™Р В Р’ВµР В РЎвЂќР В Р’В° Р В Р вЂ¦Р В Р’Вµ Р В РўвЂР В Р’В»Р РЋР РЏ Р В Р вЂ Р В РўвЂР В РЎвЂўР РЋРІР‚В¦Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋР РЏ, Р В Р’В° Р В РўвЂР В Р’В»Р РЋР РЏ Р В Р вЂ Р В РЎвЂўР В Р’В·Р В Р вЂ Р РЋР вЂљР В Р’В°Р РЋРІР‚С™Р В Р’В° Р В РЎвЂќ Р РЋР вЂљР В Р’В°Р В Р’В±Р В РЎвЂўР РЋРІР‚РЋР В Р’ВµР В РІвЂћвЂ“ Р РЋРІР‚С›Р В РЎвЂўР РЋР вЂљР В РЎВР В Р’Вµ: Р В Р’В±Р РЋРІР‚в„–Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР В РЎвЂў Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР В Р вЂ Р В Р’ВµР РЋР вЂљР В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р РЋРІвЂљВ¬Р В Р’В°Р В РЎвЂ“, Р В Р вЂ Р В РЎвЂўР РЋР С“Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р’В»Р В РЎвЂўР В РЎвЂ“Р В РЎвЂР В РЎвЂќР РЋРЎвЂњ Р РЋР С“Р В Р’ВµР РЋРІР‚С™Р В Р’В°Р В РЎвЂ”Р В Р’В°, Р РЋР С“Р РЋР вЂљР В Р’В°Р В Р вЂ Р В Р вЂ¦Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р РЋР вЂљР В Р’ВµР РЋРІвЂљВ¬Р В Р’ВµР В Р вЂ¦Р В РЎвЂР В Р’Вµ Р В РЎвЂР В Р’В»Р В РЎвЂ Р В Р вЂ¦Р В Р’Вµ Р В РЎвЂ”Р В РЎвЂўР РЋРІР‚С™Р В Р’ВµР РЋР вЂљР РЋР РЏР РЋРІР‚С™Р РЋР Р‰ Р РЋРІР‚С™Р В Р’ВµР В РЎВР В РЎвЂ” Р В Р вЂ  Р РЋРІвЂљВ¬Р РЋРЎвЂњР В РЎВР В Р’Вµ Р В Р’ВµР В Р’В¶Р В Р’ВµР В РўвЂР В Р вЂ¦Р В Р’ВµР В Р вЂ Р В Р вЂ¦Р В РЎвЂўР В РІвЂћвЂ“ Р В РЎвЂўР В РЎвЂ”Р В Р’ВµР РЋР вЂљР В Р’В°Р РЋРІР‚В Р В РЎвЂР В РЎвЂўР В Р вЂ¦Р В РЎвЂќР В РЎвЂ.\n\nР В Р Р‹Р РЋР вЂ№Р В РўвЂР В Р’В° Р В РЎвЂ”Р РЋР вЂљР В РЎвЂР РЋРІР‚В¦Р В РЎвЂўР В РўвЂР РЋР РЏР РЋРІР‚С™ Р В Р вЂ¦Р В Р’Вµ Р В Р’В·Р В Р’В° Р В РЎвЂўР В Р’В±Р РЋРІР‚В°Р В РЎвЂР В РЎВР В РЎвЂ Р РЋР С“Р В Р’В»Р В РЎвЂўР В Р вЂ Р В Р’В°Р В РЎВР В РЎвЂ, Р В Р’В° Р В Р’В·Р В Р’В° Р РЋР С“Р В Р’В»Р В Р’ВµР В РўвЂР РЋРЎвЂњР РЋР вЂ№Р РЋРІР‚В°Р В РЎвЂР В РЎВ Р РЋРІР‚С™Р В РЎвЂўР РЋРІР‚РЋР В Р вЂ¦Р РЋРІР‚в„–Р В РЎВ Р В РўвЂР В Р’ВµР В РІвЂћвЂ“Р РЋР С“Р РЋРІР‚С™Р В Р вЂ Р В РЎвЂР В Р’ВµР В РЎВ.",
     "How-to guides, troubleshooting notes, working memos, and reusable operating playbooks for buyers, farmers, tracking operators, creative teams, and everyone holding the daily mechanics of affiliate production together.\n\nThis is a library you return to not for inspiration, but to verify a step, restore setup logic, compare solutions, or keep tempo inside noisy daily operations.\n\nPeople come here not for generic advice, but for the exact next move."
 );
 if ($sectionKey !== 'playbooks') {
@@ -393,8 +393,8 @@ if ($sectionKey !== 'playbooks') {
 .jrnl-tag{color:var(--shell-muted);text-decoration:none}
 .jrnl-tag.is-active,.jrnl-tag:hover{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.1)}
 .jrnl-topic-cloud{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px 12px}
-.jrnl-topic-pill{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:42px;padding:10px 14px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:rgba(196,214,238,.78);text-decoration:none;flex:var(--topic-grow,1) 1 calc(var(--topic-basis,16) * 1%);font-size:calc(var(--topic-font,12) * 1px);font-weight:700;line-height:1.08;letter-spacing:0}
-.jrnl-topic-pill strong,.jrnl-topic-pill span{display:block;color:inherit;font-size:1em;font-weight:inherit}
+.jrnl-topic-pill{display:inline-flex;align-items:center;justify-content:flex-start;gap:8px;min-height:0;padding:8px 12px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:rgba(196,214,238,.78);text-decoration:none;flex:0 0 auto;font-size:calc(var(--topic-font,12) * 1px);font-weight:700;line-height:1.08;letter-spacing:0;white-space:nowrap}
+.jrnl-topic-pill strong,.jrnl-topic-pill span{display:inline;color:inherit;font-size:1em;font-weight:inherit}
 .jrnl-topic-pill span{opacity:.76;white-space:nowrap}
 .jrnl-topic-pill.is-active,.jrnl-topic-pill:hover{color:var(--shell-text)}
 .jrnl-topic-pill.is-all{opacity:.82}
@@ -486,7 +486,7 @@ if ($sectionKey !== 'playbooks') {
 100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0) saturate(1)}
 }
 @media (max-width:1180px){.jrnl-hero,.jrnl-grid,.jrnl-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.jrnl-hero{grid-template-columns:1fr}}
-@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-hero{padding:0 0 18px;overflow:hidden}.jrnl-cover{order:-1;border-top:0;border-left:0;border-right:0}.jrnl-copy{padding:0 18px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}.jrnl-topic-pill{flex-basis:calc(max(var(--topic-basis,24), 42) * 1%)}.jrnl-author{grid-template-columns:1fr;padding:14px}.jrnl-author-mark{width:44px;height:44px}.jrnl-author-top{gap:8px}}
+@media (max-width:720px){.jrnl{padding:18px 14px 52px}.jrnl-hero{padding:0 0 18px;overflow:hidden}.jrnl-cover{order:-1;border-top:0;border-left:0;border-right:0}.jrnl-copy{padding:0 18px}.jrnl-grid,.jrnl-related-grid{grid-template-columns:1fr}.jrnl-topic-pill{flex-basis:auto}.jrnl-author{grid-template-columns:1fr;padding:14px}.jrnl-author-mark{width:44px;height:44px}.jrnl-author-top{gap:8px}}
 </style>
 
 <section class="jrnl">
@@ -505,7 +505,7 @@ if ($sectionKey !== 'playbooks') {
             <article class="jrnl-detail">
                 <div class="jrnl-detail-top">
                     <?php if (!empty($detailBreadcrumbs)): ?>
-                        <nav class="jrnl-breadcrumbs" aria-label="<?= htmlspecialchars($t('РҐР»РµР±РЅС‹Рµ РєСЂРѕС€РєРё', 'Breadcrumbs'), ENT_QUOTES, 'UTF-8') ?>">
+                        <nav class="jrnl-breadcrumbs" aria-label="<?= htmlspecialchars($t('Р В РўС’Р В Р’В»Р В Р’ВµР В Р’В±Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В РЎвЂќР РЋР вЂљР В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂќР В РЎвЂ', 'Breadcrumbs'), ENT_QUOTES, 'UTF-8') ?>">
                             <?php foreach ($detailBreadcrumbs as $index => $crumb): ?>
                                 <?php if ($index > 0): ?><span class="jrnl-breadcrumb-sep">/</span><?php endif; ?>
                                 <?php if (!empty($crumb['url'])): ?>
@@ -563,15 +563,15 @@ if ($sectionKey !== 'playbooks') {
                             <span class="jrnl-share-label">WhatsApp</span>
                         </a>
                         <?php if ($portalUser && !empty($selected['id'])): ?>
-                            <form class="jrnl-favorite-form" method="post" data-favorite-active-label="<?= htmlspecialchars($t('Р’ РёР·Р±СЂР°РЅРЅРѕРј', 'Saved'), ENT_QUOTES, 'UTF-8') ?>" data-favorite-idle-label="<?= htmlspecialchars($t('Р”РѕР±Р°РІРёС‚СЊ РІ РёР·Р±СЂР°РЅРЅРѕРµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
+                            <form class="jrnl-favorite-form" method="post" data-favorite-active-label="<?= htmlspecialchars($t('Р В РІР‚в„ў Р В РЎвЂР В Р’В·Р В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р В РЎвЂўР В РЎВ', 'Saved'), ENT_QUOTES, 'UTF-8') ?>" data-favorite-idle-label="<?= htmlspecialchars($t('Р В РІР‚СњР В РЎвЂўР В Р’В±Р В Р’В°Р В Р вЂ Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ  Р В РЎвЂР В Р’В·Р В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р В РЎвЂўР В Р’Вµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="action" value="public_portal_favorite_toggle">
                                 <input type="hidden" name="portal_csrf" value="<?= htmlspecialchars($portalCsrf, ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="return_path" value="<?= htmlspecialchars((string)($_SERVER['REQUEST_URI'] ?? '/'), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="content_type" value="examples">
                                 <input type="hidden" name="content_id" value="<?= (int)$selected['id'] ?>">
-                                <button class="jrnl-favorite-btn <?= $portalIsFavorite ? 'is-active' : '' ?>" type="submit" aria-label="<?= htmlspecialchars($t('Р”РѕР±Р°РІРёС‚СЊ РІ РёР·Р±СЂР°РЅРЅРѕРµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
+                                <button class="jrnl-favorite-btn <?= $portalIsFavorite ? 'is-active' : '' ?>" type="submit" aria-label="<?= htmlspecialchars($t('Р В РІР‚СњР В РЎвЂўР В Р’В±Р В Р’В°Р В Р вЂ Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ  Р В РЎвЂР В Р’В·Р В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р В РЎвЂўР В Р’Вµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
                                     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.4l2.63 5.34 5.9.86-4.27 4.16 1 5.87L12 16.88 6.74 19.63l1-5.87L3.47 9.6l5.9-.86L12 3.4Z"/></svg>
-                                    <span class="jrnl-share-label"><?= htmlspecialchars($portalIsFavorite ? $t('Р’ РёР·Р±СЂР°РЅРЅРѕРј', 'Saved') : $t('Р”РѕР±Р°РІРёС‚СЊ РІ РёР·Р±СЂР°РЅРЅРѕРµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="jrnl-share-label"><?= htmlspecialchars($portalIsFavorite ? $t('Р В РІР‚в„ў Р В РЎвЂР В Р’В·Р В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р В РЎвЂўР В РЎВ', 'Saved') : $t('Р В РІР‚СњР В РЎвЂўР В Р’В±Р В Р’В°Р В Р вЂ Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ  Р В РЎвЂР В Р’В·Р В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р В РЎвЂўР В Р’Вµ', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?></span>
                                 </button>
                             </form>
                         <?php endif; ?>
@@ -580,7 +580,7 @@ if ($sectionKey !== 'playbooks') {
                 <div class="jrnl-detail-body">
                     <div class="jrnl-detail-content"><?= $selectedBodyHtml ?></div>
                     <div class="jrnl-actions">
-                        <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('РќР°Р·Р°Рґ РІ СЂР°Р·РґРµР»', 'Back to section'), ENT_QUOTES, 'UTF-8') ?></a>
+                        <a class="jrnl-btn" href="<?= htmlspecialchars($buildPageUrl($currentCluster), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Р В РЎСљР В Р’В°Р В Р’В·Р В Р’В°Р В РўвЂ Р В Р вЂ  Р РЋР вЂљР В Р’В°Р В Р’В·Р В РўвЂР В Р’ВµР В Р’В»', 'Back to section'), ENT_QUOTES, 'UTF-8') ?></a>
                     </div>
                 </div>
             </article>
@@ -596,13 +596,13 @@ if ($sectionKey !== 'playbooks') {
 
             <?php if (!empty($relatedItems)): ?>
                 <section class="jrnl-related">
-                    <h2><?= htmlspecialchars($t('Р”Р°Р»СЊС€Рµ РїРѕ С‚РµРјРµ', 'Continue reading'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <h2><?= htmlspecialchars($t('Дальше по теме', 'Continue reading'), ENT_QUOTES, 'UTF-8') ?></h2>
                     <div class="jrnl-related-grid">
                         <?php foreach ($relatedItems as $item): ?>
                             <?php $cluster = trim((string)($item['cluster_code'] ?? '')); ?>
                             <a class="jrnl-card" href="<?= htmlspecialchars($buildArticleUrl((string)($item['slug'] ?? ''), $cluster), ENT_QUOTES, 'UTF-8') ?>">
                                 <div class="jrnl-card-media"><?php if (!empty($item['image_src'])): ?><img src="<?= htmlspecialchars((string)$item['image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?></div>
-                                <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('РњР°С‚РµСЂРёР°Р»', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('Материал', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
                                 <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                                 <p><?= htmlspecialchars($strip((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 140), ENT_QUOTES, 'UTF-8') ?></p>
                                 <div class="jrnl-card-foot">
@@ -632,7 +632,7 @@ if ($sectionKey !== 'playbooks') {
             </header>
 
             <?php if (!empty($topicCloudItems)): ?>
-                <div class="jrnl-topic-cloud" aria-label="<?= htmlspecialchars($t('РўРµРјС‹ СЂР°Р·РґРµР»Р°', 'Section topics'), ENT_QUOTES, 'UTF-8') ?>">
+                <div class="jrnl-topic-cloud" aria-label="<?= htmlspecialchars($t('Темы выпуска', 'Issue topics'), ENT_QUOTES, 'UTF-8') ?>">
                     <?php foreach ($topicCloudItems as $topicItem): ?>
                         <?php $topicCode = trim((string)($topicItem['code'] ?? '')); ?>
                         <?php $isAllTopic = !empty($topicItem['is_all']); ?>
@@ -648,14 +648,14 @@ if ($sectionKey !== 'playbooks') {
             <?php endif; ?>
 
             <?php if (false && !empty($clusters)): ?>
-                <div class="jrnl-tags" aria-label="<?= htmlspecialchars($t('РўРµРјС‹ СЂР°Р·РґРµР»Р°', 'Section topics'), ENT_QUOTES, 'UTF-8') ?>">
-                    <a class="jrnl-tag <?= $currentCluster === '' ? 'is-active' : '' ?>" href="<?= htmlspecialchars($buildPageUrl(''), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Р’СЃРµ С‚РµРјС‹', 'All topics'), ENT_QUOTES, 'UTF-8') ?></a>
+                <div class="jrnl-tags" aria-label="<?= htmlspecialchars($t('Темы раздела', 'Section topics'), ENT_QUOTES, 'UTF-8') ?>">
+                    <a class="jrnl-tag <?= $currentCluster === '' ? 'is-active' : '' ?>" href="<?= htmlspecialchars($buildPageUrl(''), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Все темы', 'All topics'), ENT_QUOTES, 'UTF-8') ?></a>
                     <?php foreach ($clusters as $cluster): ?>
                         <?php $clusterCode = trim((string)($cluster['code'] ?? '')); ?>
                         <?php if ($clusterCode === '') { continue; } ?>
                         <a class="jrnl-tag <?= $currentCluster === $clusterCode ? 'is-active' : '' ?>" href="<?= htmlspecialchars($buildPageUrl($clusterCode), ENT_QUOTES, 'UTF-8') ?>">
                             <?= htmlspecialchars((string)($cluster['label'] ?? $clusterCode), ENT_QUOTES, 'UTF-8') ?>
-                            <?php if (isset($cluster['count'])): ?> В· <?= (int)$cluster['count'] ?><?php endif; ?>
+                            <?php if (isset($cluster['count'])): ?> · <?= (int)$cluster['count'] ?><?php endif; ?>
                         </a>
                     <?php endforeach; ?>
                 </div>
@@ -667,7 +667,7 @@ if ($sectionKey !== 'playbooks') {
                         <?php $cluster = trim((string)($item['cluster_code'] ?? '')); ?>
                         <a class="jrnl-card" href="<?= htmlspecialchars($buildArticleUrl((string)($item['slug'] ?? ''), $cluster), ENT_QUOTES, 'UTF-8') ?>">
                             <div class="jrnl-card-media"><?php if (!empty($item['image_src'])): ?><img src="<?= htmlspecialchars((string)$item['image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?></div>
-                            <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('РњР°С‚РµСЂРёР°Р»', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
+                            <span class="jrnl-tag"><?= htmlspecialchars($cluster !== '' ? $cluster : $t('Материал', 'Article'), ENT_QUOTES, 'UTF-8') ?></span>
                             <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
                             <p><?= htmlspecialchars($strip((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 160), ENT_QUOTES, 'UTF-8') ?></p>
                             <div class="jrnl-card-foot">
@@ -682,9 +682,9 @@ if ($sectionKey !== 'playbooks') {
                 </div>
 
                 <?php if ($totalPages > 1): ?>
-                    <nav class="jrnl-pager" aria-label="<?= htmlspecialchars($t('РџР°РіРёРЅР°С†РёСЏ', 'Pagination'), ENT_QUOTES, 'UTF-8') ?>">
+                    <nav class="jrnl-pager" aria-label="<?= htmlspecialchars($t('Пагинация', 'Pagination'), ENT_QUOTES, 'UTF-8') ?>">
                         <?php if ($page > 1): ?>
-                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page - 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('РќР°Р·Р°Рґ', 'Prev'), ENT_QUOTES, 'UTF-8') ?></a>
+                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page - 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Назад', 'Prev'), ENT_QUOTES, 'UTF-8') ?></a>
                         <?php endif; ?>
                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                             <?php if ($i < $page - 2 || $i > $page + 2) { continue; } ?>
@@ -695,16 +695,19 @@ if ($sectionKey !== 'playbooks') {
                             <?php endif; ?>
                         <?php endfor; ?>
                         <?php if ($page < $totalPages): ?>
-                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page + 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Р’РїРµСЂРµРґ', 'Next'), ENT_QUOTES, 'UTF-8') ?></a>
+                            <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page + 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Вперед', 'Next'), ENT_QUOTES, 'UTF-8') ?></a>
                         <?php endif; ?>
                     </nav>
                 <?php endif; ?>
             <?php else: ?>
                 <div class="jrnl-empty">
-                    <h2><?= htmlspecialchars($t('РџРѕРєР° РЅРµС‚ РјР°С‚РµСЂРёР°Р»РѕРІ', 'No playbook materials yet'), ENT_QUOTES, 'UTF-8') ?></h2>
-                    <p><?= htmlspecialchars($t('РљРѕРіРґР° СЃС‚Р°С‚СЊРё РїРѕСЏРІСЏС‚СЃСЏ, РѕРЅРё Р±СѓРґСѓС‚ СЃРѕР±СЂР°РЅС‹ Р·РґРµСЃСЊ РєР°Рє РѕС‚РґРµР»СЊРЅС‹Р№ СЂР°Р·РґРµР» РїСЂР°РєС‚РёРєРё СЃ С„РёР»СЊС‚СЂР°С†РёРµР№ РїРѕ С‚РµРјР°Рј Рё СЂР°Р±РѕС‡РёРј СЃС†РµРЅР°СЂРёСЏРј.', 'Published articles will appear here as a dedicated practical section with topic and scenario filters.'), ENT_QUOTES, 'UTF-8') ?></p>
+                    <h2><?= htmlspecialchars($t('Пока нет материалов', 'No playbook materials yet'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <p><?= htmlspecialchars($t('Опубликованные материалы появятся здесь как отдельный раздел практики с фильтрацией по темам.', 'Published pieces will appear here as a dedicated practical section with topic filters.'), ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
             <?php endif; ?>
+        <?php endif; ?>
+    </div>
+</section>
         <?php endif; ?>
     </div>
 </section>
