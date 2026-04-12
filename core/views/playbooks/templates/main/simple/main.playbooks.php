@@ -524,12 +524,15 @@ if ($sectionKey !== 'playbooks') {
                 <span class="jrnl-kicker"><?= htmlspecialchars((string)($issue['issue_title'] ?? $issueTitle), ENT_QUOTES, 'UTF-8') ?></span>
                 <h1><?= htmlspecialchars((string)($selected['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h1>
                 <div class="jrnl-tags">
+                    <?php if ($authorDisplayName !== ''): ?>
+                        <span class="jrnl-meta"><?= htmlspecialchars($authorDisplayName, ENT_QUOTES, 'UTF-8') ?></span>
+                    <?php endif; ?>
                     <?php if ($selectedClusterCode !== '' && $selectedClusterLabel !== ''): ?>
                         <a class="jrnl-tag" href="<?= htmlspecialchars($buildPageUrl($selectedClusterCode), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($selectedClusterLabel, ENT_QUOTES, 'UTF-8') ?></a>
                     <?php endif; ?>
                     <span class="jrnl-meta"><?= htmlspecialchars((string)($selected['published_at'] ?? $selected['created_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
                 </div>
-                <?php if ($authorDisplayName !== ''): ?>
+                <?php if (false && $authorDisplayName !== ''): ?>
                     <div class="jrnl-author">
                         <div class="jrnl-author-mark"><?= htmlspecialchars($authorInitials !== '' ? $authorInitials : 'CP', ENT_QUOTES, 'UTF-8') ?></div>
                         <div class="jrnl-author-copy">
