@@ -30,6 +30,12 @@ if (!is_file($examplesCommon)) {
 }
 
 require_once $examplesCommon;
+if (is_file(DIR . 'core/libs/examples_popularity.php')) {
+    require_once DIR . 'core/libs/examples_popularity.php';
+}
+if (is_file(DIR . 'core/libs/public_portal.php')) {
+    require_once DIR . 'core/libs/public_portal.php';
+}
 
 $db = $FRMWRK->DB();
 if (!$db || !function_exists('examples_table_exists') || !examples_table_exists($db)) {
@@ -88,6 +94,79 @@ $buildSearchSnippet = static function (string $html, int $limit = 320): string {
     return rtrim(substr($text, 0, $limit - 1)) . '...';
 };
 
+$decorateSearchRows = static function (array $rows) use (
+    $FRMWRK,
+    $buildSearchImage,
+    $buildSearchUrl,
+    $buildSearchSnippet,
+    &$searchData
+): array {
+    $grouped = [
+        'journal' => [],
+        'playbooks' => [],
+        'signals' => [],
+        'fun' => [],
+    ];
+
+    foreach ($rows as $index => $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $section = trim((string)($row['material_section'] ?? 'journal'));
+        if (!isset($grouped[$section])) {
+            $section = 'journal';
+        }
+        $grouped[$section][$index] = $row;
+    }
+
+    foreach ($grouped as $section => $sectionRows) {
+        if (empty($sectionRows) || !function_exists('examples_popularity_attach_views')) {
+            continue;
+        }
+        $grouped[$section] = examples_popularity_attach_views(
+            $FRMWRK,
+            (string)$searchData['host'],
+            (string)$searchData['lang'],
+            $section,
+            array_values($sectionRows)
+        );
+    }
+
+    $flat = [];
+    foreach ($grouped as $section => $sectionRows) {
+        foreach (array_values((array)$sectionRows) as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $row['image_src'] = $buildSearchImage((array)$row);
+            $row['article_url'] = $buildSearchUrl((array)$row, (string)$searchData['host']);
+            $row['search_snippet'] = $buildSearchSnippet((string)($row['excerpt_html'] ?? $row['content_html'] ?? ''), 220);
+            $contentId = (int)($row['id'] ?? 0);
+            $row['comment_count'] = ($contentId > 0 && function_exists('public_portal_comment_total_for_content'))
+                ? (int)public_portal_comment_total_for_content($FRMWRK, 'examples', $contentId)
+                : 0;
+            $flat[] = $row;
+        }
+    }
+
+    $orderMap = [];
+    foreach ($rows as $index => $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $key = (int)($row['id'] ?? 0) . '|' . trim((string)($row['slug'] ?? ''));
+        $orderMap[$key] = $index;
+    }
+
+    usort($flat, static function (array $a, array $b) use ($orderMap): int {
+        $keyA = (int)($a['id'] ?? 0) . '|' . trim((string)($a['slug'] ?? ''));
+        $keyB = (int)($b['id'] ?? 0) . '|' . trim((string)($b['slug'] ?? ''));
+        return ($orderMap[$keyA] ?? 999999) <=> ($orderMap[$keyB] ?? 999999);
+    });
+
+    return $flat;
+};
+
 if ($searchData['query'] !== '' && function_exists('examples_fetch_published_count') && function_exists('examples_fetch_published_page')) {
     $searchData['total'] = (int)examples_fetch_published_count(
         $FRMWRK,
@@ -109,12 +188,7 @@ if ($searchData['query'] !== '' && function_exists('examples_fetch_published_cou
         (string)$searchData['query']
     );
 
-    foreach ((array)$rows as $row) {
-        $row['image_src'] = $buildSearchImage((array)$row);
-        $row['article_url'] = $buildSearchUrl((array)$row, (string)$searchData['host']);
-        $row['search_snippet'] = $buildSearchSnippet((string)($row['excerpt_html'] ?? $row['content_html'] ?? ''), 220);
-        $searchData['items'][] = $row;
-    }
+    $searchData['items'] = $decorateSearchRows((array)$rows);
 
     if (!empty($searchData['items'])) {
         $searchData['featured'] = $searchData['items'][0];
@@ -123,10 +197,11 @@ if ($searchData['query'] !== '' && function_exists('examples_fetch_published_cou
 
 if (empty($searchData['items'])) {
     $hostSafe = mysqli_real_escape_string($db, strtolower((string)$searchData['host']));
+    $hasMaterialSection = function_exists('examples_table_has_column') && examples_table_has_column($db, 'material_section');
     $langCond = function_exists('examples_table_has_lang_column') && examples_table_has_lang_column($db)
         ? (((string)$searchData['lang'] === 'ru') ? "AND lang_code = 'ru'" : "AND lang_code = 'en'")
         : '';
-    $sectionCond = function_exists('examples_table_has_column') && examples_table_has_column($db, 'material_section')
+    $sectionCond = $hasMaterialSection
         ? "AND material_section IN ('journal','playbooks','signals','fun')"
         : '';
     $clusterSelect = (function_exists('examples_table_has_column') && examples_table_has_column($db, 'cluster_code'))
@@ -137,27 +212,52 @@ if (empty($searchData['items'])) {
         : "'journal' AS material_section";
     $previewSelect = function_exists('examples_preview_select_sql') ? examples_preview_select_sql($db) : '';
 
-    $fallbackRows = $FRMWRK->DBRecords(
-        "SELECT id, title, slug, excerpt_html, content_html, {$clusterSelect}, {$sectionSelect}{$previewSelect}
-         FROM examples_articles
-         WHERE is_published = 1
-           AND slug IS NOT NULL
-           AND slug <> ''
-           AND (domain_host IS NULL OR domain_host = '' OR domain_host = '{$hostSafe}')
-           {$langCond}
-           {$sectionCond}
-         ORDER BY RAND()
-         LIMIT 7"
-    );
+    $fallbackRows = [];
+    if ($hasMaterialSection) {
+        foreach (['journal', 'playbooks', 'signals', 'fun'] as $sectionName) {
+            $sectionNameSafe = mysqli_real_escape_string($db, $sectionName);
+            $sectionRows = $FRMWRK->DBRecords(
+                "SELECT id, title, slug, excerpt_html, content_html, {$clusterSelect}, {$sectionSelect}{$previewSelect}
+                 FROM examples_articles
+                 WHERE is_published = 1
+                   AND slug IS NOT NULL
+                   AND slug <> ''
+                   AND (domain_host IS NULL OR domain_host = '' OR domain_host = '{$hostSafe}')
+                   {$langCond}
+                   AND material_section = '{$sectionNameSafe}'
+                 ORDER BY RAND()
+                 LIMIT 2"
+            );
+            foreach ((array)$sectionRows as $row) {
+                if (is_array($row)) {
+                    $fallbackRows[] = $row;
+                }
+            }
+        }
+    } else {
+        $fallbackRows = (array)$FRMWRK->DBRecords(
+            "SELECT id, title, slug, excerpt_html, content_html, {$clusterSelect}, {$sectionSelect}{$previewSelect}
+             FROM examples_articles
+             WHERE is_published = 1
+               AND slug IS NOT NULL
+               AND slug <> ''
+               AND (domain_host IS NULL OR domain_host = '' OR domain_host = '{$hostSafe}')
+               {$langCond}
+             ORDER BY RAND()
+             LIMIT 8"
+        );
+    }
 
-    foreach ((array)$fallbackRows as $index => $row) {
-        $row['image_src'] = $buildSearchImage((array)$row);
-        $row['article_url'] = $buildSearchUrl((array)$row, (string)$searchData['host']);
-        $row['search_snippet'] = $buildSearchSnippet((string)($row['content_html'] ?? $row['excerpt_html'] ?? ''), $index === 0 ? 520 : 180);
-        if ($index === 0) {
-            $searchData['fallback_featured'] = $row;
-        } else {
-            $searchData['fallback_items'][] = $row;
+    if (!empty($fallbackRows)) {
+        shuffle($fallbackRows);
+        $decoratedFallback = $decorateSearchRows((array)$fallbackRows);
+        foreach ((array)$decoratedFallback as $index => $row) {
+            $row['search_snippet'] = $buildSearchSnippet((string)($row['content_html'] ?? $row['excerpt_html'] ?? ''), $index === 0 ? 520 : 180);
+            if ($index === 0) {
+                $searchData['fallback_featured'] = $row;
+            } elseif (count($searchData['fallback_items']) < 6) {
+                $searchData['fallback_items'][] = $row;
+            }
         }
     }
 }
