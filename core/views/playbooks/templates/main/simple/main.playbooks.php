@@ -18,10 +18,13 @@ $sectionKey = trim((string)($playbooks['section_key'] ?? 'playbooks'));
 if ($sectionKey === '') {
     $sectionKey = 'playbooks';
 }
-$authorDisplayName = trim((string)($authorProfile['resolved_name'] ?? ($selected['author_name'] ?? '')));
+$authorDisplayName = trim((string)($authorProfile['resolved_name'] ?? ($ModelPage['article_author'] ?? ($selected['author_name'] ?? ''))));
 $authorNickname = trim((string)($authorProfile['nickname'] ?? ''));
 $authorRole = trim((string)($authorProfile['resolved_role'] ?? ''));
 $authorBio = trim((string)($authorProfile['resolved_bio'] ?? ''));
+if ($authorDisplayName === '') {
+    $authorDisplayName = $t('Редакция ЦПАЛЬНЯ', 'CPALNYA Editorial');
+}
 $authorInitials = '';
 if ($authorDisplayName !== '') {
     $authorWords = preg_split('/[\s"\'.@_-]+/u', $authorDisplayName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
@@ -408,6 +411,16 @@ if ($sectionKey !== 'playbooks') {
 .jrnl-pager a,.jrnl-pager span{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:10px 14px;border:1px solid rgba(122,180,255,.18);background:rgba(255,255,255,.04);color:var(--shell-muted);text-decoration:none}
 .jrnl-pager .is-active{color:var(--shell-text);border-color:rgba(122,180,255,.38);background:rgba(122,180,255,.12)}
 .jrnl-detail{display:grid;gap:18px}
+.jrnl-detail > *{order:100}
+.jrnl-detail-top{order:10}
+.jrnl-detail > .jrnl-author{order:20}
+.jrnl-detail > .jrnl-kicker{order:30}
+.jrnl-detail > h1{order:40}
+.jrnl-detail > .jrnl-tags{order:50}
+.jrnl-detail > .jrnl-detail-intro{order:60}
+.jrnl-detail > .jrnl-detail-cover{order:70}
+.jrnl-detail > .jrnl-share{order:80}
+.jrnl-detail > .jrnl-content{order:90}
 .jrnl-detail-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .jrnl-detail-stats{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-left:auto}
 .jrnl-stat-link{color:var(--shell-muted);text-decoration:none}
@@ -517,6 +530,19 @@ if ($sectionKey !== 'playbooks') {
                     <span class="jrnl-meta"><?= htmlspecialchars((string)($selected['published_at'] ?? $selected['created_at'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
                 </div>
                 <?php if ($authorDisplayName !== ''): ?>
+                    <div class="jrnl-author">
+                        <div class="jrnl-author-mark"><?= htmlspecialchars($authorInitials !== '' ? $authorInitials : 'CP', ENT_QUOTES, 'UTF-8') ?></div>
+                        <div class="jrnl-author-copy">
+                            <div class="jrnl-author-top">
+                                <h2 class="jrnl-author-name"><?= htmlspecialchars($authorDisplayName, ENT_QUOTES, 'UTF-8') ?></h2>
+                                <?php if ($authorNickname !== ''): ?><span class="jrnl-author-handle">@<?= htmlspecialchars($authorNickname, ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
+                                <?php if ($authorRole !== ''): ?><span class="jrnl-author-role"><?= htmlspecialchars($authorRole, ENT_QUOTES, 'UTF-8') ?></span><?php endif; ?>
+                            </div>
+                            <?php if ($authorBio !== ''): ?><p class="jrnl-author-bio"><?= htmlspecialchars($authorBio, ENT_QUOTES, 'UTF-8') ?></p><?php endif; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                <?php if (false && $authorDisplayName !== ''): ?>
                     <div class="jrnl-author">
                         <div class="jrnl-author-mark"><?= htmlspecialchars($authorInitials !== '' ? $authorInitials : 'CP', ENT_QUOTES, 'UTF-8') ?></div>
                         <div class="jrnl-author-copy">
