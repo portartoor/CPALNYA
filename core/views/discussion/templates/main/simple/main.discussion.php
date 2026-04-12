@@ -51,15 +51,9 @@ $nextPageUrl = $page < $totalPages ? $buildListUrl($currentSection, $page + 1) :
 .dsc-filters{display:flex;flex-wrap:wrap;gap:10px}
 .dsc-chip{text-decoration:none;color:var(--shell-muted)}
 .dsc-chip.is-active,.dsc-chip:hover{color:var(--shell-text);border-color:rgba(122,180,255,.36);background:rgba(122,180,255,.1)}
-.dsc-groups{display:grid;gap:20px}
+.dsc-groups{display:grid;gap:18px}
 .dsc-block{padding:20px;display:grid;gap:16px}
-.dsc-block-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;flex-wrap:wrap}
-.dsc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.dsc-card{display:grid;grid-template-columns:140px minmax(0,1fr);gap:14px;padding:14px;border:1px solid rgba(122,180,255,.12);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(122,180,255,.05));text-decoration:none;color:inherit}
-.dsc-card-media{width:140px;aspect-ratio:1/1;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12))}
-.dsc-card-media img{display:block;width:100%;height:100%;object-fit:cover}
-.dsc-card-copy{display:grid;gap:8px;align-content:start}
-.dsc-card-top,.dsc-thread-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.dsc-block-head,.dsc-thread-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;flex-wrap:wrap}
 .dsc-stats{display:flex;gap:10px;flex-wrap:wrap;color:var(--shell-muted);font-size:12px;text-transform:uppercase;letter-spacing:.12em}
 .dsc-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--shell-text);font-weight:700}
 .dsc-pagination{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
@@ -69,7 +63,28 @@ $nextPageUrl = $page < $totalPages ? $buildListUrl($currentSection, $page + 1) :
 .dsc-thread-cover img{display:block;width:100%;height:auto}
 .dsc-thread-actions{display:flex;gap:10px;flex-wrap:wrap}
 .dsc-thread-btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border:1px solid rgba(122,180,255,.18);background:linear-gradient(135deg,rgba(115,184,255,.18),rgba(39,223,192,.12));color:var(--shell-text);text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-@media (max-width:900px){.dsc-grid{grid-template-columns:1fr}.dsc-card{grid-template-columns:1fr}.dsc-card-media{width:100%}}
+.dsc-board{display:grid;gap:0;border:1px solid rgba(122,180,255,.12);background:rgba(255,255,255,.02)}
+.dsc-board-head,.dsc-board-row{display:grid;grid-template-columns:120px minmax(0,1fr) 120px 118px 118px;gap:0;align-items:stretch}
+.dsc-board-head{background:linear-gradient(180deg,rgba(122,180,255,.12),rgba(122,180,255,.05));color:var(--shell-muted);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.dsc-board-head span,.dsc-board-row > *{padding:12px 14px;border-right:1px solid rgba(122,180,255,.1)}
+.dsc-board-head span:last-child,.dsc-board-row > *:last-child{border-right:0}
+.dsc-board-row{border-top:1px solid rgba(122,180,255,.1);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(122,180,255,.03))}
+.dsc-board-row:hover{background:linear-gradient(180deg,rgba(122,180,255,.08),rgba(39,223,192,.05))}
+.dsc-board-section{display:flex;align-items:flex-start}
+.dsc-board-pill{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:8px 10px;border:1px solid rgba(122,180,255,.16);background:rgba(255,255,255,.04);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.dsc-board-topic{display:grid;gap:8px;min-width:0}
+.dsc-board-topic a{color:var(--shell-text);text-decoration:none}
+.dsc-board-topic strong{display:block;font:700 1rem/1.2 "Space Grotesk","Sora",sans-serif}
+.dsc-board-excerpt{color:var(--shell-muted);font-size:14px;line-height:1.5}
+.dsc-board-meta{display:flex;align-items:flex-start;justify-content:flex-end;color:var(--shell-muted);font-size:13px}
+.dsc-board-open{display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:var(--shell-text);text-decoration:none}
+@media (max-width:980px){
+    .dsc-board-head{display:none}
+    .dsc-board-row{grid-template-columns:1fr;gap:0}
+    .dsc-board-row > *{border-right:0;border-top:1px solid rgba(122,180,255,.08)}
+    .dsc-board-row > *:first-child{border-top:0}
+    .dsc-board-section,.dsc-board-meta{justify-content:flex-start}
+}
 @media (max-width:720px){.dsc{padding:18px 14px 48px}.dsc-hero,.dsc-block,.dsc-thread{padding:18px}}
 </style>
 
@@ -133,38 +148,46 @@ $nextPageUrl = $page < $totalPages ? $buildListUrl($currentSection, $page + 1) :
                         <div class="dsc-block-head">
                             <div>
                                 <span class="dsc-kicker"><?= htmlspecialchars((string)($sectionLabels[$sectionCode] ?? $sectionCode), ENT_QUOTES, 'UTF-8') ?></span>
-                                <h2><?= htmlspecialchars($t('Темы с обсуждением', 'Active threads'), ENT_QUOTES, 'UTF-8') ?></h2>
+                                <h2><?= htmlspecialchars($t('Таблица тем', 'Thread board'), ENT_QUOTES, 'UTF-8') ?></h2>
                             </div>
                             <?php if ($currentSection === ''): ?>
                                 <a class="dsc-link" href="<?= htmlspecialchars($buildListUrl((string)$sectionCode), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Только этот раздел', 'Only this section'), ENT_QUOTES, 'UTF-8') ?></a>
                             <?php endif; ?>
                         </div>
-                        <div class="dsc-grid">
+                        <div class="dsc-board" role="table" aria-label="<?= htmlspecialchars((string)($sectionLabels[$sectionCode] ?? $sectionCode), ENT_QUOTES, 'UTF-8') ?>">
+                            <div class="dsc-board-head" role="row">
+                                <span role="columnheader"><?= htmlspecialchars($t('Раздел', 'Section'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <span role="columnheader"><?= htmlspecialchars($t('Тема', 'Topic'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <span role="columnheader"><?= htmlspecialchars($t('Ответы', 'Replies'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <span role="columnheader"><?= htmlspecialchars($t('Пост', 'Posted'), ENT_QUOTES, 'UTF-8') ?></span>
+                                <span role="columnheader"><?= htmlspecialchars($t('Тред', 'Thread'), ENT_QUOTES, 'UTF-8') ?></span>
+                            </div>
                             <?php foreach ($sectionItems as $item): ?>
-                                <?php $itemDate = $formatDate($item['published_at'] ?? $item['created_at'] ?? ''); ?>
-                                <a class="dsc-card" href="<?= htmlspecialchars((string)($item['discussion_url'] ?? '/discussion/'), ENT_QUOTES, 'UTF-8') ?>">
-                                    <div class="dsc-card-media">
-                                        <?php if (!empty($item['image_src'])): ?>
-                                            <img src="<?= htmlspecialchars((string)$item['image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
-                                        <?php endif; ?>
+                                <?php
+                                $itemDate = $formatDate($item['published_at'] ?? $item['created_at'] ?? '');
+                                $commentDate = $formatDate($item['latest_comment_at'] ?? '');
+                                ?>
+                                <div class="dsc-board-row" role="row">
+                                    <div class="dsc-board-section" role="cell">
+                                        <span class="dsc-board-pill"><?= htmlspecialchars((string)($sectionLabels[$sectionCode] ?? $sectionCode), ENT_QUOTES, 'UTF-8') ?></span>
                                     </div>
-                                    <div class="dsc-card-copy">
-                                        <div class="dsc-card-top">
-                                            <span class="dsc-meta"><?= htmlspecialchars((string)($sectionLabels[$sectionCode] ?? $sectionCode), ENT_QUOTES, 'UTF-8') ?></span>
-                                            <div class="dsc-stats">
-                                                <span><?= (int)($item['comment_count'] ?? 0) ?> <?= htmlspecialchars($t('комм.', 'comments'), ENT_QUOTES, 'UTF-8') ?></span>
-                                                <?php if ($itemDate !== ''): ?>
-                                                    <span><?= htmlspecialchars($itemDate, ENT_QUOTES, 'UTF-8') ?></span>
-                                                <?php endif; ?>
-                                            </div>
-                                        </div>
-                                        <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
+                                    <div class="dsc-board-topic" role="cell">
+                                        <a href="<?= htmlspecialchars((string)($item['discussion_url'] ?? '/discussion/'), ENT_QUOTES, 'UTF-8') ?>">
+                                            <strong><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></strong>
+                                        </a>
                                         <?php if (!empty($item['short_excerpt'])): ?>
-                                            <p><?= htmlspecialchars((string)$item['short_excerpt'], ENT_QUOTES, 'UTF-8') ?></p>
+                                            <div class="dsc-board-excerpt"><?= htmlspecialchars((string)$item['short_excerpt'], ENT_QUOTES, 'UTF-8') ?></div>
                                         <?php endif; ?>
-                                        <span class="dsc-link"><?= htmlspecialchars($t('Открыть тред', 'Open thread'), ENT_QUOTES, 'UTF-8') ?></span>
+                                        <?php if ($commentDate !== ''): ?>
+                                            <div class="dsc-board-excerpt"><?= htmlspecialchars($t('Последняя реплика: ', 'Latest reply: '), ENT_QUOTES, 'UTF-8') ?><?= htmlspecialchars($commentDate, ENT_QUOTES, 'UTF-8') ?></div>
+                                        <?php endif; ?>
                                     </div>
-                                </a>
+                                    <div class="dsc-board-meta" role="cell"><?= (int)($item['comment_count'] ?? 0) ?></div>
+                                    <div class="dsc-board-meta" role="cell"><?= htmlspecialchars($itemDate, ENT_QUOTES, 'UTF-8') ?></div>
+                                    <div class="dsc-board-meta" role="cell">
+                                        <a class="dsc-board-open" href="<?= htmlspecialchars((string)($item['discussion_url'] ?? '/discussion/'), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Открыть', 'Open'), ENT_QUOTES, 'UTF-8') ?></a>
+                                    </div>
+                                </div>
                             <?php endforeach; ?>
                         </div>
                     </section>
