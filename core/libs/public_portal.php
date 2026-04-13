@@ -691,7 +691,7 @@ if (!function_exists('public_portal_current_user')) {
             return null;
         }
         $db = $FRMWRK->DB();
-        if (!$db || !public_portal_table_exists($db, 'public_users')) {
+        if (!$db || !public_portal_users_ensure_schema($db)) {
             $GLOBALS[$cacheKey] = null;
             return null;
         }
