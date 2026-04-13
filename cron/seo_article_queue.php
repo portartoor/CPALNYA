@@ -10,6 +10,11 @@ if (is_file($seoGeneratorSettingsLib)) {
     require_once $seoGeneratorSettingsLib;
 }
 
+$seoQueueTimezone = trim((string)($GLOBALS['AppTimezone'] ?? 'Europe/Moscow'));
+if ($seoQueueTimezone === '' || @date_default_timezone_set($seoQueueTimezone) === false) {
+    date_default_timezone_set('Europe/Moscow');
+}
+
 function queue_echo(string $message): void
 {
     echo '[' . date('Y-m-d H:i:s') . '] ' . $message . PHP_EOL;
@@ -243,6 +248,16 @@ function queue_generate_irregular_slot_minutes(
     return array_values(array_unique($minutes));
 }
 
+function queue_clamp_minute_of_day(int $minuteOfDay): int
+{
+    return max(0, min(23 * 60 + 59, $minuteOfDay));
+}
+
+function queue_schedule_window_minutes(string $jobDate, string $lang, string $salt): array
+{
+    return [9 * 60, 20 * 60 + 59];
+}
+
 function queue_daily_slots_ranged(
     string $jobDate,
     string $lang,
@@ -256,7 +271,9 @@ function queue_daily_slots_ranged(
     $seed = $jobDate . '|' . $lang . '|' . $salt . '|count-ranged';
     $spread = $maxCount - $minCount;
     $target = $minCount + ($spread > 0 ? (int)floor(queue_seed_unit($seed, 'count') * ($spread + 1)) : 0);
-    $minutes = queue_generate_irregular_slot_minutes($jobDate, $lang, $salt, $startMinute, 23 * 60 + 45, $target, 'ranged');
+    [$windowStartMinute, $windowEndMinute] = queue_schedule_window_minutes($jobDate, $lang, $salt);
+    $startMinute = max($windowStartMinute, min($windowEndMinute, queue_clamp_minute_of_day($startMinute)));
+    $minutes = queue_generate_irregular_slot_minutes($jobDate, $lang, $salt, $startMinute, $windowEndMinute, $target, 'ranged|' . $startMinute);
     $slots = [];
     $slotIndex = 1;
     foreach ($minutes as $minuteTotal) {
@@ -332,7 +349,8 @@ function queue_compute_slots(array $settings, string $jobDate, string $lang, str
         return queue_daily_slots_ranged($jobDate, $lang, $dailyMin, $dailyMax, $salt, $startMinute);
     }
 
-    return queue_daily_slots_ranged($jobDate, $lang, $dailyMin, $dailyMax, $salt, 0);
+    [$windowStartMinute] = queue_schedule_window_minutes($jobDate, $lang, $salt);
+    return queue_daily_slots_ranged($jobDate, $lang, $dailyMin, $dailyMax, $salt, $windowStartMinute);
 }
 
 function queue_add_task(

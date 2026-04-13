@@ -155,6 +155,9 @@ if (function_exists('examples_fetch_published_list')) {
         $topicItem['class'] = isset($collapsedPaths[$topicPath]) ? 'nav-topic-item' : 'nav-topic-item nav-topic-item-extra';
         $importantTopicItems[] = $topicItem;
     }
+    if (count($importantTopicItems) > 1) {
+        array_pop($importantTopicItems);
+    }
 }
 
 $navSections = [

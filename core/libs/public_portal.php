@@ -695,9 +695,12 @@ if (!function_exists('public_portal_current_user')) {
             $GLOBALS[$cacheKey] = null;
             return null;
         }
+        $aboutTextSelect = public_portal_column_exists($db, 'public_users', 'about_text')
+            ? 'about_text'
+            : "'' AS about_text";
         $rows = $FRMWRK->DBRecords(
             "SELECT id, username, email, display_name, pin_code, avatar_mode, avatar_url,
-                    telegram_handle, website_url, about_text, nickname_changed_at, comment_rating, comment_votes_up,
+                    telegram_handle, website_url, {$aboutTextSelect}, nickname_changed_at, comment_rating, comment_votes_up,
                     comment_votes_down, comments_count, role_code, is_active,
                     is_banned, banned_reason, last_login_at, created_at
              FROM public_users
@@ -711,7 +714,7 @@ if (!function_exists('public_portal_current_user')) {
             public_portal_recalculate_user_rating($db, (int)$user['id']);
             $refresh = $FRMWRK->DBRecords(
                 "SELECT id, username, email, display_name, pin_code, avatar_mode, avatar_url,
-                        telegram_handle, website_url, about_text, nickname_changed_at, comment_rating, comment_votes_up,
+                        telegram_handle, website_url, {$aboutTextSelect}, nickname_changed_at, comment_rating, comment_votes_up,
                         comment_votes_down, comments_count, role_code, is_active,
                         is_banned, banned_reason, last_login_at, created_at
                  FROM public_users
@@ -1644,13 +1647,16 @@ if (!function_exists('public_portal_handle_request')) {
             $emailFallback = (string)($user['username'] ?? 'member') . '+' . (int)($user['id'] ?? 0) . '@portal.local';
             $emailSafe = mysqli_real_escape_string($db, $email !== '' ? strtolower($email) : $emailFallback);
             $nicknameSql = ($displayName !== $currentDisplayName) ? ", nickname_changed_at = NOW()" : '';
+            $aboutTextSql = public_portal_column_exists($db, 'public_users', 'about_text')
+                ? ", about_text = '{$aboutTextSafe}'"
+                : '';
             mysqli_query(
                 $db,
                 "UPDATE public_users
                  SET display_name = '{$displayNameSafe}',
                      telegram_handle = '{$telegramSafe}',
-                     website_url = '{$websiteSafe}',
-                     about_text = '{$aboutTextSafe}',
+                     website_url = '{$websiteSafe}'
+                     {$aboutTextSql},
                      email = '{$emailSafe}',
                      avatar_mode = '" . ($avatarUrl !== '' ? 'upload' : 'generated') . "',
                      avatar_url = '{$avatarSafe}',
