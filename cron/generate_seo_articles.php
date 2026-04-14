@@ -5808,10 +5808,10 @@ function seo_generate_article_payload(
           . "2) JSON format:\n"
           . "{\n  \"title\": \"...\",\n  \"slug\": \"...\",\n  \"excerpt_html\": \"<p>...</p>\",\n  \"content_html\": \"...\"\n}\n"
           . "3) slug: latin letters, numbers, dashes only, 8-180 chars.\n"
-          . "4) content_html must be valid HTML with <h2>/<h3>, lists, and practical implementation details.\n"
+          . "4) content_html must be valid HTML with <h2>/<h3>, strong paragraph flow, and practical implementation details. Short lists are allowed only when they materially improve clarity.\n"
           . "5) Include at least 3 internal links from the allowed list (blog/services), including at least one /blog/ link.\n"
           . "6) Include a natural CTA to /services/.\n"
-          . "7) Cover concrete questions users search for and provide checklists, steps, anti-patterns.\n"
+          . "7) Cover concrete questions users search for and explain steps, decisions, tradeoffs and anti-patterns in editorial prose, not as list-heavy notes.\n"
           . "8) Avoid near-duplicate topics and titles from existing list.\n\n"
           . "9) Do not mention alternatives, competitors, third-party services, or external tools (including mindmap/mind map and competitor APIs).\n"
           . "10) Do not add external links. Only internal links are allowed: /blog/... and /services/...\n"
@@ -5895,6 +5895,13 @@ function seo_generate_article_payload(
             . $structure
             . "\nFollow this structure and map it to coherent H2/H3 sections.";
     }
+    $userPrompt .= "\n\nEditorial format mandate (mandatory):\n"
+        . "Write the piece as a magazine-style article, not as a stack of bullets or checklist blocks.\n"
+        . "At least 80% of the body must be normal prose paragraphs with transitions, argument flow, examples, and editorial continuity.\n"
+        . "Lists are optional and must stay short: no more than 10-20% of the total body length combined.\n"
+        . "Do not build the article as H2 followed by a list over and over.\n"
+        . "Prefer connected paragraphs, mini-cases, operator observations, comparisons, and narrative transitions.\n"
+        . "If a list is used, keep it brief and use it only for dense comparisons, criteria, or a compact recap.\n";
     $articleAppend = trim((string)($isRu
         ? ($cfg['article_user_prompt_append_ru'] ?? '')
         : ($cfg['article_user_prompt_append_en'] ?? '')
