@@ -6,6 +6,7 @@ $isRu = ($lang === 'ru');
 $journalItems = [];
 $playbookItems = [];
 $signalsItems = [];
+$reviewsItems = [];
 $funItems = [];
 $latestComments = [];
 $issue = [];
@@ -22,6 +23,7 @@ if (function_exists('examples_fetch_published_list')) {
     $journalItems = examples_fetch_published_list($FRMWRK, $host, 8, $lang, '', 'journal');
     $playbookItems = examples_fetch_published_list($FRMWRK, $host, 8, $lang, '', 'playbooks');
     $signalsItems = examples_fetch_published_list($FRMWRK, $host, 8, $lang, '', 'signals');
+    $reviewsItems = examples_fetch_published_list($FRMWRK, $host, 8, $lang, '', 'reviews');
     $funItems = examples_fetch_published_list($FRMWRK, $host, 8, $lang, '', 'fun');
 }
 
@@ -29,6 +31,7 @@ if (function_exists('examples_popularity_attach_views')) {
     $journalItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'journal', (array)$journalItems);
     $playbookItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'playbooks', (array)$playbookItems);
     $signalsItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'signals', (array)$signalsItems);
+    $reviewsItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'reviews', (array)$reviewsItems);
     $funItems = examples_popularity_attach_views($FRMWRK, $host, $lang, 'fun', (array)$funItems);
 }
 
@@ -58,10 +61,11 @@ $decorateItems = static function (array $items, string $section) use ($FRMWRK): 
 $journalItems = $decorateItems((array)$journalItems, 'journal');
 $playbookItems = $decorateItems((array)$playbookItems, 'playbooks');
 $signalsItems = $decorateItems((array)$signalsItems, 'signals');
+$reviewsItems = $decorateItems((array)$reviewsItems, 'reviews');
 $funItems = $decorateItems((array)$funItems, 'fun');
 
 $heroPool = [];
-foreach ([$journalItems, $playbookItems, $signalsItems, $funItems] as $sectionItems) {
+foreach ([$journalItems, $playbookItems, $signalsItems, $reviewsItems, $funItems] as $sectionItems) {
     foreach ((array)$sectionItems as $item) {
         if (!is_array($item) || trim((string)($item['slug'] ?? '')) === '') {
             continue;
@@ -96,6 +100,7 @@ $ModelPage['home_portal'] = [
     'journal_items' => array_values((array)$journalItems),
     'playbook_items' => array_values((array)$playbookItems),
     'signals_items' => array_values((array)$signalsItems),
+    'reviews_items' => array_values((array)$reviewsItems),
     'fun_items' => array_values((array)$funItems),
     'latest_comments' => array_values((array)$latestComments),
 ];

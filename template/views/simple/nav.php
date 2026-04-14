@@ -15,6 +15,7 @@ $sectionTitles = [
     'journal' => $isRu ? 'Журнал' : 'Journal',
     'playbooks' => $isRu ? 'Практика' : 'Playbooks',
     'signals' => $isRu ? 'Повестка' : 'Signals',
+    'reviews' => $isRu ? 'Обзоры' : 'Reviews',
     'fun' => $isRu ? 'Фан' : 'Fun',
     'discussion' => $isRu ? 'Обсуждение' : 'Discussion',
 ];
@@ -22,6 +23,7 @@ $sectionBasePaths = [
     'journal' => '/journal/',
     'playbooks' => '/playbooks/',
     'signals' => '/signals/',
+    'reviews' => '/reviews/',
     'fun' => '/fun/',
     'discussion' => '/discussion/',
     'services' => '/services/',
@@ -31,6 +33,7 @@ $sectionIcons = [
     'journal' => '✦',
     'playbooks' => '⚙',
     'signals' => '⌃',
+    'reviews' => '≣',
     'fun' => '✺',
     'discussion' => '☰',
     'contact' => '✉',
@@ -45,12 +48,12 @@ if (!function_exists('examples_fetch_clusters') && defined('DIR')) {
 
 $importantTopicItems = [];
 if (function_exists('examples_fetch_published_list')) {
-    $topicSections = ['journal', 'playbooks', 'signals', 'fun'];
+    $topicSections = ['journal', 'playbooks', 'signals', 'reviews', 'fun'];
     $topicLang = $isRu ? 'ru' : 'en';
     $generalTitle = $isRu ? 'Общий' : 'General';
     $generalKey = function_exists('mb_strtolower') ? mb_strtolower($generalTitle, 'UTF-8') : strtolower($generalTitle);
-    $expandedQuota = ['journal' => 2, 'playbooks' => 2, 'signals' => 1, 'fun' => 1];
-    $collapsedQuota = ['journal' => 1, 'playbooks' => 1, 'signals' => 1, 'fun' => 1];
+    $expandedQuota = ['journal' => 2, 'playbooks' => 2, 'signals' => 1, 'reviews' => 2, 'fun' => 1];
+    $collapsedQuota = ['journal' => 1, 'playbooks' => 1, 'signals' => 1, 'reviews' => 1, 'fun' => 1];
 
     $normalizeTopicKey = static function (string $value): string {
         $value = trim((string)preg_replace('/\s+/u', ' ', $value));
@@ -168,6 +171,7 @@ $navSections = [
             ['title' => $sectionTitles['journal'], 'path' => $sectionBasePaths['journal'], 'icon' => $sectionIcons['journal']],
             ['title' => $sectionTitles['playbooks'], 'path' => $sectionBasePaths['playbooks'], 'icon' => $sectionIcons['playbooks']],
             ['title' => $sectionTitles['signals'], 'path' => $sectionBasePaths['signals'], 'icon' => $sectionIcons['signals']],
+            ['title' => $sectionTitles['reviews'], 'path' => $sectionBasePaths['reviews'], 'icon' => $sectionIcons['reviews']],
             ['title' => $sectionTitles['fun'], 'path' => $sectionBasePaths['fun'], 'icon' => $sectionIcons['fun']],
             ['title' => $sectionTitles['discussion'], 'path' => $sectionBasePaths['discussion'], 'icon' => $sectionIcons['discussion']],
             ['title' => 'Services', 'path' => '/services/', 'icon' => 'S'],

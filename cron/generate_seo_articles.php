@@ -115,7 +115,7 @@ function seo_runtime_options(): array
         }
         if (strpos($arg, '--campaign=') === 0) {
             $value = strtolower(trim(substr($arg, 11)));
-            if (in_array($value, ['journal', 'playbooks', 'signals', 'fun'], true)) {
+            if (in_array($value, ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)) {
                 $opts['campaign'] = $value;
             }
             continue;
@@ -1003,7 +1003,7 @@ function seo_article_public_url(string $lang, string $slug, string $clusterCode 
     }
     $clusterCode = examples_normalize_cluster((string)$clusterCode, $lang);
     $materialSection = strtolower(trim((string)$materialSection));
-    if (!in_array($materialSection, ['journal', 'playbooks', 'signals', 'fun'], true)) {
+    if (!in_array($materialSection, ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)) {
         $materialSection = 'journal';
     }
     $base = '/' . $materialSection . '/';
@@ -4171,7 +4171,7 @@ function seo_find_existing_exact_duplicate(
     }
 
     $hasMaterialSection = seo_table_has_column($db, 'examples_articles', 'material_section');
-    $allowedSections = ['journal', 'playbooks', 'signals', 'fun'];
+    $allowedSections = ['journal', 'playbooks', 'signals', 'reviews', 'fun'];
     $sectionSql = '';
     if ($hasMaterialSection) {
         $sectionParts = [];
@@ -4289,7 +4289,7 @@ function seo_find_existing_near_duplicate_title(
     $clusterSafe = mysqli_real_escape_string($db, $clusterCode);
     $hasClusterCode = seo_table_has_column($db, 'examples_articles', 'cluster_code');
     $hasMaterialSection = seo_table_has_column($db, 'examples_articles', 'material_section');
-    $allowedSections = ['journal', 'playbooks', 'signals', 'fun'];
+    $allowedSections = ['journal', 'playbooks', 'signals', 'reviews', 'fun'];
     $sectionSql = '';
     if ($hasMaterialSection) {
         $sectionParts = [];
@@ -4412,7 +4412,7 @@ function seo_is_duplicate_generation_error_message(string $message): bool
 function seo_duplicate_retry_attempts(array $cfg): int
 {
     $section = strtolower(trim((string)($cfg['campaign_material_section'] ?? 'journal')));
-    $fallback = in_array($section, ['signals', 'fun'], true) ? 3 : 1;
+    $fallback = in_array($section, ['signals', 'reviews', 'fun'], true) ? 3 : 1;
     return max(1, min(8, (int)($cfg['duplicate_retry_attempts'] ?? $fallback)));
 }
 
@@ -6427,7 +6427,7 @@ function seo_publish_article(
     $titleSafe = mysqli_real_escape_string($db, $title);
     $slugSafe = mysqli_real_escape_string($db, $slug);
     $clusterSafe = mysqli_real_escape_string($db, $clusterCode);
-    $materialSection = in_array((string)($cfg['campaign_material_section'] ?? 'journal'), ['journal', 'playbooks', 'signals', 'fun'], true)
+    $materialSection = in_array((string)($cfg['campaign_material_section'] ?? 'journal'), ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)
         ? (string)$cfg['campaign_material_section']
         : 'journal';
     $materialSectionSafe = mysqli_real_escape_string($db, $materialSection);
@@ -7294,6 +7294,7 @@ if (!$runtime['dry_run'] && $generated > 0) {
         $purged += page_html_cache_purge_prefix('/journal/');
         $purged += page_html_cache_purge_prefix('/playbooks/');
         $purged += page_html_cache_purge_prefix('/signals/');
+        $purged += page_html_cache_purge_prefix('/reviews/');
         $purged += page_html_cache_purge_prefix('/fun/');
     }
     seo_echo('HTML cache purge after generation: deleted=' . (int)$purged);

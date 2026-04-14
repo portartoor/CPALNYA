@@ -45,6 +45,9 @@ if (!function_exists('footer_seo_blocks_detect_section')) {
         if (strpos($path, '/signals/') === 0) {
             return 'signals';
         }
+        if (strpos($path, '/reviews/') === 0) {
+            return 'reviews';
+        }
         if (strpos($path, '/fun/') === 0) {
             return 'fun';
         }

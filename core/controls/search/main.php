@@ -68,7 +68,7 @@ $buildSearchUrl = static function (array $row, string $host): string {
     }
     $cluster = trim((string)($row['cluster_code'] ?? ''));
     $section = trim((string)($row['material_section'] ?? 'journal'));
-    if (!in_array($section, ['journal', 'playbooks', 'signals', 'fun'], true)) {
+    if (!in_array($section, ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)) {
         $section = 'journal';
     }
     if (function_exists('examples_article_url_path')) {
@@ -105,6 +105,7 @@ $decorateSearchRows = static function (array $rows) use (
         'journal' => [],
         'playbooks' => [],
         'signals' => [],
+        'reviews' => [],
         'fun' => [],
     ];
 
@@ -202,7 +203,7 @@ if (empty($searchData['items'])) {
         ? (((string)$searchData['lang'] === 'ru') ? "AND lang_code = 'ru'" : "AND lang_code = 'en'")
         : '';
     $sectionCond = $hasMaterialSection
-        ? "AND material_section IN ('journal','playbooks','signals','fun')"
+        ? "AND material_section IN ('journal','playbooks','signals','reviews','fun')"
         : '';
     $clusterSelect = (function_exists('examples_table_has_column') && examples_table_has_column($db, 'cluster_code'))
         ? 'cluster_code'
@@ -214,7 +215,7 @@ if (empty($searchData['items'])) {
 
     $fallbackRows = [];
     if ($hasMaterialSection) {
-        foreach (['journal', 'playbooks', 'signals', 'fun'] as $sectionName) {
+        foreach (['journal', 'playbooks', 'signals', 'reviews', 'fun'] as $sectionName) {
             $sectionNameSafe = mysqli_real_escape_string($db, $sectionName);
             $sectionRows = $FRMWRK->DBRecords(
                 "SELECT id, title, slug, excerpt_html, content_html, {$clusterSelect}, {$sectionSelect}{$previewSelect}

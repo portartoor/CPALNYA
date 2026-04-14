@@ -117,7 +117,7 @@ function queue_runtime_options(): array
         }
         if (strpos($arg, '--campaign=') === 0) {
             $value = strtolower(trim(substr($arg, 11)));
-            if (in_array($value, ['journal', 'playbooks', 'signals', 'fun'], true)) {
+            if (in_array($value, ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)) {
                 $opts['campaign'] = $value;
             }
             continue;
@@ -366,7 +366,7 @@ function queue_add_task(
 ): bool {
     $jobDateSafe = mysqli_real_escape_string($db, $jobDate);
     $langSafe = mysqli_real_escape_string($db, examples_normalize_lang($lang));
-    $campaignSafe = mysqli_real_escape_string($db, in_array($campaignKey, ['journal', 'playbooks', 'signals', 'fun'], true) ? $campaignKey : '');
+    $campaignSafe = mysqli_real_escape_string($db, in_array($campaignKey, ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true) ? $campaignKey : '');
     $slotIndex = max(0, $slotIndex);
     $plannedSql = $plannedAt !== null && $plannedAt !== ''
         ? "'" . mysqli_real_escape_string($db, $plannedAt) . "'"

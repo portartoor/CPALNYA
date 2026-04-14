@@ -81,6 +81,66 @@ if (!function_exists('seo_gen_settings_default')) {
                 'article_structures_en' => ['Market shock -> operator exposure -> control points -> next steps'],
                 'article_structures_ru' => ['Рыночный шок -> уязвимость оператора -> точки контроля -> следующие шаги'],
             ],
+            'reviews' => [
+                'key' => 'reviews',
+                'title' => 'Reviews',
+                'title_ru' => 'Обзоры',
+                'description' => 'Real reviews, comparisons and shortlists for affiliate tools, vendors and working stacks.',
+                'description_ru' => 'Реальные обзоры, сравнения и подборки по инструментам, поставщикам и рабочим стекам для арбитража.',
+                'material_section' => 'reviews',
+                'enabled' => true,
+                'daily_min' => 4,
+                'daily_max' => 8,
+                'max_per_run' => 3,
+                'duplicate_retry_attempts' => 2,
+                'word_min' => 1800,
+                'word_max' => 4200,
+                'seed_salt_suffix' => 'reviews',
+                'styles_en' => ['comparison review', 'tool benchmark', 'provider shortlist', 'buyer guide', 'stack review', 'field comparison'],
+                'styles_ru' => ['сравнительный обзор', 'бенчмарк инструментов', 'шортлист поставщиков', 'buyer guide', 'разбор стека', 'полевое сравнение'],
+                'clusters_en' => [
+                    'affiliate networks and partner programs',
+                    'cloaking tools and routing stacks',
+                    'tracker platforms and attribution quality',
+                    'ai generators for creatives and workflows',
+                    'server providers and hosting reliability',
+                    'domain registrars and domain vendors',
+                    'anti-detect browsers and operator environments',
+                    'spy tools and ad intelligence suites',
+                    'proxy providers and mobile proxy pools',
+                    'landing builders and page infrastructure',
+                    'payment tools and routing helpers',
+                    'telegram tools and team utilities',
+                ],
+                'clusters_ru' => [
+                    'партнерки и affiliate-сети',
+                    'клоаки и routing-стеки',
+                    'трекеры и качество атрибуции',
+                    'ИИ-генераторы для креативов и workflow',
+                    'серверные провайдеры и надежность хостинга',
+                    'регистраторы доменов и доменные поставщики',
+                    'anti-detect браузеры и среда оператора',
+                    'spy-сервисы и ad-intelligence наборы',
+                    'proxy-поставщики и mobile proxy-пулы',
+                    'конструкторы лендингов и инфраструктура страниц',
+                    'платежные сервисы и routing helpers',
+                    'Telegram-инструменты и утилиты команды',
+                ],
+                'article_structures_en' => [
+                    'Category -> evaluation criteria -> shortlist -> comparison table -> recommendation',
+                    'Use case -> stack candidates -> benchmarks -> tradeoffs -> verdict',
+                    'Problem -> providers -> strengths and weaknesses -> risk notes -> best fit',
+                ],
+                'article_structures_ru' => [
+                    'Категория -> критерии оценки -> шортлист -> таблица сравнения -> рекомендация',
+                    'Use-case -> кандидаты в стек -> бенчмарки -> tradeoff -> вердикт',
+                    'Проблема -> провайдеры -> сильные и слабые стороны -> риски -> лучший fit',
+                ],
+                'article_system_prompt_en' => '',
+                'article_system_prompt_ru' => '',
+                'article_user_prompt_append_en' => 'Write real reviews, comparisons and curated shortlists for affiliate operators. Compare tools and vendors by concrete criteria: routing reliability, moderation resilience, attribution quality, pricing logic, onboarding friction, geo-fit, support quality, scaling limits, hidden risks and who each option is actually for. External resources are allowed when useful.',
+                'article_user_prompt_append_ru' => 'Пиши реальные обзоры, сравнения и подборки для affiliate-операторов. Сравнивай инструменты и поставщиков по конкретным критериям: надежность routing, устойчивость под модерацией, качество атрибуции, логика цен, сложность онбординга, fit по гео, качество саппорта, ограничения по масштабу, скрытые риски и для кого подходит каждый вариант. В этом разделе допустимы ссылки на сторонние ресурсы, если они помогают обзору.',
+            ],
             'fun' => [
                 'styles_en' => ['dark comedy note', 'absurd dispatch', 'team mythology sketch', 'mock memo', 'tragicomedy review', 'ritual notebook'],
                 'styles_ru' => ['темная комедия', 'абсурдный dispatch', 'набросок командной мифологии', 'mock memo', 'трагикомический обзор', 'ритуальный блокнот'],
@@ -372,7 +432,7 @@ if (!function_exists('seo_gen_settings_default')) {
         foreach ($defaults as $key => $default) {
             $row = array_merge($default, is_array($raw[$key] ?? null) ? $raw[$key] : []);
             $row['key'] = $key;
-            $row['material_section'] = in_array((string)($row['material_section'] ?? $key), ['journal', 'playbooks', 'signals', 'fun'], true)
+            $row['material_section'] = in_array((string)($row['material_section'] ?? $key), ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)
                 ? (string)$row['material_section']
                 : $key;
             $row['enabled'] = !empty($row['enabled']);

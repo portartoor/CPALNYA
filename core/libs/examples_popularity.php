@@ -4,7 +4,7 @@ if (!function_exists('examples_popularity_normalize_section')) {
     function examples_popularity_normalize_section(string $materialSection): string
     {
         $materialSection = strtolower(trim($materialSection));
-        if (in_array($materialSection, ['journal', 'playbooks', 'signals', 'fun'], true)) {
+        if (in_array($materialSection, ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)) {
             return $materialSection;
         }
         return 'journal';
@@ -207,7 +207,7 @@ if (!function_exists('examples_popularity_fetch_top_clusters_global')) {
              FROM examples_cluster_popularity_cache
              WHERE (domain_host = '{$hostSafe}' OR domain_host = '')
                AND lang_code = '{$langSafe}'
-               AND material_section IN ('journal','playbooks','signals','fun')
+               AND material_section IN ('journal','playbooks','signals','reviews','fun')
                AND COALESCE(cluster_code, '') <> ''
              GROUP BY material_section, cluster_code, cluster_label
              ORDER BY views_count DESC, cluster_label ASC, cluster_code ASC

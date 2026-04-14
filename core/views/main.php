@@ -8,6 +8,7 @@ $heroFeature = is_array($home['hero_feature'] ?? null) ? $home['hero_feature'] :
 $journalItems = array_values((array)($home['journal_items'] ?? []));
 $playbookItems = array_values((array)($home['playbook_items'] ?? []));
 $signalsItems = array_values((array)($home['signals_items'] ?? []));
+$reviewsItems = array_values((array)($home['reviews_items'] ?? []));
 $funItems = array_values((array)($home['fun_items'] ?? []));
 $latestComments = array_values((array)($home['latest_comments'] ?? []));
 $cover = $journalItems[0] ?? null;
@@ -29,6 +30,7 @@ $buildArticleUrl = static function (array $item, string $section): string {
         'journal' => '/journal/',
         'playbooks' => '/playbooks/',
         'signals' => '/signals/',
+        'reviews' => '/reviews/',
         'fun' => '/fun/',
     ];
     if ($slug === '') {
@@ -147,6 +149,8 @@ $heroSectionTitles = [
 .home-z-card-stats{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 .home-z-stat-icon{width:15px;height:15px;display:block;flex:0 0 15px;opacity:.86}
 .home-z-comments{padding:24px;display:grid;gap:18px}
+.home-z-block-wide{grid-column:1/-1}
+.home-z-block-wide .home-z-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 .home-z-join{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:18px;padding:24px;border:1px solid rgba(122,180,255,.16);background:linear-gradient(180deg,rgba(10,18,34,.92),rgba(6,12,24,.82));box-shadow:var(--shell-shadow)}
 .home-z-join-copy{display:grid;gap:12px;align-content:start}
 .home-z-join-copy p{margin:0;color:var(--shell-muted);line-height:1.68;max-width:70ch}
@@ -184,6 +188,7 @@ $heroSectionTitles = [
     .home-z-feature{grid-template-columns:1fr}
     .home-z-feature-media{width:100%;aspect-ratio:16/10}
     .home-z-card{grid-template-columns:1fr}
+    .home-z-block-wide .home-z-list{grid-template-columns:1fr}
     .home-z-card-media-wrap{width:100%}
     .home-z-card-media{width:100%;aspect-ratio:1/1}
     .home-z-comments-grid{grid-template-columns:1fr}
@@ -405,6 +410,43 @@ $heroSectionTitles = [
                                     </span>
                                 </div>
                                 <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 150), ENT_QUOTES, 'UTF-8') ?></p>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+            <section class="home-z-block home-z-block-wide">
+                <div class="home-z-block-head">
+                    <div class="home-z-block-title">
+                        <span class="home-z-tag"><?= htmlspecialchars($t('Обзоры', 'Reviews'), ENT_QUOTES, 'UTF-8') ?></span>
+                        <h2><?= htmlspecialchars($t('Реальные сравнения и подборки', 'Real comparisons and shortlists'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    </div>
+                    <a class="home-z-block-link" href="/reviews/"><?= htmlspecialchars($t('Все материалы', 'All materials'), ENT_QUOTES, 'UTF-8') ?></a>
+                </div>
+                <div class="home-z-list">
+                    <?php foreach (array_slice($reviewsItems, 0, 4) as $item): ?>
+                        <?php $cardImage = $imageSrc((array)$item); ?>
+                        <?php $cardDate = $formatDate((array)$item); ?>
+                        <a class="home-z-card" href="<?= htmlspecialchars($buildArticleUrl((array)$item, 'reviews'), ENT_QUOTES, 'UTF-8') ?>">
+                            <div class="home-z-card-media-wrap">
+                                <?php if ($cardDate !== ''): ?>
+                                    <p class="home-z-meta"><?= htmlspecialchars($cardDate, ENT_QUOTES, 'UTF-8') ?></p>
+                                <?php endif; ?>
+                                <div class="home-z-card-media">
+                                    <?php if ($cardImage !== ''): ?>
+                                        <img src="<?= htmlspecialchars($cardImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="home-z-card-copy">
+                                <div class="home-z-card-head">
+                                    <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
+                                    <span class="home-z-card-stats">
+                                        <span class="home-z-stat"><?= $statIcon('eye') ?><?= (int)($item['view_count'] ?? 0) ?></span>
+                                        <span class="home-z-stat"><?= $statIcon('comments') ?><?= (int)($item['comment_count'] ?? 0) ?></span>
+                                    </span>
+                                </div>
+                                <p><?= htmlspecialchars($excerpt((string)($item['excerpt_html'] ?? $item['content_html'] ?? ''), 170), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
                         </a>
                     <?php endforeach; ?>

@@ -520,7 +520,7 @@ if (!function_exists('public_portal_article_url')) {
     function public_portal_article_url(array $article): string
     {
         $section = trim((string)($article['material_section'] ?? 'journal'));
-        if (!in_array($section, ['journal', 'playbooks', 'signals', 'fun'], true)) {
+        if (!in_array($section, ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)) {
             $section = 'journal';
         }
         $slug = trim((string)($article['slug'] ?? ''));

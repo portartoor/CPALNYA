@@ -11,7 +11,7 @@ if (is_file(DIR . 'core/libs/cpalnya_authors.php')) {
 }
 
 $db = $FRMWRK->DB();
-$allowedSections = ['journal', 'playbooks', 'signals', 'fun'];
+$allowedSections = ['journal', 'playbooks', 'signals', 'reviews', 'fun'];
 $sectionLabels = $isRu
     ? ['journal' => 'Журнал', 'playbooks' => 'Практика', 'signals' => 'Повестка', 'fun' => 'Фан']
     : ['journal' => 'Journal', 'playbooks' => 'Playbooks', 'signals' => 'Signals', 'fun' => 'Fun'];
@@ -132,7 +132,7 @@ if (
     if ($hasSectionColumn) {
         $articleWhere .= $sectionParam !== ''
             ? " AND a.material_section = '" . mysqli_real_escape_string($db, $sectionParam) . "'"
-            : " AND a.material_section IN ('journal','playbooks','signals','fun')";
+            : " AND a.material_section IN ('journal','playbooks','signals','reviews','fun')";
     }
     $commentStatsSql = "
         SELECT

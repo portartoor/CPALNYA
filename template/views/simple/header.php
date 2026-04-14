@@ -11,7 +11,7 @@ $logoAria = $logoMain . ' portal';
 $requestPath = parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 $requestPath = is_string($requestPath) && $requestPath !== '' ? $requestPath : '/';
 $firstSegment = strtolower((string)(explode('/', trim($requestPath, '/'))[0] ?? ''));
-$section = in_array($firstSegment, ['blog', 'journal', 'playbooks', 'signals', 'fun', 'discussion', 'services', 'search', 'contact', 'audit', 'account', 'member'], true) ? $firstSegment : 'home';
+$section = in_array($firstSegment, ['blog', 'journal', 'playbooks', 'signals', 'reviews', 'fun', 'discussion', 'services', 'search', 'contact', 'audit', 'account', 'member'], true) ? $firstSegment : 'home';
 if ($section === 'blog') {
     $section = 'journal';
 }
@@ -111,7 +111,7 @@ $canonical = $scheme . '://' . $canonicalHost . $canonicalPath;
 $ruHost = $canonicalHost;
 $enHost = $canonicalHost;
 $selfLang = $isRu ? 'ru' : 'en';
-$isEquivalentPath = in_array($canonicalPath, ['/', '/journal/', '/playbooks/', '/signals/', '/fun/', '/discussion/', '/services/', '/contact/', '/audit/', '/privacy/', '/terms/'], true);
+$isEquivalentPath = in_array($canonicalPath, ['/', '/journal/', '/playbooks/', '/signals/', '/reviews/', '/fun/', '/discussion/', '/services/', '/contact/', '/audit/', '/privacy/', '/terms/'], true);
 $hreflangLinks = [];
 $hreflangLinks[] = ['lang' => $selfLang, 'href' => $canonical];
 if ($isEquivalentPath) {
@@ -304,7 +304,7 @@ if (!function_exists('header_search_preview_results')) {
             ? "AND lang_code = '" . mysqli_real_escape_string($db, $lang) . "'"
             : '';
         $sectionCond = function_exists('examples_table_has_column') && examples_table_has_column($db, 'material_section')
-            ? "AND material_section IN ('journal','playbooks','signals','fun')"
+            ? "AND material_section IN ('journal','playbooks','signals','reviews','fun')"
             : '';
         $clusterSelect = (function_exists('examples_table_has_column') && examples_table_has_column($db, 'cluster_code'))
             ? 'cluster_code'
@@ -348,7 +348,7 @@ if (!function_exists('header_search_preview_results')) {
                 continue;
             }
             $section = trim((string)($row['material_section'] ?? 'journal'));
-            if (!in_array($section, ['journal', 'playbooks', 'signals', 'fun'], true)) {
+            if (!in_array($section, ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)) {
                 $section = 'journal';
             }
             $cluster = trim((string)($row['cluster_code'] ?? ''));
@@ -1712,11 +1712,11 @@ if (isset($_GET['header_search_preview'])) {
     var previewAbort = null;
     var previewItems = [];
     var previewActiveIndex = -1;
-    var previewSectionOrder = ['journal', 'playbooks', 'signals', 'fun'];
+    var previewSectionOrder = ['journal', 'playbooks', 'signals', 'reviews', 'fun'];
     var searchPreviewUrl = <?= json_encode($canonicalPath . '?header_search_preview=1', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
     var sectionLabels = <?= json_encode($isRu
-        ? ['journal' => 'Журнал', 'playbooks' => 'Практика', 'signals' => 'Повестка', 'fun' => 'Фан']
-        : ['journal' => 'Journal', 'playbooks' => 'Playbooks', 'signals' => 'Signals', 'fun' => 'Fun'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+        ? ['journal' => 'Журнал', 'playbooks' => 'Практика', 'signals' => 'Повестка', 'reviews' => 'Обзоры', 'fun' => 'Фан']
+        : ['journal' => 'Journal', 'playbooks' => 'Playbooks', 'signals' => 'Signals', 'reviews' => 'Reviews', 'fun' => 'Fun'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
     var placeholders = <?= json_encode($isRu
         ? ["Поиск: Facebook farm, антидетект, tracker setup, nutra funnel", "Поиск: TikTok creatives, BM risk, cloaking, iGaming flow", "Поиск: прогрев аккаунтов, sweepstakes, crypto angles, team SOP"]
         : ["Search: Facebook farm, anti-detect, tracker setup, nutra funnel", "Search: TikTok creatives, BM risk, cloaking, iGaming flow", "Search: account warmup, sweepstakes, crypto angles, team SOP"], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;

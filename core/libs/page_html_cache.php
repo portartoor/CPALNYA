@@ -44,6 +44,7 @@ if (!function_exists('page_html_cache_defaults')) {
                 '/journal/' => 600,
                 '/playbooks/' => 600,
                 '/signals/' => 300,
+                '/reviews/' => 300,
                 '/fun/' => 300,
                 '/discussion/' => 300,
                 '/services/' => 900,
@@ -595,6 +596,7 @@ if (!function_exists('page_html_cache_purge_content_routes')) {
             '/journal/',
             '/playbooks/',
             '/signals/',
+            '/reviews/',
             '/fun/',
             '/discussion/',
         ];
