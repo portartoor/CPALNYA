@@ -631,11 +631,11 @@ $issueSubtitle = trim((string)$issueSubtitle) !== '' ? (string)$issueSubtitle : 
         <?php else: ?>
             <header class="jrnl-hero">
                 <div class="jrnl-copy">
-                    <span class="jrnl-kicker"><?= htmlspecialchars($heroKicker, ENT_QUOTES, 'UTF-8') ?></span>
-                    <h1><?= htmlspecialchars($heroTitle, ENT_QUOTES, 'UTF-8') ?></h1>
-                    <?= $renderIssueText($heroDescription, 'jrnl-hero-description') ?>
-                    <h2><?= htmlspecialchars($issueTitle, ENT_QUOTES, 'UTF-8') ?></h2>
-                    <?= $renderIssueText($issueSubtitle, 'jrnl-issue-subtitle') ?>
+                    <span class="jrnl-kicker"><?= htmlspecialchars(trim((string)$heroKicker) !== '' ? (string)$heroKicker : $t('PLAYBOOKS / ПРАКТИКА', 'PLAYBOOKS / PRACTICE'), ENT_QUOTES, 'UTF-8') ?></span>
+                    <h1><?= htmlspecialchars(trim((string)$heroTitle) !== '' ? (string)$heroTitle : $t('Практические playbooks для арбитражных команд', 'Operational playbooks for affiliate teams'), ENT_QUOTES, 'UTF-8') ?></h1>
+                    <?= $renderIssueText(trim((string)$heroDescription) !== '' ? (string)$heroDescription : $t('Раздел для команд, которые строят affiliate-операционку не на удаче, а на повторяемых системах: setup-процедурах, handoff-сценариях, tracking-дисциплине, creative review loop и rollback-логике.', 'A section for teams building affiliate operations around repeatable systems: setups, handoffs, tracking discipline, creative loops and rollback logic.'), 'jrnl-hero-description') ?>
+                    <h2><?= htmlspecialchars(trim((string)$issueTitle) !== '' ? (string)$issueTitle : $t('Навигатор по backstage-операционке', 'Backstage operations index'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <?= $renderIssueText(trim((string)$issueSubtitle) !== '' ? (string)$issueSubtitle : $t('How-to заметки, troubleshooting-разборы и рабочие playbooks для баеров, фармеров, tracking-операторов и creative-команд.', 'How-to notes, troubleshooting breakdowns and working playbooks for buyers, farmers, tracking operators and creative teams.'), 'jrnl-issue-subtitle') ?>
                 </div>
                 <div class="jrnl-cover">
                     <?php if ($issueImage !== ''): ?><img src="<?= htmlspecialchars($issueImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($issueTitle, ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?>
