@@ -364,6 +364,17 @@ if ($sectionKey !== 'playbooks') {
     $issueTitle = trim((string)($issue['issue_title'] ?? '')) !== '' ? (string)$issue['issue_title'] : $issueTitle;
     $issueSubtitle = trim((string)($issue['issue_subtitle'] ?? '')) !== '' ? (string)$issue['issue_subtitle'] : $issueSubtitle;
 }
+$heroKicker = trim((string)$heroKicker) !== '' ? (string)$heroKicker : $t('PLAYBOOKS / ПРАКТИКА', 'PLAYBOOKS / PRACTICE');
+$heroTitle = trim((string)$heroTitle) !== '' ? (string)$heroTitle : $t('Практические playbooks для арбитражных команд', 'Operational playbooks for affiliate teams');
+$heroDescription = trim((string)$heroDescription) !== '' ? (string)$heroDescription : $t(
+    'Раздел для команд, которые строят affiliate-операционку не на удаче, а на повторяемых системах: setup-процедурах, handoff-сценариях, tracking-дисциплине, creative review loop и rollback-логике.',
+    'A section for teams building affiliate operations around repeatable systems: setups, handoffs, tracking discipline, creative loops and rollback logic.'
+);
+$issueTitle = trim((string)$issueTitle) !== '' ? (string)$issueTitle : $t('Навигатор по backstage-операционке', 'Backstage operations index');
+$issueSubtitle = trim((string)$issueSubtitle) !== '' ? (string)$issueSubtitle : $t(
+    'How-to заметки, troubleshooting-разборы и рабочие playbooks для баеров, фармеров, tracking-операторов и creative-команд.',
+    'How-to notes, troubleshooting breakdowns and working playbooks for buyers, farmers, tracking operators and creative teams.'
+);
 ?>
 <style>
 .jrnl{max-width:1240px;margin:0 auto;padding:28px 18px 64px;color:var(--shell-text)}
