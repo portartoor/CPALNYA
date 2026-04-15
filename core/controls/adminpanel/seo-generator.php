@@ -241,7 +241,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                         WHERE id = {$queueId} AND job_date = '{$jobDateSafe}'
                         LIMIT 1";
                 if (mysqli_query($DB, $sql)) {
-                    if ($hasCronRunsTable && $slotIndex > 0 && in_array($campaignKey, ['journal', 'playbooks', 'signals', 'fun'], true)) {
+                    if ($hasCronRunsTable && $slotIndex > 0 && in_array($campaignKey, ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)) {
                         $campaignSafe = mysqli_real_escape_string($DB, $campaignKey);
                         $langSafe = mysqli_real_escape_string($DB, $langCode);
                         mysqli_query(
@@ -447,7 +447,7 @@ if ($hasCronRunsTable) {
             {$joinArticle}
             WHERE r.job_date = '{$dateSafe}'
             ORDER BY
-                CASE r.campaign_key WHEN 'journal' THEN 1 WHEN 'playbooks' THEN 2 WHEN 'signals' THEN 3 WHEN 'fun' THEN 4 ELSE 9 END,
+                CASE r.campaign_key WHEN 'journal' THEN 1 WHEN 'playbooks' THEN 2 WHEN 'signals' THEN 3 WHEN 'reviews' THEN 4 WHEN 'fun' THEN 5 ELSE 9 END,
                 r.lang_code ASC, r.slot_index ASC, r.id ASC";
     $res = mysqli_query($DB, $sql);
     if ($res) {
@@ -465,7 +465,7 @@ if ($hasQueueTable) {
             FROM seo_article_generation_queue
             WHERE job_date = '{$dateSafe}'
             ORDER BY
-                CASE campaign_key WHEN 'journal' THEN 1 WHEN 'playbooks' THEN 2 WHEN 'signals' THEN 3 WHEN 'fun' THEN 4 ELSE 9 END,
+                CASE campaign_key WHEN 'journal' THEN 1 WHEN 'playbooks' THEN 2 WHEN 'signals' THEN 3 WHEN 'reviews' THEN 4 WHEN 'fun' THEN 5 ELSE 9 END,
                 planned_at ASC,
                 slot_index ASC,
                 id ASC";
