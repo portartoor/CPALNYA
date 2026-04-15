@@ -50,7 +50,7 @@
         .wiz-help { font-size: 12px; color: #6c757d; }
         .wiz-invalid { border-color: #dc3545 !important; }
         .wiz-progress { height: 8px; background: #e9ecef; border-radius: 999px; overflow: hidden; }
-        .wiz-progress > span { display: block; height: 100%; width: 16.6%; background: linear-gradient(90deg,#0d6efd,#00a3ff); transition: width .2s ease; }
+        .wiz-progress > span { display: block; height: 100%; width: 14.3%; background: linear-gradient(90deg,#0d6efd,#00a3ff); transition: width .2s ease; }
     </style>
 
     <div class="card wiz-wrap">
@@ -61,7 +61,7 @@
                     <div class="wiz-help">Grouped settings, side tabs, validation and step navigation.</div>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                    <span class="badge text-bg-light border" id="wizStepBadge">Step 1/6</span>
+                    <span class="badge text-bg-light border" id="wizStepBadge">Step 1/7</span>
                     <button class="btn btn-sm btn-outline-secondary" type="button" id="wizValidate">Validate</button>
                 </div>
             </div>
@@ -74,11 +74,12 @@
                     <div class="col-lg-3">
                         <div class="nav flex-column nav-pills" id="wizNav" role="tablist">
                             <button class="nav-link active" data-step="0" data-bs-toggle="pill" data-bs-target="#wiz-core" type="button"><i class="ti ti-adjustments me-1"></i> 1. Core</button>
-                            <button class="nav-link" data-step="1" data-bs-toggle="pill" data-bs-target="#wiz-provider" type="button"><i class="ti ti-key me-1"></i> 2. Provider/API</button>
-                            <button class="nav-link" data-step="2" data-bs-toggle="pill" data-bs-target="#wiz-topics" type="button"><i class="ti ti-bulb me-1"></i> 3. Topics</button>
-                            <button class="nav-link" data-step="3" data-bs-toggle="pill" data-bs-target="#wiz-prompts" type="button"><i class="ti ti-message-2-code me-1"></i> 4. Prompts</button>
-                            <button class="nav-link" data-step="4" data-bs-toggle="pill" data-bs-target="#wiz-preview" type="button"><i class="ti ti-photo-cog me-1"></i> 5. Preview/Graphics</button>
-                            <button class="nav-link" data-step="5" data-bs-toggle="pill" data-bs-target="#wiz-review" type="button"><i class="ti ti-device-floppy me-1"></i> 6. Save</button>
+                            <button class="nav-link" data-step="1" data-bs-toggle="pill" data-bs-target="#wiz-campaigns" type="button"><i class="ti ti-layers-intersect me-1"></i> 2. Campaigns</button>
+                            <button class="nav-link" data-step="2" data-bs-toggle="pill" data-bs-target="#wiz-provider" type="button"><i class="ti ti-key me-1"></i> 3. Provider/API</button>
+                            <button class="nav-link" data-step="3" data-bs-toggle="pill" data-bs-target="#wiz-topics" type="button"><i class="ti ti-bulb me-1"></i> 4. Topics</button>
+                            <button class="nav-link" data-step="4" data-bs-toggle="pill" data-bs-target="#wiz-prompts" type="button"><i class="ti ti-message-2-code me-1"></i> 5. Prompts</button>
+                            <button class="nav-link" data-step="5" data-bs-toggle="pill" data-bs-target="#wiz-preview" type="button"><i class="ti ti-photo-cog me-1"></i> 6. Preview/Graphics</button>
+                            <button class="nav-link" data-step="6" data-bs-toggle="pill" data-bs-target="#wiz-review" type="button"><i class="ti ti-device-floppy me-1"></i> 7. Save</button>
                         </div>
                     </div>
                     <div class="col-lg-9">
@@ -123,9 +124,19 @@
                                         <div class="col-md-12"><label class="form-label">IndexNow Hosts (one per line)</label><textarea class="form-control" rows="3" name="indexnow_hosts"><?= htmlspecialchars(implode("\n", (array)($s['indexnow_hosts'] ?? []))) ?></textarea></div>
                                         <div class="col-12"><hr class="my-1"></div>
                                         <div class="col-12">
-                                            <div class="wiz-title mb-0"><i class="ti ti-layers-intersect"></i> Campaigns</div>
-                                            <div class="wiz-help mb-3">Five independent generation campaigns for ЦПАЛЬНЯ. Global provider, proxy, preview and image settings are shared. Each campaign controls section, limits, topics and writing behavior.</div>
+                                            <div class="alert alert-light border mb-0">
+                                                Campaign-specific settings are now in the separate <b>Campaigns</b> tab, so each rubric is easier to find and edit.
+                                            </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="wiz-campaigns">
+                                <div class="wiz-pane">
+                                    <div class="wiz-title"><i class="ti ti-layers-intersect"></i> Campaigns / Rubrics</div>
+                                    <div class="wiz-help mb-3">Five independent generation campaigns for ЦПАЛЬНЯ. Each rubric controls its own section, limits, topics and writing behavior.</div>
+                                    <div class="row g-3">
                                         <?php foreach ($campaigns as $campaignKey => $campaign): ?>
                                             <?php $prefix = 'campaign_' . $campaignKey . '_'; ?>
                                             <div class="col-12">
