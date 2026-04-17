@@ -111,12 +111,6 @@
         }
     }
     $campaigns = $orderedCampaigns;
-    $campaigns = array_intersect_key($campaigns, $rawCampaigns);
-    $campaignFallbackFlags = [];
-    foreach ($campaigns as $campaignKey => $_campaignRow) {
-        $campaignFallbackFlags[$campaignKey] = false;
-    }
-    $hasCampaignFallback = false;
     ?>
     <style>
         .wiz-wrap .nav-link { border: 1px solid #e9ecef; margin-bottom: 8px; text-align: left; border-radius: 10px; }

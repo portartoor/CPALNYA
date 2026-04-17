@@ -581,11 +581,18 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
         $rawCampaigns = is_array($seoGeneratorSettings['__raw_campaigns'] ?? null) ? $seoGeneratorSettings['__raw_campaigns'] : [];
         $normalizedCampaigns = is_array($seoGeneratorSettings['campaigns'] ?? null) ? $seoGeneratorSettings['campaigns'] : [];
+        $campaignDefaults = function_exists('seo_gen_default_campaigns')
+            ? seo_gen_default_campaigns()
+            : [];
+        $campaignKeys = function_exists('seo_gen_allowed_campaign_keys')
+            ? seo_gen_allowed_campaign_keys()
+            : array_keys($normalizedCampaigns);
         $incomingCampaigns = [];
-        foreach ($rawCampaigns as $campaignKey => $rawCampaign) {
+        foreach ($campaignKeys as $campaignKey) {
+            $rawCampaign = is_array($rawCampaigns[$campaignKey] ?? null) ? $rawCampaigns[$campaignKey] : [];
             $campaignDefault = is_array($normalizedCampaigns[$campaignKey] ?? null)
                 ? $normalizedCampaigns[$campaignKey]
-                : (is_array($rawCampaign) ? $rawCampaign : []);
+                : (is_array($campaignDefaults[$campaignKey] ?? null) ? $campaignDefaults[$campaignKey] : $rawCampaign);
             $prefix = 'campaign_' . $campaignKey . '_';
             $incomingCampaigns[$campaignKey] = [
                 'key' => $campaignKey,
@@ -617,6 +624,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
         if (seo_gen_settings_save($DB, $incoming, (int)($adminpanelUser['id'] ?? 0))) {
             $seoGeneratorSettings = seo_gen_settings_get($DB);
+            $seoGeneratorSettingsRaw = function_exists('seo_gen_settings_get_raw') ? seo_gen_settings_get_raw($DB) : [];
+            $seoGeneratorSettings['__raw_campaigns'] = is_array($seoGeneratorSettingsRaw['campaigns'] ?? null) ? $seoGeneratorSettingsRaw['campaigns'] : [];
             $message = 'SEO generator settings saved.';
             $messageType = 'success';
         } else {
