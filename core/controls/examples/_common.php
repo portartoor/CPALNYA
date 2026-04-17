@@ -57,6 +57,9 @@ if (!function_exists('examples_section_base')) {
         if ($materialSection === 'signals') {
             return '/signals';
         }
+        if ($materialSection === 'reviews') {
+            return '/reviews';
+        }
         if ($materialSection === 'fun') {
             return '/fun';
         }
@@ -737,46 +740,17 @@ if (!function_exists('examples_fetch_clusters')) {
             ? " AND material_section = '" . mysqli_real_escape_string($db, $materialSection) . "'"
             : '';
 
-        $rows = [];
-        $cacheTableExists = false;
-        $cacheTableCheck = @mysqli_query(
-            $db,
-            "SELECT 1
-             FROM information_schema.TABLES
-             WHERE TABLE_SCHEMA = DATABASE()
-               AND TABLE_NAME = 'examples_cluster_popularity_cache'
-             LIMIT 1"
+        $rows = $FRMWRK->DBRecords(
+            "SELECT cluster_code, COUNT(*) AS cnt
+             FROM examples_articles
+             WHERE is_published = 1
+               AND COALESCE(cluster_code, '') <> ''
+               AND (domain_host IS NULL OR domain_host = '' OR domain_host = '{$hostSafe}')
+               {$langCond}{$sectionWhere}
+             GROUP BY cluster_code
+             ORDER BY cnt DESC, cluster_code ASC
+             LIMIT 50"
         );
-        if ($cacheTableCheck && mysqli_num_rows($cacheTableCheck) > 0) {
-            $cacheTableExists = true;
-        }
-
-        if ($cacheTableExists) {
-            $rows = $FRMWRK->DBRecords(
-                "SELECT cluster_code, views_count AS cnt
-                 FROM examples_cluster_popularity_cache
-                 WHERE COALESCE(cluster_code, '') <> ''
-                   AND (domain_host = '' OR domain_host = '{$hostSafe}')
-                   " . (examples_table_has_lang_column($db) ? ($lang === 'ru' ? "AND lang_code = 'ru'" : "AND lang_code = 'en'") : '') . "
-                   " . (($materialSection !== '') ? "AND material_section = '" . mysqli_real_escape_string($db, $materialSection) . "'" : '') . "
-                 ORDER BY views_count DESC, cluster_code ASC
-                 LIMIT 50"
-            );
-        }
-
-        if (empty($rows)) {
-            $rows = $FRMWRK->DBRecords(
-                "SELECT cluster_code, COUNT(*) AS cnt
-                 FROM examples_articles
-                 WHERE is_published = 1
-                   AND COALESCE(cluster_code, '') <> ''
-                   AND (domain_host IS NULL OR domain_host = '' OR domain_host = '{$hostSafe}')
-                   {$langCond}{$sectionWhere}
-                 GROUP BY cluster_code
-                 ORDER BY cnt DESC, cluster_code ASC
-                 LIMIT 50"
-            );
-        }
         $out = [];
         foreach ($rows as $row) {
             $code = trim((string)($row['cluster_code'] ?? ''));

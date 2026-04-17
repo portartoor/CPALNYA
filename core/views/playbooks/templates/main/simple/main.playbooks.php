@@ -239,15 +239,28 @@ $clusterLabelByCode = static function (string $clusterCode) use ($clusters): str
     $fallback = str_replace(['-', '_'], ' ', $clusterCode);
     return trim(mb_convert_case($fallback, MB_CASE_TITLE, 'UTF-8'));
 };
-$sectionCrumbLabel = isset($issueTitle) && trim((string)$issueTitle) !== ''
+$sectionCrumbLabel = $t("\u{0416}\u{0443}\u{0440}\u{043D}\u{0430}\u{043B}", 'Journal');
+$sectionIssueLabel = isset($issueTitle) && trim((string)$issueTitle) !== ''
     ? trim((string)$issueTitle)
-    : $t('Журнал', 'Journal');
+    : $sectionCrumbLabel;
+$sectionArticleLabel = $t("\u{0421}\u{0442}\u{0430}\u{0442}\u{044C}\u{044F}", 'Article');
+$breadcrumbsAriaLabel = $t("\u{0425}\u{043B}\u{0435}\u{0431}\u{043D}\u{044B}\u{0435} \u{043A}\u{0440}\u{043E}\u{0448}\u{043A}\u{0438}", 'Breadcrumbs');
 if ($sectionKey === 'playbooks') {
-    $sectionCrumbLabel = $t('Практика', 'Playbooks');
+    $sectionCrumbLabel = $t("\u{041F}\u{0440}\u{0430}\u{043A}\u{0442}\u{0438}\u{043A}\u{0430}", 'Playbooks');
+    $sectionArticleLabel = $t("\u{041C}\u{0430}\u{0442}\u{0435}\u{0440}\u{0438}\u{0430}\u{043B}", 'Article');
 } elseif ($sectionKey === 'signals') {
-    $sectionCrumbLabel = $t('Повестка', 'Signals');
+    $sectionCrumbLabel = $t("\u{041F}\u{043E}\u{0432}\u{0435}\u{0441}\u{0442}\u{043A}\u{0430}", 'Signals');
+    $sectionArticleLabel = $t("\u{0421}\u{0438}\u{0433}\u{043D}\u{0430}\u{043B}", 'Signal');
+} elseif ($sectionKey === 'reviews') {
+    $sectionCrumbLabel = $t("\u{041E}\u{0431}\u{0437}\u{043E}\u{0440}\u{044B}", 'Reviews');
+    $sectionArticleLabel = $t("\u{041E}\u{0431}\u{0437}\u{043E}\u{0440}", 'Review');
 } elseif ($sectionKey === 'fun') {
-    $sectionCrumbLabel = $t('Фан', 'Fun');
+    $sectionCrumbLabel = $t("\u{0424}\u{0430}\u{043D}", 'Fun');
+    $sectionArticleLabel = $t("\u{041C}\u{0430}\u{0442}\u{0435}\u{0440}\u{0438}\u{0430}\u{043B}", 'Piece');
+}
+$detailKickerLabel = trim((string)($issue['issue_title'] ?? ''));
+if ($detailKickerLabel === '') {
+    $detailKickerLabel = $sectionIssueLabel !== '' ? $sectionIssueLabel : $sectionCrumbLabel;
 }
 $selectedClusterCode = trim((string)($selected['cluster_code'] ?? ''));
 $selectedClusterLabel = $clusterLabelByCode($selectedClusterCode);
@@ -312,7 +325,7 @@ if ($selected) {
         ];
     }
     $detailBreadcrumbs[] = [
-        'label' => $selectedShareTitle !== '' ? $selectedShareTitle : $t('������', 'Article'),
+        'label' => $selectedShareTitle !== '' ? $selectedShareTitle : $sectionArticleLabel,
         'url' => '',
     ];
 }
@@ -516,7 +529,7 @@ $issueSubtitle = trim((string)$issueSubtitle) !== '' ? (string)$issueSubtitle : 
             <article class="jrnl-detail">
                 <div class="jrnl-detail-top">
                     <?php if (!empty($detailBreadcrumbs)): ?>
-                        <nav class="jrnl-breadcrumbs" aria-label="<?= htmlspecialchars($t('������� ������', 'Breadcrumbs'), ENT_QUOTES, 'UTF-8') ?>">
+                        <nav class="jrnl-breadcrumbs" aria-label="<?= htmlspecialchars($breadcrumbsAriaLabel, ENT_QUOTES, 'UTF-8') ?>">
                             <?php foreach ($detailBreadcrumbs as $index => $crumb): ?>
                                 <?php if ($index > 0): ?><span class="jrnl-breadcrumb-sep">/</span><?php endif; ?>
                                 <?php if (!empty($crumb['url'])): ?>
@@ -532,7 +545,7 @@ $issueSubtitle = trim((string)$issueSubtitle) !== '' ? (string)$issueSubtitle : 
                         <a class="jrnl-meta jrnl-stat jrnl-stat-link" href="#article-comments"><?= $statIcon('comments') ?><?= (int)$portalCommentTotal ?></a>
                     </div>
                 </div>
-                <span class="jrnl-kicker"><?= htmlspecialchars((string)($issue['issue_title'] ?? $issueTitle), ENT_QUOTES, 'UTF-8') ?></span>
+                <span class="jrnl-kicker"><?= htmlspecialchars($detailKickerLabel, ENT_QUOTES, 'UTF-8') ?></span>
                 <h1><?= htmlspecialchars((string)($selected['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h1>
                 <div class="jrnl-tags">
                     <?php if ($authorDisplayName !== ''): ?>
@@ -580,7 +593,7 @@ $issueSubtitle = trim((string)$issueSubtitle) !== '' ? (string)$issueSubtitle : 
                                 <input type="hidden" name="return_path" value="<?= htmlspecialchars((string)($_SERVER['REQUEST_URI'] ?? '/'), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="content_type" value="examples">
                                 <input type="hidden" name="content_id" value="<?= (int)$selected['id'] ?>">
-                                <button class="jrnl-favorite-btn <?= $portalIsFavorite ? 'is-active' : '' ?>" type="submit" aria-label="<?= htmlspecialchars($t('Добавить в избранное', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
+                                <button class="jrnl-favorite-btn <?= $portalIsFavorite ? 'is-active' : '' ?>" type="submit" aria-label="<?= htmlspecialchars($portalIsFavorite ? $t("\u{0412}\u{0020}\u{0438}\u{0437}\u{0431}\u{0440}\u{0430}\u{043D}\u{043D}\u{043E}\u{043C}", 'Saved') : $t("\u{0414}\u{043E}\u{0431}\u{0430}\u{0432}\u{0438}\u{0442}\u{044C}\u{0020}\u{0432}\u{0020}\u{0438}\u{0437}\u{0431}\u{0440}\u{0430}\u{043D}\u{043D}\u{043E}\u{0435}", 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?>">
                                     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.4l2.63 5.34 5.9.86-4.27 4.16 1 5.87L12 16.88 6.74 19.63l1-5.87L3.47 9.6l5.9-.86L12 3.4Z"/></svg>
                                     <span class="jrnl-share-label"><?= htmlspecialchars($portalIsFavorite ? $t('В избранном', 'Saved') : $t('Добавить в избранное', 'Save to favorites'), ENT_QUOTES, 'UTF-8') ?></span>
                                 </button>
@@ -643,7 +656,7 @@ $issueSubtitle = trim((string)$issueSubtitle) !== '' ? (string)$issueSubtitle : 
             </header>
 
             <?php if (!empty($topicCloudItems)): ?>
-                <div class="jrnl-topic-cloud" aria-label="<?= htmlspecialchars($t('Темы выпуска', 'Issue topics'), ENT_QUOTES, 'UTF-8') ?>">
+                <div class="jrnl-topic-cloud" aria-label="<?= htmlspecialchars($t("\u{0422}\u{0435}\u{043C}\u{044B}", 'Topics'), ENT_QUOTES, 'UTF-8') ?>">
                     <?php foreach ($topicCloudItems as $topicItem): ?>
                         <?php $topicCode = trim((string)($topicItem['code'] ?? '')); ?>
                         <?php $isAllTopic = !empty($topicItem['is_all']); ?>
@@ -659,7 +672,7 @@ $issueSubtitle = trim((string)$issueSubtitle) !== '' ? (string)$issueSubtitle : 
             <?php endif; ?>
 
             <?php if (false && !empty($clusters)): ?>
-                <div class="jrnl-tags" aria-label="<?= htmlspecialchars($t('Темы раздела', 'Section topics'), ENT_QUOTES, 'UTF-8') ?>">
+                <div class="jrnl-tags" aria-label="<?= htmlspecialchars($t("\u{0422}\u{0435}\u{043C}\u{044B}", 'Topics'), ENT_QUOTES, 'UTF-8') ?>">
                     <a class="jrnl-tag <?= $currentCluster === '' ? 'is-active' : '' ?>" href="<?= htmlspecialchars($buildPageUrl(''), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Все темы', 'All topics'), ENT_QUOTES, 'UTF-8') ?></a>
                     <?php foreach ($clusters as $cluster): ?>
                         <?php $clusterCode = trim((string)($cluster['code'] ?? '')); ?>
@@ -693,7 +706,7 @@ $issueSubtitle = trim((string)$issueSubtitle) !== '' ? (string)$issueSubtitle : 
                 </div>
 
                 <?php if ($totalPages > 1): ?>
-                    <nav class="jrnl-pager" aria-label="<?= htmlspecialchars($t('Пагинация', 'Pagination'), ENT_QUOTES, 'UTF-8') ?>">
+                    <nav class="jrnl-pager" aria-label="<?= htmlspecialchars($t("\u{041D}\u{0430}\u{0432}\u{0438}\u{0433}\u{0430}\u{0446}\u{0438}\u{044F}", 'Pagination'), ENT_QUOTES, 'UTF-8') ?>">
                         <?php if ($page > 1): ?>
                             <a href="<?= htmlspecialchars($buildPageUrl($currentCluster, $page - 1), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t('Назад', 'Prev'), ENT_QUOTES, 'UTF-8') ?></a>
                         <?php endif; ?>
