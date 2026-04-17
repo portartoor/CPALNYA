@@ -38,7 +38,7 @@
     }
     $provider = strtolower((string)($s['llm_provider'] ?? 'openai'));
     $pt = strtolower((string)($s['openai_proxy_type'] ?? 'http'));
-    $rawCampaigns = is_array($s['campaigns'] ?? null) ? (array)($s['campaigns'] ?? []) : [];
+    $rawCampaigns = is_array($s['__raw_campaigns'] ?? null) ? (array)($s['__raw_campaigns'] ?? []) : [];
     $campaigns = function_exists('seo_gen_normalize_campaigns')
         ? seo_gen_normalize_campaigns((array)($s['campaigns'] ?? []))
         : [];

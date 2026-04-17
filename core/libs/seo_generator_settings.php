@@ -1331,7 +1331,7 @@ if (!function_exists('seo_gen_settings_normalize')) {
 }
 
 if (!function_exists('seo_gen_settings_get')) {
-    function seo_gen_settings_get(mysqli $db): array
+    function seo_gen_settings_get_raw(mysqli $db): array
     {
         seo_gen_settings_table_ensure($db);
         $table = seo_gen_settings_table_name();
@@ -1340,8 +1340,17 @@ if (!function_exists('seo_gen_settings_get')) {
             $json = (string)($row['settings_json'] ?? '');
             $decoded = json_decode($json, true);
             if (is_array($decoded)) {
-                return seo_gen_settings_normalize($decoded);
+                return $decoded;
             }
+        }
+        return [];
+    }
+
+    function seo_gen_settings_get(mysqli $db): array
+    {
+        $decoded = seo_gen_settings_get_raw($db);
+        if (!empty($decoded)) {
+            return seo_gen_settings_normalize($decoded);
         }
         $defaults = seo_gen_settings_default();
         seo_gen_settings_save($db, $defaults, 0);

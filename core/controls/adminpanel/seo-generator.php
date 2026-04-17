@@ -330,11 +330,13 @@ if (function_exists('seo_gen_cron_runs_table_ensure')) {
     seo_gen_cron_runs_table_ensure($DB);
 }
 $seoGeneratorSettings = seo_gen_settings_get($DB);
+$seoGeneratorSettingsRaw = function_exists('seo_gen_settings_get_raw') ? seo_gen_settings_get_raw($DB) : [];
+$seoGeneratorSettings['__raw_campaigns'] = is_array($seoGeneratorSettingsRaw['campaigns'] ?? null) ? $seoGeneratorSettingsRaw['campaigns'] : [];
 $campaignDefaults = function_exists('seo_gen_default_campaigns') ? seo_gen_default_campaigns() : [];
 if (!isset($campaignDefaults['reviews']) || !is_array($campaignDefaults['reviews'])) {
     $campaignDefaults['reviews'] = admin_seo_gen_reviews_campaign_fallback();
 }
-$settingsCampaigns = is_array($seoGeneratorSettings['campaigns'] ?? null) ? $seoGeneratorSettings['campaigns'] : [];
+$settingsCampaigns = is_array($seoGeneratorSettings['__raw_campaigns'] ?? null) ? $seoGeneratorSettings['__raw_campaigns'] : [];
 $campaignsMissing = false;
 foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
     if (!isset($settingsCampaigns[$campaignKey]) || !is_array($settingsCampaigns[$campaignKey])) {
@@ -345,9 +347,12 @@ foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
 $campaignsHydrated = false;
 if ($campaignsMissing) {
     $incoming = $seoGeneratorSettings;
+    unset($incoming['__raw_campaigns']);
     $incoming['campaigns'] = $settingsCampaigns;
     if (seo_gen_settings_save($DB, $incoming, (int)($adminpanelUser['id'] ?? 0))) {
         $seoGeneratorSettings = seo_gen_settings_get($DB);
+        $seoGeneratorSettingsRaw = function_exists('seo_gen_settings_get_raw') ? seo_gen_settings_get_raw($DB) : [];
+        $seoGeneratorSettings['__raw_campaigns'] = is_array($seoGeneratorSettingsRaw['campaigns'] ?? null) ? $seoGeneratorSettingsRaw['campaigns'] : [];
         $campaignsHydrated = true;
     }
 }
