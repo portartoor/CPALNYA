@@ -344,10 +344,6 @@ foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
 }
 if ($campaignsMissing) {
     $seoGeneratorSettings['campaigns'] = $settingsCampaigns;
-    if (function_exists('seo_gen_settings_save')) {
-        seo_gen_settings_save($DB, $seoGeneratorSettings, (int)($adminpanelUser['id'] ?? 0));
-        $seoGeneratorSettings = seo_gen_settings_get($DB);
-    }
 }
 $scheduleDate = trim((string)($_GET['schedule_date'] ?? gmdate('Y-m-d')));
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $scheduleDate)) {

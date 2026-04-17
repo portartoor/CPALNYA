@@ -53,6 +53,25 @@ if (!function_exists('seo_gen_settings_parse_lines')) {
     }
 }
 
+if (!function_exists('seo_gen_settings_decode_jsonish')) {
+    function seo_gen_settings_decode_jsonish($value)
+    {
+        if (!is_string($value)) {
+            return $value;
+        }
+        $trimmed = trim($value);
+        if ($trimmed === '') {
+            return $value;
+        }
+        $first = substr($trimmed, 0, 1);
+        if ($first !== '{' && $first !== '[') {
+            return $value;
+        }
+        $decoded = json_decode($trimmed, true);
+        return json_last_error() === JSON_ERROR_NONE ? $decoded : $value;
+    }
+}
+
 if (!function_exists('seo_gen_settings_default')) {
     function seo_gen_allowed_campaign_keys(): array
     {
@@ -534,10 +553,12 @@ if (!function_exists('seo_gen_settings_default')) {
     function seo_gen_normalize_campaigns($raw): array
     {
         $defaults = seo_gen_default_campaigns();
+        $raw = seo_gen_settings_decode_jsonish($raw);
         $raw = is_array($raw) ? $raw : [];
         $out = [];
         foreach ($defaults as $key => $default) {
-            $row = array_merge($default, is_array($raw[$key] ?? null) ? $raw[$key] : []);
+            $rawRow = seo_gen_settings_decode_jsonish($raw[$key] ?? null);
+            $row = array_merge($default, is_array($rawRow) ? $rawRow : []);
             $row['key'] = $key;
             $row['material_section'] = in_array((string)($row['material_section'] ?? $key), seo_gen_allowed_campaign_keys(), true)
                 ? (string)$row['material_section']
@@ -554,6 +575,7 @@ if (!function_exists('seo_gen_settings_default')) {
                 $row['seed_salt_suffix'] = $default['seed_salt_suffix'];
             }
             foreach (['styles_en', 'styles_ru', 'clusters_en', 'clusters_ru', 'article_structures_en', 'article_structures_ru'] as $listKey) {
+                $row[$listKey] = seo_gen_settings_decode_jsonish($row[$listKey] ?? []);
                 $row[$listKey] = seo_gen_settings_parse_lines(implode("\n", (array)($row[$listKey] ?? [])), 1200);
                 if (empty($row[$listKey])) {
                     $row[$listKey] = (array)$default[$listKey];
