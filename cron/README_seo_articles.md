@@ -82,7 +82,7 @@ CLI options:
 - `--date=YYYY-MM-DD` (override job date)
 - `--lang=ru`
 - `--max-per-run=1`
-- `--campaign=journal` or `--campaign=playbooks`
+- `--campaign=journal|playbooks|signals|reviews|fun`
 - `--force` (ignore time check and run all slots for selected date)
 - `--dry-run` (call OpenAI + validate result, but do not insert into DB)
 - `--proxy-check` (check all configured proxies from pool/single proxy)
@@ -93,9 +93,10 @@ Examples:
 # Safe test: run yesterday in dry-run mode for RU only
 /usr/bin/php /home/cpalnya/public_html/cron/generate_seo_articles.php --date=$(date -u -d 'yesterday' +%F) --lang=ru --force --dry-run --max-per-run=1
 
-# Real forced generation: create 4-8 Journal or Playbooks materials immediately
+# Real forced generation: create campaign materials immediately
 /usr/bin/php /home/cpalnya/public_html/cron/generate_seo_articles.php --campaign=journal --date=$(date +%F) --lang=ru --force --max-per-run=4
 /usr/bin/php /home/cpalnya/public_html/cron/generate_seo_articles.php --campaign=playbooks --date=$(date +%F) --lang=ru --force --max-per-run=6
+/usr/bin/php /home/cpalnya/public_html/cron/generate_seo_articles.php --campaign=reviews --date=$(date +%F) --lang=ru --force --max-per-run=2
 
 # Check proxy pool only (no DB writes, no article generation)
 /usr/bin/php /home/cpalnya/public_html/cron/generate_seo_articles.php --proxy-check
@@ -103,5 +104,6 @@ Examples:
 # Queue: add campaign tasks, then process
 /usr/bin/php /home/cpalnya/public_html/cron/seo_article_queue.php --enqueue --campaign=journal --date=$(date +%F) --lang=ru --max-per-run=4
 /usr/bin/php /home/cpalnya/public_html/cron/seo_article_queue.php --enqueue --campaign=playbooks --date=$(date +%F) --lang=ru --max-per-run=6
+/usr/bin/php /home/cpalnya/public_html/cron/seo_article_queue.php --enqueue --campaign=reviews --date=$(date +%F) --lang=ru --max-per-run=2
 /usr/bin/php /home/cpalnya/public_html/cron/seo_article_queue.php --work --limit=2
 ```

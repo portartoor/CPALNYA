@@ -33,6 +33,9 @@ if ($seoCronTimezone === '' || @date_default_timezone_set($seoCronTimezone) === 
 
 function seo_runtime_options(): array
 {
+    $allowedCampaigns = function_exists('seo_gen_allowed_campaign_keys')
+        ? seo_gen_allowed_campaign_keys()
+        : ['journal', 'playbooks', 'signals', 'reviews', 'fun'];
     $opts = [
         'force' => false,
         'dry_run' => false,
@@ -115,7 +118,7 @@ function seo_runtime_options(): array
         }
         if (strpos($arg, '--campaign=') === 0) {
             $value = strtolower(trim(substr($arg, 11)));
-            if (in_array($value, ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)) {
+            if (in_array($value, $allowedCampaigns, true)) {
                 $opts['campaign'] = $value;
             }
             continue;
@@ -1003,7 +1006,10 @@ function seo_article_public_url(string $lang, string $slug, string $clusterCode 
     }
     $clusterCode = examples_normalize_cluster((string)$clusterCode, $lang);
     $materialSection = strtolower(trim((string)$materialSection));
-    if (!in_array($materialSection, ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)) {
+    $allowedSections = function_exists('seo_gen_allowed_campaign_keys')
+        ? seo_gen_allowed_campaign_keys()
+        : ['journal', 'playbooks', 'signals', 'reviews', 'fun'];
+    if (!in_array($materialSection, $allowedSections, true)) {
         $materialSection = 'journal';
     }
     $base = '/' . $materialSection . '/';
@@ -6434,7 +6440,10 @@ function seo_publish_article(
     $titleSafe = mysqli_real_escape_string($db, $title);
     $slugSafe = mysqli_real_escape_string($db, $slug);
     $clusterSafe = mysqli_real_escape_string($db, $clusterCode);
-    $materialSection = in_array((string)($cfg['campaign_material_section'] ?? 'journal'), ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)
+    $allowedSections = function_exists('seo_gen_allowed_campaign_keys')
+        ? seo_gen_allowed_campaign_keys()
+        : ['journal', 'playbooks', 'signals', 'reviews', 'fun'];
+    $materialSection = in_array((string)($cfg['campaign_material_section'] ?? 'journal'), $allowedSections, true)
         ? (string)$cfg['campaign_material_section']
         : 'journal';
     $materialSectionSafe = mysqli_real_escape_string($db, $materialSection);

@@ -54,6 +54,11 @@ if (!function_exists('seo_gen_settings_parse_lines')) {
 }
 
 if (!function_exists('seo_gen_settings_default')) {
+    function seo_gen_allowed_campaign_keys(): array
+    {
+        return ['journal', 'playbooks', 'signals', 'reviews', 'fun'];
+    }
+
     function seo_gen_campaign_variance_library(): array
     {
         return [
@@ -432,7 +437,7 @@ if (!function_exists('seo_gen_settings_default')) {
         foreach ($defaults as $key => $default) {
             $row = array_merge($default, is_array($raw[$key] ?? null) ? $raw[$key] : []);
             $row['key'] = $key;
-            $row['material_section'] = in_array((string)($row['material_section'] ?? $key), ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)
+            $row['material_section'] = in_array((string)($row['material_section'] ?? $key), seo_gen_allowed_campaign_keys(), true)
                 ? (string)$row['material_section']
                 : $key;
             $row['enabled'] = !empty($row['enabled']);

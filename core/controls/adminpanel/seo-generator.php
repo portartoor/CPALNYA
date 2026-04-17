@@ -215,6 +215,9 @@ $queueRows = [];
 $hasCronRunsTable = admin_seo_gen_table_exists($DB, 'seo_article_cron_runs');
 $hasQueueTable = admin_seo_gen_table_exists($DB, 'seo_article_generation_queue');
 $hasExamplesTable = admin_seo_gen_table_exists($DB, 'examples_articles');
+$allowedCampaigns = function_exists('seo_gen_allowed_campaign_keys')
+    ? seo_gen_allowed_campaign_keys()
+    : ['journal', 'playbooks', 'signals', 'reviews', 'fun'];
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     $action = (string)($_POST['action'] ?? '');
@@ -241,7 +244,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                         WHERE id = {$queueId} AND job_date = '{$jobDateSafe}'
                         LIMIT 1";
                 if (mysqli_query($DB, $sql)) {
-                    if ($hasCronRunsTable && $slotIndex > 0 && in_array($campaignKey, ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)) {
+                    if ($hasCronRunsTable && $slotIndex > 0 && in_array($campaignKey, $allowedCampaigns, true)) {
                         $campaignSafe = mysqli_real_escape_string($DB, $campaignKey);
                         $langSafe = mysqli_real_escape_string($DB, $langCode);
                         mysqli_query(

@@ -22,6 +22,9 @@ function queue_echo(string $message): void
 
 function queue_runtime_options(): array
 {
+    $allowedCampaigns = function_exists('seo_gen_allowed_campaign_keys')
+        ? seo_gen_allowed_campaign_keys()
+        : ['journal', 'playbooks', 'signals', 'reviews', 'fun'];
     $opts = [
         'mode' => 'help',
         'job_date' => date('Y-m-d'),
@@ -117,7 +120,7 @@ function queue_runtime_options(): array
         }
         if (strpos($arg, '--campaign=') === 0) {
             $value = strtolower(trim(substr($arg, 11)));
-            if (in_array($value, ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true)) {
+            if (in_array($value, $allowedCampaigns, true)) {
                 $opts['campaign'] = $value;
             }
             continue;
@@ -364,9 +367,12 @@ function queue_add_task(
     ?string $plannedAt = null,
     int $slotIndex = 0
 ): bool {
+    $allowedCampaigns = function_exists('seo_gen_allowed_campaign_keys')
+        ? seo_gen_allowed_campaign_keys()
+        : ['journal', 'playbooks', 'signals', 'reviews', 'fun'];
     $jobDateSafe = mysqli_real_escape_string($db, $jobDate);
     $langSafe = mysqli_real_escape_string($db, examples_normalize_lang($lang));
-    $campaignSafe = mysqli_real_escape_string($db, in_array($campaignKey, ['journal', 'playbooks', 'signals', 'reviews', 'fun'], true) ? $campaignKey : '');
+    $campaignSafe = mysqli_real_escape_string($db, in_array($campaignKey, $allowedCampaigns, true) ? $campaignKey : '');
     $slotIndex = max(0, $slotIndex);
     $plannedSql = $plannedAt !== null && $plannedAt !== ''
         ? "'" . mysqli_real_escape_string($db, $plannedAt) . "'"
@@ -652,8 +658,8 @@ if ($opts['mode'] === 'work') {
 
 queue_echo('Usage:');
 queue_echo('  --ensure');
-queue_echo('  --enqueue-test [--campaign=journal|playbooks|signals|fun] [--date=YYYY-MM-DD] [--planned-at="YYYY-MM-DD HH:MM:SS"]');
+queue_echo('  --enqueue-test [--campaign=journal|playbooks|signals|reviews|fun] [--date=YYYY-MM-DD] [--planned-at="YYYY-MM-DD HH:MM:SS"]');
 queue_echo('  --enqueue-daily [--date=YYYY-MM-DD]');
-queue_echo('  --enqueue --date=YYYY-MM-DD --lang=ru [--campaign=journal|playbooks|signals|fun] [--force|--no-force] [--dry-run] [--max-per-run=1]');
+queue_echo('  --enqueue --date=YYYY-MM-DD --lang=ru [--campaign=journal|playbooks|signals|reviews|fun] [--force|--no-force] [--dry-run] [--max-per-run=1]');
 queue_echo('  --work [--limit=2]');
 exit(0);
