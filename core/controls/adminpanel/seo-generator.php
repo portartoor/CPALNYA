@@ -206,6 +206,22 @@ if (function_exists('seo_gen_cron_runs_table_ensure')) {
     seo_gen_cron_runs_table_ensure($DB);
 }
 $seoGeneratorSettings = seo_gen_settings_get($DB);
+$campaignDefaults = function_exists('seo_gen_default_campaigns') ? seo_gen_default_campaigns() : [];
+$settingsCampaigns = is_array($seoGeneratorSettings['campaigns'] ?? null) ? $seoGeneratorSettings['campaigns'] : [];
+$campaignsMissing = false;
+foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
+    if (!isset($settingsCampaigns[$campaignKey]) || !is_array($settingsCampaigns[$campaignKey])) {
+        $settingsCampaigns[$campaignKey] = $campaignDefault;
+        $campaignsMissing = true;
+    }
+}
+if ($campaignsMissing) {
+    $seoGeneratorSettings['campaigns'] = $settingsCampaigns;
+    if (function_exists('seo_gen_settings_save')) {
+        seo_gen_settings_save($DB, $seoGeneratorSettings, (int)($adminpanelUser['id'] ?? 0));
+        $seoGeneratorSettings = seo_gen_settings_get($DB);
+    }
+}
 $scheduleDate = trim((string)($_GET['schedule_date'] ?? gmdate('Y-m-d')));
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $scheduleDate)) {
     $scheduleDate = gmdate('Y-m-d');
