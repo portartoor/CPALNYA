@@ -338,12 +338,8 @@ $settingsCampaigns = is_array($seoGeneratorSettings['campaigns'] ?? null) ? $seo
 $campaignsMissing = false;
 foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
     if (!isset($settingsCampaigns[$campaignKey]) || !is_array($settingsCampaigns[$campaignKey])) {
-        $settingsCampaigns[$campaignKey] = $campaignDefault;
         $campaignsMissing = true;
     }
-}
-if ($campaignsMissing) {
-    $seoGeneratorSettings['campaigns'] = $settingsCampaigns;
 }
 $scheduleDate = trim((string)($_GET['schedule_date'] ?? gmdate('Y-m-d')));
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $scheduleDate)) {

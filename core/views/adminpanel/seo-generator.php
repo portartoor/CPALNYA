@@ -78,6 +78,22 @@
         if (!isset($campaigns[$campaignKey]) || !is_array($campaigns[$campaignKey])) {
             $campaigns[$campaignKey] = $campaignDefault;
         }
+        if ($campaignFallbackFlags[$campaignKey]) {
+            $campaigns[$campaignKey] = array_merge($campaignDefault, [
+                'description' => '',
+                'description_ru' => '',
+                'styles_en' => [],
+                'styles_ru' => [],
+                'clusters_en' => [],
+                'clusters_ru' => [],
+                'article_structures_en' => [],
+                'article_structures_ru' => [],
+                'article_system_prompt_en' => '',
+                'article_system_prompt_ru' => '',
+                'article_user_prompt_append_en' => '',
+                'article_user_prompt_append_ru' => '',
+            ]);
+        }
     }
     $hasCampaignFallback = in_array(true, $campaignFallbackFlags, true);
     $campaignOrder = function_exists('seo_gen_allowed_campaign_keys')
@@ -214,6 +230,13 @@
                                                                 <?php endif; ?>
                                                             </h6>
                                                         </div>
+                                                        <?php if (!empty($campaignFallbackFlags[$campaignKey])): ?>
+                                                            <div class="col-12">
+                                                                <div class="alert alert-warning py-2 mb-0">
+                                                                    Stored DB object <code>settings_json.campaigns.<?= htmlspecialchars((string)$campaignKey) ?></code> is missing. This card is not loaded from DB yet.
+                                                                </div>
+                                                            </div>
+                                                        <?php endif; ?>
                                                         <div class="col-md-2"><label class="form-label">Enabled</label><select class="form-select" name="<?= htmlspecialchars($prefix) ?>enabled"><option value="1" <?= !empty($campaign['enabled']) ? 'selected' : '' ?>>Yes</option><option value="0" <?= empty($campaign['enabled']) ? 'selected' : '' ?>>No</option></select></div>
                                                         <div class="col-md-2"><label class="form-label">Section</label><select class="form-select" name="<?= htmlspecialchars($prefix) ?>material_section"><option value="journal" <?= (($campaign['material_section'] ?? '') === 'journal') ? 'selected' : '' ?>>Journal</option><option value="playbooks" <?= (($campaign['material_section'] ?? '') === 'playbooks') ? 'selected' : '' ?>>Playbooks</option><option value="signals" <?= (($campaign['material_section'] ?? '') === 'signals') ? 'selected' : '' ?>>Signals</option><option value="reviews" <?= (($campaign['material_section'] ?? '') === 'reviews') ? 'selected' : '' ?>>Reviews</option><option value="fun" <?= (($campaign['material_section'] ?? '') === 'fun') ? 'selected' : '' ?>>Fun</option></select></div>
                                                         <div class="col-md-2"><label class="form-label">Daily Min</label><input class="form-control" type="number" name="<?= htmlspecialchars($prefix) ?>daily_min" value="<?= (int)($campaign['daily_min'] ?? 4) ?>"></div>
