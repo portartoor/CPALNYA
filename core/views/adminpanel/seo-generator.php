@@ -38,6 +38,7 @@
     }
     $provider = strtolower((string)($s['llm_provider'] ?? 'openai'));
     $pt = strtolower((string)($s['openai_proxy_type'] ?? 'http'));
+    $rawCampaigns = is_array($s['campaigns'] ?? null) ? (array)($s['campaigns'] ?? []) : [];
     $campaigns = function_exists('seo_gen_normalize_campaigns')
         ? seo_gen_normalize_campaigns((array)($s['campaigns'] ?? []))
         : [];
@@ -71,11 +72,14 @@
             'article_user_prompt_append_ru' => 'Пиши реальные обзоры, сравнения и подборки для affiliate-операторов.',
         ];
     }
+    $campaignFallbackFlags = [];
     foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
+        $campaignFallbackFlags[$campaignKey] = !isset($rawCampaigns[$campaignKey]) || !is_array($rawCampaigns[$campaignKey]);
         if (!isset($campaigns[$campaignKey]) || !is_array($campaigns[$campaignKey])) {
             $campaigns[$campaignKey] = $campaignDefault;
         }
     }
+    $hasCampaignFallback = in_array(true, $campaignFallbackFlags, true);
     $campaignOrder = function_exists('seo_gen_allowed_campaign_keys')
         ? seo_gen_allowed_campaign_keys()
         : ['journal', 'playbooks', 'signals', 'reviews', 'fun'];
@@ -137,6 +141,16 @@
                             <div class="tab-pane fade show active" id="wiz-core">
                                 <div class="wiz-pane">
                                     <div class="wiz-title"><i class="ti ti-adjustments"></i> Core & Scheduling</div>
+                                    <?php if ($hasCampaignFallback): ?>
+                                        <div class="alert alert-warning py-2">
+                                            Some campaign cards are currently rendered from fallback/default config because their objects are missing or malformed in <code>settings_json.campaigns</code>.
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if ($hasCampaignFallback): ?>
+                                        <div class="alert alert-warning py-2">
+                                            Some campaign cards are currently rendered from fallback/default config because their objects are missing or malformed in <code>settings_json.campaigns</code>.
+                                        </div>
+                                    <?php endif; ?>
                                     <div class="row g-3">
                                         <div class="col-md-3"><label class="form-label">Enabled</label><select class="form-select" name="enabled"><option value="1" <?= !empty($s['enabled']) ? 'selected' : '' ?>>Yes</option><option value="0" <?= empty($s['enabled']) ? 'selected' : '' ?>>No</option></select></div>
                                         <div class="col-md-3"><label class="form-label">Daily Min</label><input class="form-control req" type="number" name="daily_min" value="<?= (int)($s['daily_min'] ?? 1) ?>"></div>
@@ -193,7 +207,12 @@
                                                 <div class="border rounded p-3">
                                                     <div class="row g-3">
                                                         <div class="col-12">
-                                                            <h6 class="mb-0"><?= htmlspecialchars((string)($campaign['title'] ?? $campaignKey)) ?> / <?= htmlspecialchars((string)($campaign['title_ru'] ?? $campaignKey)) ?></h6>
+                                                            <h6 class="mb-0">
+                                                                <?= htmlspecialchars((string)($campaign['title'] ?? $campaignKey)) ?> / <?= htmlspecialchars((string)($campaign['title_ru'] ?? $campaignKey)) ?>
+                                                                <?php if (!empty($campaignFallbackFlags[$campaignKey])): ?>
+                                                                    <span class="badge text-bg-warning ms-2">fallback</span>
+                                                                <?php endif; ?>
+                                                            </h6>
                                                         </div>
                                                         <div class="col-md-2"><label class="form-label">Enabled</label><select class="form-select" name="<?= htmlspecialchars($prefix) ?>enabled"><option value="1" <?= !empty($campaign['enabled']) ? 'selected' : '' ?>>Yes</option><option value="0" <?= empty($campaign['enabled']) ? 'selected' : '' ?>>No</option></select></div>
                                                         <div class="col-md-2"><label class="form-label">Section</label><select class="form-select" name="<?= htmlspecialchars($prefix) ?>material_section"><option value="journal" <?= (($campaign['material_section'] ?? '') === 'journal') ? 'selected' : '' ?>>Journal</option><option value="playbooks" <?= (($campaign['material_section'] ?? '') === 'playbooks') ? 'selected' : '' ?>>Playbooks</option><option value="signals" <?= (($campaign['material_section'] ?? '') === 'signals') ? 'selected' : '' ?>>Signals</option><option value="reviews" <?= (($campaign['material_section'] ?? '') === 'reviews') ? 'selected' : '' ?>>Reviews</option><option value="fun" <?= (($campaign['material_section'] ?? '') === 'fun') ? 'selected' : '' ?>>Fun</option></select></div>
