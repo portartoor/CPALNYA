@@ -533,8 +533,24 @@ if (!function_exists('seo_gen_settings_default')) {
             ],
         ];
 
+        if (isset($campaigns['reviews']) && is_array($campaigns['reviews'])) {
+            foreach ([
+                'styles_en' => 6,
+                'styles_ru' => 6,
+                'clusters_en' => 6,
+                'clusters_ru' => 6,
+                'article_structures_en' => 3,
+                'article_structures_ru' => 3,
+            ] as $listKey => $limit) {
+                $campaigns['reviews'][$listKey] = array_slice((array)($campaigns['reviews'][$listKey] ?? []), 0, $limit);
+            }
+        }
+
         $variance = seo_gen_campaign_variance_library();
         foreach ($campaigns as $key => $row) {
+            if ($key === 'reviews') {
+                continue;
+            }
             if (empty($variance[$key]) || !is_array($variance[$key])) {
                 continue;
             }

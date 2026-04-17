@@ -45,12 +45,42 @@
         }
         return max($min, min($max, $count + 1));
     };
+    $campaignListFromDb = static function ($value): array {
+        if (function_exists('seo_gen_settings_decode_jsonish')) {
+            $value = seo_gen_settings_decode_jsonish($value);
+        }
+        if (is_string($value)) {
+            $value = preg_split('/\r\n|\r|\n/', $value);
+        }
+        if (!is_array($value)) {
+            return [];
+        }
+        $lines = [];
+        foreach ($value as $item) {
+            $item = trim((string)$item);
+            if ($item === '') {
+                continue;
+            }
+            $lines[] = $item;
+        }
+        return $lines;
+    };
+    $campaignTextFromDb = static function ($value): string {
+        if (function_exists('seo_gen_settings_decode_jsonish')) {
+            $value = seo_gen_settings_decode_jsonish($value);
+        }
+        if (is_array($value)) {
+            $value = implode("\n", array_map('strval', $value));
+        }
+        return trim((string)$value);
+    };
     $provider = strtolower((string)($s['llm_provider'] ?? 'openai'));
     $pt = strtolower((string)($s['openai_proxy_type'] ?? 'http'));
     $rawCampaigns = is_array($s['__raw_campaigns'] ?? null) ? (array)($s['__raw_campaigns'] ?? []) : [];
-    $campaigns = function_exists('seo_gen_normalize_campaigns')
+    $normalizedCampaigns = function_exists('seo_gen_normalize_campaigns')
         ? seo_gen_normalize_campaigns((array)($s['campaigns'] ?? []))
         : [];
+    $campaigns = [];
     $campaignDefaults = function_exists('seo_gen_default_campaigns')
         ? seo_gen_default_campaigns()
         : [];
@@ -84,25 +114,36 @@
     $campaignFallbackFlags = [];
     foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
         $campaignFallbackFlags[$campaignKey] = !isset($rawCampaigns[$campaignKey]) || !is_array($rawCampaigns[$campaignKey]);
-        if (!isset($campaigns[$campaignKey]) || !is_array($campaigns[$campaignKey])) {
-            $campaigns[$campaignKey] = $campaignDefault;
+        $campaign = is_array($normalizedCampaigns[$campaignKey] ?? null)
+            ? $normalizedCampaigns[$campaignKey]
+            : $campaignDefault;
+        $rawCampaign = is_array($rawCampaigns[$campaignKey] ?? null) ? $rawCampaigns[$campaignKey] : [];
+        foreach (['title', 'title_ru', 'description', 'description_ru', 'material_section', 'seed_salt_suffix'] as $textKey) {
+            if (array_key_exists($textKey, $rawCampaign)) {
+                $campaign[$textKey] = $campaignTextFromDb($rawCampaign[$textKey]);
+            }
         }
-        if ($campaignFallbackFlags[$campaignKey]) {
-            $campaigns[$campaignKey] = array_merge($campaignDefault, [
-                'description' => '',
-                'description_ru' => '',
-                'styles_en' => [],
-                'styles_ru' => [],
-                'clusters_en' => [],
-                'clusters_ru' => [],
-                'article_structures_en' => [],
-                'article_structures_ru' => [],
-                'article_system_prompt_en' => '',
-                'article_system_prompt_ru' => '',
-                'article_user_prompt_append_en' => '',
-                'article_user_prompt_append_ru' => '',
-            ]);
+        foreach (['enabled'] as $boolKey) {
+            if (array_key_exists($boolKey, $rawCampaign)) {
+                $campaign[$boolKey] = !empty($rawCampaign[$boolKey]);
+            }
         }
+        foreach (['daily_min', 'daily_max', 'max_per_run', 'word_min', 'word_max', 'duplicate_retry_attempts'] as $intKey) {
+            if (array_key_exists($intKey, $rawCampaign)) {
+                $campaign[$intKey] = (int)$rawCampaign[$intKey];
+            }
+        }
+        foreach (['styles_en', 'styles_ru', 'clusters_en', 'clusters_ru', 'article_structures_en', 'article_structures_ru'] as $listKey) {
+            if (array_key_exists($listKey, $rawCampaign)) {
+                $campaign[$listKey] = $campaignListFromDb($rawCampaign[$listKey]);
+            }
+        }
+        foreach (['article_system_prompt_en', 'article_system_prompt_ru', 'article_user_prompt_append_en', 'article_user_prompt_append_ru'] as $promptKey) {
+            if (array_key_exists($promptKey, $rawCampaign)) {
+                $campaign[$promptKey] = $campaignTextFromDb($rawCampaign[$promptKey]);
+            }
+        }
+        $campaigns[$campaignKey] = $campaign;
     }
     $hasCampaignFallback = in_array(true, $campaignFallbackFlags, true);
     $campaignOrder = function_exists('seo_gen_allowed_campaign_keys')
@@ -166,11 +207,6 @@
                             <div class="tab-pane fade show active" id="wiz-core">
                                 <div class="wiz-pane">
                                     <div class="wiz-title"><i class="ti ti-adjustments"></i> Core & Scheduling</div>
-                                    <?php if ($hasCampaignFallback): ?>
-                                        <div class="alert alert-warning py-2">
-                                            Some campaign cards are currently rendered from fallback/default config because their objects are missing or malformed in <code>settings_json.campaigns</code>.
-                                        </div>
-                                    <?php endif; ?>
                                     <?php if ($hasCampaignFallback): ?>
                                         <div class="alert alert-warning py-2">
                                             Some campaign cards are currently rendered from fallback/default config because their objects are missing or malformed in <code>settings_json.campaigns</code>.

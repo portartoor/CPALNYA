@@ -378,9 +378,6 @@ $seoGeneratorSettingsRaw = function_exists('seo_gen_settings_get_raw') ? seo_gen
 
 $rawSettingsForMigration = is_array($seoGeneratorSettingsRaw) ? $seoGeneratorSettingsRaw : [];
 $defaultSettingsForMigration = seo_gen_settings_default();
-if (isset($defaultSettingsForMigration['campaigns']) && is_array($defaultSettingsForMigration['campaigns'])) {
-    $defaultSettingsForMigration['campaigns']['reviews'] = admin_seo_gen_reviews_campaign_payload();
-}
 $mergedSettingsForMigration = admin_seo_gen_merge_missing_recursive($rawSettingsForMigration, $defaultSettingsForMigration);
 $migrationBeforeJson = json_encode($rawSettingsForMigration, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 $migrationAfterJson = json_encode($mergedSettingsForMigration, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
