@@ -36,6 +36,15 @@
             . ' | ' . (string)($row['label_ru'] ?? '')
             . ' | ' . (string)($row['instruction'] ?? '');
     }
+    $campaignTextareaRows = static function (array $items, int $min = 4, int $max = 20): int {
+        $count = count(array_values(array_filter(array_map('trim', $items), static function ($item): bool {
+            return $item !== '';
+        })));
+        if ($count <= 0) {
+            return $min;
+        }
+        return max($min, min($max, $count + 1));
+    };
     $provider = strtolower((string)($s['llm_provider'] ?? 'openai'));
     $pt = strtolower((string)($s['openai_proxy_type'] ?? 'http'));
     $rawCampaigns = is_array($s['__raw_campaigns'] ?? null) ? (array)($s['__raw_campaigns'] ?? []) : [];
@@ -219,6 +228,16 @@
                                     <div class="row g-3">
                                         <?php foreach ($campaigns as $campaignKey => $campaign): ?>
                                             <?php $prefix = 'campaign_' . $campaignKey . '_'; ?>
+                                            <?php
+                                            $campaignStylesEnRows = $campaignTextareaRows((array)($campaign['styles_en'] ?? []), 4, 18);
+                                            $campaignStylesRuRows = $campaignTextareaRows((array)($campaign['styles_ru'] ?? []), 4, 18);
+                                            $campaignClustersEnRows = $campaignTextareaRows((array)($campaign['clusters_en'] ?? []), 5, 28);
+                                            $campaignClustersRuRows = $campaignTextareaRows((array)($campaign['clusters_ru'] ?? []), 5, 28);
+                                            $campaignStructuresEnRows = $campaignTextareaRows((array)($campaign['article_structures_en'] ?? []), 4, 20);
+                                            $campaignStructuresRuRows = $campaignTextareaRows((array)($campaign['article_structures_ru'] ?? []), 4, 20);
+                                            $campaignPromptEnRows = $campaignTextareaRows(preg_split('/\r\n|\r|\n/', (string)($campaign['article_user_prompt_append_en'] ?? '')) ?: [], 3, 12);
+                                            $campaignPromptRuRows = $campaignTextareaRows(preg_split('/\r\n|\r|\n/', (string)($campaign['article_user_prompt_append_ru'] ?? '')) ?: [], 3, 12);
+                                            ?>
                                             <div class="col-12">
                                                 <div class="border rounded p-3">
                                                     <div class="row g-3">
@@ -249,14 +268,14 @@
                                                         <div class="col-md-3"><label class="form-label">Title RU</label><input class="form-control" name="<?= htmlspecialchars($prefix) ?>title_ru" value="<?= htmlspecialchars((string)($campaign['title_ru'] ?? '')) ?>"></div>
                                                         <div class="col-md-6"><label class="form-label">Description EN</label><textarea class="form-control" rows="2" name="<?= htmlspecialchars($prefix) ?>description"><?= htmlspecialchars((string)($campaign['description'] ?? '')) ?></textarea></div>
                                                         <div class="col-md-6"><label class="form-label">Description RU</label><textarea class="form-control" rows="2" name="<?= htmlspecialchars($prefix) ?>description_ru"><?= htmlspecialchars((string)($campaign['description_ru'] ?? '')) ?></textarea></div>
-                                                        <div class="col-md-6"><label class="form-label">Styles EN</label><textarea class="form-control" rows="4" name="<?= htmlspecialchars($prefix) ?>styles_en"><?= htmlspecialchars(implode("\n", (array)($campaign['styles_en'] ?? []))) ?></textarea></div>
-                                                        <div class="col-md-6"><label class="form-label">Styles RU</label><textarea class="form-control" rows="4" name="<?= htmlspecialchars($prefix) ?>styles_ru"><?= htmlspecialchars(implode("\n", (array)($campaign['styles_ru'] ?? []))) ?></textarea></div>
-                                                        <div class="col-md-6"><label class="form-label">Clusters EN</label><textarea class="form-control" rows="5" name="<?= htmlspecialchars($prefix) ?>clusters_en"><?= htmlspecialchars(implode("\n", (array)($campaign['clusters_en'] ?? []))) ?></textarea></div>
-                                                        <div class="col-md-6"><label class="form-label">Clusters RU</label><textarea class="form-control" rows="5" name="<?= htmlspecialchars($prefix) ?>clusters_ru"><?= htmlspecialchars(implode("\n", (array)($campaign['clusters_ru'] ?? []))) ?></textarea></div>
-                                                        <div class="col-md-6"><label class="form-label">Structures EN</label><textarea class="form-control" rows="4" name="<?= htmlspecialchars($prefix) ?>article_structures_en"><?= htmlspecialchars(implode("\n", (array)($campaign['article_structures_en'] ?? []))) ?></textarea></div>
-                                                        <div class="col-md-6"><label class="form-label">Structures RU</label><textarea class="form-control" rows="4" name="<?= htmlspecialchars($prefix) ?>article_structures_ru"><?= htmlspecialchars(implode("\n", (array)($campaign['article_structures_ru'] ?? []))) ?></textarea></div>
-                                                        <div class="col-md-6"><label class="form-label">Prompt Append EN</label><textarea class="form-control" rows="3" name="<?= htmlspecialchars($prefix) ?>article_user_prompt_append_en"><?= htmlspecialchars((string)($campaign['article_user_prompt_append_en'] ?? '')) ?></textarea></div>
-                                                        <div class="col-md-6"><label class="form-label">Prompt Append RU</label><textarea class="form-control" rows="3" name="<?= htmlspecialchars($prefix) ?>article_user_prompt_append_ru"><?= htmlspecialchars((string)($campaign['article_user_prompt_append_ru'] ?? '')) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Styles EN</label><textarea class="form-control" rows="<?= $campaignStylesEnRows ?>" name="<?= htmlspecialchars($prefix) ?>styles_en"><?= htmlspecialchars(implode("\n", (array)($campaign['styles_en'] ?? []))) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Styles RU</label><textarea class="form-control" rows="<?= $campaignStylesRuRows ?>" name="<?= htmlspecialchars($prefix) ?>styles_ru"><?= htmlspecialchars(implode("\n", (array)($campaign['styles_ru'] ?? []))) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Clusters EN</label><textarea class="form-control" rows="<?= $campaignClustersEnRows ?>" name="<?= htmlspecialchars($prefix) ?>clusters_en"><?= htmlspecialchars(implode("\n", (array)($campaign['clusters_en'] ?? []))) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Clusters RU</label><textarea class="form-control" rows="<?= $campaignClustersRuRows ?>" name="<?= htmlspecialchars($prefix) ?>clusters_ru"><?= htmlspecialchars(implode("\n", (array)($campaign['clusters_ru'] ?? []))) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Structures EN</label><textarea class="form-control" rows="<?= $campaignStructuresEnRows ?>" name="<?= htmlspecialchars($prefix) ?>article_structures_en"><?= htmlspecialchars(implode("\n", (array)($campaign['article_structures_en'] ?? []))) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Structures RU</label><textarea class="form-control" rows="<?= $campaignStructuresRuRows ?>" name="<?= htmlspecialchars($prefix) ?>article_structures_ru"><?= htmlspecialchars(implode("\n", (array)($campaign['article_structures_ru'] ?? []))) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Prompt Append EN</label><textarea class="form-control" rows="<?= $campaignPromptEnRows ?>" name="<?= htmlspecialchars($prefix) ?>article_user_prompt_append_en"><?= htmlspecialchars((string)($campaign['article_user_prompt_append_en'] ?? '')) ?></textarea></div>
+                                                        <div class="col-md-6"><label class="form-label">Prompt Append RU</label><textarea class="form-control" rows="<?= $campaignPromptRuRows ?>" name="<?= htmlspecialchars($prefix) ?>article_user_prompt_append_ru"><?= htmlspecialchars((string)($campaign['article_user_prompt_append_ru'] ?? '')) ?></textarea></div>
                                                     </div>
                                                 </div>
                                             </div>
