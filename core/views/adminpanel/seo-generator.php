@@ -44,6 +44,33 @@
     $campaignDefaults = function_exists('seo_gen_default_campaigns')
         ? seo_gen_default_campaigns()
         : [];
+    if (!isset($campaignDefaults['reviews']) || !is_array($campaignDefaults['reviews'])) {
+        $campaignDefaults['reviews'] = [
+            'key' => 'reviews',
+            'title' => 'Reviews',
+            'title_ru' => 'Обзоры',
+            'description' => 'Real reviews, comparisons and shortlists for affiliate tools, vendors and working stacks.',
+            'description_ru' => 'Реальные обзоры, сравнения и подборки по инструментам, поставщикам и рабочим стекам для арбитража.',
+            'material_section' => 'reviews',
+            'enabled' => true,
+            'daily_min' => 4,
+            'daily_max' => 8,
+            'max_per_run' => 3,
+            'word_min' => 1800,
+            'word_max' => 4200,
+            'seed_salt_suffix' => 'reviews',
+            'styles_en' => ['comparison review', 'tool benchmark', 'provider shortlist', 'buyer guide', 'stack review', 'field comparison'],
+            'styles_ru' => ['сравнительный обзор', 'бенчмарк инструментов', 'шортлист поставщиков', 'buyer guide', 'разбор стека', 'полевое сравнение'],
+            'clusters_en' => ['affiliate networks and partner programs', 'cloaking tools and routing stacks', 'tracker platforms and attribution quality'],
+            'clusters_ru' => ['партнерки и affiliate-сети', 'клоаки и routing-стеки', 'трекеры и качество атрибуции'],
+            'article_structures_en' => ['Category -> evaluation criteria -> shortlist -> comparison table -> recommendation'],
+            'article_structures_ru' => ['Категория -> критерии оценки -> шортлист -> таблица сравнения -> рекомендация'],
+            'article_system_prompt_en' => '',
+            'article_system_prompt_ru' => '',
+            'article_user_prompt_append_en' => 'Write real reviews, comparisons and curated shortlists for affiliate operators.',
+            'article_user_prompt_append_ru' => 'Пиши реальные обзоры, сравнения и подборки для affiliate-операторов.',
+        ];
+    }
     foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
         if (!isset($campaigns[$campaignKey]) || !is_array($campaigns[$campaignKey])) {
             $campaigns[$campaignKey] = $campaignDefault;

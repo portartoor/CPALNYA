@@ -194,6 +194,70 @@ function admin_seo_gen_parse_image_scene_families(string $raw): array
     return $out;
 }
 
+function admin_seo_gen_reviews_campaign_fallback(): array
+{
+    return [
+        'key' => 'reviews',
+        'title' => 'Reviews',
+        'title_ru' => 'Обзоры',
+        'description' => 'Real reviews, comparisons and shortlists for affiliate tools, vendors and working stacks.',
+        'description_ru' => 'Реальные обзоры, сравнения и подборки по инструментам, поставщикам и рабочим стекам для арбитража.',
+        'material_section' => 'reviews',
+        'enabled' => true,
+        'daily_min' => 4,
+        'daily_max' => 8,
+        'max_per_run' => 3,
+        'duplicate_retry_attempts' => 2,
+        'word_min' => 1800,
+        'word_max' => 4200,
+        'seed_salt_suffix' => 'reviews',
+        'styles_en' => ['comparison review', 'tool benchmark', 'provider shortlist', 'buyer guide', 'stack review', 'field comparison'],
+        'styles_ru' => ['сравнительный обзор', 'бенчмарк инструментов', 'шортлист поставщиков', 'buyer guide', 'разбор стека', 'полевое сравнение'],
+        'clusters_en' => [
+            'affiliate networks and partner programs',
+            'cloaking tools and routing stacks',
+            'tracker platforms and attribution quality',
+            'ai generators for creatives and workflows',
+            'server providers and hosting reliability',
+            'domain registrars and domain vendors',
+            'anti-detect browsers and operator environments',
+            'spy tools and ad intelligence suites',
+            'proxy providers and mobile proxy pools',
+            'landing builders and page infrastructure',
+            'payment tools and routing helpers',
+            'telegram tools and team utilities',
+        ],
+        'clusters_ru' => [
+            'партнерки и affiliate-сети',
+            'клоаки и routing-стеки',
+            'трекеры и качество атрибуции',
+            'ИИ-генераторы для креативов и workflow',
+            'серверные провайдеры и надежность хостинга',
+            'регистраторы доменов и доменные поставщики',
+            'anti-detect браузеры и среда оператора',
+            'spy-сервисы и ad-intelligence наборы',
+            'proxy-поставщики и mobile proxy-пулы',
+            'конструкторы лендингов и инфраструктура страниц',
+            'платежные сервисы и routing helpers',
+            'Telegram-инструменты и утилиты команды',
+        ],
+        'article_structures_en' => [
+            'Category -> evaluation criteria -> shortlist -> comparison table -> recommendation',
+            'Use case -> stack candidates -> benchmarks -> tradeoffs -> verdict',
+            'Problem -> providers -> strengths and weaknesses -> risk notes -> best fit',
+        ],
+        'article_structures_ru' => [
+            'Категория -> критерии оценки -> шортлист -> таблица сравнения -> рекомендация',
+            'Use-case -> кандидаты в стек -> бенчмарки -> tradeoff -> вердикт',
+            'Проблема -> провайдеры -> сильные и слабые стороны -> риски -> лучший fit',
+        ],
+        'article_system_prompt_en' => '',
+        'article_system_prompt_ru' => '',
+        'article_user_prompt_append_en' => 'Write real reviews, comparisons and curated shortlists for affiliate operators. Compare tools and vendors by concrete criteria: routing reliability, moderation resilience, attribution quality, pricing logic, onboarding friction, geo-fit, support quality, scaling limits, hidden risks and who each option is actually for. External resources are allowed when useful.',
+        'article_user_prompt_append_ru' => 'Пиши реальные обзоры, сравнения и подборки для affiliate-операторов. Сравнивай инструменты и поставщиков по конкретным критериям: надежность routing, устойчивость под модерацией, качество атрибуции, логика цен, сложность онбординга, fit по гео, качество саппорта, ограничения по масштабу, скрытые риски и для кого подходит каждый вариант. В этом разделе допустимы ссылки на сторонние ресурсы, если они помогают обзору.',
+    ];
+}
+
 if (!$DB) {
     $message = 'Database connection failed.';
     $messageType = 'danger';
@@ -207,6 +271,9 @@ if (function_exists('seo_gen_cron_runs_table_ensure')) {
 }
 $seoGeneratorSettings = seo_gen_settings_get($DB);
 $campaignDefaults = function_exists('seo_gen_default_campaigns') ? seo_gen_default_campaigns() : [];
+if (!isset($campaignDefaults['reviews']) || !is_array($campaignDefaults['reviews'])) {
+    $campaignDefaults['reviews'] = admin_seo_gen_reviews_campaign_fallback();
+}
 $settingsCampaigns = is_array($seoGeneratorSettings['campaigns'] ?? null) ? $seoGeneratorSettings['campaigns'] : [];
 $campaignsMissing = false;
 foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
@@ -410,6 +477,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         $incoming['preview_image_prompt_template'] = admin_seo_gen_post_string('preview_image_prompt_template');
 
         $campaignDefaults = function_exists('seo_gen_default_campaigns') ? seo_gen_default_campaigns() : [];
+        if (!isset($campaignDefaults['reviews']) || !is_array($campaignDefaults['reviews'])) {
+            $campaignDefaults['reviews'] = admin_seo_gen_reviews_campaign_fallback();
+        }
         $incomingCampaigns = [];
         foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
             $prefix = 'campaign_' . $campaignKey . '_';
