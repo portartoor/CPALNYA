@@ -332,30 +332,6 @@ if (function_exists('seo_gen_cron_runs_table_ensure')) {
 $seoGeneratorSettings = seo_gen_settings_get($DB);
 $seoGeneratorSettingsRaw = function_exists('seo_gen_settings_get_raw') ? seo_gen_settings_get_raw($DB) : [];
 $seoGeneratorSettings['__raw_campaigns'] = is_array($seoGeneratorSettingsRaw['campaigns'] ?? null) ? $seoGeneratorSettingsRaw['campaigns'] : [];
-$campaignDefaults = function_exists('seo_gen_default_campaigns') ? seo_gen_default_campaigns() : [];
-if (!isset($campaignDefaults['reviews']) || !is_array($campaignDefaults['reviews'])) {
-    $campaignDefaults['reviews'] = admin_seo_gen_reviews_campaign_fallback();
-}
-$settingsCampaigns = is_array($seoGeneratorSettings['__raw_campaigns'] ?? null) ? $seoGeneratorSettings['__raw_campaigns'] : [];
-$campaignsMissing = false;
-foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
-    if (!isset($settingsCampaigns[$campaignKey]) || !is_array($settingsCampaigns[$campaignKey])) {
-        $settingsCampaigns[$campaignKey] = $campaignDefault;
-        $campaignsMissing = true;
-    }
-}
-$campaignsHydrated = false;
-if ($campaignsMissing) {
-    $incoming = $seoGeneratorSettings;
-    unset($incoming['__raw_campaigns']);
-    $incoming['campaigns'] = $settingsCampaigns;
-    if (seo_gen_settings_save($DB, $incoming, (int)($adminpanelUser['id'] ?? 0))) {
-        $seoGeneratorSettings = seo_gen_settings_get($DB);
-        $seoGeneratorSettingsRaw = function_exists('seo_gen_settings_get_raw') ? seo_gen_settings_get_raw($DB) : [];
-        $seoGeneratorSettings['__raw_campaigns'] = is_array($seoGeneratorSettingsRaw['campaigns'] ?? null) ? $seoGeneratorSettingsRaw['campaigns'] : [];
-        $campaignsHydrated = true;
-    }
-}
 $scheduleDate = trim((string)($_GET['schedule_date'] ?? gmdate('Y-m-d')));
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $scheduleDate)) {
     $scheduleDate = gmdate('Y-m-d');
@@ -543,12 +519,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         $incoming['image_scenarios'] = admin_seo_gen_parse_image_scene_families(admin_seo_gen_post_string('image_scenarios'));
         $incoming['preview_image_prompt_template'] = admin_seo_gen_post_string('preview_image_prompt_template');
 
-        $campaignDefaults = function_exists('seo_gen_default_campaigns') ? seo_gen_default_campaigns() : [];
-        if (!isset($campaignDefaults['reviews']) || !is_array($campaignDefaults['reviews'])) {
-            $campaignDefaults['reviews'] = admin_seo_gen_reviews_campaign_fallback();
-        }
+        $rawCampaigns = is_array($seoGeneratorSettings['__raw_campaigns'] ?? null) ? $seoGeneratorSettings['__raw_campaigns'] : [];
+        $normalizedCampaigns = is_array($seoGeneratorSettings['campaigns'] ?? null) ? $seoGeneratorSettings['campaigns'] : [];
         $incomingCampaigns = [];
-        foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
+        foreach ($rawCampaigns as $campaignKey => $rawCampaign) {
+            $campaignDefault = is_array($normalizedCampaigns[$campaignKey] ?? null)
+                ? $normalizedCampaigns[$campaignKey]
+                : (is_array($rawCampaign) ? $rawCampaign : []);
             $prefix = 'campaign_' . $campaignKey . '_';
             $incomingCampaigns[$campaignKey] = [
                 'key' => $campaignKey,
