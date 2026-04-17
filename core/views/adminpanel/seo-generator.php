@@ -41,6 +41,29 @@
     $campaigns = function_exists('seo_gen_normalize_campaigns')
         ? seo_gen_normalize_campaigns((array)($s['campaigns'] ?? []))
         : [];
+    $campaignDefaults = function_exists('seo_gen_default_campaigns')
+        ? seo_gen_default_campaigns()
+        : [];
+    foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
+        if (!isset($campaigns[$campaignKey]) || !is_array($campaigns[$campaignKey])) {
+            $campaigns[$campaignKey] = $campaignDefault;
+        }
+    }
+    $campaignOrder = function_exists('seo_gen_allowed_campaign_keys')
+        ? seo_gen_allowed_campaign_keys()
+        : ['journal', 'playbooks', 'signals', 'reviews', 'fun'];
+    $orderedCampaigns = [];
+    foreach ($campaignOrder as $campaignKey) {
+        if (isset($campaigns[$campaignKey]) && is_array($campaigns[$campaignKey])) {
+            $orderedCampaigns[$campaignKey] = $campaigns[$campaignKey];
+        }
+    }
+    foreach ($campaigns as $campaignKey => $campaign) {
+        if (!isset($orderedCampaigns[$campaignKey]) && is_array($campaign)) {
+            $orderedCampaigns[$campaignKey] = $campaign;
+        }
+    }
+    $campaigns = $orderedCampaigns;
     ?>
     <style>
         .wiz-wrap .nav-link { border: 1px solid #e9ecef; margin-bottom: 8px; text-align: left; border-radius: 10px; }
