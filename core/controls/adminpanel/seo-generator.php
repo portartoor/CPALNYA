@@ -338,7 +338,17 @@ $settingsCampaigns = is_array($seoGeneratorSettings['campaigns'] ?? null) ? $seo
 $campaignsMissing = false;
 foreach ($campaignDefaults as $campaignKey => $campaignDefault) {
     if (!isset($settingsCampaigns[$campaignKey]) || !is_array($settingsCampaigns[$campaignKey])) {
+        $settingsCampaigns[$campaignKey] = $campaignDefault;
         $campaignsMissing = true;
+    }
+}
+$campaignsHydrated = false;
+if ($campaignsMissing) {
+    $incoming = $seoGeneratorSettings;
+    $incoming['campaigns'] = $settingsCampaigns;
+    if (seo_gen_settings_save($DB, $incoming, (int)($adminpanelUser['id'] ?? 0))) {
+        $seoGeneratorSettings = seo_gen_settings_get($DB);
+        $campaignsHydrated = true;
     }
 }
 $scheduleDate = trim((string)($_GET['schedule_date'] ?? gmdate('Y-m-d')));
