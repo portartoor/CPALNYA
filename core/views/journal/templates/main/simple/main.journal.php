@@ -573,7 +573,7 @@ if ($selected) {
 
             <?php if (!empty($relatedItems)): ?>
                 <section class="jrnl-related">
-                    <h2><?= htmlspecialchars($t('Р вЂќР В°Р В»РЎРЉРЎв‚¬Р Вµ Р С—Р С• РЎвЂљР ВµР СР Вµ', 'Continue reading'), ENT_QUOTES, 'UTF-8') ?></h2>
+                    <h2><?= htmlspecialchars($t("\u{041F}\u{043E}\u{0445}\u{043E}\u{0436}\u{0438}\u{0435} \u{0441}\u{0442}\u{0430}\u{0442}\u{044C}\u{0438}", 'Continue reading'), ENT_QUOTES, 'UTF-8') ?></h2>
                     <div class="jrnl-related-grid">
                         <?php foreach ($relatedItems as $item): ?>
                             <?php $cluster = trim((string)($item['cluster_code'] ?? '')); ?>
